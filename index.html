@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PulsePrep — Nursing Study & NCLEX Prep</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  >
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            medical: {
+              50: "#f0fdfa",
+              100: "#ccfbf1",
+              500: "#14b8a6",
+              600: "#0d9488",
+              700: "#0f766e",
+              800: "#115e59",
+              900: "#134e4a"
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body {
+      background: #f8fafc;
+    }
+
+    .tab {
+      display: none;
+    }
+
+    .tab.active {
+      display: block;
+    }
+
+    .premium-lock {
+      backdrop-filter: blur(5px);
+    }
+
+    .plan-card {
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .plan-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-slate-800">
+
+<!-- ================= HEADER ================= -->
+
+<header class="sticky top-0 z-50 bg-gradient-to-r from-medical-800 to-medical-600 text-white shadow-lg">
+
+  <div class="max-w-7xl mx-auto px-4">
+
+    <div class="h-16 flex items-center justify-between">
+
+      <div class="flex items-center gap-3">
+
+        <div class="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center">
+          <i class="fa-solid fa-user-nurse text-xl text-teal-200"></i>
+        </div>
+
+        <div>
+          <h1 class="font-bold text-lg">
+            PulsePrep
+          </h1>
+
+          <p class="text-xs text-teal-100">
+            Nursing Study & NCLEX Prep
+          </p>
+        </div>
+
+      </div>
+
+      <div class="hidden sm:flex items-center gap-2">
+
+        <span
+          id="membershipBadge"
+          class="px-3 py-1 rounded-full bg-white/10 text-xs font-semibold"
+        >
+          Free Student
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- ================= NAVIGATION ================= -->
+
+<nav class="bg-white border-b border-slate-200 sticky top-16 z-40">
+
+  <div class="max-w-7xl mx-auto px-3">
+
+    <div class="flex gap-1 overflow-x-auto py-2">
+
+      <button onclick="showTab('dashboard')" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+        <i class="fa-solid fa-chart-line mr-1"></i>
+        Dashboard
+      </button>
+
+      <button onclick="showTab('mcq')" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+        <i class="fa-solid fa-file-circle-question mr-1"></i>
+        NCLEX MCQs
+      </button>
+
+      <button onclick="showTab('anatomy')" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+        <i class="fa-solid fa-heart-pulse mr-1"></i>
+        Anatomy
+      </button>
+
+      <button onclick="showTab('calculator')" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+        <i class="fa-solid fa-calculator mr-1"></i>
+        Dosage
+      </button>
+
+      <button onclick="showTab('adpie')" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+        <i class="fa-solid fa-notes-medical mr-1"></i>
+        ADPIE
+      </button>
+
+      <button onclick="showTab('payment')" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
+        <i class="fa-solid fa-mobile-screen-button mr-1"></i>
+        Subscribe
+      </button>
+
+    </div>
+
+  </div>
+
+</nav>
+
+
+<!-- ================= MAIN ================= -->
+
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard" class="tab active">
+
+  <div class="rounded-3xl bg-gradient-to-r from-medical-800 to-teal-500 text-white p-6 sm:p-8 shadow-lg">
+
+    <span class="inline-block bg-white/10 px-3 py-1 rounded-full text-xs font-semibold">
+      Nursing Student Platform
+    </span>
+
+    <h2 class="text-3xl sm:text-4xl font-extrabold mt-3">
+      Study smarter. Prepare better.
+    </h2>
+
+    <p class="mt-3 max-w-2xl text-teal-50">
+      Practice nursing questions, review anatomy, calculate medication
+      dosages and master the ADPIE nursing process.
+    </p>
+
+    <div class="mt-6 flex flex-wrap gap-3">
+
+      <button
+        onclick="showTab('mcq')"
+        class="bg-white text-medical-800 px-5 py-3 rounded-xl font-bold"
+      >
+        <i class="fa-solid fa-play mr-2"></i>
+        Start MCQs
+      </button>
+
+      <button
+        onclick="showTab('payment')"
+        class="bg-white/10 border border-white/30 px-5 py-3 rounded-xl font-bold"
+      >
+        <i class="fa-solid fa-crown mr-2"></i>
+        Get Pro Access
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-200">
+      <i class="fa-solid fa-file-circle-check text-teal-600 text-xl"></i>
+      <p class="text-xs text-slate-500 mt-3">Questions</p>
+      <h3 class="text-2xl font-bold">500+</h3>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-200">
+      <i class="fa-solid fa-heart-pulse text-rose-500 text-xl"></i>
+      <p class="text-xs text-slate-500 mt-3">Anatomy</p>
+      <h3 class="text-2xl font-bold">Interactive</h3>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-200">
+      <i class="fa-solid fa-calculator text-blue-600 text-xl"></i>
+      <p class="text-xs text-slate-500 mt-3">Dosage</p>
+      <h3 class="text-2xl font-bold">Practice</h3>
+    </div>
+
+    <div class="bg-white rounded-2xl p-5 border border-slate-200">
+      <i class="fa-solid fa-graduation-cap text-purple-600 text-xl"></i>
+      <p class="text-xs text-slate-500 mt-3">NCLEX</p>
+      <h3 class="text-2xl font-bold">Prep</h3>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= MCQ ================= -->
+
+<section id="mcq" class="tab">
+
+  <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+
+    <div class="p-6 border-b border-slate-200">
+
+      <div class="flex justify-between items-start gap-4">
+
+        <div>
+          <h2 class="text-2xl font-bold">
+            NCLEX-RN Practice Questions
+          </h2>
+
+          <p class="text-sm text-slate-500 mt-1">
+            Test your clinical judgment.
+          </p>
+        </div>
+
+        <span class="bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-bold">
+          PRO
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- LOCK SCREEN -->
+
+    <div id="mcqLocked" class="p-8 text-center">
+
+      <div class="mx-auto w-16 h-16 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-2xl">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+
+      <h3 class="text-xl font-bold mt-4">
+        Premium Questions Locked
+      </h3>
+
+      <p class="text-sm text-slate-500 max-w-md mx-auto mt-2">
+        Subscribe to PulsePrep Pro to access the complete NCLEX question bank,
+        answers and rationales.
+      </p>
+
+      <button
+        onclick="showTab('payment')"
+        class="mt-5 bg-medical-600 hover:bg-medical-700 text-white px-6 py-3 rounded-xl font-bold"
+      >
+        <i class="fa-solid fa-crown mr-2"></i>
+        Unlock Questions
+      </button>
+
+    </div>
+
+
+    <!-- QUESTIONS -->
+
+    <div id="mcqContent" class="hidden p-6">
+
+      <div class="bg-slate-50 rounded-2xl p-6">
+
+        <span id="questionCategory"
+              class="text-xs font-bold text-teal-700 uppercase">
+          Pharmacology
+        </span>
+
+        <h3 id="questionText"
+            class="text-lg font-bold mt-3">
+          Loading question...
+        </h3>
+
+        <div id="questionOptions"
+             class="space-y-3 mt-6">
+        </div>
+
+        <div id="answerBox"
+             class="hidden mt-5 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+
+          <p class="font-bold text-emerald-800">
+            Correct Answer
+          </p>
+
+          <p id="answerText"
+             class="text-sm mt-1">
+          </p>
+
+        </div>
+
+      </div>
+
+      <button
+        onclick="loadNextQuestion()"
+        class="mt-5 bg-medical-600 text-white px-5 py-3 rounded-xl font-bold"
+      >
+        Next Question
+        <i class="fa-solid fa-arrow-right ml-2"></i>
+      </button>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= ANATOMY ================= -->
+
+<section id="anatomy" class="tab">
+
+  <div class="bg-white rounded-2xl border border-slate-200 p-6">
+
+    <h2 class="text-2xl font-bold">
+      <i class="fa-solid fa-heart-pulse text-rose-500 mr-2"></i>
+      Human Anatomy
+    </h2>
+
+    <p class="text-sm text-slate-500 mt-1">
+      Review important structures for nursing practice.
+    </p>
+
+    <div class="grid sm:grid-cols-2 gap-4 mt-6">
+
+      <div class="p-5 bg-rose-50 rounded-2xl border border-rose-100">
+        <i class="fa-solid fa-heart text-rose-500 text-3xl"></i>
+        <h3 class="font-bold mt-3">Cardiovascular System</h3>
+        <p class="text-sm text-slate-600 mt-2">
+          Review chambers, valves and circulation.
+        </p>
+      </div>
+
+      <div class="p-5 bg-blue-50 rounded-2xl border border-blue-100">
+        <i class="fa-solid fa-lungs text-blue-500 text-3xl"></i>
+        <h3 class="font-bold mt-3">Respiratory System</h3>
+        <p class="text-sm text-slate-600 mt-2">
+          Review lungs, airways and gas exchange.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= CALCULATOR ================= -->
+
+<section id="calculator" class="tab">
+
+  <div class="bg-white rounded-2xl border border-slate-200 p-6">
+
+    <h2 class="text-2xl font-bold">
+      <i class="fa-solid fa-calculator text-teal-600 mr-2"></i>
+      Dosage Calculator
+    </h2>
+
+    <p class="text-sm text-slate-500 mt-1">
+      Practice standard nursing dosage calculations.
+    </p>
+
+    <div class="grid sm:grid-cols-3 gap-4 mt-6">
+
+      <input
+        id="desired"
+        type="number"
+        placeholder="Desired dose"
+        class="p-3 border rounded-xl"
+      >
+
+      <input
+        id="available"
+        type="number"
+        placeholder="Available dose"
+        class="p-3 border rounded-xl"
+      >
+
+      <input
+        id="vehicle"
+        type="number"
+        value="1"
+        placeholder="Vehicle"
+        class="p-3 border rounded-xl"
+      >
+
+    </div>
+
+    <button
+      onclick="calculateDose()"
+      class="mt-4 w-full bg-medical-600 text-white py-3 rounded-xl font-bold"
+    >
+      Calculate
+    </button>
+
+    <div
+      id="doseResult"
+      class="hidden mt-5 p-5 bg-teal-50 rounded-xl text-center"
+    >
+      <p class="text-xs text-teal-700 font-bold uppercase">
+        Answer
+      </p>
+
+      <h3 id="doseAnswer"
+          class="text-2xl font-bold text-teal-900 mt-1">
+      </h3>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= ADPIE ================= -->
+
+<section id="adpie" class="tab">
+
+  <div class="bg-white rounded-2xl border border-slate-200 p-6">
+
+    <h2 class="text-2xl font-bold">
+      <i class="fa-solid fa-notes-medical text-teal-600 mr-2"></i>
+      ADPIE Simulator
+    </h2>
+
+    <p class="text-sm text-slate-500 mt-1">
+      Practice Assessment, Diagnosis, Planning, Implementation and Evaluation.
+    </p>
+
+    <div class="grid grid-cols-5 gap-2 mt-6">
+
+      <button onclick="adpie('Assessment')" class="p-2 bg-teal-600 text-white rounded-lg text-xs font-bold">
+        Assessment
+      </button>
+
+      <button onclick="adpie('Diagnosis')" class="p-2 bg-slate-100 rounded-lg text-xs font-bold">
+        Diagnosis
+      </button>
+
+      <button onclick="adpie('Planning')" class="p-2 bg-slate-100 rounded-lg text-xs font-bold">
+        Planning
+      </button>
+
+      <button onclick="adpie('Implementation')" class="p-2 bg-slate-100 rounded-lg text-xs font-bold">
+        Implementation
+      </button>
+
+      <button onclick="adpie('Evaluation')" class="p-2 bg-slate-100 rounded-lg text-xs font-bold">
+        Evaluation
+      </button>
+
+    </div>
+
+    <div id="adpieResult"
+         class="mt-5 p-5 bg-slate-50 rounded-xl">
+
+      <h3 class="font-bold">
+        Assessment
+      </h3>
+
+      <p class="text-sm text-slate-600 mt-2">
+        Collect subjective and objective information about the patient.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ================= PAYMENT ================= -->
+
+<section id="payment" class="tab">
+
+  <div class="text-center">
+
+    <span class="inline-block bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-bold">
+      PULSEPREP PRO
+    </span>
+
+    <h2 class="text-3xl font-extrabold mt-3">
+      Unlock Your Nursing Study Tools
+    </h2>
+
+    <p class="text-slate-500 mt-2">
+      Choose a subscription and pay securely with Mobile Money.
+    </p>
+
+  </div>
+
+
+  <div class="grid md:grid-cols-3 gap-5 mt-8">
+
+
+    <!-- MONTHLY -->
+
+    <div class="plan-card bg-white rounded-2xl border-2 border-teal-500 p-6 relative">
+
+      <span class="absolute top-4 right-4 bg-teal-100 text-teal-800 text-xs font-bold px-2 py-1 rounded-full">
+        POPULAR
+      </span>
+
+      <h3 class="font-bold text-lg">
+        Monthly NCLEX Pass
+      </h3>
+
+      <div class="mt-4">
+
+        <span class="text-4xl font-extrabold">
+          GHS 30
+        </span>
+
+        <span class="text-sm text-slate-500">
+          / month
+        </span>
+
+      </div>
+
+      <ul class="text-sm text-slate-600 mt-5 space-y-2">
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          NCLEX question bank
+        </li>
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          Answers & rationales
+        </li>
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          Anatomy resources
+        </li>
+
+      </ul>
+
+      <button
+        onclick="startPayment(30, 'Monthly NCLEX Pass')"
+        class="mt-6 w-full bg-teal-600 hover:bg-teal-700 text-white py-3 rounded-xl font-bold"
+      >
+        Pay GHS 30
+      </button>
+
+    </div>
+
+
+    <!-- 3 MONTHS -->
+
+    <div class="plan-card bg-white rounded-2xl border border-slate-200 p-6">
+
+      <h3 class="font-bold text-lg">
+        Semester Bundle
+      </h3>
+
+      <div class="mt-4">
+
+        <span class="text-4xl font-extrabold">
+          GHS 75
+        </span>
+
+        <span class="text-sm text-slate-500">
+          / 3 months
+        </span>
+
+      </div>
+
+      <ul class="text-sm text-slate-600 mt-5 space-y-2">
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          Full premium access
+        </li>
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          NCLEX question bank
+        </li>
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          Study tools
+        </li>
+
+      </ul>
+
+      <button
+        onclick="startPayment(75, 'Semester Bundle')"
+        class="mt-6 w-full bg-medical-600 text-white py-3 rounded-xl font-bold"
+      >
+        Pay GHS 75
+      </button>
+
+    </div>
+
+
+    <!-- ANNUAL -->
+
+    <div class="plan-card bg-white rounded-2xl border border-slate-200 p-6">
+
+      <h3 class="font-bold text-lg">
+        Nursing Mastery
+      </h3>
+
+      <div class="mt-4">
+
+        <span class="text-4xl font-extrabold">
+          GHS 120
+        </span>
+
+        <span class="text-sm text-slate-500">
+          / year
+        </span>
+
+      </div>
+
+      <ul class="text-sm text-slate-600 mt-5 space-y-2">
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          Full premium access
+        </li>
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          NCLEX practice
+        </li>
+
+        <li>
+          <i class="fa-solid fa-check text-emerald-500 mr-2"></i>
+          All study tools
+        </li>
+
+      </ul>
+
+      <button
+        onclick="startPayment(120, 'Annual Nursing Mastery')"
+        class="mt-6 w-full bg-medical-600 text-white py-3 rounded-xl font-bold"
+      >
+        Pay GHS 120
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div
+    id="paymentStatus"
+    class="hidden max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm"
+  ></div>
+
+
+  <div class="max-w-xl mx-auto mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+
+    <p class="text-xs text-amber-800">
+      <i class="fa-solid fa-shield-halved mr-1"></i>
+
+      Your payment will be processed securely. PulsePrep will only activate
+      premium access after the payment provider confirms the transaction.
+    </p>
+
+  </div>
+
+</section>
+
+</main>
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="mt-10 border-t bg-white">
+
+  <div class="max-w-7xl mx-auto px-4 py-6 text-center">
+
+    <h3 class="font-bold text-medical-800">
+      PulsePrep
+    </h3>
+
+    <p class="text-xs text-slate-500 mt-1">
+      Nursing Study & NCLEX Preparation Platform
+    </p>
+
+    <p class="text-xs text-slate-400 mt-3">
+      © 2026 PulsePrep. For educational purposes.
+    </p>
+
+  </div>
+
+</footer>
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+let premiumAccess = false;
+
+let currentQuestion = 0;
+
+
+/* ================= TAB SYSTEM ================= */
+
+function showTab(tabId) {
+
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.classList.remove("active");
+  });
+
+  const selected = document.getElementById(tabId);
+
+  if (selected) {
+    selected.classList.add("active");
+  }
+
+  if (tabId === "mcq") {
+    checkPremiumAccess();
+  }
+
+}
+
+
+/* ================= PREMIUM ACCESS ================= */
+
+function checkPremiumAccess() {
+
+  const locked = document.getElementById("mcqLocked");
+  const content = document.getElementById("mcqContent");
+
+  if (premiumAccess) {
+
+    locked.classList.add("hidden");
+    content.classList.remove("hidden");
+
+    loadQuestion();
+
+  } else {
+
+    locked.classList.remove("hidden");
+    content.classList.add("hidden");
+
+  }
+
+}
+
+
+/*
+  IMPORTANT:
+
+  This function intentionally does NOT unlock the account.
+
+  The real version will call our Netlify Function after
+  Paystack confirms payment.
+*/
+
+function unlockPremium() {
+
+  premiumAccess = true;
+
+  document.getElementById("membershipBadge").innerText =
+    "Pro Student";
+
+  checkPremiumAccess();
+
+}
+
+
+/* ================= PAYMENT ================= */
+
+async function startPayment(amount, plan) {
+
+  const status = document.getElementById("paymentStatus");
+
+  status.className =
+    "max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm bg-blue-50 border border-blue-200 text-blue-800";
+
+  status.innerHTML = `
+    <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+    Preparing secure payment for ${plan}...
+  `;
+
+  status.classList.remove("hidden");
+
+
+  try {
+
+    /*
+      This calls the Netlify server function.
+
+      We will create this function next.
+    */
+
+    const response = await fetch(
+      "/.netlify/functions/initialize-payment",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          amount: amount,
+          plan: plan
+        })
+      }
+    );
+
+
+    const data = await response.json();
+
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Unable to initialize payment."
+      );
+    }
+
+
+    if (!data.authorization_url) {
+      throw new Error(
+        "Payment gateway did not return a checkout URL."
+      );
+    }
+
+
+    window.location.href =
+      data.authorization_url;
+
+
+  } catch (error) {
+
+    status.className =
+      "max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm bg-red-50 border border-red-200 text-red-800";
+
+    status.innerHTML = `
+      <i class="fa-solid fa-circle-exclamation mr-2"></i>
+      ${escapeHTML(error.message)}
+    `;
+
+  }
+
+}
+
+
+/* ================= QUESTIONS ================= */
+
+/*
+  Questions will NOT contain the answer key in this
+  public HTML file.
+
+  The protected Netlify Function will provide them
+  only after premium access has been verified.
+*/
+
+async function loadQuestion() {
+
+  const questionText =
+    document.getElementById("questionText");
+
+  questionText.innerText =
+    "Loading premium question...";
+
+  try {
+
+    const response = await fetch(
+      "/.netlify/functions/get-questions"
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error || "Premium access required."
+      );
+    }
+
+    if (!data.questions || !data.questions.length) {
+      throw new Error(
+        "No questions are currently available."
+      );
+    }
+
+    const question =
+      data.questions[currentQuestion %
+      data.questions.length];
+
+    renderQuestion(question);
+
+  } catch (error) {
+
+    questionText.innerText =
+      error.message;
+
+  }
+
+}
+
+
+function renderQuestion(question) {
+
+  document.getElementById("questionCategory")
+    .innerText =
+    question.category || "Nursing";
+
+  document.getElementById("questionText")
+    .innerText =
+    question.question;
+
+  const container =
+    document.getElementById("questionOptions");
+
+  container.innerHTML = "";
+
+  question.options.forEach((option, index) => {
+
+    const button =
+      document.createElement("button");
+
+    button.className =
+      "w-full text-left p-4 rounded-xl border border-slate-200 bg-white hover:bg-teal-50 hover:border-teal-300 transition";
+
+    button.innerText =
+      `${String.fromCharCode(65 + index)}. ${option}`;
+
+    button.onclick = () => {
+
+      /*
+        The server response will eventually include
+        the information required to validate the answer.
+      */
+
+      showAnswer(question, index);
+
+    };
+
+    container.appendChild(button);
+
+  });
+
+}
+
+
+function showAnswer(question, selected) {
+
+  const answerBox =
+    document.getElementById("answerBox");
+
+  const answerText =
+    document.getElementById("answerText");
+
+  answerBox.classList.remove("hidden");
+
+  if (question.correctIndex === selected) {
+
+    answerText.innerText =
+      "Correct! " +
+      (question.rationale || "");
+
+  } else {
+
+    answerText.innerText =
+      "Incorrect. " +
+      (question.rationale || "");
+
+  }
+
+}
+
+
+function loadNextQuestion() {
+
+  currentQuestion++;
+
+  loadQuestion();
+
+}
+
+
+/* ================= DOSAGE ================= */
+
+function calculateDose() {
+
+  const desired =
+    parseFloat(
+      document.getElementById("desired").value
+    );
+
+  const available =
+    parseFloat(
+      document.getElementById("available").value
+    );
+
+  const vehicle =
+    parseFloat(
+      document.getElementById("vehicle").value
+    ) || 1;
+
+
+  if (
+    !Number.isFinite(desired) ||
+    !Number.isFinite(available) ||
+    available <= 0
+  ) {
+
+    alert(
+      "Please enter valid dosage values."
+    );
+
+    return;
+
+  }
+
+
+  const answer =
+    (desired / available) * vehicle;
+
+
+  document.getElementById("doseAnswer")
+    .innerText =
+    answer.toFixed(2) + " unit(s)";
+
+
+  document.getElementById("doseResult")
+    .classList.remove("hidden");
+
+}
+
+
+/* ================= ADPIE ================= */
+
+function adpie(step) {
+
+  const descriptions = {
+
+    Assessment:
+      "Collect subjective and objective information about the patient's condition.",
+
+    Diagnosis:
+      "Identify appropriate nursing diagnoses based on the assessment findings.",
+
+    Planning:
+      "Develop measurable goals and expected patient outcomes.",
+
+    Implementation:
+      "Carry out appropriate nursing interventions.",
+
+    Evaluation:
+      "Determine whether the patient's goals and expected outcomes were achieved."
+
+  };
+
+
+  document.getElementById("adpieResult")
+    .innerHTML = `
+      <h3 class="font-bold">
+        ${escapeHTML(step)}
+      </h3>
+
+      <p class="text-sm text-slate-600 mt-2">
+        ${escapeHTML(descriptions[step])}
+      </p>
+    `;
+
+}
+
+
+/* ================= SECURITY HELPER ================= */
+
+function escapeHTML(value) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    String(value);
+
+  return div.innerHTML;
+
+}
+
+
+/* ================= INITIALIZATION ================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    showTab("dashboard");
+
+  }
+);
+
+</script>
+
+</body>
+</html>
