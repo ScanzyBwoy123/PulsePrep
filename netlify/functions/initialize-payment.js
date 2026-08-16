@@ -13,6 +13,7 @@ exports.handler = async (event) => {
 
     const amount = Number(body.amount);
     const plan = String(body.plan || "");
+    const email = String(body.email || "").trim();
 
     if (!Number.isFinite(amount) || amount <= 0) {
       return {
@@ -28,6 +29,15 @@ exports.handler = async (event) => {
         statusCode: 400,
         body: JSON.stringify({
           error: "Payment plan is required."
+        })
+      };
+    }
+
+    if (!email || !email.includes("@")) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          error: "A valid email address is required."
         })
       };
     }
@@ -57,6 +67,7 @@ exports.handler = async (event) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+          email,
           amount: Math.round(amount * 100),
           currency: "GHS",
           reference,
@@ -86,10 +97,8 @@ exports.handler = async (event) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        authorization_url:
-          data.data.authorization_url,
-        reference:
-          data.data.reference
+        authorization_url: data.data.authorization_url,
+        reference: data.data.reference
       })
     };
 
