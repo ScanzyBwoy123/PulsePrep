@@ -14,7 +14,11 @@ exports.handler = async (event) => {
       };
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    const apiKey = process.env.OPENAI_API_KEY;
+
+    if (!apiKey) {
+      console.error("OPENAI_API_KEY is missing");
+
       return {
         statusCode: 500,
         headers: {
@@ -42,7 +46,7 @@ exports.handler = async (event) => {
       };
     }
 
-    const question = body.question || body.message || "";
+    const question = body.message || body.question || "";
 
     if (!question.trim()) {
       return {
@@ -57,7 +61,7 @@ exports.handler = async (event) => {
     }
 
     const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
+      apiKey: apiKey
     });
 
     const response = await client.responses.create({
@@ -67,18 +71,20 @@ exports.handler = async (event) => {
       input: question
     });
 
+    const answer = response.output_text || "";
+
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        answer: response.output_text
+        answer: answer
       })
     };
 
   } catch (error) {
-    console.error("Junior Dangote Pro AI error:", error);
+    console.error("Junior Dangote Pro AI ERROR:", error);
 
     return {
       statusCode: 500,
@@ -86,7 +92,9 @@ exports.handler = async (event) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        error: "Unable to connect to Junior Dangote Pro AI"
+        error:
+          error?.message ||
+          "OpenAI request failed"
       })
     };
   }
