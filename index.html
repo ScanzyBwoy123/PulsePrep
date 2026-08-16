@@ -2831,23 +2831,24 @@ const pharmacologyChapters = {
 };
 
 
-/* ---------- OPEN PHARMACOLOGY CHAPTER ----------
+/* ---------- OPEN PHARMACOLOGY CHAPTER --------
 function openPharmacologyChapter(chapterNumber) {
-
-  const chapter = pharmacologyChapters[chapterNumber];
-
-  if (!chapter) {
-    return;
-  }
 
   const content = document.getElementById("pharmacologyContent");
 
   if (!content) {
+    alert("Pharmacology content area not found.");
+    return;
+  }
+
+  const chapter = pharmacologyChapters[chapterNumber];
+
+  if (!chapter) {
+    alert("Chapter " + chapterNumber + " could not be found.");
     return;
   }
 
   content.innerHTML = `
-    
     ${chapter.content}
 
     <div class="mt-10 bg-teal-50 border border-teal-200 rounded-2xl p-5">
@@ -2858,12 +2859,11 @@ function openPharmacologyChapter(chapterNumber) {
 
       <p class="text-slate-600 mt-2">
         Need help understanding this chapter?
-        Ask Junior Dangote Pro.
       </p>
 
       <button
         type="button"
-        onclick="openJuniorDangoteAI('${chapter.title.replace(/'/g, "\\'")}')"
+        onclick="openJuniorDangoteAI()"
         class="mt-4 bg-teal-600 text-white px-5 py-3 rounded-xl font-bold"
       >
         Ask Junior Dangote Pro
@@ -2890,11 +2890,9 @@ function openPharmacologyChapter(chapterNumber) {
       </button>
 
     </div>
-
   `;
 
 }
-
 /* ---------- SEARCH CHAPTERS ---------- */
 
 function searchPharmacologyChapters() {
