@@ -1187,7 +1187,529 @@ function loadNextQuestion() {
   loadQuestion();
 
 }
+/* ================= EXAM MODE ================= */
 
+let examQuestions = [];
+let examIndex = 0;
+let examCorrect = 0;
+let examWrong = 0;
+let examUnanswered = 0;
+let examTimer = null;
+let examTimeLeft = 0;
+let examTotalTime = 0;
+let examAnswers = [];
+let examModeType = "";
+
+
+/* ---------- GET QUESTIONS ---------- */
+
+async function getExamQuestions(amount) {
+
+  const response = await fetch(
+    "/.netlify/functions/get-questions"
+  );
+
+  const data = await response.json();
+
+  if (!response.ok || !data.questions) {
+    throw new Error(
+      data.error || "Unable to load exam questions."
+    );
+  }
+
+  if (data.questions.length < amount) {
+    throw new Error(
+      `Only ${data.questions.length} questions are available. ${amount} are required for this exam.`
+    );
+  }
+
+  return [...data.questions]
+    .sort(() => Math.random() - 0.5)
+    .slice(0, amount);
+}
+
+
+/* ---------- START 30 QUESTION EXAM ---------- */
+
+async function start30QuestionExam() {
+
+  if (!premiumAccess) {
+    alert("Premium access is required for Exam Mode.");
+    return;
+  }
+
+  try {
+
+    examQuestions = await getExamQuestions(30);
+
+    examModeType = "perQuestion";
+
+    examIndex = 0;
+    examCorrect = 0;
+    examWrong = 0;
+    examUnanswered = 0;
+    examAnswers = [];
+
+    const choices =
+      document.getElementById("examChoices");
+
+    const screen =
+      document.getElementById("examScreen");
+
+    const results =
+      document.getElementById("examResults");
+
+    if (choices) {
+      choices.classList.add("hidden");
+    }
+
+    if (results) {
+      results.classList.add("hidden");
+    }
+
+    if (screen) {
+      screen.classList.remove("hidden");
+    }
+
+    startExamQuestion();
+
+  } catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+/* ---------- START 20 QUESTION / 10 MINUTE EXAM ---------- */
+
+async function start20QuestionExam() {
+
+  if (!premiumAccess) {
+    alert("Premium access is required for Exam Mode.");
+    return;
+  }
+
+  try {
+
+    examQuestions = await getExamQuestions(20);
+
+    examModeType = "totalTime";
+
+    examIndex = 0;
+    examCorrect = 0;
+    examWrong = 0;
+    examUnanswered = 0;
+    examAnswers = [];
+
+    const choices =
+      document.getElementById("examChoices");
+
+    const screen =
+      document.getElementById("examScreen");
+
+    const results =
+      document.getElementById("examResults");
+
+    if (choices) {
+      choices.classList.add("hidden");
+    }
+
+    if (results) {
+      results.classList.add("hidden");
+    }
+
+    if (screen) {
+      screen.classList.remove("hidden");
+    }
+
+    examTotalTime = 600;
+
+    updateTotalExamTimer();
+
+    displayExamQuestion();
+
+    clearInterval(examTimer);
+
+    examTimer = setInterval(() => {
+
+      examTotalTime--;
+
+      updateTotalExamTimer();
+
+      if (examTotalTime <= 0) {
+
+        clearInterval(examTimer);
+
+        while (
+          examIndex < examQuestions.length
+        ) {
+
+          examUnanswered++;
+
+          examAnswers.push({
+            question:
+              examQuestions[examIndex],
+            selected: null
+          });
+
+          examIndex++;
+
+        }
+
+        finishExam();
+
+      }
+
+    }, 1000);
+
+  } catch (error) {
+
+    alert(error.message);
+
+  }
+
+}
+
+
+/* ---------- START 20 SECOND QUESTION TIMER ---------- */
+
+function startExamQuestion() {
+
+  clearInterval(examTimer);
+
+  examTimeLeft = 20;
+
+  displayExamQuestion();
+
+  updateQuestionExamTimer();
+
+  examTimer = setInterval(() => {
+
+    examTimeLeft--;
+
+    updateQuestionExamTimer();
+
+    if (examTimeLeft <= 0) {
+
+      clearInterval(examTimer);
+
+      submitExamQuestion(null);
+
+    }
+
+  }, 1000);
+
+}
+
+
+/* ---------- DISPLAY EXAM QUESTION ---------- */
+
+function displayExamQuestion() {
+
+  const question =
+    examQuestions[examIndex];
+
+  if (!question) {
+
+    finishExam();
+
+    return;
+
+  }
+
+  const number =
+    document.getElementById(
+      "examQuestionNumber"
+    );
+
+  const category =
+    document.getElementById(
+      "examQuestionCategory"
+    );
+
+  const text =
+    document.getElementById(
+      "examQuestionText"
+    );
+
+  const options =
+    document.getElementById(
+      "examOptions"
+    );
+
+  if (number) {
+
+    number.innerText =
+      `Question ${examIndex + 1} of ${examQuestions.length}`;
+
+  }
+
+  if (category) {
+
+    category.innerText =
+      question.category || "Nursing";
+
+  }
+
+  if (text) {
+
+    text.innerText =
+      question.question ||
+      "Question unavailable.";
+
+  }
+
+  if (!options) return;
+
+  options.innerHTML = "";
+
+  let questionOptions =
+    question.options || [];
+
+  questionOptions.forEach(
+    (option, index) => {
+
+      const button =
+        document.createElement("button");
+
+      button.type = "button";
+
+      button.className =
+        "w-full text-left p-4 mb-3 rounded-xl border border-slate-200 bg-white hover:bg-teal-50 transition";
+
+      button.innerText =
+        `${String.fromCharCode(65 + index)}. ${option}`;
+
+      button.onclick = function () {
+
+        submitExamQuestion(index);
+
+      };
+
+      options.appendChild(button);
+
+    }
+  );
+
+}
+
+
+/* ---------- SUBMIT ANSWER ---------- */
+
+function submitExamQuestion(selected) {
+
+  if (
+    examIndex >= examQuestions.length
+  ) {
+    return;
+  }
+
+  clearInterval(examTimer);
+
+  const question =
+    examQuestions[examIndex];
+
+  const correctIndex =
+    Number(question.correctIndex);
+
+  if (selected === null) {
+
+    examUnanswered++;
+
+    examAnswers.push({
+      question: question,
+      selected: null
+    });
+
+  } else {
+
+    if (selected === correctIndex) {
+
+      examCorrect++;
+
+    } else {
+
+      examWrong++;
+
+    }
+
+    examAnswers.push({
+      question: question,
+      selected: selected
+    });
+
+  }
+
+  examIndex++;
+
+  if (
+    examIndex >= examQuestions.length
+  ) {
+
+    finishExam();
+
+    return;
+
+  }
+
+  if (
+    examModeType === "perQuestion"
+  ) {
+
+    startExamQuestion();
+
+  } else {
+
+    displayExamQuestion();
+
+  }
+
+}
+
+
+/* ---------- 20 SECOND TIMER DISPLAY ---------- */
+
+function updateQuestionExamTimer() {
+
+  const timer =
+    document.getElementById(
+      "examTimer"
+    );
+
+  if (!timer) return;
+
+  timer.innerText =
+    `00:${String(examTimeLeft).padStart(2, "0")}`;
+
+}
+
+
+/* ---------- 10 MINUTE TIMER DISPLAY ---------- */
+
+function updateTotalExamTimer() {
+
+  const timer =
+    document.getElementById(
+      "examTimer"
+    );
+
+  if (!timer) return;
+
+  const minutes =
+    Math.floor(examTotalTime / 60);
+
+  const seconds =
+    examTotalTime % 60;
+
+  timer.innerText =
+    `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+}
+
+
+/* ---------- FINISH EXAM ---------- */
+
+function finishExam() {
+
+  clearInterval(examTimer);
+
+  const screen =
+    document.getElementById(
+      "examScreen"
+    );
+
+  const choices =
+    document.getElementById(
+      "examChoices"
+    );
+
+  const results =
+    document.getElementById(
+      "examResults"
+    );
+
+  if (screen) {
+
+    screen.classList.add("hidden");
+
+  }
+
+  if (choices) {
+
+    choices.classList.add("hidden");
+
+  }
+
+  if (!results) return;
+
+  const total =
+    examQuestions.length;
+
+  const percentage =
+    total > 0
+      ? Math.round(
+          (examCorrect / total) * 100
+        )
+      : 0;
+
+  results.classList.remove("hidden");
+
+  results.innerHTML = `
+
+    <div class="bg-white rounded-2xl p-6 shadow">
+
+      <h2 class="text-2xl font-bold text-teal-700">
+        Exam Complete 🎉
+      </h2>
+
+      <p class="mt-3 text-lg">
+        Score:
+        <strong>
+          ${examCorrect}/${total}
+        </strong>
+      </p>
+
+      <p class="mt-2">
+        Percentage:
+        <strong>
+          ${percentage}%
+        </strong>
+      </p>
+
+      <div class="grid grid-cols-3 gap-3 mt-5 text-center">
+
+        <div class="bg-green-50 p-3 rounded-xl">
+          <strong>${examCorrect}</strong>
+          <p class="text-sm">Correct</p>
+        </div>
+
+        <div class="bg-red-50 p-3 rounded-xl">
+          <strong>${examWrong}</strong>
+          <p class="text-sm">Wrong</p>
+        </div>
+
+        <div class="bg-yellow-50 p-3 rounded-xl">
+          <strong>${examUnanswered}</strong>
+          <p class="text-sm">Unanswered</p>
+        </div>
+
+      </div>
+
+      <button
+        type="button"
+        onclick="location.reload()"
+        class="mt-6 w-full bg-teal-600 text-white py-3 rounded-xl font-bold"
+      >
+        Back to PulsePrep
+      </button>
+
+    </div>
+
+  `;
+
+}
 
 /* ================= DOSAGE ================= */
 
