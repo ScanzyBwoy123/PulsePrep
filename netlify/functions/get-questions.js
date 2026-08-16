@@ -344,13 +344,48 @@ exports.handler = async (event) => {
         ],
         correctIndex: 0,
         rationale: "Professional nursing practice requires safe, ethical, and accurate care."
+      },
+
+      {
+        category: "Pharmacology",
+        question: "A nurse is preparing to administer insulin to a client with diabetes. Which action is most important before giving the medication?",
+        options: [
+          "Verify the client's blood glucose level",
+          "Give the insulin without checking the prescription",
+          "Skip checking the client's identity",
+          "Administer the medication to another client"
+        ],
+        correctIndex: 0,
+        rationale: "Checking the client's blood glucose level helps the nurse determine the client's current status and safely administer insulin as prescribed."
+      },
+
+      {
+        category: "Medical-Surgical",
+        question: "A client reports sudden chest pain and difficulty breathing. What should the nurse do first?",
+        options: [
+          "Assess the client's airway, breathing, and circulation",
+          "Ask the client to walk around",
+          "Offer a large meal",
+          "Leave the client alone"
+        ],
+        correctIndex: 0,
+        rationale: "Airway, breathing, and circulation are immediate priorities when a client develops potentially life-threatening symptoms."
+      },
+
+      {
+        category: "Fundamentals",
+        question: "Which finding should the nurse report immediately after a surgical procedure?",
+        options: [
+          "Sudden decrease in level of consciousness",
+          "Mild incisional discomfort",
+          "Slight fatigue",
+          "Mild thirst"
+        ],
+        correctIndex: 0,
+        rationale: "A sudden change in level of consciousness can indicate serious complications and requires immediate assessment."
       }
     ];
 
-    /*
-      Randomize the question order each time
-      the function is requested.
-    */
     const shuffledQuestions = [...questions].sort(
       () => Math.random() - 0.5
     );
