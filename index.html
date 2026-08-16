@@ -743,7 +743,7 @@
 
 <script>
 
-let premiumAccess = false;
+let premiumAccess = localStorage.getItem("pulseprep_pro") === "true";
 
 let currentQuestion = 0;
 
@@ -881,7 +881,8 @@ async function startPayment(amount, plan) {
       );
     }
 
-    window.location.href = data.authorization_url;
+    window.location.href =
+  data.authorization_url;
 
   } catch (error) {
 
@@ -1138,9 +1139,72 @@ function escapeHTML(value) {
 
 document.addEventListener(
   "DOMContentLoaded",
-  () => {
+  async () => {
 
     showTab("dashboard");
+
+    const params =
+      new URLSearchParams(window.location.search);
+
+    const reference =
+      params.get("reference") ||
+      params.get("trxref");
+
+    if (!reference) {
+      return;
+    }
+
+    try {
+
+      const response = await fetch(
+        `/.netlify/functions/verify-payment?reference=${encodeURIComponent(reference)}`
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.error || "Payment could not be verified."
+        );
+      }
+
+      localStorage.setItem(
+        "pulseprep_pro",
+        "true"
+      );
+
+      premiumAccess = true;
+
+      document.getElementById(
+        "membershipBadge"
+      ).innerText = "Pro Student";
+
+      alert(
+        "Payment verified successfully! Your PulsePrep Pro access is now active."
+      );
+
+      showTab("mcq");
+
+      checkPremiumAccess();
+
+      window.history.replaceState(
+        {},
+        document.title,
+        window.location.pathname
+      );
+
+    } catch (error) {
+
+      console.error(
+        "Payment verification error:",
+        error
+      );
+
+      alert(
+        "We could not verify your payment yet. Please contact support if money was deducted."
+      );
+
+    }
 
   }
 );
