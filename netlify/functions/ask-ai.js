@@ -1,5 +1,3 @@
-const OpenAI = require("openai");
-
 exports.handler = async (event) => {
   try {
     if (event.httpMethod !== "POST") {
@@ -14,18 +12,16 @@ exports.handler = async (event) => {
       };
     }
 
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
-      console.error("OPENAI_API_KEY is missing");
-
       return {
         statusCode: 500,
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: "OPENAI_API_KEY is not configured"
+          error: "GEMINI_API_KEY is not configured"
         })
       };
     }
@@ -60,18 +56,58 @@ exports.handler = async (event) => {
       };
     }
 
-    const client = new OpenAI({
-      apiKey: apiKey
-    });
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey
+        },
+        body: JSON.stringify({
+          systemInstruction: {
+            parts: [
+              {
+                text:
+                  "You are Junior Dangote Pro AI, a helpful nursing study tutor for PulsePrep. Give clear, accurate educational explanations suitable for nursing students. Do not diagnose patients or replace professional medical care."
+              }
+            ]
+          },
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: question
+                }
+              ]
+            }
+          ]
+        })
+      }
+    );
 
-    const response = await client.responses.create({
-      model: "gpt-4o-mini",
-      instructions:
-        "You are Junior Dangote Pro AI, a helpful nursing study tutor for PulsePrep. Give clear, accurate educational explanations suitable for nursing students. Do not diagnose patients or replace professional medical care.",
-      input: question
-    });
+    const data = await response.json();
 
-    const answer = response.output_text || "";
+    if (!response.ok) {
+      console.error("Gemini API error:", data);
+
+      return {
+        statusCode: response.status,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          error:
+            data?.error?.message ||
+            "Gemini API request failed"
+        })
+      };
+    }
+
+    const answer =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "I couldn't generate an answer.";
 
     return {
       statusCode: 200,
@@ -79,12 +115,12 @@ exports.handler = async (event) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        answer: answer
+        answer
       })
     };
 
   } catch (error) {
-    console.error("Junior Dangote Pro AI ERROR:", error);
+    console.error("Junior Dangote Pro Gemini error:", error);
 
     return {
       statusCode: 500,
@@ -92,9 +128,7 @@ exports.handler = async (event) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        error:
-          error?.message ||
-          "OpenAI request failed"
+        error: error.message || "Gemini request failed"
       })
     };
   }
