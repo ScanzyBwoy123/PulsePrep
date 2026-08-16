@@ -67,16 +67,15 @@ exports.handler = async (event) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          email,
-          amount: Math.round(amount * 100),
-          currency: "GHS",
-          reference,
-          metadata: {
-            plan
-          }
-        })
-      }
-    );
+  email,
+  amount: Math.round(amount * 100),
+  currency: "GHS",
+  reference,
+  callback_url: "https://palseprep1.netlify.app/",
+  metadata: {
+    plan
+  }
+})
 
     const data = await response.json();
 
