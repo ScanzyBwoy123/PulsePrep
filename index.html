@@ -2929,12 +2929,247 @@ function searchPharmacologyChapters() {
 
 /* ---------- AI BUTTON PLACEHOLDER ---------- */
 
-function openJuniorDangoteAI(topic) {
+function openJuniorDangoteAI(topic = "Nursing") {
 
-  alert(
-    `Junior Dangote Pro AI is ready for "${topic}". We will connect the AI tutor next.`
+  const existing = document.getElementById("juniorDangoteAI");
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const aiBox = document.createElement("div");
+
+  aiBox.id = "juniorDangoteAI";
+
+  aiBox.className =
+    "fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4";
+
+  aiBox.innerHTML = `
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden">
+
+      <div class="bg-teal-700 text-white p-5 flex justify-between items-center">
+
+        <div>
+          <h2 class="text-xl font-bold">
+            🤖 Junior Dangote Pro AI
+          </h2>
+
+          <p class="text-sm opacity-90 mt-1">
+            PulsePrep Nursing AI Tutor
+          </p>
+        </div>
+
+        <button
+          type="button"
+          id="closeJuniorAI"
+          class="text-white text-2xl font-bold"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <div
+        id="juniorAIConversation"
+        class="p-5 h-80 overflow-y-auto bg-slate-50"
+      >
+
+        <div class="bg-white rounded-xl p-4 shadow-sm">
+          <p class="font-bold text-teal-700">
+            Junior Dangote Pro
+          </p>
+
+          <p class="mt-2 text-slate-600">
+            Hi! 👋 I'm your PulsePrep nursing tutor.
+            Ask me anything about <strong>${topic}</strong>.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="p-4 border-t">
+
+        <textarea
+          id="juniorAIInput"
+          rows="3"
+          placeholder="Ask Junior Dangote Pro a nursing question..."
+          class="w-full border border-slate-300 rounded-xl p-3 resize-none outline-none focus:ring-2 focus:ring-teal-500"
+        ></textarea>
+
+        <button
+          type="button"
+          id="juniorAISend"
+          class="mt-3 w-full bg-teal-600 text-white py-3 rounded-xl font-bold"
+        >
+          🤖 Ask Junior Dangote Pro
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(aiBox);
+
+  document
+    .getElementById("closeJuniorAI")
+    .onclick = () => aiBox.remove();
+
+  const input =
+    document.getElementById("juniorAIInput");
+
+  const sendButton =
+    document.getElementById("juniorAISend");
+
+  const conversation =
+    document.getElementById("juniorAIConversation");
+
+  async function askAI() {
+
+    const message = input.value.trim();
+
+    if (!message) {
+      return;
+    }
+
+    input.value = "";
+
+    conversation.innerHTML += `
+      <div class="mt-4 bg-teal-100 rounded-xl p-4">
+        <p class="font-bold text-teal-800">You</p>
+        <p class="mt-1 text-slate-700">${message}</p>
+      </div>
+    `;
+
+    conversation.innerHTML += `
+      <div id="aiThinking" class="mt-4 bg-white rounded-xl p-4 shadow-sm">
+        <p class="font-bold text-teal-700">
+          Junior Dangote Pro
+        </p>
+
+        <p class="mt-1 text-slate-500">
+          Thinking... 🤔
+        </p>
+      </div>
+    `;
+
+    conversation.scrollTop =
+      conversation.scrollHeight;
+
+    sendButton.disabled = true;
+    sendButton.textContent = "Thinking...";
+
+    try {
+
+      const response = await fetch(
+        "/.netlify/functions/ask-ai",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            message:
+              `The student is studying ${topic}. ${message}`
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      const thinking =
+        document.getElementById("aiThinking");
+
+      if (thinking) {
+        thinking.remove();
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "AI request failed."
+        );
+      }
+
+      const answer =
+        data.answer ||
+        "I couldn't generate an answer.";
+
+      conversation.innerHTML += `
+        <div class="mt-4 bg-white rounded-xl p-4 shadow-sm">
+
+          <p class="font-bold text-teal-700">
+            Junior Dangote Pro
+          </p>
+
+          <p class="mt-2 text-slate-700 whitespace-pre-wrap">
+            ${answer}
+          </p>
+
+        </div>
+      `;
+
+    } catch (error) {
+
+      const thinking =
+        document.getElementById("aiThinking");
+
+      if (thinking) {
+        thinking.remove();
+      }
+
+      conversation.innerHTML += `
+        <div class="mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
+
+          <p class="font-bold text-red-700">
+            Connection Error
+          </p>
+
+          <p class="mt-1 text-red-600">
+            Unable to connect to Junior Dangote Pro AI.
+            Please try again.
+          </p>
+
+        </div>
+      `;
+
+      console.error(
+        "Junior Dangote Pro:",
+        error
+      );
+
+    } finally {
+
+      sendButton.disabled = false;
+      sendButton.textContent =
+        "🤖 Ask Junior Dangote Pro";
+
+      conversation.scrollTop =
+        conversation.scrollHeight;
+    }
+  }
+
+  sendButton.onclick = askAI;
+
+  input.addEventListener(
+    "keydown",
+    function (event) {
+
+      if (
+        event.key === "Enter" &&
+        !event.shiftKey
+      ) {
+
+        event.preventDefault();
+
+        askAI();
+      }
+
+    }
   );
 
+  input.focus();
 }
 
 
