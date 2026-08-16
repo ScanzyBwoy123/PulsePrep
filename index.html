@@ -2831,28 +2831,23 @@ const pharmacologyChapters = {
 };
 
 
-/* ---------- OPEN PHARMACOLOGY CHAPTER ---------- */
-
+/* ---------- OPEN PHARMACOLOGY CHAPTER ----------
 function openPharmacologyChapter(chapterNumber) {
 
-  const chapter =
-    pharmacologyChapters[chapterNumber];
+  const chapter = pharmacologyChapters[chapterNumber];
 
   if (!chapter) {
     return;
   }
 
-  const content =
-    document.getElementById(
-      "pharmacologyContent"
-    );
+  const content = document.getElementById("pharmacologyContent");
 
   if (!content) {
     return;
   }
 
   content.innerHTML = `
-
+    
     ${chapter.content}
 
     <div class="mt-10 bg-teal-50 border border-teal-200 rounded-2xl p-5">
@@ -2898,15 +2893,7 @@ function openPharmacologyChapter(chapterNumber) {
 
   `;
 
-  document
-    .getElementById("pharmacologyContent")
-    .scrollIntoView({
-      behavior: "smooth",
-      block: "start"
-    });
-
 }
-
 
 /* ---------- SEARCH CHAPTERS ---------- */
 
