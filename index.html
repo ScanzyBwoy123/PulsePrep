@@ -870,6 +870,436 @@
   </div>
 
 </section>
+  <!-- ================= PHARMACOLOGY TEXTBOOK ================= -->
+
+<section
+  id="pharmacologyTextbook"
+  class="max-w-6xl mx-auto px-4 py-8"
+>
+
+  <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+
+    <!-- HEADER -->
+
+    <div class="bg-teal-700 text-white p-6">
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <div>
+
+          <p class="text-sm font-semibold uppercase tracking-wide opacity-90">
+            PulsePrep Pro Textbook
+          </p>
+
+          <h2 class="text-3xl font-bold mt-1">
+            📚 Pharmacology
+          </h2>
+
+          <p class="mt-2 opacity-90">
+            Comprehensive nursing pharmacology study guide
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          onclick="document.getElementById('pharmacologyTextbook').scrollIntoView({behavior:'smooth'})"
+          class="bg-white text-teal-700 px-5 py-3 rounded-xl font-bold"
+        >
+          Start Studying
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- SEARCH -->
+
+    <div class="p-5 border-b">
+
+      <input
+        id="pharmacologySearch"
+        type="text"
+        placeholder="Search Pharmacology chapters..."
+        oninput="searchPharmacologyChapters()"
+        class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-teal-500"
+      >
+
+    </div>
+
+
+    <div class="grid lg:grid-cols-4">
+
+
+      <!-- CHAPTER LIST -->
+
+      <aside
+        class="lg:col-span-1 border-r bg-slate-50 p-4"
+      >
+
+        <h3 class="font-bold text-lg mb-4">
+          📖 Chapters
+        </h3>
+
+        <div
+          id="pharmacologyChapterList"
+          class="space-y-2"
+        >
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(1)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            1. Introduction to Pharmacology
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(2)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            2. Drug Sources and Development
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(3)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            3. Drug Names and Classifications
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(4)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            4. Medication Forms
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(5)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            5. Routes of Administration
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(6)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            6. Pharmacokinetics
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(7)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            7. Pharmacodynamics
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(8)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            8. Drug-Receptor Interactions
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(9)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            9. Half-Life and Steady State
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(10)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            10. Therapeutic Index
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(11)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            11. Drug Interactions
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(12)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            12. Adverse Drug Reactions
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(13)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            13. Contraindications and Precautions
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(14)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            14. Medication Safety
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(15)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            15. Medication Administration
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(16)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            16. Dosage and Drug Calculations
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(17)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            17. Antimicrobial Drugs
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(18)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            18. Cardiovascular Drugs
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(19)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            19. Respiratory Drugs
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(20)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            20. Endocrine Drugs
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(21)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            21. Central Nervous System Drugs
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(22)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            22. Psychiatric Medications
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(23)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            23. Gastrointestinal Drugs
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(24)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            24. Musculoskeletal Drugs
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(25)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            25. Obstetric and Gynecologic Drugs
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(26)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            26. Pediatric Pharmacology
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(27)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            27. Emergency Medications
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(28)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            28. High-Alert Medications
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(29)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            29. Nursing Responsibilities
+          </button>
+
+          <button
+            type="button"
+            onclick="openPharmacologyChapter(30)"
+            class="pharm-chapter w-full text-left p-3 rounded-lg hover:bg-teal-100"
+          >
+            30. NCLEX Pharmacology Review
+          </button>
+
+        </div>
+
+      </aside>
+
+
+      <!-- TEXTBOOK CONTENT -->
+
+      <div class="lg:col-span-3 p-6">
+
+        <article id="pharmacologyContent">
+
+          <h2 class="text-3xl font-bold text-slate-800">
+            Introduction to Pharmacology
+          </h2>
+
+          <p class="mt-4 text-slate-600 leading-7">
+            Pharmacology is the scientific study of drugs and their
+            interactions with living organisms. Nursing pharmacology
+            focuses on understanding how medications work, why they are
+            prescribed, how they are administered safely, and how clients
+            should be monitored for therapeutic effects and adverse reactions.
+          </p>
+
+
+          <h3 class="text-xl font-bold mt-8">
+            Learning Objectives
+          </h3>
+
+          <ul class="list-disc ml-6 mt-3 space-y-2 text-slate-600">
+
+            <li>Define pharmacology and related terminology.</li>
+
+            <li>Explain how medications affect the human body.</li>
+
+            <li>Describe important principles of medication safety.</li>
+
+            <li>Recognize common adverse drug reactions.</li>
+
+            <li>Understand the nurse's responsibilities when administering medications.</li>
+
+          </ul>
+
+
+          <h3 class="text-xl font-bold mt-8">
+            Why Pharmacology Matters in Nursing
+          </h3>
+
+          <p class="mt-3 text-slate-600 leading-7">
+            Nurses administer medications, monitor therapeutic responses,
+            identify adverse effects, educate clients, and communicate
+            important medication-related information to the healthcare team.
+            A strong understanding of pharmacology therefore contributes
+            directly to safe patient care.
+          </p>
+
+
+          <!-- AI ASSISTANCE -->
+
+          <div class="mt-10 bg-teal-50 border border-teal-200 rounded-2xl p-5">
+
+            <h3 class="text-xl font-bold text-teal-800">
+              🤖 Junior Dangote Pro AI
+            </h3>
+
+            <p class="text-slate-600 mt-2">
+              Need help understanding this chapter?
+              Ask Junior Dangote Pro.
+            </p>
+
+            <button
+              type="button"
+              onclick="openJuniorDangoteAI('Pharmacology')"
+              class="mt-4 bg-teal-600 text-white px-5 py-3 rounded-xl font-bold"
+            >
+              Ask Junior Dangote Pro
+            </button>
+
+          </div>
+
+
+          <!-- CHAPTER QUIZ -->
+
+          <div class="mt-8 bg-slate-50 rounded-2xl p-5">
+
+            <h3 class="text-xl font-bold">
+              📝 Practice This Chapter
+            </h3>
+
+            <p class="text-slate-600 mt-2">
+              Test your understanding with nursing questions.
+            </p>
+
+            <button
+              type="button"
+              onclick="startPharmacologyQuiz()"
+              class="mt-4 bg-indigo-600 text-white px-5 py-3 rounded-xl font-bold"
+            >
+              Start Practice Questions
+            </button>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+<!-- ================= END PHARMACOLOGY TEXTBOOK ================= -->
 </main>
 
 
@@ -1710,7 +2140,844 @@ function finishExam() {
   `;
 
 }
+/* ================= PHARMACOLOGY TEXTBOOK ================= */
 
+const pharmacologyChapters = {
+
+  1: {
+    title: "Introduction to Pharmacology",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Introduction to Pharmacology
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Pharmacology is the scientific study of drugs and their effects
+        on living organisms. In nursing, pharmacology provides the
+        foundation for safe medication administration, patient education,
+        monitoring, and recognition of therapeutic and adverse effects.
+      </p>
+
+      <h3 class="text-xl font-bold mt-8">
+        Important Terms
+      </h3>
+
+      <ul class="list-disc ml-6 mt-3 space-y-2 text-slate-600">
+        <li><strong>Drug:</strong> A substance used to diagnose, prevent, treat, or manage a health condition.</li>
+        <li><strong>Pharmacology:</strong> The study of drugs and their effects.</li>
+        <li><strong>Pharmacokinetics:</strong> What the body does to a drug.</li>
+        <li><strong>Pharmacodynamics:</strong> What a drug does to the body.</li>
+        <li><strong>Therapeutic effect:</strong> The intended beneficial effect of a medication.</li>
+        <li><strong>Adverse effect:</strong> An unwanted or harmful response to a medication.</li>
+      </ul>
+
+      <h3 class="text-xl font-bold mt-8">
+        Importance to Nursing
+      </h3>
+
+      <p class="mt-3 text-slate-600 leading-7">
+        Nurses are responsible for safely administering medications,
+        assessing patients before and after administration, monitoring
+        therapeutic responses, recognizing adverse reactions, providing
+        patient education, and reporting significant findings.
+      </p>
+    `
+  },
+
+  2: {
+    title: "Drug Sources and Development",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Drug Sources and Development
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Medications may originate from natural sources or be produced
+        through chemical and biological processes.
+      </p>
+
+      <h3 class="text-xl font-bold mt-8">
+        Common Drug Sources
+      </h3>
+
+      <ul class="list-disc ml-6 mt-3 space-y-2 text-slate-600">
+        <li>Plants</li>
+        <li>Animals</li>
+        <li>Minerals</li>
+        <li>Microorganisms</li>
+        <li>Synthetic chemical processes</li>
+        <li>Biotechnology and biological products</li>
+      </ul>
+
+      <h3 class="text-xl font-bold mt-8">
+        Drug Development
+      </h3>
+
+      <p class="mt-3 text-slate-600 leading-7">
+        Before a new medication becomes widely available, it generally
+        undergoes laboratory research and clinical evaluation to determine
+        its safety, effectiveness, appropriate dosing, and potential risks.
+      </p>
+    `
+  },
+
+  3: {
+    title: "Drug Names and Classifications",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Drug Names and Classifications
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Medications may have several names, including a chemical name,
+        generic name, and brand or trade name.
+      </p>
+
+      <h3 class="text-xl font-bold mt-8">
+        Generic and Brand Names
+      </h3>
+
+      <p class="mt-3 text-slate-600 leading-7">
+        The generic name is the standardized name of a medication, while
+        the brand name is the name given by a manufacturer for marketing.
+        Nurses should become familiar with both names used in clinical care.
+      </p>
+
+      <h3 class="text-xl font-bold mt-8">
+        Drug Classification
+      </h3>
+
+      <p class="mt-3 text-slate-600 leading-7">
+        Drugs may be classified according to their therapeutic use,
+        pharmacologic action, chemical characteristics, or body system
+        affected.
+      </p>
+    `
+  },
+
+  4: {
+    title: "Medication Forms",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Medication Forms
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Medications are prepared in different dosage forms to allow
+        appropriate administration and absorption.
+      </p>
+
+      <ul class="list-disc ml-6 mt-4 space-y-2 text-slate-600">
+        <li>Tablets</li>
+        <li>Capsules</li>
+        <li>Solutions</li>
+        <li>Suspensions</li>
+        <li>Creams and ointments</li>
+        <li>Inhaled preparations</li>
+        <li>Injectable preparations</li>
+        <li>Transdermal patches</li>
+      </ul>
+    `
+  },
+
+  5: {
+    title: "Routes of Administration",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Routes of Administration
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        The route through which a medication is administered affects how
+        quickly and how completely the drug reaches its site of action.
+      </p>
+
+      <h3 class="text-xl font-bold mt-8">
+        Common Routes
+      </h3>
+
+      <ul class="list-disc ml-6 mt-3 space-y-2 text-slate-600">
+        <li>Oral</li>
+        <li>Intravenous</li>
+        <li>Intramuscular</li>
+        <li>Subcutaneous</li>
+        <li>Intradermal</li>
+        <li>Topical</li>
+        <li>Inhalation</li>
+        <li>Rectal</li>
+        <li>Ophthalmic</li>
+        <li>Otic</li>
+        <li>Sublingual</li>
+      </ul>
+    `
+  },
+
+  6: {
+    title: "Pharmacokinetics",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Pharmacokinetics
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Pharmacokinetics describes what the body does to a medication.
+        The major processes are commonly remembered as ADME.
+      </p>
+
+      <div class="mt-6 grid gap-4">
+        <div class="p-4 bg-teal-50 rounded-xl">
+          <strong>Absorption:</strong>
+          Movement of a drug from its site of administration into the bloodstream.
+        </div>
+
+        <div class="p-4 bg-teal-50 rounded-xl">
+          <strong>Distribution:</strong>
+          Movement of the drug throughout body tissues and fluids.
+        </div>
+
+        <div class="p-4 bg-teal-50 rounded-xl">
+          <strong>Metabolism:</strong>
+          Chemical modification of drugs, often occurring in the liver.
+        </div>
+
+        <div class="p-4 bg-teal-50 rounded-xl">
+          <strong>Excretion:</strong>
+          Removal of drugs or their metabolites from the body.
+        </div>
+      </div>
+    `
+  },
+
+  7: {
+    title: "Pharmacodynamics",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Pharmacodynamics
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Pharmacodynamics describes what a medication does to the body.
+        It includes the effects of drugs on receptors, cells, tissues,
+        organs, and physiological processes.
+      </p>
+
+      <h3 class="text-xl font-bold mt-8">
+        Therapeutic Effects
+      </h3>
+
+      <p class="mt-3 text-slate-600 leading-7">
+        The therapeutic effect is the intended clinical effect of a
+        medication. Nurses monitor patients to determine whether the
+        desired response is occurring.
+      </p>
+    `
+  },
+
+  8: {
+    title: "Drug-Receptor Interactions",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Drug-Receptor Interactions
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Many medications produce their effects by interacting with
+        specific receptors on or inside cells.
+      </p>
+
+      <ul class="list-disc ml-6 mt-4 space-y-2 text-slate-600">
+        <li><strong>Agonist:</strong> Activates a receptor to produce a response.</li>
+        <li><strong>Antagonist:</strong> Blocks or reduces receptor activity.</li>
+      </ul>
+    `
+  },
+
+  9: {
+    title: "Half-Life and Steady State",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Half-Life and Steady State
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        A medication's half-life is the time required for the amount of
+        drug in the body to decrease by approximately one-half.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Half-life helps clinicians understand dosing intervals and how
+        long a medication may remain in the body.
+      </p>
+    `
+  },
+
+  10: {
+    title: "Therapeutic Index",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Therapeutic Index
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        The therapeutic index describes the relationship between doses
+        that produce desired effects and doses associated with toxicity.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Medications with a narrow therapeutic range require careful
+        monitoring because relatively small changes in drug concentration
+        may increase the risk of toxicity.
+      </p>
+    `
+  },
+
+  11: {
+    title: "Drug Interactions",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Drug Interactions
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Drug interactions occur when one medication, food, supplement,
+        or substance changes the effect of another medication.
+      </p>
+
+      <h3 class="text-xl font-bold mt-8">
+        Nursing Responsibilities
+      </h3>
+
+      <ul class="list-disc ml-6 mt-3 space-y-2 text-slate-600">
+        <li>Review the medication history.</li>
+        <li>Check for known interactions.</li>
+        <li>Monitor for unexpected effects.</li>
+        <li>Educate the client about important precautions.</li>
+      </ul>
+    `
+  },
+
+  12: {
+    title: "Adverse Drug Reactions",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Adverse Drug Reactions
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        An adverse drug reaction is an unwanted or harmful response
+        associated with medication use.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Nurses should monitor patients for changes in vital signs,
+        neurological status, respiratory status, allergic reactions,
+        laboratory abnormalities, and other clinically significant findings.
+      </p>
+    `
+  },
+
+  13: {
+    title: "Contraindications and Precautions",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Contraindications and Precautions
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        A contraindication is a situation in which a medication should
+        generally not be used because the potential harm may outweigh
+        the expected benefit.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Precautions identify circumstances where additional assessment
+        or monitoring may be necessary.
+      </p>
+    `
+  },
+
+  14: {
+    title: "Medication Safety",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Medication Safety
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Medication safety is a major nursing responsibility. Nurses should
+        verify the medication order, identify the correct client, check
+        allergies, calculate doses accurately, and monitor the response.
+      </p>
+
+      <h3 class="text-xl font-bold mt-8">
+        Common Safety Checks
+      </h3>
+
+      <ul class="list-disc ml-6 mt-3 space-y-2 text-slate-600">
+        <li>Right patient</li>
+        <li>Right medication</li>
+        <li>Right dose</li>
+        <li>Right route</li>
+        <li>Right time</li>
+        <li>Right documentation</li>
+        <li>Right assessment</li>
+        <li>Right education</li>
+      </ul>
+    `
+  },
+
+  15: {
+    title: "Medication Administration",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Medication Administration
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Safe medication administration requires assessment, preparation,
+        administration, documentation, and evaluation.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        The nurse should verify the medication order and patient identity,
+        assess relevant clinical information, administer the medication
+        using the appropriate route, document appropriately, and evaluate
+        the patient's response.
+      </p>
+    `
+  },
+
+  16: {
+    title: "Dosage and Drug Calculations",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Dosage and Drug Calculations
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Accurate medication calculations are essential for patient safety.
+        Nurses may need to calculate tablet doses, liquid volumes,
+        infusion rates, weight-based doses, and other medication quantities.
+      </p>
+
+      <div class="mt-6 p-5 bg-indigo-50 rounded-xl">
+        <strong>Basic Formula:</strong>
+
+        <p class="mt-2">
+          Desired dose ÷ Dose available × Quantity = Amount to administer
+        </p>
+      </div>
+    `
+  },
+
+  17: {
+    title: "Antimicrobial Drugs",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Antimicrobial Drugs
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Antimicrobial medications are used against infectious organisms.
+        Different agents target different microorganisms.
+      </p>
+
+      <ul class="list-disc ml-6 mt-4 space-y-2 text-slate-600">
+        <li>Antibacterial agents</li>
+        <li>Antiviral agents</li>
+        <li>Antifungal agents</li>
+        <li>Antiparasitic agents</li>
+      </ul>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Nurses should monitor therapeutic response, adverse effects,
+        allergies, and appropriate use of antimicrobial therapy.
+      </p>
+    `
+  },
+
+  18: {
+    title: "Cardiovascular Drugs",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Cardiovascular Drugs
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Cardiovascular medications are used to manage conditions such as
+        hypertension, heart failure, dysrhythmias, angina, and thrombotic
+        disorders.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Nurses frequently monitor blood pressure, heart rate, rhythm,
+        fluid balance, laboratory results, and symptoms related to
+        cardiovascular function.
+      </p>
+    `
+  },
+
+  19: {
+    title: "Respiratory Drugs",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Respiratory Drugs
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Respiratory medications are used to manage conditions affecting
+        airflow, inflammation, infection, and airway secretions.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Nurses should monitor respiratory rate, oxygen saturation,
+        breath sounds, work of breathing, and therapeutic response.
+      </p>
+    `
+  },
+
+  20: {
+    title: "Endocrine Drugs",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Endocrine Drugs
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Endocrine medications affect hormones and metabolic processes.
+        Important examples include medications used to manage diabetes,
+        thyroid disorders, and other endocrine conditions.
+      </p>
+    `
+  },
+
+  21: {
+    title: "Central Nervous System Drugs",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Central Nervous System Drugs
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        CNS medications affect brain and spinal cord activity and may be
+        used for pain, seizures, sleep disorders, movement disorders,
+        and other neurological conditions.
+      </p>
+    `
+  },
+
+  22: {
+    title: "Psychiatric Medications",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Psychiatric Medications
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Psychiatric medications are used to manage conditions such as
+        depression, anxiety disorders, bipolar disorder, psychotic
+        disorders, and other mental health conditions.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Nurses should monitor therapeutic response, adherence, adverse
+        effects, safety, and significant changes in mental status.
+      </p>
+    `
+  },
+
+  23: {
+    title: "Gastrointestinal Drugs",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Gastrointestinal Drugs
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Gastrointestinal medications may be used to manage nausea,
+        vomiting, acid-related disorders, constipation, diarrhea,
+        and other gastrointestinal conditions.
+      </p>
+    `
+  },
+
+  24: {
+    title: "Musculoskeletal Drugs",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Musculoskeletal Drugs
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Medications affecting the musculoskeletal system may be used
+        for pain, inflammation, muscle spasms, and bone-related disorders.
+      </p>
+    `
+  },
+
+  25: {
+    title: "Obstetric and Gynecologic Drugs",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Obstetric and Gynecologic Drugs
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Medications in obstetric and gynecologic care require careful
+        consideration of pregnancy status, fetal effects, maternal
+        condition, breastfeeding, and clinical indication.
+      </p>
+    `
+  },
+
+  26: {
+    title: "Pediatric Pharmacology",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Pediatric Pharmacology
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Pediatric medication administration requires special attention
+        because children differ from adults in body size, development,
+        metabolism, and medication response.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Weight-based calculations and careful verification are especially
+        important in pediatric medication safety.
+      </p>
+    `
+  },
+
+  27: {
+    title: "Emergency Medications",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Emergency Medications
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Emergency medications are used when rapid intervention is needed
+        to support airway, breathing, circulation, neurological function,
+        or other life-threatening conditions.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Nurses must understand indications, dosing, routes, monitoring,
+        and potential adverse effects according to clinical protocols.
+      </p>
+    `
+  },
+
+  28: {
+    title: "High-Alert Medications",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        High-Alert Medications
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        High-alert medications can cause significant harm if used
+        incorrectly. Examples include certain anticoagulants, insulin,
+        opioids, and concentrated electrolytes.
+      </p>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        These medications often require additional verification,
+        accurate calculations, and careful monitoring.
+      </p>
+    `
+  },
+
+  29: {
+    title: "Nursing Responsibilities",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        Nursing Responsibilities
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        Medication administration is more than simply giving a drug.
+        Nurses assess the patient, verify orders, administer medications
+        safely, monitor outcomes, educate patients, document care, and
+        communicate clinically significant findings.
+      </p>
+    `
+  },
+
+  30: {
+    title: "NCLEX Pharmacology Review",
+    content: `
+      <h2 class="text-3xl font-bold text-slate-800">
+        NCLEX Pharmacology Review
+      </h2>
+
+      <p class="mt-4 text-slate-600 leading-7">
+        NCLEX pharmacology questions commonly test medication safety,
+        adverse effects, contraindications, therapeutic effects,
+        patient education, prioritization, and nursing assessment.
+      </p>
+
+      <div class="mt-6 p-5 bg-yellow-50 rounded-xl">
+        <strong>NCLEX Tip:</strong>
+        Always consider patient safety first. When a medication question
+        presents an unexpected assessment finding, determine whether it
+        represents a potentially serious adverse effect or toxicity.
+      </div>
+    `
+  }
+
+};
+
+
+/* ---------- OPEN PHARMACOLOGY CHAPTER ---------- */
+
+function openPharmacologyChapter(chapterNumber) {
+
+  const chapter =
+    pharmacologyChapters[chapterNumber];
+
+  if (!chapter) {
+    return;
+  }
+
+  const content =
+    document.getElementById(
+      "pharmacologyContent"
+    );
+
+  if (!content) {
+    return;
+  }
+
+  content.innerHTML = `
+
+    ${chapter.content}
+
+    <div class="mt-10 bg-teal-50 border border-teal-200 rounded-2xl p-5">
+
+      <h3 class="text-xl font-bold text-teal-800">
+        🤖 Junior Dangote Pro AI
+      </h3>
+
+      <p class="text-slate-600 mt-2">
+        Need help understanding this chapter?
+        Ask Junior Dangote Pro.
+      </p>
+
+      <button
+        type="button"
+        onclick="openJuniorDangoteAI('${chapter.title.replace(/'/g, "\\'")}')"
+        class="mt-4 bg-teal-600 text-white px-5 py-3 rounded-xl font-bold"
+      >
+        Ask Junior Dangote Pro
+      </button>
+
+    </div>
+
+    <div class="mt-8 bg-slate-50 rounded-2xl p-5">
+
+      <h3 class="text-xl font-bold">
+        📝 Practice This Chapter
+      </h3>
+
+      <p class="text-slate-600 mt-2">
+        Test your understanding with nursing questions.
+      </p>
+
+      <button
+        type="button"
+        onclick="startPharmacologyQuiz()"
+        class="mt-4 bg-indigo-600 text-white px-5 py-3 rounded-xl font-bold"
+      >
+        Start Practice Questions
+      </button>
+
+    </div>
+
+  `;
+
+  document
+    .getElementById("pharmacologyContent")
+    .scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+
+}
+
+
+/* ---------- SEARCH CHAPTERS ---------- */
+
+function searchPharmacologyChapters() {
+
+  const input =
+    document.getElementById(
+      "pharmacologySearch"
+    );
+
+  const search =
+    (input?.value || "")
+      .toLowerCase()
+      .trim();
+
+  const buttons =
+    document.querySelectorAll(
+      ".pharm-chapter"
+    );
+
+  buttons.forEach(button => {
+
+    const text =
+      button.innerText.toLowerCase();
+
+    button.style.display =
+      !search || text.includes(search)
+        ? ""
+        : "none";
+
+  });
+
+}
+
+
+/* ---------- AI BUTTON PLACEHOLDER ---------- */
+
+function openJuniorDangoteAI(topic) {
+
+  alert(
+    `Junior Dangote Pro AI is ready for "${topic}". We will connect the AI tutor next.`
+  );
+
+}
+
+
+/* ---------- PRACTICE BUTTON ---------- */
+
+function startPharmacologyQuiz() {
+
+  if (typeof loadQuestion === "function") {
+
+    loadQuestion();
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+    return;
+
+  }
+
+  alert(
+    "Practice questions are currently unavailable."
+  );
+
+}
+
+
+/* ================= END PHARMACOLOGY TEXTBOOK ================= */
 /* ================= DOSAGE ================= */
 
 function calculateDose() {
