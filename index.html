@@ -162,7 +162,185 @@
 <!-- ================= MAIN ================= -->
 
 <main class="max-w-7xl mx-auto px-4 py-6">
+<!-- ================= STUDENT ACCOUNT ================= -->
 
+<section id="account" class="tab">
+
+  <div class="max-w-2xl mx-auto">
+
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-medical-800 to-medical-600 p-8 text-white">
+
+        <div class="flex items-center gap-4">
+
+          <div class="w-14 h-14 rounded-2xl bg-white/15 flex items-center justify-center">
+            <i class="fa-solid fa-user-graduate text-2xl"></i>
+          </div>
+
+          <div>
+            <h2 class="text-2xl font-extrabold">
+              PulsePrep Student Account
+            </h2>
+
+            <p class="text-teal-100 text-sm mt-1">
+              Your learning journey starts here.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- Logged Out -->
+      <div id="authLoggedOut" class="p-6 sm:p-8">
+
+        <div class="flex gap-2 mb-6">
+
+          <button
+            id="loginModeBtn"
+            onclick="showAuthMode('login')"
+            class="flex-1 py-3 rounded-xl bg-medical-600 text-white font-bold"
+          >
+            Login
+          </button>
+
+          <button
+            id="signupModeBtn"
+            onclick="showAuthMode('signup')"
+            class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-bold"
+          >
+            Create Account
+          </button>
+
+        </div>
+
+
+        <div id="authMessage"
+             class="hidden mb-4 p-4 rounded-xl text-sm">
+        </div>
+
+
+        <label class="block text-sm font-semibold mb-2">
+          Email address
+        </label>
+
+        <input
+          id="authEmail"
+          type="email"
+          autocomplete="email"
+          placeholder="student@example.com"
+          class="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
+        >
+
+
+        <label class="block text-sm font-semibold mt-5 mb-2">
+          Password
+        </label>
+
+        <input
+          id="authPassword"
+          type="password"
+          autocomplete="current-password"
+          placeholder="Minimum 6 characters"
+          class="w-full p-4 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-teal-500"
+        >
+
+
+        <button
+          id="authSubmitBtn"
+          onclick="handleAuthSubmit()"
+          class="w-full mt-6 py-4 rounded-xl bg-medical-600 hover:bg-medical-700 text-white font-bold shadow-lg"
+        >
+          Login to PulsePrep
+        </button>
+
+      </div>
+
+
+      <!-- Logged In -->
+      <div id="authLoggedIn" class="hidden p-6 sm:p-8">
+
+        <div class="p-5 rounded-2xl bg-teal-50 border border-teal-100">
+
+          <div class="flex items-center gap-4">
+
+            <div class="w-12 h-12 rounded-full bg-teal-600 text-white flex items-center justify-center">
+              <i class="fa-solid fa-user"></i>
+            </div>
+
+            <div class="min-w-0">
+
+              <p class="text-xs text-slate-500">
+                Signed in as
+              </p>
+
+              <p
+                id="studentEmail"
+                class="font-bold text-slate-800 truncate"
+              >
+                Student
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="grid sm:grid-cols-2 gap-4 mt-5">
+
+          <div class="p-5 rounded-2xl border border-slate-200">
+
+            <i class="fa-solid fa-book-open text-teal-600 text-xl"></i>
+
+            <p class="text-sm text-slate-500 mt-3">
+              Learning
+            </p>
+
+            <p class="font-bold">
+              20 Nursing Subjects
+            </p>
+
+          </div>
+
+
+          <div class="p-5 rounded-2xl border border-slate-200">
+
+            <i class="fa-solid fa-crown text-amber-500 text-xl"></i>
+
+            <p class="text-sm text-slate-500 mt-3">
+              Membership
+            </p>
+
+            <p id="accountMembership"
+               class="font-bold">
+              Free Student
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <button
+          onclick="pulsePrepLogout()"
+          class="w-full mt-6 py-3 rounded-xl border border-red-200 text-red-600 font-bold hover:bg-red-50"
+        >
+          <i class="fa-solid fa-right-from-bracket mr-2"></i>
+          Logout
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
 <!-- ================= DASHBOARD ================= -->
 
@@ -3518,6 +3696,154 @@ document.addEventListener(
   }
 
 })();
+</script>
+  <script>
+let pulsePrepAuthMode = "login";
+
+function showAuthMode(mode) {
+
+  pulsePrepAuthMode = mode;
+
+  const loginBtn = document.getElementById("loginModeBtn");
+  const signupBtn = document.getElementById("signupModeBtn");
+  const submitBtn = document.getElementById("authSubmitBtn");
+
+  if (mode === "login") {
+
+    loginBtn.className =
+      "flex-1 py-3 rounded-xl bg-medical-600 text-white font-bold";
+
+    signupBtn.className =
+      "flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-bold";
+
+    submitBtn.textContent = "Login to PulsePrep";
+
+  } else {
+
+    signupBtn.className =
+      "flex-1 py-3 rounded-xl bg-medical-600 text-white font-bold";
+
+    loginBtn.className =
+      "flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 font-bold";
+
+    submitBtn.textContent = "Create Student Account";
+  }
+}
+
+
+async function handleAuthSubmit() {
+
+  const email =
+    document.getElementById("authEmail").value.trim();
+
+  const password =
+    document.getElementById("authPassword").value;
+
+  const message =
+    document.getElementById("authMessage");
+
+  if (!email || !password) {
+
+    showAuthMessage(
+      "Please enter your email and password.",
+      "error"
+    );
+
+    return;
+  }
+
+  const button =
+    document.getElementById("authSubmitBtn");
+
+  button.disabled = true;
+  button.textContent = "Please wait...";
+
+  try {
+
+    if (pulsePrepAuthMode === "signup") {
+
+      await pulsePrepSignUp(email, password);
+
+      showAuthMessage(
+        "Account created successfully. Check your email if confirmation is required.",
+        "success"
+      );
+
+    } else {
+
+      await pulsePrepLogin(email, password);
+
+      showAuthMessage(
+        "Welcome back to PulsePrep!",
+        "success"
+      );
+    }
+
+  } catch (error) {
+
+    console.error(error);
+
+    showAuthMessage(
+      error.message || "Authentication failed.",
+      "error"
+    );
+
+  } finally {
+
+    button.disabled = false;
+
+    button.textContent =
+      pulsePrepAuthMode === "login"
+        ? "Login to PulsePrep"
+        : "Create Student Account";
+  }
+}
+
+
+function showAuthMessage(text, type) {
+
+  const box =
+    document.getElementById("authMessage");
+
+  box.textContent = text;
+
+  box.className =
+    "mb-4 p-4 rounded-xl text-sm " +
+    (
+      type === "success"
+        ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+        : "bg-red-50 text-red-700 border border-red-200"
+    );
+}
+
+
+async function refreshPulsePrepAccountUI(session) {
+
+  const loggedOut =
+    document.getElementById("authLoggedOut");
+
+  const loggedIn =
+    document.getElementById("authLoggedIn");
+
+  const emailElement =
+    document.getElementById("studentEmail");
+
+  if (!loggedOut || !loggedIn) return;
+
+  if (session?.user) {
+
+    loggedOut.classList.add("hidden");
+    loggedIn.classList.remove("hidden");
+
+    emailElement.textContent =
+      session.user.email || "Student";
+
+  } else {
+
+    loggedIn.classList.add("hidden");
+    loggedOut.classList.remove("hidden");
+  }
+}
 </script>
 </body>
 </html>
