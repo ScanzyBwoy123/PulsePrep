@@ -9,23 +9,27 @@ exports.handler = async (event) => {
       };
     }
 
-    const reference = event.queryStringParameters?.reference;
+    const reference =
+      event.queryStringParameters?.reference;
 
     if (!reference) {
       return {
         statusCode: 400,
         body: JSON.stringify({
+          success: false,
           error: "Payment reference is required."
         })
       };
     }
 
-    const secretKey = process.env.PAYSTACK_API_KEY;
+    const secretKey =
+      process.env.PAYSTACK_API_KEY;
 
     if (!secretKey) {
       return {
         statusCode: 500,
         body: JSON.stringify({
+          success: false,
           error: "Paystack API key is not configured."
         })
       };
@@ -61,21 +65,39 @@ exports.handler = async (event) => {
     const successful =
       transaction.status === "success";
 
+    if (!successful) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          success: false,
+          reference: transaction.reference,
+          message: "Payment was not successful."
+        })
+      };
+    }
+
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        success: successful,
+        success: true,
         reference: transaction.reference,
         amount: transaction.amount,
         currency: transaction.currency,
-        plan: transaction.metadata?.plan || null
+        email: transaction.customer?.email || null,
+        plan:
+          transaction.metadata?.plan || null,
+        paidAt:
+          transaction.paid_at || null
       })
     };
 
   } catch (error) {
+
+    console.error("Payment verification error:", error);
+
     return {
       statusCode: 500,
       body: JSON.stringify({
