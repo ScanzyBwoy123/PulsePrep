@@ -3376,6 +3376,114 @@ document.addEventListener(
 );
 
 </script>
+<script>
+/* =========================================================
+   PULSEPREP — PAYSTACK PAYMENT VERIFICATION
+   ========================================================= */
 
+(async function verifyPaystackPayment() {
+
+  const params = new URLSearchParams(window.location.search);
+  const reference = params.get("reference");
+
+  // Nothing to verify
+  if (!reference) {
+    return;
+  }
+
+  try {
+
+    console.log("Verifying Paystack payment:", reference);
+
+    const response = await fetch(
+      "/.netlify/functions/verify-payment?reference=" +
+      encodeURIComponent(reference)
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+
+      console.error(
+        "Payment verification failed:",
+        data.error || "Payment was not successful."
+      );
+
+      alert(
+        "Payment could not be verified. Please contact PulsePrep support."
+      );
+
+      return;
+    }
+
+    /*
+      Payment successfully verified by Paystack.
+    */
+
+    localStorage.setItem(
+      "pulseprep_pro",
+      "true"
+    );
+
+    localStorage.setItem(
+      "pulseprep_payment_reference",
+      data.reference
+    );
+
+    localStorage.setItem(
+      "pulseprep_pro_plan",
+      data.plan || ""
+    );
+
+    localStorage.setItem(
+      "pulseprep_payment_date",
+      data.paidAt || new Date().toISOString()
+    );
+
+    console.log(
+      "PulsePrep Pro activated successfully."
+    );
+
+    alert(
+      "🎉 Payment successful! PulsePrep Pro has been activated."
+    );
+
+    /*
+      Remove the Paystack reference from the URL
+      so refreshing the page doesn't repeatedly verify it.
+    */
+
+    const cleanURL =
+      window.location.origin +
+      window.location.pathname;
+
+    window.history.replaceState(
+      {},
+      document.title,
+      cleanURL
+    );
+
+    /*
+      Reload so the existing PulsePrep interface
+      recognizes the newly verified Pro status.
+    */
+
+    window.location.reload();
+
+  } catch (error) {
+
+    console.error(
+      "Payment verification error:",
+      error
+    );
+
+    alert(
+      "We couldn't verify your payment right now. Please try again."
+    );
+
+  }
+
+})();
+</script>
 </body>
 </html>
