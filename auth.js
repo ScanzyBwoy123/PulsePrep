@@ -167,3 +167,50 @@ window.pulsePrepSignUp = pulsePrepSignUp;
 window.pulsePrepLogin = pulsePrepLogin;
 window.pulsePrepLogout = pulsePrepLogout;
 window.getPulsePrepUser = getPulsePrepUser;
+// ============================================================
+// PREMIUM STATUS
+// ============================================================
+
+async function checkPulsePrepPremium() {
+
+  if (!window.pulseprepSupabase) {
+    return {
+      authenticated: false,
+      premium: false
+    };
+  }
+
+  const {
+    data: { session }
+  } = await window.pulseprepSupabase.auth.getSession();
+
+  if (!session) {
+    return {
+      authenticated: false,
+      premium: false
+    };
+  }
+
+  const response = await fetch(
+    "/.netlify/functions/check-premium",
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      "Unable to verify Premium status."
+    );
+  }
+
+  return await response.json();
+}
+
+
+// Make it available to PulsePrep
+window.checkPulsePrepPremium =
+  checkPulsePrepPremium;
