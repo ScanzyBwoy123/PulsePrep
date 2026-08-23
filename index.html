@@ -152,7 +152,13 @@
         <i class="fa-solid fa-mobile-screen-button mr-1"></i>
         Subscribe
       </button>
-
+<button
+  onclick="showTab('subjects')"
+  class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap"
+>
+  <i class="fa-solid fa-book-open mr-1"></i>
+  Subjects
+</button>
     </div>
 
   </div>
@@ -347,7 +353,84 @@
   </div>
 
 </section>
+<!-- ================= SUBJECT LIBRARY ================= -->
 
+<section id="subjects" class="tab">
+
+  <div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- Premium Header -->
+    <div class="mb-8">
+
+      <div class="inline-flex items-center gap-2
+                  px-3 py-1 rounded-full
+                  bg-amber-50 text-amber-700
+                  text-xs font-extrabold uppercase">
+
+        <i class="fa-solid fa-crown"></i>
+        Premium Learning Library
+
+      </div>
+
+      <h1 class="text-3xl sm:text-4xl font-black
+                 text-slate-900 mt-3">
+
+        Nursing Subjects
+
+      </h1>
+
+      <p class="text-slate-500 mt-2 max-w-2xl">
+
+        Master essential nursing subjects through
+        structured lessons, clinical notes and
+        practice questions.
+
+      </p>
+
+    </div>
+
+
+    <!-- Search -->
+    <div class="mb-7 max-w-xl">
+
+      <div class="relative">
+
+        <i class="fa-solid fa-magnifying-glass
+                  absolute left-4 top-1/2
+                  -translate-y-1/2
+                  text-slate-400"></i>
+
+        <input
+          id="subjectSearch"
+          type="search"
+          placeholder="Search nursing subjects..."
+          oninput="filterPulsePrepSubjects(this.value)"
+          class="w-full pl-11 pr-4 py-4
+                 rounded-2xl
+                 border border-slate-200
+                 bg-white
+                 outline-none
+                 focus:ring-2 focus:ring-teal-500"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- 20 Subjects -->
+    <div
+      id="pulseprepSubjectGrid"
+      class="grid grid-cols-1
+             sm:grid-cols-2
+             lg:grid-cols-3
+             xl:grid-cols-4
+             gap-5"
+    ></div>
+
+  </div>
+
+</section>
 <!-- ================= DASHBOARD ================= -->
 
 <section id="dashboard" class="tab active">
@@ -3890,6 +3973,94 @@ try {
     loggedIn.classList.add("hidden");
     loggedOut.classList.remove("hidden");
   }
+}
+</script>
+  <script src="subjects-page.js"></script>
+  <script>
+function filterPulsePrepSubjects(searchTerm) {
+
+  const grid =
+    document.getElementById("pulseprepSubjectGrid");
+
+  if (!grid) return;
+
+  const query =
+    String(searchTerm || "").trim().toLowerCase();
+
+  const subjects =
+    window.PULSEPREP_SUBJECTS || [];
+
+  const filtered =
+    subjects.filter(subject =>
+      subject.name.toLowerCase().includes(query) ||
+      subject.description.toLowerCase().includes(query)
+    );
+
+  if (!filtered.length) {
+
+    grid.innerHTML = `
+      <div class="col-span-full text-center p-12
+                  bg-white rounded-3xl
+                  border border-slate-200">
+
+        <i class="fa-solid fa-magnifying-glass
+                  text-3xl text-slate-300"></i>
+
+        <p class="font-bold text-slate-700 mt-4">
+          No subjects found
+        </p>
+
+        <p class="text-sm text-slate-500 mt-1">
+          Try another search.
+        </p>
+
+      </div>
+    `;
+
+    return;
+  }
+
+  const originalSubjects =
+    window.PULSEPREP_SUBJECTS;
+
+  window.PULSEPREP_SUBJECTS =
+    filtered;
+
+  if (typeof window.renderPulsePrepSubjects === "function") {
+    window.renderPulsePrepSubjects();
+  }
+
+  window.PULSEPREP_SUBJECTS =
+    originalSubjects;
+}
+
+
+// Render subjects whenever the Subjects tab opens.
+const pulsePrepOriginalShowTab =
+  window.showTab;
+
+if (typeof pulsePrepOriginalShowTab === "function") {
+
+  window.showTab = function(tabName) {
+
+    pulsePrepOriginalShowTab(tabName);
+
+    if (tabName === "subjects") {
+
+      setTimeout(function() {
+
+        if (
+          typeof window.renderPulsePrepSubjects === "function"
+        ) {
+          window.renderPulsePrepSubjects();
+        }
+
+      }, 100);
+
+    }
+
+  };
+
 }
 </script>
 </body>
