@@ -3843,7 +3843,48 @@ async function refreshPulsePrepAccountUI(session) {
 
     emailElement.textContent =
       session.user.email || "Student";
+try {
 
+  const premiumStatus =
+    await checkPulsePrepPremium();
+
+  const membership =
+    document.getElementById("accountMembership");
+
+  const badge =
+    document.getElementById("membershipBadge");
+
+  if (premiumStatus.premium) {
+
+    if (membership) {
+      membership.textContent = "Premium Student 👑";
+    }
+
+    if (badge) {
+      badge.textContent = "Premium Student 👑";
+      badge.className =
+        "px-3 py-1 rounded-full bg-amber-400/20 text-xs font-semibold";
+    }
+
+  } else {
+
+    if (membership) {
+      membership.textContent = "Free Student";
+    }
+
+    if (badge) {
+      badge.textContent = "Free Student";
+    }
+  }
+
+} catch (error) {
+
+  console.error(
+    "Premium status check failed:",
+    error
+  );
+
+}
   } else {
 
     loggedIn.classList.add("hidden");
