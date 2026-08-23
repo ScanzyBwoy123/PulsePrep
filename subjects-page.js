@@ -133,7 +133,7 @@
 
             <!-- Open button -->
             <button
-              onclick="openPulsePrepSubject('${escapeHTML(subject.id)}')"
+             onclick="openPulsePrepSubjectPage('${escapeHTML(subject.id)}')" 
               class="w-full mt-6
                      py-3
                      rounded-xl
