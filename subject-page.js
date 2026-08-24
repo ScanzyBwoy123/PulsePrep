@@ -56,7 +56,7 @@
 
           <!-- Back -->
           <button
-            onclick="showTab('subjects')"
+            onclick="showTab('subject-library')"
             class="mb-6 px-4 py-2 rounded-xl
                    bg-white border border-slate-200
                    text-slate-700 font-bold
