@@ -50,17 +50,17 @@
   }
 
   window.openPulsePrepSubject = function (subjectId) {
-    const subject = window.PULSEPREP_SUBJECTS.find(function (item) {
-      return item.id === subjectId;
-    });
+  const subject = window.PULSEPREP_SUBJECTS.find(function (item) {
+    return item.id === subjectId;
+  });
 
-    if (!subject) return;
+  if (!subject) return;
 
-    alert(
-      subject.name +
-      "\\n\\nSubject content will be added to PulsePrep."
-    );
-  };
+  alert(
+    subject.name +
+    "\n\nSubject content will be added to PulsePrep."
+  );
+};
 
   function initializeSubjects() {
     if (window.PULSEPREP_SUBJECTS) {
