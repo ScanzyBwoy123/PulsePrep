@@ -5,8 +5,11 @@
 (function () {
   "use strict";
 
-  const subjects =
-    window.PULSEPREP_SUBJECTS || [];
+  function getSubjects() {
+  return Array.isArray(window.PULSEPREP_SUBJECTS)
+    ? window.PULSEPREP_SUBJECTS
+    : [];
+}
 
   function escapeHTML(value) {
     return String(value || "")
@@ -24,7 +27,7 @@
 
     if (!container) return;
 
-    if (!subjects.length) {
+    if (!getSubjects().length) {
       container.innerHTML = `
         <div class="col-span-full text-center p-10">
           <p class="text-slate-500">
@@ -35,7 +38,7 @@
       return;
     }
 
-    container.innerHTML = subjects.map((subject, index) => {
+    container.innerHTML = getSubjects().map((subject, index) => {
 
       const name =
         escapeHTML(subject.name);
@@ -164,7 +167,7 @@
     function (subjectId) {
 
       const subject =
-        subjects.find(
+        getSubjects().find(
           item => item.id === subjectId
         );
 
