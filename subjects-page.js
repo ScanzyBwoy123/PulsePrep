@@ -198,7 +198,19 @@
   // INITIALIZE
   // ==========================================================
 
-  window.renderPulsePrepSubjects =
+ window.renderPulsePrepSubjects =
     renderSubjects;
+
+  // Render the subject cards when the page is ready
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      function () {
+        renderSubjects();
+      }
+    );
+  } else {
+    renderSubjects();
+  }
 
 })();
