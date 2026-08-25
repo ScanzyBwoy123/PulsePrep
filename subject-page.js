@@ -321,7 +321,7 @@
         </div>
       `;
             if (typeof window.showTab === "function") {
-        window.showTab("subject");
+        window.showTab("subject-page");
       }
     };
 
