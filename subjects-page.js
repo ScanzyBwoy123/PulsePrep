@@ -163,35 +163,28 @@
   // OPEN SUBJECT
   // ==========================================================
 
-  window.openPulsePrepSubject =
-    function (subjectId) {
+  window.openPulsePrepSubject = function (subjectId) {
 
-      const subject =
-        getSubjects().find(
-          item => item.id === subjectId
-        );
+  const subject = getSubjects().find(
+    item => String(item.id) === String(subjectId)
+  );
 
-      if (!subject) {
-        console.error(
-          "Subject not found:",
-          subjectId
-        );
-        return;
-      }
+  if (!subject) {
+    console.error("Subject not found:", subjectId);
+    return;
+  }
 
-      window.dispatchEvent(
-        new CustomEvent(
-          "pulseprep:subject-selected",
-          {
-            detail: subject
-          }
-        )
-      );
+  if (
+    typeof window.openPulsePrepSubjectPage === "function"
+  ) {
+    window.openPulsePrepSubjectPage(subject.id);
+    return;
+  }
 
-      if (typeof window.showTab === "function") {
-       window.showTab("subject-page");
-      }
-    };
+  console.error(
+    "openPulsePrepSubjectPage is not available."
+  );
+};
 
 
   // ==========================================================
