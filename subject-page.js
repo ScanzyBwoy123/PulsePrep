@@ -51,69 +51,1092 @@
     // ========================================================
     // 1. ANATOMY & PHYSIOLOGY
     // ========================================================
+"anatomy-physiology": [
 
-    "anatomy-physiology": [
-      [
-        "Introduction to Anatomy & Physiology",
-        "Introduction to the study of human body structure and function.",
-        "Define anatomy and physiology and explain their importance in nursing."
-      ],
-      [
-        "Anatomical Terminology",
-        "Learn the standard language used to describe the location and relationship of body structures.",
-        "Explain anatomical position and common directional terms."
-      ],
-      [
-        "Cells & Tissues",
-        "Study the cell as the basic structural and functional unit of the human body.",
-        "Describe major cell structures and the four major tissue types."
-      ],
-      [
-        "Skeletal System",
-        "Study bones, joints and the functions of the skeletal system.",
-        "Explain the major functions of bones and identify major skeletal structures."
-      ],
-      [
-        "Muscular System",
-        "Study skeletal, cardiac and smooth muscle and their functions.",
-        "Compare the three major types of muscle tissue."
-      ],
-      [
-        "Cardiovascular System",
-        "Study the heart, blood and blood vessels.",
-        "Explain blood circulation and the major functions of the cardiovascular system."
-      ],
-      [
-        "Respiratory System",
-        "Study the organs involved in breathing and gas exchange.",
-        "Explain ventilation and gas exchange."
-      ],
-      [
-        "Nervous System",
-        "Study the brain, spinal cord, nerves and nervous control.",
-        "Differentiate the central and peripheral nervous systems."
-      ],
-      [
-        "Digestive System",
-        "Study digestion, absorption and elimination.",
-        "Explain the major organs and processes of digestion."
-      ],
-      [
-        "Urinary System",
-        "Study the kidneys, ureters, bladder and urethra.",
-        "Explain urine formation and the role of the kidneys."
-      ],
-      [
-        "Reproductive System",
-        "Study the male and female reproductive systems.",
-        "Identify major reproductive organs and their functions."
-      ],
-      [
-        "Endocrine System",
-        "Study hormones and the major endocrine glands.",
-        "Explain how hormones regulate body functions."
-      ]
+  // ======================================================
+  // 1. INTRODUCTION TO ANATOMY & PHYSIOLOGY
+  // ======================================================
+  {
+    title: "Introduction to Anatomy & Physiology",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">What are Anatomy and Physiology?</h3>
+
+      <p class="mb-4">
+        <strong>Anatomy</strong> is the study of the structure of the human body,
+        while <strong>physiology</strong> is the study of how the body and its
+        parts function.
+      </p>
+
+      <p class="mb-4">
+        Anatomy and physiology are closely related. The structure of a body part
+        usually determines how it performs its function.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Levels of Organization</h3>
+
+      <ol class="list-decimal ml-6 space-y-2">
+        <li>Chemical level — atoms and molecules.</li>
+        <li>Cellular level — cells, the basic units of life.</li>
+        <li>Tissue level — groups of similar cells performing a function.</li>
+        <li>Organ level — two or more tissues forming an organ.</li>
+        <li>Organ-system level — organs working together.</li>
+        <li>Organism level — the complete human being.</li>
+      </ol>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Homeostasis</h3>
+
+      <p class="mb-4">
+        <strong>Homeostasis</strong> is the maintenance of a relatively stable
+        internal environment despite changes inside or outside the body.
+      </p>
+
+      <p>
+        The nervous and endocrine systems play major roles in maintaining
+        homeostasis.
+      </p>
+    `,
+
+    keyPoints: [
+      "Anatomy studies body structure.",
+      "Physiology studies body function.",
+      "Structure and function are closely related.",
+      "The human body is organized from chemicals to cells, tissues, organs and systems.",
+      "Homeostasis keeps the internal environment relatively stable."
     ],
+
+    nursing: `
+      Nurses need a strong understanding of anatomy and physiology to assess
+      patients, recognize abnormal findings, understand disease processes and
+      provide safe nursing care.
+    `,
+
+    questions: [
+      {
+        question: "What is the study of body structure called?",
+        options: [
+          "Physiology",
+          "Anatomy",
+          "Pathology",
+          "Pharmacology"
+        ],
+        answer: 1,
+        explanation: "Anatomy is the study of the structure of the body."
+      },
+      {
+        question: "What does physiology primarily study?",
+        options: [
+          "Body function",
+          "Drug names",
+          "Disease classification",
+          "Medical equipment"
+        ],
+        answer: 0,
+        explanation: "Physiology focuses on how body parts function."
+      },
+      {
+        question: "What is homeostasis?",
+        options: [
+          "Growth of bones",
+          "Maintenance of a stable internal environment",
+          "Movement of blood only",
+          "Production of hormones only"
+        ],
+        answer: 1,
+        explanation: "Homeostasis is the maintenance of a relatively stable internal environment."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 2. ANATOMICAL TERMINOLOGY
+  // ======================================================
+  {
+    title: "Anatomical Terminology",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Anatomical Position</h3>
+
+      <p class="mb-4">
+        The standard anatomical position is standing upright, facing forward,
+        with the arms at the sides and palms facing forward.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Directional Terms</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li><strong>Superior:</strong> toward the head.</li>
+        <li><strong>Inferior:</strong> away from the head.</li>
+        <li><strong>Anterior:</strong> toward the front.</li>
+        <li><strong>Posterior:</strong> toward the back.</li>
+        <li><strong>Medial:</strong> toward the body's midline.</li>
+        <li><strong>Lateral:</strong> away from the midline.</li>
+        <li><strong>Proximal:</strong> closer to the point of attachment.</li>
+        <li><strong>Distal:</strong> farther from the point of attachment.</li>
+        <li><strong>Superficial:</strong> closer to the surface.</li>
+        <li><strong>Deep:</strong> farther from the surface.</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Body Planes</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li><strong>Sagittal:</strong> divides the body into right and left portions.</li>
+        <li><strong>Frontal:</strong> divides the body into anterior and posterior portions.</li>
+        <li><strong>Transverse:</strong> divides the body into superior and inferior portions.</li>
+      </ul>
+    `,
+
+    keyPoints: [
+      "Anatomical position provides a standard reference.",
+      "Medial means toward the midline.",
+      "Lateral means away from the midline.",
+      "Proximal means closer to the point of attachment.",
+      "Distal means farther from the point of attachment.",
+      "Sagittal, frontal and transverse are major body planes."
+    ],
+
+    nursing: `
+      Anatomical terminology allows nurses and other healthcare professionals
+      to communicate patient findings accurately and consistently.
+    `,
+
+    questions: [
+      {
+        question: "Which term means toward the body's midline?",
+        options: [
+          "Lateral",
+          "Medial",
+          "Distal",
+          "Posterior"
+        ],
+        answer: 1,
+        explanation: "Medial means toward the body's midline."
+      },
+      {
+        question: "The elbow is what in relation to the wrist?",
+        options: [
+          "Distal",
+          "Proximal",
+          "Inferior",
+          "Lateral"
+        ],
+        answer: 1,
+        explanation: "The elbow is closer to the point of attachment of the upper limb than the wrist, so it is proximal."
+      },
+      {
+        question: "Which plane divides the body into superior and inferior portions?",
+        options: [
+          "Sagittal",
+          "Frontal",
+          "Transverse",
+          "Oblique"
+        ],
+        answer: 2,
+        explanation: "The transverse plane divides the body into superior and inferior portions."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 3. CELLS & TISSUES
+  // ======================================================
+  {
+    title: "Cells & Tissues",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">The Cell</h3>
+
+      <p class="mb-4">
+        The cell is the basic structural and functional unit of the human body.
+        Cells contain specialized structures called organelles.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Major Cell Structures</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li><strong>Nucleus:</strong> contains genetic material and controls many cellular activities.</li>
+        <li><strong>Cell membrane:</strong> controls movement of substances into and out of the cell.</li>
+        <li><strong>Cytoplasm:</strong> contains organelles and is the site of many chemical reactions.</li>
+        <li><strong>Mitochondria:</strong> produce most of the cell's usable energy.</li>
+        <li><strong>Ribosomes:</strong> produce proteins.</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Four Major Tissue Types</h3>
+
+      <ol class="list-decimal ml-6 space-y-2">
+        <li><strong>Epithelial tissue:</strong> covers surfaces and lines body cavities.</li>
+        <li><strong>Connective tissue:</strong> supports, connects and protects body structures.</li>
+        <li><strong>Muscle tissue:</strong> produces movement.</li>
+        <li><strong>Nervous tissue:</strong> receives and transmits electrical signals.</li>
+      </ol>
+    `,
+
+    keyPoints: [
+      "The cell is the basic unit of life.",
+      "The nucleus contains genetic material.",
+      "Mitochondria are important for energy production.",
+      "Ribosomes are involved in protein synthesis.",
+      "The four major tissues are epithelial, connective, muscle and nervous tissue."
+    ],
+
+    nursing: `
+      Understanding cells and tissues helps nurses understand wound healing,
+      infection, inflammation, cancer and many other disease processes.
+    `,
+
+    questions: [
+      {
+        question: "Which organelle contains most of the cell's genetic material?",
+        options: [
+          "Mitochondrion",
+          "Nucleus",
+          "Ribosome",
+          "Cell membrane"
+        ],
+        answer: 1,
+        explanation: "The nucleus contains most of the cell's DNA."
+      },
+      {
+        question: "Which tissue type is specialized for contraction and movement?",
+        options: [
+          "Epithelial",
+          "Connective",
+          "Muscle",
+          "Nervous"
+        ],
+        answer: 2,
+        explanation: "Muscle tissue contracts to produce movement."
+      },
+      {
+        question: "Which organelle is primarily associated with protein synthesis?",
+        options: [
+          "Ribosome",
+          "Lysosome",
+          "Nucleus",
+          "Mitochondrion"
+        ],
+        answer: 0,
+        explanation: "Ribosomes are responsible for protein synthesis."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 4. SKELETAL SYSTEM
+  // ======================================================
+  {
+    title: "Skeletal System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Functions of the Skeletal System</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li>Provides support and body shape.</li>
+        <li>Protects internal organs.</li>
+        <li>Allows movement together with muscles.</li>
+        <li>Stores minerals such as calcium and phosphorus.</li>
+        <li>Produces blood cells in red bone marrow.</li>
+        <li>Stores energy in yellow bone marrow.</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Major Divisions</h3>
+
+      <p class="mb-4">
+        The skeleton is divided into the <strong>axial skeleton</strong> and
+        <strong>appendicular skeleton</strong>.
+      </p>
+
+      <p class="mb-4">
+        The axial skeleton includes the skull, vertebral column and thoracic
+        cage. The appendicular skeleton includes the limbs and the bones that
+        attach them to the axial skeleton.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Joints</h3>
+
+      <p>
+        Joints are locations where two or more bones meet. They provide
+        stability and, depending on their structure, allow different amounts
+        of movement.
+      </p>
+    `,
+
+    keyPoints: [
+      "Bones provide support and protection.",
+      "Bone marrow is involved in blood-cell production.",
+      "Calcium and phosphorus are stored in bones.",
+      "The skeleton has axial and appendicular divisions.",
+      "Joints connect bones and allow movement."
+    ],
+
+    nursing: `
+      Knowledge of the skeletal system is important when assessing fractures,
+      mobility, posture, falls, osteoporosis and musculoskeletal injuries.
+    `,
+
+    questions: [
+      {
+        question: "Which is a major function of the skeletal system?",
+        options: [
+          "Producing insulin",
+          "Protecting internal organs",
+          "Digesting proteins",
+          "Producing bile"
+        ],
+        answer: 1,
+        explanation: "Bones protect important organs such as the brain, heart and lungs."
+      },
+      {
+        question: "Which division includes the skull and vertebral column?",
+        options: [
+          "Appendicular skeleton",
+          "Axial skeleton",
+          "Peripheral skeleton",
+          "Muscular skeleton"
+        ],
+        answer: 1,
+        explanation: "The skull and vertebral column are part of the axial skeleton."
+      },
+      {
+        question: "What is the location where two or more bones meet called?",
+        options: [
+          "Tendon",
+          "Joint",
+          "Ligament",
+          "Cartilage only"
+        ],
+        answer: 1,
+        explanation: "A joint is where two or more bones meet."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 5. MUSCULAR SYSTEM
+  // ======================================================
+  {
+    title: "Muscular System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Functions of Muscles</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li>Produce body movement.</li>
+        <li>Maintain posture.</li>
+        <li>Generate heat.</li>
+        <li>Support and stabilize joints.</li>
+        <li>Move substances through certain organs.</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Three Types of Muscle</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li><strong>Skeletal muscle:</strong> usually under voluntary control and attached to bones.</li>
+        <li><strong>Cardiac muscle:</strong> found in the heart and contracts involuntarily.</li>
+        <li><strong>Smooth muscle:</strong> found in many internal organs and blood vessels.</li>
+      </ul>
+
+      <p class="mt-4">
+        Muscle contraction requires energy and depends on interactions between
+        specialized proteins within muscle cells.
+      </p>
+    `,
+
+    keyPoints: [
+      "Skeletal muscle is generally voluntary.",
+      "Cardiac muscle is found in the heart.",
+      "Smooth muscle is found in internal organs and blood vessels.",
+      "Muscles produce movement and help maintain posture.",
+      "Muscle activity contributes to heat production."
+    ],
+
+    nursing: `
+      Nurses assess muscle strength, mobility, movement and signs of weakness
+      when evaluating neurological and musculoskeletal function.
+    `,
+
+    questions: [
+      {
+        question: "Which type of muscle is found in the heart?",
+        options: [
+          "Skeletal",
+          "Smooth",
+          "Cardiac",
+          "Connective"
+        ],
+        answer: 2,
+        explanation: "Cardiac muscle forms the muscular wall of the heart."
+      },
+      {
+        question: "Which muscle type is generally under voluntary control?",
+        options: [
+          "Cardiac",
+          "Skeletal",
+          "Smooth",
+          "Visceral"
+        ],
+        answer: 1,
+        explanation: "Skeletal muscle is generally controlled voluntarily."
+      },
+      {
+        question: "Which is a function of muscle tissue?",
+        options: [
+          "Movement",
+          "Producing urine",
+          "Filtering blood",
+          "Producing bile"
+        ],
+        answer: 0,
+        explanation: "Muscle contraction produces movement."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 6. CARDIOVASCULAR SYSTEM
+  // ======================================================
+  {
+    title: "Cardiovascular System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Overview</h3>
+
+      <p class="mb-4">
+        The cardiovascular system consists mainly of the <strong>heart, blood
+        and blood vessels</strong>.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">The Heart</h3>
+
+      <p class="mb-4">
+        The heart is a muscular organ that pumps blood through the circulation.
+        It has four chambers: right atrium, right ventricle, left atrium and
+        left ventricle.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Blood Vessels</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li><strong>Arteries:</strong> carry blood away from the heart.</li>
+        <li><strong>Veins:</strong> carry blood toward the heart.</li>
+        <li><strong>Capillaries:</strong> are small vessels where exchange occurs between blood and tissues.</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Circulation</h3>
+
+      <p>
+        Pulmonary circulation carries blood between the heart and lungs.
+        Systemic circulation carries blood between the heart and the rest of
+        the body.
+      </p>
+    `,
+
+    keyPoints: [
+      "The cardiovascular system includes the heart, blood and blood vessels.",
+      "The heart has four chambers.",
+      "Arteries carry blood away from the heart.",
+      "Veins carry blood toward the heart.",
+      "Capillaries are major sites of exchange.",
+      "Pulmonary circulation involves the lungs."
+    ],
+
+    nursing: `
+      Cardiovascular knowledge is essential for assessing pulse, blood pressure,
+      circulation, chest symptoms, edema and signs of poor tissue perfusion.
+    `,
+
+    questions: [
+      {
+        question: "How many chambers does the normal human heart have?",
+        options: [
+          "Two",
+          "Three",
+          "Four",
+          "Five"
+        ],
+        answer: 2,
+        explanation: "The heart has four chambers: two atria and two ventricles."
+      },
+      {
+        question: "Which vessels carry blood away from the heart?",
+        options: [
+          "Veins",
+          "Arteries",
+          "Capillaries",
+          "Venules"
+        ],
+        answer: 1,
+        explanation: "Arteries carry blood away from the heart."
+      },
+      {
+        question: "Where does much exchange between blood and tissues occur?",
+        options: [
+          "Large arteries",
+          "Large veins",
+          "Capillaries",
+          "Heart valves"
+        ],
+        answer: 2,
+        explanation: "Capillaries have thin walls that allow exchange between blood and tissues."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 7. RESPIRATORY SYSTEM
+  // ======================================================
+  {
+    title: "Respiratory System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Main Function</h3>
+
+      <p class="mb-4">
+        The respiratory system brings oxygen into the body and removes carbon
+        dioxide. It also contributes to regulation of blood pH.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Major Structures</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li>Nose and nasal cavity</li>
+        <li>Pharynx</li>
+        <li>Larynx</li>
+        <li>Trachea</li>
+        <li>Bronchi</li>
+        <li>Bronchioles</li>
+        <li>Lungs</li>
+        <li>Alveoli</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Gas Exchange</h3>
+
+      <p>
+        Gas exchange occurs mainly in the alveoli. Oxygen moves from inhaled
+        air into the blood, while carbon dioxide moves from the blood into the
+        alveolar air to be exhaled.
+      </p>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Ventilation</h3>
+
+      <p>
+        Ventilation is the movement of air into and out of the lungs. The
+        diaphragm is a major muscle involved in breathing.
+      </p>
+    `,
+
+    keyPoints: [
+      "The respiratory system supplies oxygen and removes carbon dioxide.",
+      "Gas exchange occurs mainly in the alveoli.",
+      "The trachea divides into the bronchi.",
+      "The diaphragm is important in breathing.",
+      "Ventilation moves air into and out of the lungs."
+    ],
+
+    nursing: `
+      Respiratory anatomy is essential when assessing respiratory rate, oxygen
+      saturation, breath sounds, breathing difficulty and airway problems.
+    `,
+
+    questions: [
+      {
+        question: "Where does most gas exchange occur?",
+        options: [
+          "Trachea",
+          "Bronchi",
+          "Alveoli",
+          "Pharynx"
+        ],
+        answer: 2,
+        explanation: "Gas exchange between air and blood occurs mainly across the alveoli."
+      },
+      {
+        question: "Which muscle is especially important for normal breathing?",
+        options: [
+          "Biceps",
+          "Diaphragm",
+          "Triceps",
+          "Deltoid"
+        ],
+        answer: 1,
+        explanation: "The diaphragm is the major muscle of normal inspiration."
+      },
+      {
+        question: "Which gas is primarily removed from the body during exhalation?",
+        options: [
+          "Oxygen",
+          "Nitrogen",
+          "Carbon dioxide",
+          "Helium"
+        ],
+        answer: 2,
+        explanation: "Carbon dioxide is produced by metabolism and removed through exhalation."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 8. NERVOUS SYSTEM
+  // ======================================================
+  {
+    title: "Nervous System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Overview</h3>
+
+      <p class="mb-4">
+        The nervous system controls and coordinates many activities of the body.
+        It receives information, processes it and produces appropriate responses.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Central Nervous System</h3>
+
+      <p class="mb-4">
+        The <strong>central nervous system (CNS)</strong> consists of the
+        brain and spinal cord.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Peripheral Nervous System</h3>
+
+      <p class="mb-4">
+        The <strong>peripheral nervous system (PNS)</strong> consists of nerves
+        and structures outside the brain and spinal cord.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Neurons</h3>
+
+      <p>
+        Neurons are specialized cells that receive and transmit electrical and
+        chemical signals.
+      </p>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Autonomic Nervous System</h3>
+
+      <p>
+        The autonomic nervous system regulates many involuntary functions,
+        including heart rate, digestion and blood-vessel activity.
+      </p>
+    `,
+
+    keyPoints: [
+      "The CNS consists of the brain and spinal cord.",
+      "The PNS includes nerves outside the CNS.",
+      "Neurons transmit information.",
+      "The nervous system coordinates body functions.",
+      "The autonomic nervous system regulates many involuntary activities."
+    ],
+
+    nursing: `
+      Nurses assess neurological status through consciousness, pupils, movement,
+      sensation, reflexes and other neurological observations.
+    `,
+
+    questions: [
+      {
+        question: "Which structures make up the central nervous system?",
+        options: [
+          "Brain and spinal cord",
+          "Heart and brain",
+          "Spinal nerves only",
+          "Muscles and nerves"
+        ],
+        answer: 0,
+        explanation: "The CNS consists of the brain and spinal cord."
+      },
+      {
+        question: "What is the main function of neurons?",
+        options: [
+          "Store calcium",
+          "Transmit information",
+          "Produce bile",
+          "Filter urine"
+        ],
+        answer: 1,
+        explanation: "Neurons are specialized for receiving and transmitting signals."
+      },
+      {
+        question: "Which system regulates many involuntary body functions?",
+        options: [
+          "Autonomic nervous system",
+          "Skeletal system",
+          "Digestive system",
+          "Skeletal nervous system"
+        ],
+        answer: 0,
+        explanation: "The autonomic nervous system controls many involuntary functions."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 9. DIGESTIVE SYSTEM
+  // ======================================================
+  {
+    title: "Digestive System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Purpose of Digestion</h3>
+
+      <p class="mb-4">
+        The digestive system breaks food into smaller substances that can be
+        absorbed and used by the body. It also eliminates undigested material.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Major Organs</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li>Mouth</li>
+        <li>Pharynx</li>
+        <li>Esophagus</li>
+        <li>Stomach</li>
+        <li>Small intestine</li>
+        <li>Large intestine</li>
+        <li>Rectum</li>
+        <li>Anus</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Accessory Organs</h3>
+
+      <p class="mb-4">
+        The liver, gallbladder and pancreas assist digestion.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Small Intestine</h3>
+
+      <p>
+        Much of the digestion and absorption of nutrients occurs in the small
+        intestine. Its large surface area helps maximize absorption.
+      </p>
+    `,
+
+    keyPoints: [
+      "Digestion breaks food into usable components.",
+      "The stomach performs mechanical and chemical digestion.",
+      "The small intestine is a major site of nutrient absorption.",
+      "The large intestine absorbs water and forms feces.",
+      "The liver, gallbladder and pancreas assist digestion."
+    ],
+
+    nursing: `
+      Digestive-system knowledge helps nurses assess appetite, swallowing,
+      abdominal symptoms, bowel function, nutrition and hydration.
+    `,
+
+    questions: [
+      {
+        question: "Where does most nutrient absorption occur?",
+        options: [
+          "Stomach",
+          "Small intestine",
+          "Esophagus",
+          "Large intestine"
+        ],
+        answer: 1,
+        explanation: "The small intestine is the major site of nutrient absorption."
+      },
+      {
+        question: "Which organ produces bile?",
+        options: [
+          "Pancreas",
+          "Liver",
+          "Stomach",
+          "Kidney"
+        ],
+        answer: 1,
+        explanation: "The liver produces bile, which assists in fat digestion."
+      },
+      {
+        question: "What is a major function of the large intestine?",
+        options: [
+          "Absorb water",
+          "Pump blood",
+          "Produce insulin only",
+          "Exchange oxygen"
+        ],
+        answer: 0,
+        explanation: "The large intestine absorbs water and helps form feces."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 10. URINARY SYSTEM
+  // ======================================================
+  {
+    title: "Urinary System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Major Functions</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li>Remove metabolic waste from the blood.</li>
+        <li>Regulate water balance.</li>
+        <li>Help regulate electrolytes.</li>
+        <li>Contribute to acid-base balance.</li>
+        <li>Assist in regulation of blood pressure.</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Major Organs</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li><strong>Kidneys:</strong> filter blood and form urine.</li>
+        <li><strong>Ureters:</strong> transport urine from kidneys to bladder.</li>
+        <li><strong>Urinary bladder:</strong> stores urine.</li>
+        <li><strong>Urethra:</strong> carries urine out of the body.</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Nephrons</h3>
+
+      <p>
+        The nephron is the functional unit of the kidney. Processes including
+        filtration, reabsorption and secretion contribute to urine formation.
+      </p>
+    `,
+
+    keyPoints: [
+      "The kidneys filter blood and form urine.",
+      "Ureters carry urine to the bladder.",
+      "The bladder stores urine.",
+      "The urethra carries urine out of the body.",
+      "Nephrons are functional units of the kidneys."
+    ],
+
+    nursing: `
+      Understanding the urinary system is important when monitoring urine output,
+      hydration, kidney function, fluid balance and urinary problems.
+    `,
+
+    questions: [
+      {
+        question: "Which organs form urine?",
+        options: [
+          "Lungs",
+          "Kidneys",
+          "Liver",
+          "Heart"
+        ],
+        answer: 1,
+        explanation: "The kidneys filter blood and form urine."
+      },
+      {
+        question: "Where is urine stored before elimination?",
+        options: [
+          "Ureter",
+          "Kidney",
+          "Bladder",
+          "Nephron"
+        ],
+        answer: 2,
+        explanation: "The urinary bladder stores urine."
+      },
+      {
+        question: "What is the functional unit of the kidney?",
+        options: [
+          "Alveolus",
+          "Neuron",
+          "Nephron",
+          "Osteon"
+        ],
+        answer: 2,
+        explanation: "The nephron is the functional unit of the kidney."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 11. REPRODUCTIVE SYSTEM
+  // ======================================================
+  {
+    title: "Reproductive System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Purpose</h3>
+
+      <p class="mb-4">
+        The reproductive system is responsible for producing reproductive cells,
+        supporting reproduction and producing reproductive hormones.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Male Reproductive System</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li>Testes</li>
+        <li>Epididymis</li>
+        <li>Vas deferens</li>
+        <li>Seminal vesicles</li>
+        <li>Prostate gland</li>
+        <li>Penis</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Female Reproductive System</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li>Ovaries</li>
+        <li>Fallopian tubes</li>
+        <li>Uterus</li>
+        <li>Cervix</li>
+        <li>Vagina</li>
+      </ul>
+
+      <p class="mt-4">
+        The ovaries produce ova and reproductive hormones. The testes produce
+        sperm and testosterone.
+      </p>
+    `,
+
+    keyPoints: [
+      "The reproductive system supports reproduction.",
+      "Testes produce sperm and testosterone.",
+      "Ovaries produce ova and reproductive hormones.",
+      "The uterus is the organ where pregnancy develops.",
+      "The reproductive system is influenced by hormones."
+    ],
+
+    nursing: `
+      Reproductive anatomy is important in sexual-health assessment, antenatal
+      care, family planning, reproductive health education and clinical assessment.
+    `,
+
+    questions: [
+      {
+        question: "Which organs produce sperm?",
+        options: [
+          "Ovaries",
+          "Testes",
+          "Uterus",
+          "Prostate only"
+        ],
+        answer: 1,
+        explanation: "The testes produce sperm."
+      },
+      {
+        question: "Which organ is the usual site of pregnancy development?",
+        options: [
+          "Ovary",
+          "Uterus",
+          "Vagina",
+          "Fallopian tube"
+        ],
+        answer: 1,
+        explanation: "Pregnancy normally develops in the uterus."
+      },
+      {
+        question: "Which organs produce ova?",
+        options: [
+          "Testes",
+          "Ovaries",
+          "Kidneys",
+          "Adrenal glands"
+        ],
+        answer: 1,
+        explanation: "The ovaries produce ova and reproductive hormones."
+      }
+    ]
+  },
+
+
+  // ======================================================
+  // 12. ENDOCRINE SYSTEM
+  // ======================================================
+  {
+    title: "Endocrine System",
+
+    notes: `
+      <h3 class="text-xl font-black mb-3">Overview</h3>
+
+      <p class="mb-4">
+        The endocrine system consists of glands that produce hormones.
+        Hormones are chemical messengers that travel through the blood to
+        influence target cells and organs.
+      </p>
+
+      <h3 class="text-xl font-black mb-3">Major Endocrine Glands</h3>
+
+      <ul class="list-disc ml-6 space-y-2">
+        <li><strong>Pituitary gland:</strong> regulates several other endocrine glands and body functions.</li>
+        <li><strong>Thyroid gland:</strong> produces hormones involved in metabolism.</li>
+        <li><strong>Parathyroid glands:</strong> help regulate calcium levels.</li>
+        <li><strong>Adrenal glands:</strong> produce hormones involved in stress responses and other functions.</li>
+        <li><strong>Pancreas:</strong> produces hormones including insulin and glucagon.</li>
+        <li><strong>Ovaries and testes:</strong> produce reproductive hormones.</li>
+      </ul>
+
+      <h3 class="text-xl font-black mt-6 mb-3">Hormonal Regulation</h3>
+
+      <p>
+        Hormones help regulate metabolism, growth, reproduction, stress responses,
+        blood glucose and many other body processes.
+      </p>
+
+      <p class="mt-4">
+        Many endocrine systems use <strong>negative feedback</strong> to help
+        maintain stable hormone levels.
+      </p>
+    `,
+
+    keyPoints: [
+      "Endocrine glands produce hormones.",
+      "Hormones act as chemical messengers.",
+      "The thyroid contributes to regulation of metabolism.",
+      "Insulin helps regulate blood glucose.",
+      "The endocrine system works closely with the nervous system.",
+      "Negative feedback helps maintain physiological balance."
+    ],
+
+    nursing: `
+      Endocrine knowledge helps nurses understand conditions such as diabetes,
+      thyroid disorders and hormonal disturbances and recognize important
+      clinical findings.
+    `,
+
+    questions: [
+      {
+        question: "What do endocrine glands produce?",
+        options: [
+          "Hormones",
+          "Urine",
+          "Bile",
+          "Red blood cells only"
+        ],
+        answer: 0,
+        explanation: "Endocrine glands produce hormones that act as chemical messengers."
+      },
+      {
+        question: "Which hormone helps lower blood glucose?",
+        options: [
+          "Insulin",
+          "Adrenaline",
+          "Thyroxine",
+          "Melatonin"
+        ],
+        answer: 0,
+        explanation: "Insulin promotes processes that lower blood glucose."
+      },
+      {
+        question: "Which gland is strongly associated with regulation of metabolism?",
+        options: [
+          "Thyroid",
+          "Sweat gland",
+          "Salivary gland",
+          "Sebaceous gland"
+        ],
+        answer: 0,
+        explanation: "The thyroid produces hormones that have major effects on metabolism."
+      }
+    ]
+  }
+
+],
 
     // ========================================================
     // 2. MICROBIOLOGY
