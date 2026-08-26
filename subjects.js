@@ -2,19 +2,13 @@
   "use strict";
 
   function renderPulsePrepSubjects() {
-    const container = document.getElementById("pulseprepSubjects");
+    const container = document.getElementById("subjects-grid");
 
-    if (!container) return;
+    if (!container) {
+      return;
+    }
 
-    if (
-      !Array.isArray(window.PULSEPREP_SUBJECTS) ||
-      window.PULSEPREP_SUBJECTS.length === 0
-    ) {
-      container.innerHTML = `
-        <p class="text-sm text-slate-500">
-          No subjects available yet.
-        </p>
-      `;
+    if (!window.PULSEPREP_SUBJECTS) {
       return;
     }
 
@@ -49,18 +43,7 @@
     }).join("");
   }
 
-  window.openPulsePrepSubject = function (subjectId) {
-  const subject = window.PULSEPREP_SUBJECTS.find(function (item) {
-    return item.id === subjectId;
-  });
-
-  if (!subject) return;
-
-  alert(
-    subject.name +
-    "\n\nSubject content will be added to PulsePrep."
-  );
-};
+  window.renderPulsePrepSubjects = renderPulsePrepSubjects;
 
   function initializeSubjects() {
     if (window.PULSEPREP_SUBJECTS) {
