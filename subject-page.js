@@ -1,6 +1,6 @@
 // ============================================================
 // PULSEPREP — INDIVIDUAL SUBJECT PAGE
-// FINAL SUBJECT-SPECIFIC LESSON ENGINE
+// COMPLETE CORRECTED SUBJECT ENGINE
 // ============================================================
 
 (function () {
@@ -9,12 +9,6 @@
   // ==========================================================
   // HELPERS
   // ==========================================================
-
-  function getSubjects() {
-    return Array.isArray(window.PULSEPREP_SUBJECTS)
-      ? window.PULSEPREP_SUBJECTS
-      : [];
-  }
 
   function escapeHTML(value) {
     return String(value ?? "")
@@ -25,17 +19,69 @@
       .replace(/'/g, "&#039;");
   }
 
+  function getSubjects() {
+    return Array.isArray(window.PULSEPREP_SUBJECTS)
+      ? window.PULSEPREP_SUBJECTS
+      : [];
+  }
+
+  function getSubject(subjectId) {
+    return getSubjects().find(function (subject) {
+      return String(subject.id) === String(subjectId);
+    });
+  }
+
   function getPage() {
     return document.getElementById("pulseprepSubjectPage");
   }
 
-  function goToSubjectPageTab() {
+  function ensurePage() {
+    let page = getPage();
+
+    if (page) {
+      return page;
+    }
+
+    page = document.createElement("div");
+    page.id = "pulseprepSubjectPage";
+    page.className = "w-full";
+
+    const subjectTab = document.getElementById("subject-page");
+
+    if (subjectTab) {
+      subjectTab.innerHTML = "";
+      subjectTab.appendChild(page);
+    } else {
+      document.body.appendChild(page);
+    }
+
+    return page;
+  }
+
+  function showSubjectTab() {
     if (typeof window.showTab === "function") {
-      window.showTab("subject-page");
+      try {
+        window.showTab("subject-page");
+        return;
+      } catch (error) {
+        console.warn("PulsePrep showTab error:", error);
+      }
+    }
+
+    const tabs = document.querySelectorAll(".tab");
+
+    tabs.forEach(function (tab) {
+      tab.style.display = "none";
+    });
+
+    const subjectTab = document.getElementById("subject-page");
+
+    if (subjectTab) {
+      subjectTab.style.display = "block";
     }
   }
 
-  function scrollTop() {
+  function scrollToTop() {
     window.scrollTo({
       top: 0,
       behavior: "smooth"
@@ -43,3840 +89,1864 @@
   }
 
   // ==========================================================
-  // CURRICULUM
+  // SUBJECT CONTENT
   // ==========================================================
 
-  const curriculum = {
+  const SUBJECT_CONTENT = {
 
     // ========================================================
     // 1. ANATOMY & PHYSIOLOGY
     // ========================================================
-"anatomy-physiology": [
 
-  // ======================================================
-  // 1. INTRODUCTION TO ANATOMY & PHYSIOLOGY
-  // ======================================================
-  {
-    title: "Introduction to Anatomy & Physiology",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">What are Anatomy and Physiology?</h3>
-
-      <p class="mb-4">
-        <strong>Anatomy</strong> is the study of the structure of the human body,
-        while <strong>physiology</strong> is the study of how the body and its
-        parts function.
-      </p>
-
-      <p class="mb-4">
-        Anatomy and physiology are closely related. The structure of a body part
-        usually determines how it performs its function.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Levels of Organization</h3>
-
-      <ol class="list-decimal ml-6 space-y-2">
-        <li>Chemical level — atoms and molecules.</li>
-        <li>Cellular level — cells, the basic units of life.</li>
-        <li>Tissue level — groups of similar cells performing a function.</li>
-        <li>Organ level — two or more tissues forming an organ.</li>
-        <li>Organ-system level — organs working together.</li>
-        <li>Organism level — the complete human being.</li>
-      </ol>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Homeostasis</h3>
-
-      <p class="mb-4">
-        <strong>Homeostasis</strong> is the maintenance of a relatively stable
-        internal environment despite changes inside or outside the body.
-      </p>
-
-      <p>
-        The nervous and endocrine systems play major roles in maintaining
-        homeostasis.
-      </p>
-    `,
-
-    keyPoints: [
-      "Anatomy studies body structure.",
-      "Physiology studies body function.",
-      "Structure and function are closely related.",
-      "The human body is organized from chemicals to cells, tissues, organs and systems.",
-      "Homeostasis keeps the internal environment relatively stable."
-    ],
-
-    nursing: `
-      Nurses need a strong understanding of anatomy and physiology to assess
-      patients, recognize abnormal findings, understand disease processes and
-      provide safe nursing care.
-    `,
-
-    questions: [
-      {
-        question: "What is the study of body structure called?",
-        options: [
-          "Physiology",
-          "Anatomy",
-          "Pathology",
-          "Pharmacology"
-        ],
-        answer: 1,
-        explanation: "Anatomy is the study of the structure of the body."
-      },
-      {
-        question: "What does physiology primarily study?",
-        options: [
-          "Body function",
-          "Drug names",
-          "Disease classification",
-          "Medical equipment"
-        ],
-        answer: 0,
-        explanation: "Physiology focuses on how body parts function."
-      },
-      {
-        question: "What is homeostasis?",
-        options: [
-          "Growth of bones",
-          "Maintenance of a stable internal environment",
-          "Movement of blood only",
-          "Production of hormones only"
-        ],
-        answer: 1,
-        explanation: "Homeostasis is the maintenance of a relatively stable internal environment."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 2. ANATOMICAL TERMINOLOGY
-  // ======================================================
-  {
-    title: "Anatomical Terminology",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Anatomical Position</h3>
-
-      <p class="mb-4">
-        The standard anatomical position is standing upright, facing forward,
-        with the arms at the sides and palms facing forward.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Directional Terms</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Superior:</strong> toward the head.</li>
-        <li><strong>Inferior:</strong> away from the head.</li>
-        <li><strong>Anterior:</strong> toward the front.</li>
-        <li><strong>Posterior:</strong> toward the back.</li>
-        <li><strong>Medial:</strong> toward the body's midline.</li>
-        <li><strong>Lateral:</strong> away from the midline.</li>
-        <li><strong>Proximal:</strong> closer to the point of attachment.</li>
-        <li><strong>Distal:</strong> farther from the point of attachment.</li>
-        <li><strong>Superficial:</strong> closer to the surface.</li>
-        <li><strong>Deep:</strong> farther from the surface.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Body Planes</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Sagittal:</strong> divides the body into right and left portions.</li>
-        <li><strong>Frontal:</strong> divides the body into anterior and posterior portions.</li>
-        <li><strong>Transverse:</strong> divides the body into superior and inferior portions.</li>
-      </ul>
-    `,
-
-    keyPoints: [
-      "Anatomical position provides a standard reference.",
-      "Medial means toward the midline.",
-      "Lateral means away from the midline.",
-      "Proximal means closer to the point of attachment.",
-      "Distal means farther from the point of attachment.",
-      "Sagittal, frontal and transverse are major body planes."
-    ],
-
-    nursing: `
-      Anatomical terminology allows nurses and other healthcare professionals
-      to communicate patient findings accurately and consistently.
-    `,
-
-    questions: [
-      {
-        question: "Which term means toward the body's midline?",
-        options: [
-          "Lateral",
-          "Medial",
-          "Distal",
-          "Posterior"
-        ],
-        answer: 1,
-        explanation: "Medial means toward the body's midline."
-      },
-      {
-        question: "The elbow is what in relation to the wrist?",
-        options: [
-          "Distal",
-          "Proximal",
-          "Inferior",
-          "Lateral"
-        ],
-        answer: 1,
-        explanation: "The elbow is closer to the point of attachment of the upper limb than the wrist, so it is proximal."
-      },
-      {
-        question: "Which plane divides the body into superior and inferior portions?",
-        options: [
-          "Sagittal",
-          "Frontal",
-          "Transverse",
-          "Oblique"
-        ],
-        answer: 2,
-        explanation: "The transverse plane divides the body into superior and inferior portions."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 3. CELLS & TISSUES
-  // ======================================================
-  {
-    title: "Cells & Tissues",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">The Cell</h3>
-
-      <p class="mb-4">
-        The cell is the basic structural and functional unit of the human body.
-        Cells contain specialized structures called organelles.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Major Cell Structures</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Nucleus:</strong> contains genetic material and controls many cellular activities.</li>
-        <li><strong>Cell membrane:</strong> controls movement of substances into and out of the cell.</li>
-        <li><strong>Cytoplasm:</strong> contains organelles and is the site of many chemical reactions.</li>
-        <li><strong>Mitochondria:</strong> produce most of the cell's usable energy.</li>
-        <li><strong>Ribosomes:</strong> produce proteins.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Four Major Tissue Types</h3>
-
-      <ol class="list-decimal ml-6 space-y-2">
-        <li><strong>Epithelial tissue:</strong> covers surfaces and lines body cavities.</li>
-        <li><strong>Connective tissue:</strong> supports, connects and protects body structures.</li>
-        <li><strong>Muscle tissue:</strong> produces movement.</li>
-        <li><strong>Nervous tissue:</strong> receives and transmits electrical signals.</li>
-      </ol>
-    `,
-
-    keyPoints: [
-      "The cell is the basic unit of life.",
-      "The nucleus contains genetic material.",
-      "Mitochondria are important for energy production.",
-      "Ribosomes are involved in protein synthesis.",
-      "The four major tissues are epithelial, connective, muscle and nervous tissue."
-    ],
-
-    nursing: `
-      Understanding cells and tissues helps nurses understand wound healing,
-      infection, inflammation, cancer and many other disease processes.
-    `,
-
-    questions: [
-      {
-        question: "Which organelle contains most of the cell's genetic material?",
-        options: [
-          "Mitochondrion",
-          "Nucleus",
-          "Ribosome",
-          "Cell membrane"
-        ],
-        answer: 1,
-        explanation: "The nucleus contains most of the cell's DNA."
-      },
-      {
-        question: "Which tissue type is specialized for contraction and movement?",
-        options: [
-          "Epithelial",
-          "Connective",
-          "Muscle",
-          "Nervous"
-        ],
-        answer: 2,
-        explanation: "Muscle tissue contracts to produce movement."
-      },
-      {
-        question: "Which organelle is primarily associated with protein synthesis?",
-        options: [
-          "Ribosome",
-          "Lysosome",
-          "Nucleus",
-          "Mitochondrion"
-        ],
-        answer: 0,
-        explanation: "Ribosomes are responsible for protein synthesis."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 4. SKELETAL SYSTEM
-  // ======================================================
-  {
-    title: "Skeletal System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Functions of the Skeletal System</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Provides support and body shape.</li>
-        <li>Protects internal organs.</li>
-        <li>Allows movement together with muscles.</li>
-        <li>Stores minerals such as calcium and phosphorus.</li>
-        <li>Produces blood cells in red bone marrow.</li>
-        <li>Stores energy in yellow bone marrow.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Major Divisions</h3>
-
-      <p class="mb-4">
-        The skeleton is divided into the <strong>axial skeleton</strong> and
-        <strong>appendicular skeleton</strong>.
-      </p>
-
-      <p class="mb-4">
-        The axial skeleton includes the skull, vertebral column and thoracic
-        cage. The appendicular skeleton includes the limbs and the bones that
-        attach them to the axial skeleton.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Joints</h3>
-
-      <p>
-        Joints are locations where two or more bones meet. They provide
-        stability and, depending on their structure, allow different amounts
-        of movement.
-      </p>
-    `,
-
-    keyPoints: [
-      "Bones provide support and protection.",
-      "Bone marrow is involved in blood-cell production.",
-      "Calcium and phosphorus are stored in bones.",
-      "The skeleton has axial and appendicular divisions.",
-      "Joints connect bones and allow movement."
-    ],
-
-    nursing: `
-      Knowledge of the skeletal system is important when assessing fractures,
-      mobility, posture, falls, osteoporosis and musculoskeletal injuries.
-    `,
-
-    questions: [
-      {
-        question: "Which is a major function of the skeletal system?",
-        options: [
-          "Producing insulin",
-          "Protecting internal organs",
-          "Digesting proteins",
-          "Producing bile"
-        ],
-        answer: 1,
-        explanation: "Bones protect important organs such as the brain, heart and lungs."
-      },
-      {
-        question: "Which division includes the skull and vertebral column?",
-        options: [
-          "Appendicular skeleton",
-          "Axial skeleton",
-          "Peripheral skeleton",
-          "Muscular skeleton"
-        ],
-        answer: 1,
-        explanation: "The skull and vertebral column are part of the axial skeleton."
-      },
-      {
-        question: "What is the location where two or more bones meet called?",
-        options: [
-          "Tendon",
-          "Joint",
-          "Ligament",
-          "Cartilage only"
-        ],
-        answer: 1,
-        explanation: "A joint is where two or more bones meet."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 5. MUSCULAR SYSTEM
-  // ======================================================
-  {
-    title: "Muscular System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Functions of Muscles</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Produce body movement.</li>
-        <li>Maintain posture.</li>
-        <li>Generate heat.</li>
-        <li>Support and stabilize joints.</li>
-        <li>Move substances through certain organs.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Three Types of Muscle</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Skeletal muscle:</strong> usually under voluntary control and attached to bones.</li>
-        <li><strong>Cardiac muscle:</strong> found in the heart and contracts involuntarily.</li>
-        <li><strong>Smooth muscle:</strong> found in many internal organs and blood vessels.</li>
-      </ul>
-
-      <p class="mt-4">
-        Muscle contraction requires energy and depends on interactions between
-        specialized proteins within muscle cells.
-      </p>
-    `,
-
-    keyPoints: [
-      "Skeletal muscle is generally voluntary.",
-      "Cardiac muscle is found in the heart.",
-      "Smooth muscle is found in internal organs and blood vessels.",
-      "Muscles produce movement and help maintain posture.",
-      "Muscle activity contributes to heat production."
-    ],
-
-    nursing: `
-      Nurses assess muscle strength, mobility, movement and signs of weakness
-      when evaluating neurological and musculoskeletal function.
-    `,
-
-    questions: [
-      {
-        question: "Which type of muscle is found in the heart?",
-        options: [
-          "Skeletal",
-          "Smooth",
-          "Cardiac",
-          "Connective"
-        ],
-        answer: 2,
-        explanation: "Cardiac muscle forms the muscular wall of the heart."
-      },
-      {
-        question: "Which muscle type is generally under voluntary control?",
-        options: [
-          "Cardiac",
-          "Skeletal",
-          "Smooth",
-          "Visceral"
-        ],
-        answer: 1,
-        explanation: "Skeletal muscle is generally controlled voluntarily."
-      },
-      {
-        question: "Which is a function of muscle tissue?",
-        options: [
-          "Movement",
-          "Producing urine",
-          "Filtering blood",
-          "Producing bile"
-        ],
-        answer: 0,
-        explanation: "Muscle contraction produces movement."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 6. CARDIOVASCULAR SYSTEM
-  // ======================================================
-  {
-    title: "Cardiovascular System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Overview</h3>
-
-      <p class="mb-4">
-        The cardiovascular system consists mainly of the <strong>heart, blood
-        and blood vessels</strong>.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">The Heart</h3>
-
-      <p class="mb-4">
-        The heart is a muscular organ that pumps blood through the circulation.
-        It has four chambers: right atrium, right ventricle, left atrium and
-        left ventricle.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Blood Vessels</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Arteries:</strong> carry blood away from the heart.</li>
-        <li><strong>Veins:</strong> carry blood toward the heart.</li>
-        <li><strong>Capillaries:</strong> are small vessels where exchange occurs between blood and tissues.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Circulation</h3>
-
-      <p>
-        Pulmonary circulation carries blood between the heart and lungs.
-        Systemic circulation carries blood between the heart and the rest of
-        the body.
-      </p>
-    `,
-
-    keyPoints: [
-      "The cardiovascular system includes the heart, blood and blood vessels.",
-      "The heart has four chambers.",
-      "Arteries carry blood away from the heart.",
-      "Veins carry blood toward the heart.",
-      "Capillaries are major sites of exchange.",
-      "Pulmonary circulation involves the lungs."
-    ],
-
-    nursing: `
-      Cardiovascular knowledge is essential for assessing pulse, blood pressure,
-      circulation, chest symptoms, edema and signs of poor tissue perfusion.
-    `,
-
-    questions: [
-      {
-        question: "How many chambers does the normal human heart have?",
-        options: [
-          "Two",
-          "Three",
-          "Four",
-          "Five"
-        ],
-        answer: 2,
-        explanation: "The heart has four chambers: two atria and two ventricles."
-      },
-      {
-        question: "Which vessels carry blood away from the heart?",
-        options: [
-          "Veins",
-          "Arteries",
-          "Capillaries",
-          "Venules"
-        ],
-        answer: 1,
-        explanation: "Arteries carry blood away from the heart."
-      },
-      {
-        question: "Where does much exchange between blood and tissues occur?",
-        options: [
-          "Large arteries",
-          "Large veins",
-          "Capillaries",
-          "Heart valves"
-        ],
-        answer: 2,
-        explanation: "Capillaries have thin walls that allow exchange between blood and tissues."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 7. RESPIRATORY SYSTEM
-  // ======================================================
-  {
-    title: "Respiratory System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Main Function</h3>
-
-      <p class="mb-4">
-        The respiratory system brings oxygen into the body and removes carbon
-        dioxide. It also contributes to regulation of blood pH.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Major Structures</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Nose and nasal cavity</li>
-        <li>Pharynx</li>
-        <li>Larynx</li>
-        <li>Trachea</li>
-        <li>Bronchi</li>
-        <li>Bronchioles</li>
-        <li>Lungs</li>
-        <li>Alveoli</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Gas Exchange</h3>
-
-      <p>
-        Gas exchange occurs mainly in the alveoli. Oxygen moves from inhaled
-        air into the blood, while carbon dioxide moves from the blood into the
-        alveolar air to be exhaled.
-      </p>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Ventilation</h3>
-
-      <p>
-        Ventilation is the movement of air into and out of the lungs. The
-        diaphragm is a major muscle involved in breathing.
-      </p>
-    `,
-
-    keyPoints: [
-      "The respiratory system supplies oxygen and removes carbon dioxide.",
-      "Gas exchange occurs mainly in the alveoli.",
-      "The trachea divides into the bronchi.",
-      "The diaphragm is important in breathing.",
-      "Ventilation moves air into and out of the lungs."
-    ],
-
-    nursing: `
-      Respiratory anatomy is essential when assessing respiratory rate, oxygen
-      saturation, breath sounds, breathing difficulty and airway problems.
-    `,
-
-    questions: [
-      {
-        question: "Where does most gas exchange occur?",
-        options: [
-          "Trachea",
-          "Bronchi",
-          "Alveoli",
-          "Pharynx"
-        ],
-        answer: 2,
-        explanation: "Gas exchange between air and blood occurs mainly across the alveoli."
-      },
-      {
-        question: "Which muscle is especially important for normal breathing?",
-        options: [
-          "Biceps",
-          "Diaphragm",
-          "Triceps",
-          "Deltoid"
-        ],
-        answer: 1,
-        explanation: "The diaphragm is the major muscle of normal inspiration."
-      },
-      {
-        question: "Which gas is primarily removed from the body during exhalation?",
-        options: [
-          "Oxygen",
-          "Nitrogen",
-          "Carbon dioxide",
-          "Helium"
-        ],
-        answer: 2,
-        explanation: "Carbon dioxide is produced by metabolism and removed through exhalation."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 8. NERVOUS SYSTEM
-  // ======================================================
-  {
-    title: "Nervous System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Overview</h3>
-
-      <p class="mb-4">
-        The nervous system controls and coordinates many activities of the body.
-        It receives information, processes it and produces appropriate responses.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Central Nervous System</h3>
-
-      <p class="mb-4">
-        The <strong>central nervous system (CNS)</strong> consists of the
-        brain and spinal cord.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Peripheral Nervous System</h3>
-
-      <p class="mb-4">
-        The <strong>peripheral nervous system (PNS)</strong> consists of nerves
-        and structures outside the brain and spinal cord.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Neurons</h3>
-
-      <p>
-        Neurons are specialized cells that receive and transmit electrical and
-        chemical signals.
-      </p>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Autonomic Nervous System</h3>
-
-      <p>
-        The autonomic nervous system regulates many involuntary functions,
-        including heart rate, digestion and blood-vessel activity.
-      </p>
-    `,
-
-    keyPoints: [
-      "The CNS consists of the brain and spinal cord.",
-      "The PNS includes nerves outside the CNS.",
-      "Neurons transmit information.",
-      "The nervous system coordinates body functions.",
-      "The autonomic nervous system regulates many involuntary activities."
-    ],
-
-    nursing: `
-      Nurses assess neurological status through consciousness, pupils, movement,
-      sensation, reflexes and other neurological observations.
-    `,
-
-    questions: [
-      {
-        question: "Which structures make up the central nervous system?",
-        options: [
-          "Brain and spinal cord",
-          "Heart and brain",
-          "Spinal nerves only",
-          "Muscles and nerves"
-        ],
-        answer: 0,
-        explanation: "The CNS consists of the brain and spinal cord."
-      },
-      {
-        question: "What is the main function of neurons?",
-        options: [
-          "Store calcium",
-          "Transmit information",
-          "Produce bile",
-          "Filter urine"
-        ],
-        answer: 1,
-        explanation: "Neurons are specialized for receiving and transmitting signals."
-      },
-      {
-        question: "Which system regulates many involuntary body functions?",
-        options: [
-          "Autonomic nervous system",
-          "Skeletal system",
-          "Digestive system",
-          "Skeletal nervous system"
-        ],
-        answer: 0,
-        explanation: "The autonomic nervous system controls many involuntary functions."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 9. DIGESTIVE SYSTEM
-  // ======================================================
-  {
-    title: "Digestive System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Purpose of Digestion</h3>
-
-      <p class="mb-4">
-        The digestive system breaks food into smaller substances that can be
-        absorbed and used by the body. It also eliminates undigested material.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Major Organs</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Mouth</li>
-        <li>Pharynx</li>
-        <li>Esophagus</li>
-        <li>Stomach</li>
-        <li>Small intestine</li>
-        <li>Large intestine</li>
-        <li>Rectum</li>
-        <li>Anus</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Accessory Organs</h3>
-
-      <p class="mb-4">
-        The liver, gallbladder and pancreas assist digestion.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Small Intestine</h3>
-
-      <p>
-        Much of the digestion and absorption of nutrients occurs in the small
-        intestine. Its large surface area helps maximize absorption.
-      </p>
-    `,
-
-    keyPoints: [
-      "Digestion breaks food into usable components.",
-      "The stomach performs mechanical and chemical digestion.",
-      "The small intestine is a major site of nutrient absorption.",
-      "The large intestine absorbs water and forms feces.",
-      "The liver, gallbladder and pancreas assist digestion."
-    ],
-
-    nursing: `
-      Digestive-system knowledge helps nurses assess appetite, swallowing,
-      abdominal symptoms, bowel function, nutrition and hydration.
-    `,
-
-    questions: [
-      {
-        question: "Where does most nutrient absorption occur?",
-        options: [
-          "Stomach",
-          "Small intestine",
-          "Esophagus",
-          "Large intestine"
-        ],
-        answer: 1,
-        explanation: "The small intestine is the major site of nutrient absorption."
-      },
-      {
-        question: "Which organ produces bile?",
-        options: [
-          "Pancreas",
-          "Liver",
-          "Stomach",
-          "Kidney"
-        ],
-        answer: 1,
-        explanation: "The liver produces bile, which assists in fat digestion."
-      },
-      {
-        question: "What is a major function of the large intestine?",
-        options: [
-          "Absorb water",
-          "Pump blood",
-          "Produce insulin only",
-          "Exchange oxygen"
-        ],
-        answer: 0,
-        explanation: "The large intestine absorbs water and helps form feces."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 10. URINARY SYSTEM
-  // ======================================================
-  {
-    title: "Urinary System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Major Functions</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Remove metabolic waste from the blood.</li>
-        <li>Regulate water balance.</li>
-        <li>Help regulate electrolytes.</li>
-        <li>Contribute to acid-base balance.</li>
-        <li>Assist in regulation of blood pressure.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Major Organs</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Kidneys:</strong> filter blood and form urine.</li>
-        <li><strong>Ureters:</strong> transport urine from kidneys to bladder.</li>
-        <li><strong>Urinary bladder:</strong> stores urine.</li>
-        <li><strong>Urethra:</strong> carries urine out of the body.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Nephrons</h3>
-
-      <p>
-        The nephron is the functional unit of the kidney. Processes including
-        filtration, reabsorption and secretion contribute to urine formation.
-      </p>
-    `,
-
-    keyPoints: [
-      "The kidneys filter blood and form urine.",
-      "Ureters carry urine to the bladder.",
-      "The bladder stores urine.",
-      "The urethra carries urine out of the body.",
-      "Nephrons are functional units of the kidneys."
-    ],
-
-    nursing: `
-      Understanding the urinary system is important when monitoring urine output,
-      hydration, kidney function, fluid balance and urinary problems.
-    `,
-
-    questions: [
-      {
-        question: "Which organs form urine?",
-        options: [
-          "Lungs",
-          "Kidneys",
-          "Liver",
-          "Heart"
-        ],
-        answer: 1,
-        explanation: "The kidneys filter blood and form urine."
-      },
-      {
-        question: "Where is urine stored before elimination?",
-        options: [
-          "Ureter",
-          "Kidney",
-          "Bladder",
-          "Nephron"
-        ],
-        answer: 2,
-        explanation: "The urinary bladder stores urine."
-      },
-      {
-        question: "What is the functional unit of the kidney?",
-        options: [
-          "Alveolus",
-          "Neuron",
-          "Nephron",
-          "Osteon"
-        ],
-        answer: 2,
-        explanation: "The nephron is the functional unit of the kidney."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 11. REPRODUCTIVE SYSTEM
-  // ======================================================
-  {
-    title: "Reproductive System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Purpose</h3>
-
-      <p class="mb-4">
-        The reproductive system is responsible for producing reproductive cells,
-        supporting reproduction and producing reproductive hormones.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Male Reproductive System</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Testes</li>
-        <li>Epididymis</li>
-        <li>Vas deferens</li>
-        <li>Seminal vesicles</li>
-        <li>Prostate gland</li>
-        <li>Penis</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Female Reproductive System</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Ovaries</li>
-        <li>Fallopian tubes</li>
-        <li>Uterus</li>
-        <li>Cervix</li>
-        <li>Vagina</li>
-      </ul>
-
-      <p class="mt-4">
-        The ovaries produce ova and reproductive hormones. The testes produce
-        sperm and testosterone.
-      </p>
-    `,
-
-    keyPoints: [
-      "The reproductive system supports reproduction.",
-      "Testes produce sperm and testosterone.",
-      "Ovaries produce ova and reproductive hormones.",
-      "The uterus is the organ where pregnancy develops.",
-      "The reproductive system is influenced by hormones."
-    ],
-
-    nursing: `
-      Reproductive anatomy is important in sexual-health assessment, antenatal
-      care, family planning, reproductive health education and clinical assessment.
-    `,
-
-    questions: [
-      {
-        question: "Which organs produce sperm?",
-        options: [
-          "Ovaries",
-          "Testes",
-          "Uterus",
-          "Prostate only"
-        ],
-        answer: 1,
-        explanation: "The testes produce sperm."
-      },
-      {
-        question: "Which organ is the usual site of pregnancy development?",
-        options: [
-          "Ovary",
-          "Uterus",
-          "Vagina",
-          "Fallopian tube"
-        ],
-        answer: 1,
-        explanation: "Pregnancy normally develops in the uterus."
-      },
-      {
-        question: "Which organs produce ova?",
-        options: [
-          "Testes",
-          "Ovaries",
-          "Kidneys",
-          "Adrenal glands"
-        ],
-        answer: 1,
-        explanation: "The ovaries produce ova and reproductive hormones."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 12. ENDOCRINE SYSTEM
-  // ======================================================
-  {
-    title: "Endocrine System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Overview</h3>
-
-      <p class="mb-4">
-        The endocrine system consists of glands that produce hormones.
-        Hormones are chemical messengers that travel through the blood to
-        influence target cells and organs.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Major Endocrine Glands</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Pituitary gland:</strong> regulates several other endocrine glands and body functions.</li>
-        <li><strong>Thyroid gland:</strong> produces hormones involved in metabolism.</li>
-        <li><strong>Parathyroid glands:</strong> help regulate calcium levels.</li>
-        <li><strong>Adrenal glands:</strong> produce hormones involved in stress responses and other functions.</li>
-        <li><strong>Pancreas:</strong> produces hormones including insulin and glucagon.</li>
-        <li><strong>Ovaries and testes:</strong> produce reproductive hormones.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Hormonal Regulation</h3>
-
-      <p>
-        Hormones help regulate metabolism, growth, reproduction, stress responses,
-        blood glucose and many other body processes.
-      </p>
-
-      <p class="mt-4">
-        Many endocrine systems use <strong>negative feedback</strong> to help
-        maintain stable hormone levels.
-      </p>
-    `,
-
-    keyPoints: [
-      "Endocrine glands produce hormones.",
-      "Hormones act as chemical messengers.",
-      "The thyroid contributes to regulation of metabolism.",
-      "Insulin helps regulate blood glucose.",
-      "The endocrine system works closely with the nervous system.",
-      "Negative feedback helps maintain physiological balance."
-    ],
-
-    nursing: `
-      Endocrine knowledge helps nurses understand conditions such as diabetes,
-      thyroid disorders and hormonal disturbances and recognize important
-      clinical findings.
-    `,
-
-    questions: [
-      {
-        question: "What do endocrine glands produce?",
-        options: [
-          "Hormones",
-          "Urine",
-          "Bile",
-          "Red blood cells only"
-        ],
-        answer: 0,
-        explanation: "Endocrine glands produce hormones that act as chemical messengers."
-      },
-      {
-        question: "Which hormone helps lower blood glucose?",
-        options: [
-          "Insulin",
-          "Adrenaline",
-          "Thyroxine",
-          "Melatonin"
-        ],
-        answer: 0,
-        explanation: "Insulin promotes processes that lower blood glucose."
-      },
-      {
-        question: "Which gland is strongly associated with regulation of metabolism?",
-        options: [
-          "Thyroid",
-          "Sweat gland",
-          "Salivary gland",
-          "Sebaceous gland"
-        ],
-        answer: 0,
-        explanation: "The thyroid produces hormones that have major effects on metabolism."
-      }
-    ]
-  }
-
-],
-
-  // ======================================================
-  // 2. ANATOMICAL TERMINOLOGY
-  // ======================================================
-  {
-    title: "Anatomical Terminology",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Anatomical Position</h3>
-
-      <p class="mb-4">
-        The standard anatomical position is standing upright, facing forward,
-        with the arms at the sides and palms facing forward.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Directional Terms</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Superior:</strong> toward the head.</li>
-        <li><strong>Inferior:</strong> away from the head.</li>
-        <li><strong>Anterior:</strong> toward the front.</li>
-        <li><strong>Posterior:</strong> toward the back.</li>
-        <li><strong>Medial:</strong> toward the body's midline.</li>
-        <li><strong>Lateral:</strong> away from the midline.</li>
-        <li><strong>Proximal:</strong> closer to the point of attachment.</li>
-        <li><strong>Distal:</strong> farther from the point of attachment.</li>
-        <li><strong>Superficial:</strong> closer to the surface.</li>
-        <li><strong>Deep:</strong> farther from the surface.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Body Planes</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Sagittal:</strong> divides the body into right and left portions.</li>
-        <li><strong>Frontal:</strong> divides the body into anterior and posterior portions.</li>
-        <li><strong>Transverse:</strong> divides the body into superior and inferior portions.</li>
-      </ul>
-    `,
-
-    keyPoints: [
-      "Anatomical position provides a standard reference.",
-      "Medial means toward the midline.",
-      "Lateral means away from the midline.",
-      "Proximal means closer to the point of attachment.",
-      "Distal means farther from the point of attachment.",
-      "Sagittal, frontal and transverse are major body planes."
-    ],
-
-    nursing: `
-      Anatomical terminology allows nurses and other healthcare professionals
-      to communicate patient findings accurately and consistently.
-    `,
-
-    questions: [
-      {
-        question: "Which term means toward the body's midline?",
-        options: [
-          "Lateral",
-          "Medial",
-          "Distal",
-          "Posterior"
-        ],
-        answer: 1,
-        explanation: "Medial means toward the body's midline."
-      },
-      {
-        question: "The elbow is what in relation to the wrist?",
-        options: [
-          "Distal",
-          "Proximal",
-          "Inferior",
-          "Lateral"
-        ],
-        answer: 1,
-        explanation: "The elbow is closer to the point of attachment of the upper limb than the wrist, so it is proximal."
-      },
-      {
-        question: "Which plane divides the body into superior and inferior portions?",
-        options: [
-          "Sagittal",
-          "Frontal",
-          "Transverse",
-          "Oblique"
-        ],
-        answer: 2,
-        explanation: "The transverse plane divides the body into superior and inferior portions."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 3. CELLS & TISSUES
-  // ======================================================
-  {
-    title: "Cells & Tissues",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">The Cell</h3>
-
-      <p class="mb-4">
-        The cell is the basic structural and functional unit of the human body.
-        Cells contain specialized structures called organelles.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Major Cell Structures</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Nucleus:</strong> contains genetic material and controls many cellular activities.</li>
-        <li><strong>Cell membrane:</strong> controls movement of substances into and out of the cell.</li>
-        <li><strong>Cytoplasm:</strong> contains organelles and is the site of many chemical reactions.</li>
-        <li><strong>Mitochondria:</strong> produce most of the cell's usable energy.</li>
-        <li><strong>Ribosomes:</strong> produce proteins.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Four Major Tissue Types</h3>
-
-      <ol class="list-decimal ml-6 space-y-2">
-        <li><strong>Epithelial tissue:</strong> covers surfaces and lines body cavities.</li>
-        <li><strong>Connective tissue:</strong> supports, connects and protects body structures.</li>
-        <li><strong>Muscle tissue:</strong> produces movement.</li>
-        <li><strong>Nervous tissue:</strong> receives and transmits electrical signals.</li>
-      </ol>
-    `,
-
-    keyPoints: [
-      "The cell is the basic unit of life.",
-      "The nucleus contains genetic material.",
-      "Mitochondria are important for energy production.",
-      "Ribosomes are involved in protein synthesis.",
-      "The four major tissues are epithelial, connective, muscle and nervous tissue."
-    ],
-
-    nursing: `
-      Understanding cells and tissues helps nurses understand wound healing,
-      infection, inflammation, cancer and many other disease processes.
-    `,
-
-    questions: [
-      {
-        question: "Which organelle contains most of the cell's genetic material?",
-        options: [
-          "Mitochondrion",
-          "Nucleus",
-          "Ribosome",
-          "Cell membrane"
-        ],
-        answer: 1,
-        explanation: "The nucleus contains most of the cell's DNA."
-      },
-      {
-        question: "Which tissue type is specialized for contraction and movement?",
-        options: [
-          "Epithelial",
-          "Connective",
-          "Muscle",
-          "Nervous"
-        ],
-        answer: 2,
-        explanation: "Muscle tissue contracts to produce movement."
-      },
-      {
-        question: "Which organelle is primarily associated with protein synthesis?",
-        options: [
-          "Ribosome",
-          "Lysosome",
-          "Nucleus",
-          "Mitochondrion"
-        ],
-        answer: 0,
-        explanation: "Ribosomes are responsible for protein synthesis."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 4. SKELETAL SYSTEM
-  // ======================================================
-  {
-    title: "Skeletal System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Functions of the Skeletal System</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Provides support and body shape.</li>
-        <li>Protects internal organs.</li>
-        <li>Allows movement together with muscles.</li>
-        <li>Stores minerals such as calcium and phosphorus.</li>
-        <li>Produces blood cells in red bone marrow.</li>
-        <li>Stores energy in yellow bone marrow.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Major Divisions</h3>
-
-      <p class="mb-4">
-        The skeleton is divided into the <strong>axial skeleton</strong> and
-        <strong>appendicular skeleton</strong>.
-      </p>
-
-      <p class="mb-4">
-        The axial skeleton includes the skull, vertebral column and thoracic
-        cage. The appendicular skeleton includes the limbs and the bones that
-        attach them to the axial skeleton.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Joints</h3>
-
-      <p>
-        Joints are locations where two or more bones meet. They provide
-        stability and, depending on their structure, allow different amounts
-        of movement.
-      </p>
-    `,
-
-    keyPoints: [
-      "Bones provide support and protection.",
-      "Bone marrow is involved in blood-cell production.",
-      "Calcium and phosphorus are stored in bones.",
-      "The skeleton has axial and appendicular divisions.",
-      "Joints connect bones and allow movement."
-    ],
-
-    nursing: `
-      Knowledge of the skeletal system is important when assessing fractures,
-      mobility, posture, falls, osteoporosis and musculoskeletal injuries.
-    `,
-
-    questions: [
-      {
-        question: "Which is a major function of the skeletal system?",
-        options: [
-          "Producing insulin",
-          "Protecting internal organs",
-          "Digesting proteins",
-          "Producing bile"
-        ],
-        answer: 1,
-        explanation: "Bones protect important organs such as the brain, heart and lungs."
-      },
-      {
-        question: "Which division includes the skull and vertebral column?",
-        options: [
-          "Appendicular skeleton",
-          "Axial skeleton",
-          "Peripheral skeleton",
-          "Muscular skeleton"
-        ],
-        answer: 1,
-        explanation: "The skull and vertebral column are part of the axial skeleton."
-      },
-      {
-        question: "What is the location where two or more bones meet called?",
-        options: [
-          "Tendon",
-          "Joint",
-          "Ligament",
-          "Cartilage only"
-        ],
-        answer: 1,
-        explanation: "A joint is where two or more bones meet."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 5. MUSCULAR SYSTEM
-  // ======================================================
-  {
-    title: "Muscular System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Functions of Muscles</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Produce body movement.</li>
-        <li>Maintain posture.</li>
-        <li>Generate heat.</li>
-        <li>Support and stabilize joints.</li>
-        <li>Move substances through certain organs.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Three Types of Muscle</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Skeletal muscle:</strong> usually under voluntary control and attached to bones.</li>
-        <li><strong>Cardiac muscle:</strong> found in the heart and contracts involuntarily.</li>
-        <li><strong>Smooth muscle:</strong> found in many internal organs and blood vessels.</li>
-      </ul>
-
-      <p class="mt-4">
-        Muscle contraction requires energy and depends on interactions between
-        specialized proteins within muscle cells.
-      </p>
-    `,
-
-    keyPoints: [
-      "Skeletal muscle is generally voluntary.",
-      "Cardiac muscle is found in the heart.",
-      "Smooth muscle is found in internal organs and blood vessels.",
-      "Muscles produce movement and help maintain posture.",
-      "Muscle activity contributes to heat production."
-    ],
-
-    nursing: `
-      Nurses assess muscle strength, mobility, movement and signs of weakness
-      when evaluating neurological and musculoskeletal function.
-    `,
-
-    questions: [
-      {
-        question: "Which type of muscle is found in the heart?",
-        options: [
-          "Skeletal",
-          "Smooth",
-          "Cardiac",
-          "Connective"
-        ],
-        answer: 2,
-        explanation: "Cardiac muscle forms the muscular wall of the heart."
-      },
-      {
-        question: "Which muscle type is generally under voluntary control?",
-        options: [
-          "Cardiac",
-          "Skeletal",
-          "Smooth",
-          "Visceral"
-        ],
-        answer: 1,
-        explanation: "Skeletal muscle is generally controlled voluntarily."
-      },
-      {
-        question: "Which is a function of muscle tissue?",
-        options: [
-          "Movement",
-          "Producing urine",
-          "Filtering blood",
-          "Producing bile"
-        ],
-        answer: 0,
-        explanation: "Muscle contraction produces movement."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 6. CARDIOVASCULAR SYSTEM
-  // ======================================================
-  {
-    title: "Cardiovascular System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Overview</h3>
-
-      <p class="mb-4">
-        The cardiovascular system consists mainly of the <strong>heart, blood
-        and blood vessels</strong>.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">The Heart</h3>
-
-      <p class="mb-4">
-        The heart is a muscular organ that pumps blood through the circulation.
-        It has four chambers: right atrium, right ventricle, left atrium and
-        left ventricle.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Blood Vessels</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Arteries:</strong> carry blood away from the heart.</li>
-        <li><strong>Veins:</strong> carry blood toward the heart.</li>
-        <li><strong>Capillaries:</strong> are small vessels where exchange occurs between blood and tissues.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Circulation</h3>
-
-      <p>
-        Pulmonary circulation carries blood between the heart and lungs.
-        Systemic circulation carries blood between the heart and the rest of
-        the body.
-      </p>
-    `,
-
-    keyPoints: [
-      "The cardiovascular system includes the heart, blood and blood vessels.",
-      "The heart has four chambers.",
-      "Arteries carry blood away from the heart.",
-      "Veins carry blood toward the heart.",
-      "Capillaries are major sites of exchange.",
-      "Pulmonary circulation involves the lungs."
-    ],
-
-    nursing: `
-      Cardiovascular knowledge is essential for assessing pulse, blood pressure,
-      circulation, chest symptoms, edema and signs of poor tissue perfusion.
-    `,
-
-    questions: [
-      {
-        question: "How many chambers does the normal human heart have?",
-        options: [
-          "Two",
-          "Three",
-          "Four",
-          "Five"
-        ],
-        answer: 2,
-        explanation: "The heart has four chambers: two atria and two ventricles."
-      },
-      {
-        question: "Which vessels carry blood away from the heart?",
-        options: [
-          "Veins",
-          "Arteries",
-          "Capillaries",
-          "Venules"
-        ],
-        answer: 1,
-        explanation: "Arteries carry blood away from the heart."
-      },
-      {
-        question: "Where does much exchange between blood and tissues occur?",
-        options: [
-          "Large arteries",
-          "Large veins",
-          "Capillaries",
-          "Heart valves"
-        ],
-        answer: 2,
-        explanation: "Capillaries have thin walls that allow exchange between blood and tissues."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 7. RESPIRATORY SYSTEM
-  // ======================================================
-  {
-    title: "Respiratory System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Main Function</h3>
-
-      <p class="mb-4">
-        The respiratory system brings oxygen into the body and removes carbon
-        dioxide. It also contributes to regulation of blood pH.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Major Structures</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Nose and nasal cavity</li>
-        <li>Pharynx</li>
-        <li>Larynx</li>
-        <li>Trachea</li>
-        <li>Bronchi</li>
-        <li>Bronchioles</li>
-        <li>Lungs</li>
-        <li>Alveoli</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Gas Exchange</h3>
-
-      <p>
-        Gas exchange occurs mainly in the alveoli. Oxygen moves from inhaled
-        air into the blood, while carbon dioxide moves from the blood into the
-        alveolar air to be exhaled.
-      </p>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Ventilation</h3>
-
-      <p>
-        Ventilation is the movement of air into and out of the lungs. The
-        diaphragm is a major muscle involved in breathing.
-      </p>
-    `,
-
-    keyPoints: [
-      "The respiratory system supplies oxygen and removes carbon dioxide.",
-      "Gas exchange occurs mainly in the alveoli.",
-      "The trachea divides into the bronchi.",
-      "The diaphragm is important in breathing.",
-      "Ventilation moves air into and out of the lungs."
-    ],
-
-    nursing: `
-      Respiratory anatomy is essential when assessing respiratory rate, oxygen
-      saturation, breath sounds, breathing difficulty and airway problems.
-    `,
-
-    questions: [
-      {
-        question: "Where does most gas exchange occur?",
-        options: [
-          "Trachea",
-          "Bronchi",
-          "Alveoli",
-          "Pharynx"
-        ],
-        answer: 2,
-        explanation: "Gas exchange between air and blood occurs mainly across the alveoli."
-      },
-      {
-        question: "Which muscle is especially important for normal breathing?",
-        options: [
-          "Biceps",
-          "Diaphragm",
-          "Triceps",
-          "Deltoid"
-        ],
-        answer: 1,
-        explanation: "The diaphragm is the major muscle of normal inspiration."
-      },
-      {
-        question: "Which gas is primarily removed from the body during exhalation?",
-        options: [
-          "Oxygen",
-          "Nitrogen",
-          "Carbon dioxide",
-          "Helium"
-        ],
-        answer: 2,
-        explanation: "Carbon dioxide is produced by metabolism and removed through exhalation."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 8. NERVOUS SYSTEM
-  // ======================================================
-  {
-    title: "Nervous System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Overview</h3>
-
-      <p class="mb-4">
-        The nervous system controls and coordinates many activities of the body.
-        It receives information, processes it and produces appropriate responses.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Central Nervous System</h3>
-
-      <p class="mb-4">
-        The <strong>central nervous system (CNS)</strong> consists of the
-        brain and spinal cord.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Peripheral Nervous System</h3>
-
-      <p class="mb-4">
-        The <strong>peripheral nervous system (PNS)</strong> consists of nerves
-        and structures outside the brain and spinal cord.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Neurons</h3>
-
-      <p>
-        Neurons are specialized cells that receive and transmit electrical and
-        chemical signals.
-      </p>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Autonomic Nervous System</h3>
-
-      <p>
-        The autonomic nervous system regulates many involuntary functions,
-        including heart rate, digestion and blood-vessel activity.
-      </p>
-    `,
-
-    keyPoints: [
-      "The CNS consists of the brain and spinal cord.",
-      "The PNS includes nerves outside the CNS.",
-      "Neurons transmit information.",
-      "The nervous system coordinates body functions.",
-      "The autonomic nervous system regulates many involuntary activities."
-    ],
-
-    nursing: `
-      Nurses assess neurological status through consciousness, pupils, movement,
-      sensation, reflexes and other neurological observations.
-    `,
-
-    questions: [
-      {
-        question: "Which structures make up the central nervous system?",
-        options: [
-          "Brain and spinal cord",
-          "Heart and brain",
-          "Spinal nerves only",
-          "Muscles and nerves"
-        ],
-        answer: 0,
-        explanation: "The CNS consists of the brain and spinal cord."
-      },
-      {
-        question: "What is the main function of neurons?",
-        options: [
-          "Store calcium",
-          "Transmit information",
-          "Produce bile",
-          "Filter urine"
-        ],
-        answer: 1,
-        explanation: "Neurons are specialized for receiving and transmitting signals."
-      },
-      {
-        question: "Which system regulates many involuntary body functions?",
-        options: [
-          "Autonomic nervous system",
-          "Skeletal system",
-          "Digestive system",
-          "Skeletal nervous system"
-        ],
-        answer: 0,
-        explanation: "The autonomic nervous system controls many involuntary functions."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 9. DIGESTIVE SYSTEM
-  // ======================================================
-  {
-    title: "Digestive System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Purpose of Digestion</h3>
-
-      <p class="mb-4">
-        The digestive system breaks food into smaller substances that can be
-        absorbed and used by the body. It also eliminates undigested material.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Major Organs</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Mouth</li>
-        <li>Pharynx</li>
-        <li>Esophagus</li>
-        <li>Stomach</li>
-        <li>Small intestine</li>
-        <li>Large intestine</li>
-        <li>Rectum</li>
-        <li>Anus</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Accessory Organs</h3>
-
-      <p class="mb-4">
-        The liver, gallbladder and pancreas assist digestion.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Small Intestine</h3>
-
-      <p>
-        Much of the digestion and absorption of nutrients occurs in the small
-        intestine. Its large surface area helps maximize absorption.
-      </p>
-    `,
-
-    keyPoints: [
-      "Digestion breaks food into usable components.",
-      "The stomach performs mechanical and chemical digestion.",
-      "The small intestine is a major site of nutrient absorption.",
-      "The large intestine absorbs water and forms feces.",
-      "The liver, gallbladder and pancreas assist digestion."
-    ],
-
-    nursing: `
-      Digestive-system knowledge helps nurses assess appetite, swallowing,
-      abdominal symptoms, bowel function, nutrition and hydration.
-    `,
-
-    questions: [
-      {
-        question: "Where does most nutrient absorption occur?",
-        options: [
-          "Stomach",
-          "Small intestine",
-          "Esophagus",
-          "Large intestine"
-        ],
-        answer: 1,
-        explanation: "The small intestine is the major site of nutrient absorption."
-      },
-      {
-        question: "Which organ produces bile?",
-        options: [
-          "Pancreas",
-          "Liver",
-          "Stomach",
-          "Kidney"
-        ],
-        answer: 1,
-        explanation: "The liver produces bile, which assists in fat digestion."
-      },
-      {
-        question: "What is a major function of the large intestine?",
-        options: [
-          "Absorb water",
-          "Pump blood",
-          "Produce insulin only",
-          "Exchange oxygen"
-        ],
-        answer: 0,
-        explanation: "The large intestine absorbs water and helps form feces."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 10. URINARY SYSTEM
-  // ======================================================
-  {
-    title: "Urinary System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Major Functions</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Remove metabolic waste from the blood.</li>
-        <li>Regulate water balance.</li>
-        <li>Help regulate electrolytes.</li>
-        <li>Contribute to acid-base balance.</li>
-        <li>Assist in regulation of blood pressure.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Major Organs</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Kidneys:</strong> filter blood and form urine.</li>
-        <li><strong>Ureters:</strong> transport urine from kidneys to bladder.</li>
-        <li><strong>Urinary bladder:</strong> stores urine.</li>
-        <li><strong>Urethra:</strong> carries urine out of the body.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Nephrons</h3>
-
-      <p>
-        The nephron is the functional unit of the kidney. Processes including
-        filtration, reabsorption and secretion contribute to urine formation.
-      </p>
-    `,
-
-    keyPoints: [
-      "The kidneys filter blood and form urine.",
-      "Ureters carry urine to the bladder.",
-      "The bladder stores urine.",
-      "The urethra carries urine out of the body.",
-      "Nephrons are functional units of the kidneys."
-    ],
-
-    nursing: `
-      Understanding the urinary system is important when monitoring urine output,
-      hydration, kidney function, fluid balance and urinary problems.
-    `,
-
-    questions: [
-      {
-        question: "Which organs form urine?",
-        options: [
-          "Lungs",
-          "Kidneys",
-          "Liver",
-          "Heart"
-        ],
-        answer: 1,
-        explanation: "The kidneys filter blood and form urine."
-      },
-      {
-        question: "Where is urine stored before elimination?",
-        options: [
-          "Ureter",
-          "Kidney",
-          "Bladder",
-          "Nephron"
-        ],
-        answer: 2,
-        explanation: "The urinary bladder stores urine."
-      },
-      {
-        question: "What is the functional unit of the kidney?",
-        options: [
-          "Alveolus",
-          "Neuron",
-          "Nephron",
-          "Osteon"
-        ],
-        answer: 2,
-        explanation: "The nephron is the functional unit of the kidney."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 11. REPRODUCTIVE SYSTEM
-  // ======================================================
-  {
-    title: "Reproductive System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Purpose</h3>
-
-      <p class="mb-4">
-        The reproductive system is responsible for producing reproductive cells,
-        supporting reproduction and producing reproductive hormones.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Male Reproductive System</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Testes</li>
-        <li>Epididymis</li>
-        <li>Vas deferens</li>
-        <li>Seminal vesicles</li>
-        <li>Prostate gland</li>
-        <li>Penis</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Female Reproductive System</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li>Ovaries</li>
-        <li>Fallopian tubes</li>
-        <li>Uterus</li>
-        <li>Cervix</li>
-        <li>Vagina</li>
-      </ul>
-
-      <p class="mt-4">
-        The ovaries produce ova and reproductive hormones. The testes produce
-        sperm and testosterone.
-      </p>
-    `,
-
-    keyPoints: [
-      "The reproductive system supports reproduction.",
-      "Testes produce sperm and testosterone.",
-      "Ovaries produce ova and reproductive hormones.",
-      "The uterus is the organ where pregnancy develops.",
-      "The reproductive system is influenced by hormones."
-    ],
-
-    nursing: `
-      Reproductive anatomy is important in sexual-health assessment, antenatal
-      care, family planning, reproductive health education and clinical assessment.
-    `,
-
-    questions: [
-      {
-        question: "Which organs produce sperm?",
-        options: [
-          "Ovaries",
-          "Testes",
-          "Uterus",
-          "Prostate only"
-        ],
-        answer: 1,
-        explanation: "The testes produce sperm."
-      },
-      {
-        question: "Which organ is the usual site of pregnancy development?",
-        options: [
-          "Ovary",
-          "Uterus",
-          "Vagina",
-          "Fallopian tube"
-        ],
-        answer: 1,
-        explanation: "Pregnancy normally develops in the uterus."
-      },
-      {
-        question: "Which organs produce ova?",
-        options: [
-          "Testes",
-          "Ovaries",
-          "Kidneys",
-          "Adrenal glands"
-        ],
-        answer: 1,
-        explanation: "The ovaries produce ova and reproductive hormones."
-      }
-    ]
-  },
-
-
-  // ======================================================
-  // 12. ENDOCRINE SYSTEM
-  // ======================================================
-  {
-    title: "Endocrine System",
-
-    notes: `
-      <h3 class="text-xl font-black mb-3">Overview</h3>
-
-      <p class="mb-4">
-        The endocrine system consists of glands that produce hormones.
-        Hormones are chemical messengers that travel through the blood to
-        influence target cells and organs.
-      </p>
-
-      <h3 class="text-xl font-black mb-3">Major Endocrine Glands</h3>
-
-      <ul class="list-disc ml-6 space-y-2">
-        <li><strong>Pituitary gland:</strong> regulates several other endocrine glands and body functions.</li>
-        <li><strong>Thyroid gland:</strong> produces hormones involved in metabolism.</li>
-        <li><strong>Parathyroid glands:</strong> help regulate calcium levels.</li>
-        <li><strong>Adrenal glands:</strong> produce hormones involved in stress responses and other functions.</li>
-        <li><strong>Pancreas:</strong> produces hormones including insulin and glucagon.</li>
-        <li><strong>Ovaries and testes:</strong> produce reproductive hormones.</li>
-      </ul>
-
-      <h3 class="text-xl font-black mt-6 mb-3">Hormonal Regulation</h3>
-
-      <p>
-        Hormones help regulate metabolism, growth, reproduction, stress responses,
-        blood glucose and many other body processes.
-      </p>
-
-      <p class="mt-4">
-        Many endocrine systems use <strong>negative feedback</strong> to help
-        maintain stable hormone levels.
-      </p>
-    `,
-
-    keyPoints: [
-      "Endocrine glands produce hormones.",
-      "Hormones act as chemical messengers.",
-      "The thyroid contributes to regulation of metabolism.",
-      "Insulin helps regulate blood glucose.",
-      "The endocrine system works closely with the nervous system.",
-      "Negative feedback helps maintain physiological balance."
-    ],
-
-    nursing: `
-      Endocrine knowledge helps nurses understand conditions such as diabetes,
-      thyroid disorders and hormonal disturbances and recognize important
-      clinical findings.
-    `,
-
-    questions: [
-      {
-        question: "What do endocrine glands produce?",
-        options: [
-          "Hormones",
-          "Urine",
-          "Bile",
-          "Red blood cells only"
-        ],
-        answer: 0,
-        explanation: "Endocrine glands produce hormones that act as chemical messengers."
-      },
-      {
-        question: "Which hormone helps lower blood glucose?",
-        options: [
-          "Insulin",
-          "Adrenaline",
-          "Thyroxine",
-          "Melatonin"
-        ],
-        answer: 0,
-        explanation: "Insulin promotes processes that lower blood glucose."
-      },
-      {
-        question: "Which gland is strongly associated with regulation of metabolism?",
-        options: [
-          "Thyroid",
-          "Sweat gland",
-          "Salivary gland",
-          "Sebaceous gland"
-        ],
-        answer: 0,
-        explanation: "The thyroid produces hormones that have major effects on metabolism."
-      }
-    ]
-  }
-
-],
+    "anatomy-physiology": {
+      lessons: [
+        {
+          title: "Introduction to Anatomy & Physiology",
+          description: "Understand the structure and function of the human body.",
+          notes: `
+            <p><strong>Anatomy</strong> is the study of body structures, while
+            <strong>physiology</strong> is the study of how those structures function.</p>
+
+            <p>The two subjects are closely related because the structure of a body
+            part usually determines how it performs its function.</p>
+
+            <h3>Levels of organization</h3>
+            <ol>
+              <li>Chemical level</li>
+              <li>Cellular level</li>
+              <li>Tissue level</li>
+              <li>Organ level</li>
+              <li>Organ-system level</li>
+              <li>Organism level</li>
+            </ol>
+
+            <h3>Homeostasis</h3>
+            <p>Homeostasis is the maintenance of a relatively stable internal
+            environment despite changes in the body or surroundings.</p>
+          `,
+          keyPoints: [
+            "Anatomy studies structure.",
+            "Physiology studies function.",
+            "Structure and function are closely related.",
+            "The body is organized into different levels.",
+            "Homeostasis helps maintain internal balance."
+          ],
+          question: "What does physiology study?",
+          options: [
+            "Body structure",
+            "Body function",
+            "Diseases only",
+            "Medications only"
+          ],
+          answer: 1,
+          explanation: "Physiology is the study of how the body and its parts function."
+        },
+
+        {
+          title: "Cells and Tissues",
+          description: "Learn about the basic structural units of the human body.",
+          notes: `
+            <p>The <strong>cell</strong> is the basic structural and functional unit
+            of the human body.</p>
+
+            <h3>Major cell structures</h3>
+            <ul>
+              <li><strong>Cell membrane:</strong> controls movement into and out of the cell.</li>
+              <li><strong>Nucleus:</strong> contains genetic material.</li>
+              <li><strong>Mitochondria:</strong> produce much of the cell's usable energy.</li>
+              <li><strong>Ribosomes:</strong> participate in protein synthesis.</li>
+            </ul>
+
+            <h3>Four major tissue types</h3>
+            <ol>
+              <li>Epithelial tissue</li>
+              <li>Connective tissue</li>
+              <li>Muscle tissue</li>
+              <li>Nervous tissue</li>
+            </ol>
+          `,
+          keyPoints: [
+            "Cells are the basic units of life.",
+            "The nucleus contains genetic material.",
+            "Mitochondria are important for energy production.",
+            "There are four major tissue types."
+          ],
+          question: "Which structure contains most of a cell's genetic material?",
+          options: [
+            "Nucleus",
+            "Cell membrane",
+            "Ribosome",
+            "Mitochondrion"
+          ],
+          answer: 0,
+          explanation: "The nucleus contains the cell's chromosomes and most of its genetic material."
+        },
+
+        {
+          title: "Skeletal System",
+          description: "Study bones, joints and their functions.",
+          notes: `
+            <p>The skeletal system provides support, protects internal organs,
+            assists movement and stores minerals.</p>
+
+            <h3>Functions of bones</h3>
+            <ul>
+              <li>Support</li>
+              <li>Protection</li>
+              <li>Movement</li>
+              <li>Mineral storage</li>
+              <li>Blood cell formation in bone marrow</li>
+            </ul>
+
+            <p>Joints are locations where two or more bones meet. Their structure
+            allows different degrees of movement.</p>
+          `,
+          keyPoints: [
+            "Bones provide support.",
+            "The skeleton protects important organs.",
+            "Bones help movement.",
+            "Bone marrow is involved in blood cell production."
+          ],
+          question: "Which is a major function of the skeletal system?",
+          options: [
+            "Producing insulin",
+            "Protecting organs",
+            "Digesting food",
+            "Filtering urine"
+          ],
+          answer: 1,
+          explanation: "The skeleton protects organs such as the brain, heart and lungs."
+        },
+
+        {
+          title: "Cardiovascular System",
+          description: "Understand the heart, blood and circulation.",
+          notes: `
+            <p>The cardiovascular system consists mainly of the <strong>heart,
+            blood and blood vessels</strong>.</p>
+
+            <p>The heart pumps blood through the pulmonary and systemic circulations.</p>
+
+            <h3>Blood vessels</h3>
+            <ul>
+              <li><strong>Arteries:</strong> carry blood away from the heart.</li>
+              <li><strong>Veins:</strong> carry blood toward the heart.</li>
+              <li><strong>Capillaries:</strong> allow exchange between blood and tissues.</li>
+            </ul>
+          `,
+          keyPoints: [
+            "The heart pumps blood.",
+            "Arteries carry blood away from the heart.",
+            "Veins carry blood toward the heart.",
+            "Capillaries are important sites of exchange."
+          ],
+          question: "Which blood vessels carry blood away from the heart?",
+          options: [
+            "Veins",
+            "Arteries",
+            "Capillaries",
+            "Venules"
+          ],
+          answer: 1,
+          explanation: "Arteries carry blood away from the heart."
+        },
+
+        {
+          title: "Respiratory System",
+          description: "Learn how oxygen enters the body and carbon dioxide is removed.",
+          notes: `
+            <p>The respiratory system allows the body to exchange oxygen and
+            carbon dioxide with the environment.</p>
+
+            <h3>Major structures</h3>
+            <ul>
+              <li>Nose and nasal cavity</li>
+              <li>Pharynx</li>
+              <li>Larynx</li>
+              <li>Trachea</li>
+              <li>Bronchi</li>
+              <li>Lungs</li>
+              <li>Alveoli</li>
+            </ul>
+
+            <p>Gas exchange occurs mainly in the <strong>alveoli</strong>.</p>
+          `,
+          keyPoints: [
+            "The respiratory system exchanges gases.",
+            "Oxygen is needed by cells.",
+            "Carbon dioxide is removed.",
+            "Gas exchange occurs mainly in the alveoli."
+          ],
+          question: "Where does most gas exchange occur in the lungs?",
+          options: [
+            "Trachea",
+            "Bronchi",
+            "Alveoli",
+            "Larynx"
+          ],
+          answer: 2,
+          explanation: "The alveoli provide a large surface area for oxygen and carbon dioxide exchange."
+        }
+      ]
+    },
 
     // ========================================================
     // 2. MICROBIOLOGY
     // ========================================================
 
-    "microbiology": [
-      [
-        "Introduction to Microbiology",
-        "Study microorganisms and their importance to human health.",
-        "Define microbiology and identify major groups of microorganisms."
-      ],
-      [
-        "Bacteria",
-        "Study bacterial structure, classification and reproduction.",
-        "Describe basic bacterial structure and binary fission."
-      ],
-      [
-        "Viruses",
-        "Study viruses, their structure and replication.",
-        "Explain why viruses require host cells for replication."
-      ],
-      [
-        "Fungi",
-        "Study yeasts, molds and medically important fungal infections.",
-        "Differentiate common forms of fungi."
-      ],
-      [
-        "Protozoa & Parasites",
-        "Study medically important protozoa and parasites.",
-        "Explain how selected parasites can cause human disease."
-      ],
-      [
-        "Normal Microbiota",
-        "Study microorganisms that normally live on and inside the human body.",
-        "Explain beneficial and harmful effects of normal microbiota."
-      ],
-      [
-        "Infection & Disease",
-        "Study the relationship between microorganisms, infection and disease.",
-        "Explain the basic chain of infection."
-      ],
-      [
-        "Sterilization & Disinfection",
-        "Study cleaning, disinfection, antisepsis and sterilization.",
-        "Differentiate sterilization from disinfection."
-      ],
-      [
-        "Immunity",
-        "Study innate and adaptive immune defenses.",
-        "Explain the basic mechanisms of immune protection."
-      ],
-      [
-        "Infection Prevention",
-        "Study methods used to prevent transmission of microorganisms.",
-        "Explain the importance of standard precautions."
+    "microbiology": {
+      lessons: [
+        {
+          title: "Introduction to Microbiology",
+          description: "Study microorganisms and their importance in healthcare.",
+          notes: `
+            <p>Microbiology is the study of microorganisms, including bacteria,
+            viruses, fungi, protozoa and some other microscopic organisms.</p>
+
+            <p>Microorganisms can be beneficial, harmless or disease-causing.</p>
+          `,
+          keyPoints: [
+            "Microbiology studies microorganisms.",
+            "Not all microorganisms cause disease.",
+            "Microorganisms may be useful or harmful."
+          ],
+          question: "What does microbiology mainly study?",
+          options: [
+            "Bones",
+            "Microorganisms",
+            "Medication prices",
+            "Hospital buildings"
+          ],
+          answer: 1,
+          explanation: "Microbiology is the study of microorganisms."
+        },
+
+        {
+          title: "Bacteria",
+          description: "Understand bacterial structure, growth and disease.",
+          notes: `
+            <p>Bacteria are single-celled microorganisms. Some bacteria are
+            beneficial while others can cause infection.</p>
+
+            <p>Important bacterial structures include the cell membrane,
+            cell wall, cytoplasm and genetic material.</p>
+          `,
+          keyPoints: [
+            "Bacteria are microorganisms.",
+            "Some bacteria cause disease.",
+            "Some bacteria are beneficial."
+          ],
+          question: "Are all bacteria harmful to humans?",
+          options: [
+            "Yes",
+            "No",
+            "Only in hospitals",
+            "Only in children"
+          ],
+          answer: 1,
+          explanation: "Many bacteria are harmless or beneficial, although some cause disease."
+        },
+
+        {
+          title: "Viruses",
+          description: "Learn how viruses differ from cellular microorganisms.",
+          notes: `
+            <p>Viruses are infectious agents that require living host cells to
+            replicate.</p>
+
+            <p>Viral infections can affect different organs and body systems.</p>
+          `,
+          keyPoints: [
+            "Viruses require host cells for replication.",
+            "Viral diseases can affect many body systems.",
+            "Prevention may include vaccination and infection-control measures."
+          ],
+          question: "What do viruses require for replication?",
+          options: [
+            "A living host cell",
+            "Only water",
+            "Bone marrow",
+            "Oxygen alone"
+          ],
+          answer: 0,
+          explanation: "Viruses depend on living host cells to replicate."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 3. FIRST AID
     // ========================================================
 
-    "first-aid": [
-      [
-        "Introduction to First Aid",
-        "Study the principles and priorities of immediate care.",
-        "Explain the purpose of first aid."
-      ],
-      [
-        "Primary Assessment",
-        "Learn how to rapidly assess an injured or ill person.",
-        "Identify immediate life-threatening problems."
-      ],
-      [
-        "Basic Life Support",
-        "Study basic approaches to cardiopulmonary emergencies.",
-        "Describe the basic sequence of emergency response."
-      ],
-      [
-        "Bleeding & Wounds",
-        "Study first aid management of bleeding and wounds.",
-        "Explain basic bleeding-control principles."
-      ],
-      [
-        "Fractures & Sprains",
-        "Study immediate care for musculoskeletal injuries.",
-        "Describe appropriate first-aid measures for suspected fractures."
-      ],
-      [
-        "Burns",
-        "Study first aid for thermal and other burns.",
-        "Identify important initial care principles for burns."
-      ],
-      [
-        "Shock",
-        "Study recognition and immediate management of shock.",
-        "Identify common signs of shock."
-      ],
-      [
-        "Choking",
-        "Study emergency response to airway obstruction.",
-        "Recognize the signs of choking and appropriate emergency action."
+    "first-aid": {
+      lessons: [
+        {
+          title: "Principles of First Aid",
+          description: "Learn the basic approach to providing immediate care.",
+          notes: `
+            <p>First aid is immediate care given to a person who is injured or
+            suddenly ill before definitive medical treatment is available.</p>
+
+            <h3>Basic priorities</h3>
+            <ol>
+              <li>Ensure scene safety.</li>
+              <li>Assess the person.</li>
+              <li>Call for appropriate emergency assistance.</li>
+              <li>Provide appropriate first aid.</li>
+              <li>Monitor the person.</li>
+            </ol>
+          `,
+          keyPoints: [
+            "Safety comes first.",
+            "Assess the person's condition.",
+            "Activate emergency help when necessary.",
+            "Continue monitoring."
+          ],
+          question: "What should be considered first when giving first aid?",
+          options: [
+            "Scene safety",
+            "Taking a photograph",
+            "Giving medication",
+            "Moving the patient immediately"
+          ],
+          answer: 0,
+          explanation: "The rescuer should first make sure the scene is safe."
+        },
+
+        {
+          title: "Bleeding and Wound Care",
+          description: "Understand basic management of bleeding.",
+          notes: `
+            <p>Bleeding should be assessed quickly. Appropriate first aid may
+            include applying direct pressure with a clean dressing.</p>
+
+            <p>Severe bleeding requires urgent medical attention.</p>
+          `,
+          keyPoints: [
+            "Severe bleeding can become life-threatening.",
+            "Direct pressure is commonly used for external bleeding.",
+            "Seek emergency assistance for serious bleeding."
+          ],
+          question: "What is commonly used initially for significant external bleeding?",
+          options: [
+            "Direct pressure",
+            "Ignoring the wound",
+            "Giving food",
+            "Applying perfume"
+          ],
+          answer: 0,
+          explanation: "Direct pressure can help control external bleeding."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 4. FUNDAMENTALS OF NURSING
     // ========================================================
 
-    "fundamentals-nursing": [
-      [
-        "Introduction to Nursing",
-        "Study the role, purpose and principles of professional nursing.",
-        "Explain the major responsibilities of a nurse."
-      ],
-      [
-        "Nursing Process",
-        "Study assessment, diagnosis, planning, implementation and evaluation.",
-        "Describe the five major steps of the nursing process."
-      ],
-      [
-        "Vital Signs",
-        "Study temperature, pulse, respiration, blood pressure and oxygen saturation.",
-        "Explain correct measurement and documentation of vital signs."
-      ],
-      [
-        "Patient Hygiene",
-        "Study principles of personal hygiene and comfort care.",
-        "Explain the nurse's role in maintaining patient hygiene."
-      ],
-      [
-        "Patient Safety",
-        "Study principles for preventing falls, errors and avoidable harm.",
-        "Identify common nursing safety measures."
-      ],
-      [
-        "Communication",
-        "Study therapeutic and professional communication.",
-        "Differentiate therapeutic communication from ineffective communication."
-      ],
-      [
-        "Documentation",
-        "Study accurate, timely and professional nursing documentation.",
-        "Explain principles of safe clinical documentation."
-      ],
-      [
-        "Basic Clinical Skills",
-        "Study essential bedside nursing skills.",
-        "Explain the importance of correct technique and infection prevention."
+    "fundamentals-nursing": {
+      lessons: [
+        {
+          title: "Introduction to Nursing",
+          description: "Understand the role and responsibilities of nurses.",
+          notes: `
+            <p>Nursing involves promoting health, preventing illness, caring for
+            people who are ill and supporting recovery.</p>
+
+            <p>Nurses provide care using clinical knowledge, communication,
+            assessment, planning, intervention and evaluation.</p>
+          `,
+          keyPoints: [
+            "Nursing promotes health.",
+            "Nurses provide holistic patient care.",
+            "Communication is essential.",
+            "Nursing care should be evidence-informed and safe."
+          ],
+          question: "Which is an important part of nursing care?",
+          options: [
+            "Patient assessment",
+            "Ignoring symptoms",
+            "Avoiding communication",
+            "Skipping documentation"
+          ],
+          answer: 0,
+          explanation: "Assessment is a fundamental component of safe nursing care."
+        },
+
+        {
+          title: "Vital Signs",
+          description: "Study temperature, pulse, respiration and blood pressure.",
+          notes: `
+            <p>Vital signs provide important information about a patient's
+            physiological condition.</p>
+
+            <ul>
+              <li>Temperature</li>
+              <li>Pulse</li>
+              <li>Respiratory rate</li>
+              <li>Blood pressure</li>
+              <li>Oxygen saturation when clinically indicated</li>
+            </ul>
+          `,
+          keyPoints: [
+            "Vital signs help assess patient status.",
+            "Changes in vital signs may indicate deterioration.",
+            "Accurate measurement is important."
+          ],
+          question: "Which of the following is a vital sign?",
+          options: [
+            "Blood pressure",
+            "Hair colour",
+            "Shoe size",
+            "Height of the nurse"
+          ],
+          answer: 0,
+          explanation: "Blood pressure is one of the commonly measured vital signs."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 5. MEDICAL-SURGICAL NURSING
     // ========================================================
 
-    "medical-surgical": [
-      [
-        "Introduction to Medical-Surgical Nursing",
-        "Study nursing care of adults with common medical and surgical conditions.",
-        "Explain the role of the medical-surgical nurse."
-      ],
-      [
-        "Patient Assessment",
-        "Study systematic assessment of adult patients.",
-        "Identify important components of patient assessment."
-      ],
-      [
-        "Respiratory Disorders",
-        "Study nursing care for common respiratory conditions.",
-        "Identify important respiratory assessment findings."
-      ],
-      [
-        "Cardiovascular Disorders",
-        "Study common cardiovascular conditions and nursing care.",
-        "Explain major nursing priorities in cardiovascular care."
-      ],
-      [
-        "Gastrointestinal Disorders",
-        "Study common gastrointestinal problems.",
-        "Identify important nursing considerations for gastrointestinal disorders."
-      ],
-      [
-        "Renal Disorders",
-        "Study common kidney and urinary conditions.",
-        "Explain major nursing considerations for renal patients."
-      ],
-      [
-        "Postoperative Nursing Care",
-        "Study nursing care before and after surgery.",
-        "Identify important postoperative nursing priorities."
-      ],
-      [
-        "Pain Management",
-        "Study assessment and management of patient pain.",
-        "Explain the importance of pain assessment."
+    "medical-surgical": {
+      lessons: [
+        {
+          title: "Introduction to Medical-Surgical Nursing",
+          description: "Learn the foundations of adult medical and surgical care.",
+          notes: `
+            <p>Medical-surgical nursing focuses on caring for adults with a wide
+            range of medical and surgical conditions.</p>
+
+            <p>Nurses assess patients, monitor changes, administer treatments,
+            educate patients and evaluate responses to care.</p>
+          `,
+          keyPoints: [
+            "Assessment is central to medical-surgical nursing.",
+            "Patients may have acute or chronic conditions.",
+            "Monitoring for deterioration is essential."
+          ],
+          question: "What is an important nursing responsibility in medical-surgical care?",
+          options: [
+            "Patient assessment",
+            "Ignoring changes",
+            "Avoiding documentation",
+            "Stopping all communication"
+          ],
+          answer: 0,
+          explanation: "Patient assessment is essential for identifying needs and changes in condition."
+        },
+
+        {
+          title: "Postoperative Nursing Care",
+          description: "Understand important nursing considerations after surgery.",
+          notes: `
+            <p>Postoperative care involves monitoring the patient's recovery,
+            pain, wound, vital signs, mobility, nutrition and possible
+            complications.</p>
+          `,
+          keyPoints: [
+            "Monitor vital signs.",
+            "Assess pain.",
+            "Observe the surgical wound.",
+            "Monitor for complications."
+          ],
+          question: "Which is important after surgery?",
+          options: [
+            "Monitoring the patient",
+            "Ignoring pain",
+            "Ignoring the wound",
+            "Avoiding vital signs"
+          ],
+          answer: 0,
+          explanation: "Close postoperative monitoring helps identify complications early."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 6. PHARMACOLOGY
     // ========================================================
 
-    "pharmacology": [
-      [
-        "Introduction to Pharmacology",
-        "Study basic principles of medicines and drug therapy.",
-        "Define pharmacology and explain its importance to nursing."
-      ],
-      [
-        "Drug Names & Classification",
-        "Study generic names, brand names and drug classes.",
-        "Differentiate generic and brand drug names."
-      ],
-      [
-        "Pharmacokinetics",
-        "Study absorption, distribution, metabolism and excretion.",
-        "Explain the four major processes of pharmacokinetics."
-      ],
-      [
-        "Pharmacodynamics",
-        "Study how medicines produce effects in the body.",
-        "Explain the relationship between drugs and their targets."
-      ],
-      [
-        "Routes of Administration",
-        "Study oral, topical, parenteral and other medication routes.",
-        "Compare common routes of medication administration."
-      ],
-      [
-        "Medication Safety",
-        "Study safe medication administration and error prevention.",
-        "Identify important medication-safety principles."
-      ],
-      [
-        "Adverse Drug Reactions",
-        "Study unwanted and harmful responses to medicines.",
-        "Differentiate common adverse effects from serious reactions."
-      ],
-      [
-        "Nursing Responsibilities",
-        "Study nursing responsibilities before, during and after medication administration.",
-        "Explain the nurse's role in safe medication therapy."
+    "pharmacology": {
+      lessons: [
+        {
+          title: "Introduction to Pharmacology",
+          description: "Understand how medicines interact with the body.",
+          notes: `
+            <p>Pharmacology is the study of drugs and their effects on living
+            organisms.</p>
+
+            <p>Nurses need knowledge of medication indications, routes,
+            adverse effects, interactions and safe administration.</p>
+          `,
+          keyPoints: [
+            "Pharmacology studies drugs.",
+            "Medication safety is essential.",
+            "Nurses should understand medication effects."
+          ],
+          question: "What is pharmacology?",
+          options: [
+            "Study of drugs",
+            "Study of bones only",
+            "Study of hospital architecture",
+            "Study of nutrition only"
+          ],
+          answer: 0,
+          explanation: "Pharmacology is the study of drugs and their effects."
+        },
+
+        {
+          title: "Medication Safety",
+          description: "Learn principles of safe medication administration.",
+          notes: `
+            <p>Medication safety involves correctly identifying the patient,
+            medicine, dose, route, timing and other relevant requirements.</p>
+
+            <p>Always follow institutional policies and verify medication
+            information before administration.</p>
+          `,
+          keyPoints: [
+            "Correct patient identification is important.",
+            "Verify medication information.",
+            "Check the prescribed dose and route.",
+            "Document medication administration appropriately."
+          ],
+          question: "Why is patient identification important before medication administration?",
+          options: [
+            "To prevent medication errors",
+            "To save paper",
+            "To avoid documentation",
+            "It is unnecessary"
+          ],
+          answer: 0,
+          explanation: "Correct patient identification helps prevent medication errors."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 7. PATHOPHYSIOLOGY
     // ========================================================
 
-    "pathophysiology": [
-      [
-        "Introduction to Pathophysiology",
-        "Study how disease alters normal body function.",
-        "Define pathophysiology."
-      ],
-      [
-        "Cellular Injury",
-        "Study how cells respond to stress and injury.",
-        "Identify basic causes of cellular injury."
-      ],
-      [
-        "Inflammation",
-        "Study the body's inflammatory response.",
-        "Describe the basic features of inflammation."
-      ],
-      [
-        "Fluid & Electrolyte Imbalance",
-        "Study disturbances of body fluids and electrolytes.",
-        "Identify common signs of fluid imbalance."
-      ],
-      [
-        "Infection & Disease",
-        "Study how disease processes develop from infection.",
-        "Explain basic mechanisms of infectious disease."
-      ],
-      [
-        "Immune Disorders",
-        "Study abnormal immune responses.",
-        "Differentiate basic immune dysfunctions."
-      ],
-      [
-        "Neoplasia",
-        "Study abnormal cell growth and cancer.",
-        "Explain basic concepts of neoplasia."
-      ],
-      [
-        "Systemic Disease Processes",
-        "Review how pathological processes affect body systems.",
-        "Relate disease mechanisms to clinical findings."
+    "pathophysiology": {
+      lessons: [
+        {
+          title: "Introduction to Pathophysiology",
+          description: "Understand how disease changes normal body function.",
+          notes: `
+            <p>Pathophysiology examines functional changes associated with disease
+            or injury.</p>
+
+            <p>Understanding these changes helps nurses connect signs and symptoms
+            with underlying disease processes.</p>
+          `,
+          keyPoints: [
+            "Pathophysiology studies abnormal body function.",
+            "Disease can disturb normal homeostasis.",
+            "Signs and symptoms reflect underlying changes."
+          ],
+          question: "What does pathophysiology focus on?",
+          options: [
+            "Abnormal body function",
+            "Hospital construction",
+            "Food prices",
+            "Clothing"
+          ],
+          answer: 0,
+          explanation: "Pathophysiology focuses on functional changes associated with disease."
+        }
       ]
-    ],
+    },
 
     // ========================================================
-    // 8. COMMUNITY HEALTH
+    // 8. COMMUNITY HEALTH NURSING
     // ========================================================
 
-    "community-health": [
-      [
-        "Introduction to Community Health Nursing",
-        "Study nursing care delivered to individuals, families and communities.",
-        "Define community health nursing."
-      ],
-      [
-        "Community Assessment",
-        "Study systematic assessment of community health needs.",
-        "Identify important components of community assessment."
-      ],
-      [
-        "Primary Health Care",
-        "Study essential principles of primary health care.",
-        "Explain the importance of accessible primary care."
-      ],
-      [
-        "Disease Prevention",
-        "Study primary, secondary and tertiary prevention.",
-        "Differentiate the levels of disease prevention."
-      ],
-      [
-        "Maternal & Child Community Care",
-        "Study community services for mothers and children.",
-        "Explain the importance of maternal and child health services."
-      ],
-      [
-        "Environmental Health",
-        "Study environmental factors affecting health.",
-        "Identify common environmental health risks."
-      ],
-      [
-        "Health Education",
-        "Study effective community health education.",
-        "Explain principles of effective health education."
-      ],
-      [
-        "Community Nursing Practice",
-        "Apply community health principles to nursing practice.",
-        "Explain the nurse's role in community-based care."
+    "community-health": {
+      lessons: [
+        {
+          title: "Introduction to Community Health Nursing",
+          description: "Learn how nurses promote health within communities.",
+          notes: `
+            <p>Community health nursing focuses on individuals, families and
+            populations within their communities.</p>
+
+            <p>Major activities include health education, prevention,
+            screening and community assessment.</p>
+          `,
+          keyPoints: [
+            "Community health focuses on populations.",
+            "Prevention is important.",
+            "Health education is a major nursing activity."
+          ],
+          question: "What is an important focus of community health nursing?",
+          options: [
+            "Disease prevention",
+            "Ignoring communities",
+            "Only hospital construction",
+            "Avoiding health education"
+          ],
+          answer: 0,
+          explanation: "Prevention and health promotion are important parts of community health nursing."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 9. MATERNAL & CHILD HEALTH
     // ========================================================
 
-    "maternal-child-health": [
-      [
-        "Introduction to Maternal & Child Health",
-        "Study health care of women, newborns and children.",
-        "Explain the scope of maternal and child health."
-      ],
-      [
-        "Antenatal Care",
-        "Study care provided during pregnancy.",
-        "Identify major components of antenatal care."
-      ],
-      [
-        "Normal Pregnancy",
-        "Study normal physiological changes during pregnancy.",
-        "Describe common changes associated with pregnancy."
-      ],
-      [
-        "Labour & Birth",
-        "Study the basic processes of labour and childbirth.",
-        "Identify the major stages of labour."
-      ],
-      [
-        "Postnatal Care",
-        "Study care of the mother after childbirth.",
-        "Identify important postnatal assessments."
-      ],
-      [
-        "Newborn Care",
-        "Study immediate and continuing care of the newborn.",
-        "Identify essential newborn-care principles."
-      ],
-      [
-        "Child Growth & Development",
-        "Study normal physical, cognitive and social development.",
-        "Explain the importance of developmental assessment."
-      ],
-      [
-        "Maternal & Child Health Promotion",
-        "Study strategies for improving maternal and child health.",
-        "Explain preventive approaches in maternal and child health."
+    "maternal-child-health": {
+      lessons: [
+        {
+          title: "Maternal and Child Health",
+          description: "Understand care of mothers, newborns and children.",
+          notes: `
+            <p>Maternal and child health includes care before, during and after
+            pregnancy as well as health services for infants and children.</p>
+
+            <p>Early identification of risk factors and appropriate education
+            can improve outcomes.</p>
+          `,
+          keyPoints: [
+            "Maternal health includes pregnancy and postpartum care.",
+            "Child health includes prevention and treatment.",
+            "Health education supports families."
+          ],
+          question: "Who is included in maternal and child health services?",
+          options: [
+            "Only doctors",
+            "Mothers and children",
+            "Only hospital administrators",
+            "Only pharmacists"
+          ],
+          answer: 1,
+          explanation: "Maternal and child health focuses on mothers, infants and children."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 10. MIDWIFERY
     // ========================================================
 
-    "midwifery": [
-      [
-        "Introduction to Midwifery",
-        "Study the role and responsibilities of the midwife.",
-        "Explain the scope of midwifery practice."
-      ],
-      [
-        "Antenatal Care",
-        "Study assessment and care during pregnancy.",
-        "Identify important antenatal-care activities."
-      ],
-      [
-        "Normal Pregnancy",
-        "Study physiological changes during pregnancy.",
-        "Describe common maternal changes during pregnancy."
-      ],
-      [
-        "First Stage of Labour",
-        "Study assessment and management during the first stage of labour.",
-        "Identify important observations during labour."
-      ],
-      [
-        "Second & Third Stages of Labour",
-        "Study birth and placental delivery.",
-        "Explain the major events surrounding birth and placental delivery."
-      ],
-      [
-        "Postpartum Care",
-        "Study maternal care after delivery.",
-        "Identify important postpartum assessments."
-      ],
-      [
-        "Newborn Care",
-        "Study essential care immediately after birth.",
-        "Explain basic newborn-care priorities."
-      ],
-      [
-        "Midwifery Emergencies",
-        "Study recognition of important obstetric emergencies.",
-        "Identify the importance of early recognition and referral."
+    "midwifery": {
+      lessons: [
+        {
+          title: "Introduction to Midwifery",
+          description: "Learn the foundations of midwifery care.",
+          notes: `
+            <p>Midwifery focuses on care during pregnancy, labour, birth and
+            the postpartum period, as well as newborn care.</p>
+
+            <p>Midwives support normal pregnancy and childbirth while recognizing
+            situations that require referral or additional medical care.</p>
+          `,
+          keyPoints: [
+            "Midwifery includes antenatal care.",
+            "Midwives support women during labour and birth.",
+            "Newborn care is also important.",
+            "Complications require appropriate referral."
+          ],
+          question: "Which period is included in midwifery care?",
+          options: [
+            "Pregnancy",
+            "Only childhood",
+            "Only old age",
+            "Only adolescence"
+          ],
+          answer: 0,
+          explanation: "Midwifery care includes pregnancy and the childbirth continuum."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 11. PAEDIATRIC NURSING
     // ========================================================
 
-    "paediatric-nursing": [
-      [
-        "Introduction to Paediatric Nursing",
-        "Study nursing care of infants, children and adolescents.",
-        "Explain the principles of paediatric nursing."
-      ],
-      [
-        "Growth & Development",
-        "Study normal growth and developmental milestones.",
-        "Explain why developmental assessment is important."
-      ],
-      [
-        "Paediatric Assessment",
-        "Study assessment of children at different developmental stages.",
-        "Identify important paediatric assessment principles."
-      ],
-      [
-        "Nutrition in Children",
-        "Study nutritional requirements during childhood.",
-        "Explain the importance of adequate childhood nutrition."
-      ],
-      [
-        "Common Childhood Illnesses",
-        "Study common conditions affecting children.",
-        "Identify important nursing considerations for childhood illnesses."
-      ],
-      [
-        "Medication Safety in Children",
-        "Study safe medication principles in paediatric patients.",
-        "Explain why medication dosing requires special attention in children."
-      ],
-      [
-        "Child Safety",
-        "Study injury prevention and safeguarding.",
-        "Identify common safety risks for children."
-      ],
-      [
-        "Family-Centred Care",
-        "Study the role of families in paediatric nursing.",
-        "Explain family-centred nursing care."
+    "paediatric-nursing": {
+      lessons: [
+        {
+          title: "Introduction to Paediatric Nursing",
+          description: "Understand nursing care for infants, children and adolescents.",
+          notes: `
+            <p>Paediatric nursing focuses on the health needs of children and
+            adolescents.</p>
+
+            <p>Children are not simply small adults. Their anatomy,
+            physiology, communication and medication requirements vary with age.</p>
+          `,
+          keyPoints: [
+            "Children have age-specific healthcare needs.",
+            "Growth and development are important.",
+            "Family involvement is often essential."
+          ],
+          question: "Why does paediatric nursing require age-specific care?",
+          options: [
+            "Children are identical to adults",
+            "Children have different developmental and physiological needs",
+            "Children never become ill",
+            "Medication is never required"
+          ],
+          answer: 1,
+          explanation: "Children have developmental and physiological characteristics that require age-appropriate care."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 12. MENTAL HEALTH
     // ========================================================
 
-    "mental-health": [
-      [
-        "Introduction to Mental Health Nursing",
-        "Study principles of psychiatric and mental health nursing.",
-        "Define mental health and mental illness."
-      ],
-      [
-        "Therapeutic Communication",
-        "Study communication techniques used in mental health care.",
-        "Identify therapeutic communication techniques."
-      ],
-      [
-        "Mental Health Assessment",
-        "Study systematic assessment of mental status.",
-        "Identify major components of mental status assessment."
-      ],
-      [
-        "Anxiety Disorders",
-        "Study common anxiety-related conditions.",
-        "Identify common features of anxiety disorders."
-      ],
-      [
-        "Depression",
-        "Study depressive disorders and nursing care.",
-        "Identify important features requiring nursing attention."
-      ],
-      [
-        "Psychosis",
-        "Study psychotic symptoms and nursing care.",
-        "Differentiate common psychotic symptoms."
-      ],
-      [
-        "Crisis & Suicide Prevention",
-        "Study recognition and response to mental health crises.",
-        "Explain the importance of safety assessment."
-      ],
-      [
-        "Mental Health Nursing Care",
-        "Apply nursing principles to patients with mental health conditions.",
-        "Explain major nursing priorities in psychiatric care."
+    "mental-health": {
+      lessons: [
+        {
+          title: "Introduction to Mental Health Nursing",
+          description: "Learn the foundations of mental health and psychiatric care.",
+          notes: `
+            <p>Mental health nursing supports people experiencing psychological,
+            emotional and behavioural difficulties.</p>
+
+            <p>Therapeutic communication, safety assessment and respect for
+            dignity are central to care.</p>
+          `,
+          keyPoints: [
+            "Mental health nursing uses therapeutic communication.",
+            "Patient safety is important.",
+            "Respect and dignity must be maintained."
+          ],
+          question: "Which skill is especially important in mental health nursing?",
+          options: [
+            "Therapeutic communication",
+            "Ignoring the patient",
+            "Avoiding listening",
+            "Judging the patient"
+          ],
+          answer: 0,
+          explanation: "Therapeutic communication is a key component of mental health nursing."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 13. NUTRITION & DIETETICS
     // ========================================================
 
-    "nutrition-dietetics": [
-      [
-        "Introduction to Nutrition",
-        "Study the relationship between nutrition and health.",
-        "Define nutrition and explain its importance."
-      ],
-      [
-        "Carbohydrates",
-        "Study dietary carbohydrates and their functions.",
-        "Explain the major functions of carbohydrates."
-      ],
-      [
-        "Proteins",
-        "Study proteins and amino acids.",
-        "Explain the importance of protein in the body."
-      ],
-      [
-        "Fats",
-        "Study dietary fats and their functions.",
-        "Differentiate major types of dietary fat."
-      ],
-      [
-        "Vitamins",
-        "Study essential vitamins and their roles.",
-        "Explain why vitamins are required for normal body function."
-      ],
-      [
-        "Minerals",
-        "Study essential minerals and their functions.",
-        "Identify important dietary minerals."
-      ],
-      [
-        "Balanced Diet",
-        "Study principles of healthy and balanced eating.",
-        "Explain the components of a balanced diet."
-      ],
-      [
-        "Therapeutic Nutrition",
-        "Study nutritional considerations in disease.",
-        "Explain how diet may be modified for patient needs."
+    "nutrition-dietetics": {
+      lessons: [
+        {
+          title: "Introduction to Nutrition",
+          description: "Understand nutrients and their role in health.",
+          notes: `
+            <p>Nutrition involves the intake and use of nutrients required for
+            growth, energy, repair and normal body function.</p>
+
+            <h3>Major nutrients</h3>
+            <ul>
+              <li>Carbohydrates</li>
+              <li>Proteins</li>
+              <li>Fats</li>
+              <li>Vitamins</li>
+              <li>Minerals</li>
+              <li>Water</li>
+            </ul>
+          `,
+          keyPoints: [
+            "Nutrition supports growth and health.",
+            "Carbohydrates, proteins and fats provide energy and structural functions.",
+            "Vitamins and minerals support normal body processes.",
+            "Water is essential for life."
+          ],
+          question: "Which nutrient is important for tissue growth and repair?",
+          options: [
+            "Protein",
+            "Water only",
+            "Oxygen",
+            "Salt only"
+          ],
+          answer: 0,
+          explanation: "Protein provides amino acids needed for growth and tissue repair."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 14. HEALTH ASSESSMENT
     // ========================================================
 
-    "health-assessment": [
-      [
-        "Introduction to Health Assessment",
-        "Study systematic assessment of patients.",
-        "Explain the purpose of health assessment."
-      ],
-      [
-        "Health History",
-        "Study collection of subjective patient information.",
-        "Identify important components of a health history."
-      ],
-      [
-        "General Survey",
-        "Study the first visual assessment of a patient.",
-        "Explain the importance of the general survey."
-      ],
-      [
-        "Vital Signs",
-        "Study measurement and interpretation of vital signs.",
-        "Identify the major vital signs."
-      ],
-      [
-        "Head-to-Toe Assessment",
-        "Study systematic physical assessment.",
-        "Explain the importance of a systematic assessment sequence."
-      ],
-      [
-        "Respiratory Assessment",
-        "Study assessment of the respiratory system.",
-        "Identify important respiratory assessment findings."
-      ],
-      [
-        "Cardiovascular Assessment",
-        "Study cardiovascular assessment.",
-        "Identify important cardiovascular assessment components."
-      ],
-      [
-        "Documentation & Reporting",
-        "Study documentation and communication of assessment findings.",
-        "Explain principles of accurate clinical reporting."
+    "health-assessment": {
+      lessons: [
+        {
+          title: "Introduction to Health Assessment",
+          description: "Learn how nurses collect information about patient health.",
+          notes: `
+            <p>Health assessment involves collecting subjective and objective
+            information about a patient's health status.</p>
+
+            <p>Methods may include health history, physical examination and
+            observation.</p>
+          `,
+          keyPoints: [
+            "Assessment collects patient information.",
+            "Subjective data comes from the patient or caregiver.",
+            "Objective data can be observed or measured."
+          ],
+          question: "What is an important component of health assessment?",
+          options: [
+            "Health history",
+            "Guessing",
+            "Ignoring symptoms",
+            "Avoiding observation"
+          ],
+          answer: 0,
+          explanation: "A health history is an important part of comprehensive assessment."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 15. NURSING ETHICS
     // ========================================================
 
-    "nursing-ethics": [
-      [
-        "Introduction to Nursing Ethics",
-        "Study ethical principles that guide professional nursing.",
-        "Define nursing ethics."
-      ],
-      [
-        "Patient Autonomy",
-        "Study respect for patient choices and self-determination.",
-        "Explain the principle of autonomy."
-      ],
-      [
-        "Beneficence & Nonmaleficence",
-        "Study the ethical duties to benefit patients and avoid harm.",
-        "Differentiate beneficence and nonmaleficence."
-      ],
-      [
-        "Confidentiality",
-        "Study protection of patient information.",
-        "Explain why confidentiality is essential."
-      ],
-      [
-        "Informed Consent",
-        "Study ethical principles surrounding informed consent.",
-        "Explain the purpose of informed consent."
-      ],
-      [
-        "Professional Boundaries",
-        "Study appropriate professional relationships.",
-        "Identify the importance of professional boundaries."
-      ],
-      [
-        "Patient Rights",
-        "Study fundamental rights of patients.",
-        "Identify important patient rights."
-      ],
-      [
-        "Professional Practice",
-        "Study accountability, professionalism and ethical nursing practice.",
-        "Explain professional responsibility in nursing."
+    "nursing-ethics": {
+      lessons: [
+        {
+          title: "Nursing Ethics and Professional Practice",
+          description: "Understand ethical principles and professional responsibilities.",
+          notes: `
+            <p>Nursing ethics helps nurses make decisions that respect patients'
+            rights, dignity and wellbeing.</p>
+
+            <h3>Important principles</h3>
+            <ul>
+              <li>Respect for autonomy</li>
+              <li>Beneficence</li>
+              <li>Non-maleficence</li>
+              <li>Justice</li>
+              <li>Confidentiality</li>
+            </ul>
+          `,
+          keyPoints: [
+            "Patients deserve dignity and respect.",
+            "Confidentiality is important.",
+            "Ethical principles guide professional decisions."
+          ],
+          question: "Which principle involves respecting a patient's right to make decisions?",
+          options: [
+            "Autonomy",
+            "Negligence",
+            "Deception",
+            "Isolation"
+          ],
+          answer: 0,
+          explanation: "Autonomy refers to respecting a person's right to make informed decisions."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 16. RESEARCH METHODS
     // ========================================================
 
-    "research-methods": [
-      [
-        "Introduction to Nursing Research",
-        "Study the purpose and role of research in nursing.",
-        "Define nursing research."
-      ],
-      [
-        "Research Problems",
-        "Study how research problems and questions are developed.",
-        "Identify characteristics of a good research problem."
-      ],
-      [
-        "Literature Review",
-        "Study searching, evaluating and synthesizing existing evidence.",
-        "Explain the purpose of a literature review."
-      ],
-      [
-        "Research Designs",
-        "Study quantitative and qualitative research designs.",
-        "Differentiate common research designs."
-      ],
-      [
-        "Sampling",
-        "Study methods of selecting research participants.",
-        "Explain the basic concept of sampling."
-      ],
-      [
-        "Data Collection",
-        "Study common methods of collecting research data.",
-        "Identify common data-collection methods."
-      ],
-      [
-        "Research Ethics",
-        "Study ethical principles governing research.",
-        "Explain why research participants require protection."
-      ],
-      [
-        "Research Reporting",
-        "Study interpretation and presentation of research findings.",
-        "Identify major sections of a research report."
+    "research-methods": {
+      lessons: [
+        {
+          title: "Introduction to Nursing Research",
+          description: "Learn why research is important in nursing.",
+          notes: `
+            <p>Nursing research generates evidence that can improve patient care,
+            nursing practice, education and healthcare systems.</p>
+
+            <p>A research project normally begins with a clearly defined problem
+            or question.</p>
+          `,
+          keyPoints: [
+            "Research supports evidence-based practice.",
+            "A clear research question is important.",
+            "Research findings can improve healthcare."
+          ],
+          question: "Why is nursing research important?",
+          options: [
+            "To improve evidence-based care",
+            "To avoid learning",
+            "To replace all clinical judgement",
+            "To eliminate documentation"
+          ],
+          answer: 0,
+          explanation: "Research provides evidence that can improve nursing practice and patient care."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 17. BIOSTATISTICS
     // ========================================================
 
-    "biostatistics": [
-      [
-        "Introduction to Biostatistics",
-        "Study the use of statistics in health and nursing.",
-        "Define biostatistics."
-      ],
-      [
-        "Data Types",
-        "Study qualitative and quantitative health data.",
-        "Differentiate common data types."
-      ],
-      [
-        "Measures of Central Tendency",
-        "Study mean, median and mode.",
-        "Define mean, median and mode."
-      ],
-      [
-        "Measures of Variation",
-        "Study range, variance and standard deviation.",
-        "Explain why variability is important."
-      ],
-      [
-        "Tables & Graphs",
-        "Study presentation of health data.",
-        "Identify appropriate ways to display data."
-      ],
-      [
-        "Probability",
-        "Study basic concepts of probability.",
-        "Explain the meaning of probability."
-      ],
-      [
-        "Research Statistics",
-        "Study statistics commonly used in health research.",
-        "Explain the role of statistics in research."
-      ],
-      [
-        "Interpreting Health Data",
-        "Apply basic statistical reasoning to health information.",
-        "Explain how statistics can support nursing decisions."
+    "biostatistics": {
+      lessons: [
+        {
+          title: "Introduction to Biostatistics",
+          description: "Learn how statistics are applied to health and nursing.",
+          notes: `
+            <p>Biostatistics involves the application of statistical methods to
+            biological, medical and public health information.</p>
+
+            <p>Nurses may encounter statistics when reading research, interpreting
+            health data or evaluating outcomes.</p>
+          `,
+          keyPoints: [
+            "Biostatistics applies statistics to health.",
+            "Statistics help summarize data.",
+            "Nurses should understand basic statistical information."
+          ],
+          question: "What is biostatistics used for?",
+          options: [
+            "Analyzing health-related data",
+            "Building hospital walls",
+            "Preparing uniforms",
+            "Cleaning equipment only"
+          ],
+          answer: 0,
+          explanation: "Biostatistics applies statistical methods to health and biological data."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 18. PUBLIC HEALTH
     // ========================================================
 
-    "public-health": [
-      [
-        "Introduction to Public Health",
-        "Study population-level approaches to health.",
-        "Define public health."
-      ],
-      [
-        "Population Health",
-        "Study factors affecting the health of populations.",
-        "Explain the concept of population health."
-      ],
-      [
-        "Epidemiology",
-        "Study patterns and causes of disease in populations.",
-        "Define epidemiology."
-      ],
-      [
-        "Disease Surveillance",
-        "Study monitoring of diseases and health events.",
-        "Explain the purpose of disease surveillance."
-      ],
-      [
-        "Health Promotion",
-        "Study strategies for improving population health.",
-        "Explain the role of health promotion."
-      ],
-      [
-        "Disease Prevention",
-        "Study prevention strategies at population level.",
-        "Differentiate levels of prevention."
-      ],
-      [
-        "Environmental Health",
-        "Study environmental influences on population health.",
-        "Identify important environmental health factors."
-      ],
-      [
-        "Public Health Nursing",
-        "Study the role of nurses in population health.",
-        "Explain the contribution of nursing to public health."
+    "public-health": {
+      lessons: [
+        {
+          title: "Introduction to Public Health",
+          description: "Understand how health is protected at population level.",
+          notes: `
+            <p>Public health focuses on protecting and improving the health of
+            populations through prevention, health promotion, surveillance and
+            other community-level interventions.</p>
+          `,
+          keyPoints: [
+            "Public health focuses on populations.",
+            "Prevention is central.",
+            "Surveillance helps identify health problems."
+          ],
+          question: "What is a major focus of public health?",
+          options: [
+            "Population health",
+            "Only individual entertainment",
+            "Hospital decoration",
+            "Personal shopping"
+          ],
+          answer: 0,
+          explanation: "Public health focuses on protecting and improving population health."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 19. HEALTH PROMOTION
     // ========================================================
 
-    "health-promotion": [
-      [
-        "Introduction to Health Promotion",
-        "Study strategies that enable individuals and communities to improve health.",
-        "Define health promotion."
-      ],
-      [
-        "Health Education",
-        "Study methods of communicating health information.",
-        "Explain principles of effective health education."
-      ],
-      [
-        "Healthy Lifestyle",
-        "Study behaviours that support physical and mental health.",
-        "Identify major components of a healthy lifestyle."
-      ],
-      [
-        "Exercise & Physical Activity",
-        "Study the health benefits of physical activity.",
-        "Explain the importance of regular physical activity."
-      ],
-      [
-        "Nutrition & Healthy Eating",
-        "Study healthy dietary behaviours.",
-        "Explain the role of nutrition in health promotion."
-      ],
-      [
-        "Disease Prevention",
-        "Study strategies for preventing illness.",
-        "Identify primary prevention strategies."
-      ],
-      [
-        "Behaviour Change",
-        "Study factors that influence health behaviours.",
-        "Explain why behaviour change can be challenging."
-      ],
-      [
-        "Community Health Promotion",
-        "Study population approaches to improving health.",
-        "Explain the role of community participation."
+    "health-promotion": {
+      lessons: [
+        {
+          title: "Introduction to Health Promotion",
+          description: "Learn how nurses help individuals and communities improve health.",
+          notes: `
+            <p>Health promotion helps people increase control over factors that
+            influence their health.</p>
+
+            <p>Nurses can promote health through education, healthy lifestyle
+            support, screening and prevention.</p>
+          `,
+          keyPoints: [
+            "Health promotion supports healthier choices.",
+            "Education is an important nursing intervention.",
+            "Prevention and healthy lifestyles are major components."
+          ],
+          question: "Which activity can promote health?",
+          options: [
+            "Health education",
+            "Ignoring risk factors",
+            "Discouraging exercise",
+            "Avoiding screening"
+          ],
+          answer: 0,
+          explanation: "Health education can help people make informed health decisions."
+        }
       ]
-    ],
+    },
 
     // ========================================================
     // 20. INFECTION PREVENTION & CONTROL
     // ========================================================
 
-    "infection-control": [
-      [
-        "Introduction to Infection Prevention",
-        "Study principles of preventing healthcare-associated infections.",
-        "Explain the purpose of infection prevention and control."
-      ],
-      [
-        "Chain of Infection",
-        "Study the links involved in transmission of infection.",
-        "Identify the major links in the chain of infection."
-      ],
-      [
-        "Standard Precautions",
-        "Study precautions used for all patients.",
-        "Explain the purpose of standard precautions."
-      ],
-      [
-        "Hand Hygiene",
-        "Study hand hygiene principles and indications.",
-        "Explain why hand hygiene is central to infection prevention."
-      ],
-      [
-        "Personal Protective Equipment",
-        "Study appropriate selection and use of PPE.",
-        "Identify common types of PPE."
-      ],
-      [
-        "Transmission-Based Precautions",
-        "Study precautions for different modes of transmission.",
-        "Differentiate common transmission-based precautions."
-      ],
-      [
-        "Healthcare-Associated Infections",
-        "Study prevention of infections associated with healthcare.",
-        "Identify common strategies for reducing healthcare-associated infections."
-      ],
-      [
-        "Cleaning, Disinfection & Sterilization",
-        "Study methods for reducing or eliminating microorganisms.",
-        "Differentiate cleaning, disinfection and sterilization."
+    "infection-control": {
+      lessons: [
+        {
+          title: "Introduction to Infection Prevention and Control",
+          description: "Learn how healthcare workers prevent the spread of infection.",
+          notes: `
+            <p>Infection prevention and control aims to reduce the transmission
+            of infectious organisms in healthcare and community settings.</p>
+
+            <h3>Important measures</h3>
+            <ul>
+              <li>Hand hygiene</li>
+              <li>Appropriate personal protective equipment</li>
+              <li>Safe injection practices</li>
+              <li>Cleaning and disinfection</li>
+              <li>Appropriate waste management</li>
+            </ul>
+          `,
+          keyPoints: [
+            "Hand hygiene is fundamental.",
+            "PPE should be selected according to risk.",
+            "Safe practices reduce infection transmission."
+          ],
+          question: "Which practice is fundamental to infection prevention?",
+          options: [
+            "Hand hygiene",
+            "Ignoring contamination",
+            "Reusing contaminated equipment",
+            "Avoiding cleaning"
+          ],
+          answer: 0,
+          explanation: "Hand hygiene is one of the most important measures for preventing transmission of infection."
+        }
       ]
-    ]
+    }
   };
 
   // ==========================================================
-  // OPEN SUBJECT
+  // FALLBACK CONTENT
   // ==========================================================
 
-  window.openPulsePrepSubjectPage = function (subjectId) {
+  function createFallbackContent(subject) {
+    const name = subject && subject.name
+      ? subject.name
+      : "Nursing Subject";
 
-    const subjects = getSubjects();
+    return {
+      lessons: [
+        {
+          title: "Introduction to " + name,
+          description: "Learn the basic concepts and foundations of " + name + ".",
+          notes: `
+            <p>
+              Welcome to the <strong>${escapeHTML(name)}</strong> section of
+              PulsePrep.
+            </p>
 
-    const subject = subjects.find(function (item) {
-      return String(item.id) === String(subjectId);
+            <p>
+              This module introduces important concepts that nursing students
+              should understand before progressing to more advanced topics.
+            </p>
+
+            <h3>Study approach</h3>
+
+            <ul>
+              <li>Read the lesson carefully.</li>
+              <li>Review the key points.</li>
+              <li>Answer the practice question.</li>
+              <li>Review the explanation.</li>
+              <li>Continue to the next lesson.</li>
+            </ul>
+          `,
+          keyPoints: [
+            name + " is an important area of nursing education.",
+            "Understand the basic concepts before studying advanced topics.",
+            "Use practice questions to test your understanding."
+          ],
+          question: "What is the best approach when studying " + name + "?",
+          options: [
+            "Understand the concepts",
+            "Memorize without understanding",
+            "Skip all lessons",
+            "Avoid practice questions"
+          ],
+          answer: 0,
+          explanation: "Understanding the concepts provides a stronger foundation for nursing practice."
+        }
+      ]
+    };
+  }
+
+  // ==========================================================
+  // GET CONTENT
+  // ==========================================================
+
+  function getContent(subject) {
+    if (!subject) {
+      return null;
+    }
+
+    return SUBJECT_CONTENT[subject.id] || createFallbackContent(subject);
+  }
+
+  // ==========================================================
+  // LESSON HTML
+  // ==========================================================
+
+  function renderLesson(lesson, index) {
+    const options = Array.isArray(lesson.options)
+      ? lesson.options
+      : [];
+
+    const keyPoints = Array.isArray(lesson.keyPoints)
+      ? lesson.keyPoints
+      : [];
+
+    let optionsHTML = "";
+
+    options.forEach(function (option, optionIndex) {
+      optionsHTML += `
+        <button
+          type="button"
+          class="pulseprep-answer-option"
+          data-option-index="${optionIndex}"
+          data-correct="${optionIndex === lesson.answer ? "true" : "false"}"
+          style="
+            width:100%;
+            text-align:left;
+            padding:14px 16px;
+            margin-bottom:10px;
+            border:1px solid #e5e7eb;
+            border-radius:12px;
+            background:#ffffff;
+            cursor:pointer;
+            transition:all .2s ease;
+          "
+        >
+          <strong>${String.fromCharCode(65 + optionIndex)}.</strong>
+          ${escapeHTML(option)}
+        </button>
+      `;
     });
 
+    let keyPointsHTML = "";
+
+    keyPoints.forEach(function (point) {
+      keyPointsHTML += `
+        <li style="margin-bottom:8px;">
+          ${escapeHTML(point)}
+        </li>
+      `;
+    });
+
+    return `
+      <article
+        class="pulseprep-lesson"
+        id="pulseprep-lesson-${index}"
+        style="
+          background:#ffffff;
+          border:1px solid #e5e7eb;
+          border-radius:20px;
+          padding:24px;
+          margin-bottom:24px;
+          box-shadow:0 5px 20px rgba(0,0,0,.05);
+        "
+      >
+
+        <div
+          style="
+            display:inline-flex;
+            align-items:center;
+            padding:6px 12px;
+            border-radius:999px;
+            background:#eef2ff;
+            color:#3730a3;
+            font-size:13px;
+            font-weight:700;
+            margin-bottom:12px;
+          "
+        >
+          LESSON ${index + 1}
+        </div>
+
+        <h2
+          style="
+            font-size:25px;
+            font-weight:800;
+            margin:0 0 8px;
+          "
+        >
+          ${escapeHTML(lesson.title)}
+        </h2>
+
+        <p
+          style="
+            color:#6b7280;
+            margin-bottom:20px;
+          "
+        >
+          ${escapeHTML(lesson.description || "")}
+        </p>
+
+        <div
+          class="pulseprep-notes"
+          style="
+            line-height:1.8;
+            color:#374151;
+          "
+        >
+          ${lesson.notes || ""}
+        </div>
+
+        ${
+          keyPoints.length
+            ? `
+              <div
+                style="
+                  margin-top:24px;
+                  padding:20px;
+                  border-radius:16px;
+                  background:#f8fafc;
+                "
+              >
+                <h3
+                  style="
+                    margin:0 0 12px;
+                    font-size:18px;
+                    font-weight:800;
+                  "
+                >
+                  Key Points
+                </h3>
+
+                <ul style="padding-left:20px;margin:0;">
+                  ${keyPointsHTML}
+                </ul>
+              </div>
+            `
+            : ""
+        }
+
+        <div
+          style="
+            margin-top:24px;
+            padding:20px;
+            border-radius:16px;
+            background:#f9fafb;
+            border:1px solid #e5e7eb;
+          "
+        >
+
+          <h3
+            style="
+              margin:0 0 16px;
+              font-size:18px;
+              font-weight:800;
+            "
+          >
+            Practice Question
+          </h3>
+
+          <p
+            style="
+              font-weight:700;
+              margin-bottom:16px;
+            "
+          >
+            ${escapeHTML(lesson.question || "Review the lesson above.")}
+          </p>
+
+          <div class="pulseprep-options">
+            ${optionsHTML}
+          </div>
+
+          <div
+            class="pulseprep-answer-feedback"
+            style="
+              display:none;
+              margin-top:16px;
+              padding:16px;
+              border-radius:12px;
+            "
+          ></div>
+
+        </div>
+
+      </article>
+    `;
+  }
+
+  // ==========================================================
+  // RENDER SUBJECT
+  // ==========================================================
+
+  function renderSubjectPage(subjectId) {
+    const subject = getSubject(subjectId);
+
     if (!subject) {
-      console.error("PulsePrep: Subject not found:", subjectId);
-      return;
-    }
+      const page = ensurePage();
 
-    const page = getPage();
-
-    if (!page) {
-      console.error(
-        "PulsePrep: #pulseprepSubjectPage was not found."
-      );
-      return;
-    }
-
-    const lessons = curriculum[subject.id];
-
-    if (!Array.isArray(lessons) || lessons.length === 0) {
       page.innerHTML = `
-        <div class="max-w-5xl mx-auto px-4 py-8">
+        <div
+          style="
+            max-width:900px;
+            margin:40px auto;
+            padding:30px;
+            text-align:center;
+          "
+        >
+          <h2>Subject Not Found</h2>
+
+          <p>
+            We could not find this subject. Please return to the
+            Subject Library and try again.
+          </p>
 
           <button
             type="button"
-            onclick="showTab('subject-library')"
-            class="mb-6 px-4 py-2 rounded-xl
-                   bg-white border border-slate-200
-                   text-slate-700 font-bold
-                   hover:bg-slate-50"
+            onclick="showPulsePrepSubjects()"
+            style="
+              margin-top:20px;
+              padding:12px 20px;
+              border:0;
+              border-radius:10px;
+              cursor:pointer;
+              font-weight:700;
+            "
           >
-            <i class="fa-solid fa-arrow-left mr-2"></i>
             Back to Subjects
           </button>
-
-          <div
-            class="bg-white rounded-3xl
-                   border border-slate-200
-                   shadow-sm p-8 text-center"
-          >
-            <h1 class="text-2xl font-black text-slate-900">
-              ${escapeHTML(subject.name)}
-            </h1>
-
-            <p class="text-slate-500 mt-3">
-              Lesson content is being prepared.
-            </p>
-          </div>
-
         </div>
       `;
 
-      goToSubjectPageTab();
-      scrollTop();
       return;
     }
 
-    // ========================================================
-    // SUBJECT HEADER + REAL SUBJECT-SPECIFIC LESSONS
-    // ========================================================
+    const page = ensurePage();
+    const content = getContent(subject);
+    const lessons = content.lessons || [];
+
+    let lessonsHTML = "";
+
+    lessons.forEach(function (lesson, index) {
+      lessonsHTML += renderLesson(lesson, index);
+    });
 
     page.innerHTML = `
-
-      <div class="max-w-6xl mx-auto px-4 py-6">
-
-        <button
-          type="button"
-          onclick="showTab('subject-library')"
-          class="mb-6 px-4 py-2 rounded-xl
-                 bg-white border border-slate-200
-                 text-slate-700 font-bold
-                 hover:bg-slate-50"
-        >
-          <i class="fa-solid fa-arrow-left mr-2"></i>
-          Back to Subjects
-        </button>
-
-        <!-- SUBJECT HEADER -->
+      <div
+        class="pulseprep-subject-wrapper"
+        style="
+          width:100%;
+          min-height:100vh;
+          background:#f8fafc;
+          padding:20px;
+        "
+      >
 
         <div
-          class="bg-gradient-to-r
-                 from-slate-900
-                 to-teal-700
-                 rounded-3xl
-                 p-7 sm:p-10
-                 text-white
-                 shadow-xl"
+          style="
+            max-width:1100px;
+            margin:0 auto;
+          "
         >
 
-          <div class="flex flex-col sm:flex-row gap-5 sm:items-center">
+          <!-- BACK BUTTON -->
 
-            <div
-              class="w-16 h-16 rounded-2xl
-                     bg-white/10
-                     flex items-center justify-center"
-            >
-              <i
-                class="fa-solid ${escapeHTML(subject.icon || "fa-book")}
-                       text-3xl"
-              ></i>
-            </div>
+          <button
+            type="button"
+            onclick="showPulsePrepSubjects()"
+            style="
+              display:inline-flex;
+              align-items:center;
+              gap:8px;
+              border:0;
+              background:transparent;
+              cursor:pointer;
+              font-weight:700;
+              color:#4f46e5;
+              margin-bottom:20px;
+              padding:8px 0;
+            "
+          >
+            ← Back to Subject Library
+          </button>
 
-            <div>
+          <!-- SUBJECT HEADER -->
 
-              <div
-                class="text-xs font-bold
-                       text-teal-200
-                       uppercase tracking-wider"
-              >
-                PulsePrep Subject
-              </div>
-
-              <h1
-                class="text-3xl sm:text-4xl
-                       font-black mt-1"
-              >
-                ${escapeHTML(subject.name)}
-              </h1>
-
-              <p
-                class="text-slate-200
-                       mt-3 max-w-3xl"
-              >
-                ${escapeHTML(subject.description)}
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        <!-- CONTENT -->
-
-        <div class="grid lg:grid-cols-3 gap-6 mt-7">
-
-          <!-- LESSONS -->
-
-          <div
-            class="lg:col-span-2
-                   bg-white
-                   rounded-3xl
-                   border border-slate-200
-                   shadow-sm
-                   p-6"
+          <header
+            style="
+              background:linear-gradient(135deg,#4f46e5,#7c3aed);
+              color:#ffffff;
+              border-radius:24px;
+              padding:32px;
+              margin-bottom:28px;
+              box-shadow:0 10px 30px rgba(79,70,229,.2);
+            "
           >
 
-            <div class="mb-5">
-
-              <h2
-                class="text-xl font-black
-                       text-slate-900"
-              >
-                Learning Modules
-              </h2>
-
-              <p class="text-sm text-slate-500 mt-1">
-                ${lessons.length} lessons available in
-                ${escapeHTML(subject.name)}.
-              </p>
-
-            </div>
-
-            <div class="space-y-3">
-
-              ${lessons.map(function (lesson, index) {
-
-                const number = index + 1;
-
-                return `
-
-                  <button
-                    type="button"
-                    onclick="
-                      openPulsePrepLesson(
-                        '${escapeHTML(subject.id)}',
-                        ${number}
-                      )
-                    "
-                    class="w-full
-                           flex items-center
-                           gap-4
-                           p-4
-                           rounded-2xl
-                           border border-slate-200
-                           hover:border-teal-300
-                           hover:bg-teal-50
-                           transition
-                           text-left"
-                  >
-
-                    <div
-                      class="w-11 h-11
-                             flex-shrink-0
-                             rounded-xl
-                             bg-teal-50
-                             text-teal-600
-                             flex items-center
-                             justify-center
-                             font-black"
-                    >
-                      ${number}
-                    </div>
-
-                    <div class="flex-1 min-w-0">
-
-                      <p
-                        class="font-bold
-                               text-slate-800"
-                      >
-                        ${escapeHTML(lesson[0])}
-                      </p>
-
-                      <p
-                        class="text-xs
-                               text-slate-500
-                               mt-1"
-                      >
-                        Lesson ${number}
-                      </p>
-
-                    </div>
-
-                    <i
-                      class="fa-solid
-                             fa-chevron-right
-                             text-slate-400"
-                    ></i>
-
-                  </button>
-
-                `;
-              }).join("")}
-
-            </div>
-
-          </div>
-
-          <!-- PROGRESS -->
-
-          <aside
-            class="bg-white
-                   rounded-3xl
-                   border border-slate-200
-                   shadow-sm
-                   p-6
-                   h-fit"
-          >
-
-            <h3
-              class="font-black
-                     text-slate-900"
+            <div
+              style="
+                font-size:48px;
+                margin-bottom:12px;
+              "
             >
-              Your Progress
-            </h3>
+              ${escapeHTML(subject.icon || "📚")}
+            </div>
+
+            <h1
+              style="
+                margin:0 0 10px;
+                font-size:32px;
+                font-weight:900;
+              "
+            >
+              ${escapeHTML(subject.name)}
+            </h1>
+
+            <p
+              style="
+                margin:0;
+                opacity:.9;
+                font-size:16px;
+                line-height:1.6;
+              "
+            >
+              ${escapeHTML(subject.description || "Study this nursing subject through structured lessons and practice questions.")}
+            </p>
 
             <div
-              class="mt-5
-                     w-28 h-28
-                     mx-auto
-                     rounded-full
-                     border-8
-                     border-teal-100
-                     flex items-center
-                     justify-center"
+              style="
+                display:flex;
+                flex-wrap:wrap;
+                gap:10px;
+                margin-top:20px;
+              "
             >
 
               <span
-                class="text-2xl
-                       font-black
-                       text-teal-600"
+                style="
+                  padding:8px 12px;
+                  background:rgba(255,255,255,.15);
+                  border-radius:999px;
+                  font-size:13px;
+                  font-weight:700;
+                "
               >
+                ${lessons.length} Lesson${lessons.length === 1 ? "" : "s"}
+              </span>
+
+              <span
+                style="
+                  padding:8px 12px;
+                  background:rgba(255,255,255,.15);
+                  border-radius:999px;
+                  font-size:13px;
+                  font-weight:700;
+                "
+              >
+                Practice Questions
+              </span>
+
+              <span
+                style="
+                  padding:8px 12px;
+                  background:rgba(255,255,255,.15);
+                  border-radius:999px;
+                  font-size:13px;
+                  font-weight:700;
+                "
+              >
+                Nursing Study
+              </span>
+
+            </div>
+
+          </header>
+
+          <!-- PROGRESS -->
+
+          <div
+            style="
+              background:#ffffff;
+              border:1px solid #e5e7eb;
+              border-radius:18px;
+              padding:20px;
+              margin-bottom:28px;
+            "
+          >
+
+            <div
+              style="
+                display:flex;
+                justify-content:space-between;
+                gap:15px;
+                margin-bottom:10px;
+              "
+            >
+
+              <strong>Study Progress</strong>
+
+              <span id="pulseprepProgressText">
                 0%
               </span>
 
             </div>
 
-            <div class="mt-6 space-y-3">
-
-              <div
-                class="p-4 rounded-xl
-                       bg-teal-50
-                       text-teal-800"
-              >
-                <div class="font-bold">
-                  ${lessons.length} Lessons
-                </div>
-
-                <div class="text-xs mt-1">
-                  Complete lessons to build your progress.
-                </div>
-              </div>
-
-              <div
-                class="p-4 rounded-xl
-                       bg-slate-50
-                       text-slate-700"
-              >
-                <div class="font-bold">
-                  Study + Practice
-                </div>
-
-                <div class="text-xs mt-1">
-                  Each lesson contains study notes,
-                  key points and a practice question.
-                </div>
-              </div>
-
-            </div>
-
-          </aside>
-
-        </div>
-
-      </div>
-    `;
-
-    goToSubjectPageTab();
-    scrollTop();
-  };
-
-  // ==========================================================
-  // OPEN LESSON
-  // ==========================================================
-
-  window.openPulsePrepLesson = function (subjectId, lessonNumber) {
-
-    const subjects = getSubjects();
-
-    const subject = subjects.find(function (item) {
-      return String(item.id) === String(subjectId);
-    });
-
-    if (!subject) {
-      console.error("PulsePrep: Subject not found:", subjectId);
-      return;
-    }
-
-    const lessons = curriculum[subject.id];
-
-    // Never allow a lesson from another subject.
-    if (!Array.isArray(lessons)) {
-      console.error(
-        "PulsePrep: No curriculum found for:",
-        subject.id
-      );
-      return;
-    }
-
-    const lessonIndex = Number(lessonNumber) - 1;
-
-    if (
-      !Number.isInteger(lessonIndex) ||
-      lessonIndex < 0 ||
-      lessonIndex >= lessons.length
-    ) {
-      console.error(
-        "PulsePrep: Invalid lesson:",
-        subject.id,
-        lessonNumber
-      );
-      return;
-    }
-
-    const lesson = lessons[lessonIndex];
-
-    const page = getPage();
-
-    if (!page) {
-      console.error(
-        "PulsePrep: #pulseprepSubjectPage was not found."
-      );
-      return;
-    }
-
-    const currentLesson = Number(lessonNumber);
-    const totalLessons = lessons.length;
-
-    const previousLesson =
-      currentLesson > 1
-        ? currentLesson - 1
-        : null;
-
-    const nextLesson =
-      currentLesson < totalLessons
-        ? currentLesson + 1
-        : null;
-
-    const progress = Math.round(
-      (currentLesson / totalLessons) * 100
-    );
-
-    page.innerHTML = `
-
-      <div class="max-w-5xl mx-auto px-4 py-6">
-
-        <!-- BACK -->
-
-        <button
-          type="button"
-          onclick="
-            openPulsePrepSubjectPage(
-              '${escapeHTML(subject.id)}'
-            )
-          "
-          class="mb-6 px-4 py-2 rounded-xl
-                 bg-white border border-slate-200
-                 text-slate-700 font-bold
-                 hover:bg-slate-50"
-        >
-          <i class="fa-solid fa-arrow-left mr-2"></i>
-          Back to Lessons
-        </button>
-
-        <!-- HEADER -->
-
-        <div
-          class="bg-gradient-to-r
-                 from-slate-900
-                 to-teal-700
-                 rounded-3xl
-                 p-7 sm:p-10
-                 text-white
-                 shadow-xl"
-        >
-
-          <div
-            class="text-xs uppercase
-                   tracking-wider
-                   font-bold text-teal-200"
-          >
-            ${escapeHTML(subject.name)}
-          </div>
-
-          <h1
-            class="text-3xl sm:text-4xl
-                   font-black mt-2"
-          >
-            ${escapeHTML(lesson[0])}
-          </h1>
-
-          <p class="text-slate-200 mt-3">
-            Lesson ${currentLesson}
-            of
-            ${totalLessons}
-          </p>
-
-          <div class="mt-6">
-
             <div
-              class="flex justify-between
-                     text-xs font-bold
-                     text-teal-100 mb-2"
-            >
-              <span>Course Progress</span>
-              <span>${progress}%</span>
-            </div>
-
-            <div
-              class="h-2
-                     bg-white/20
-                     rounded-full
-                     overflow-hidden"
+              style="
+                height:10px;
+                background:#e5e7eb;
+                border-radius:999px;
+                overflow:hidden;
+              "
             >
 
               <div
-                class="h-full
-                       bg-white
-                       rounded-full"
-                style="width:${progress}%"
+                id="pulseprepProgressBar"
+                style="
+                  width:0%;
+                  height:100%;
+                  background:#4f46e5;
+                  transition:width .3s ease;
+                "
               ></div>
 
             </div>
 
           </div>
 
-        </div>
+          <!-- LESSONS -->
 
-        <!-- STUDY NOTES -->
-
-        <section
-          class="bg-white
-                 rounded-3xl
-                 border border-slate-200
-                 shadow-sm
-                 p-6 sm:p-8
-                 mt-6"
-        >
-
-          <div
-            class="flex items-center
-                   gap-3 mb-5"
-          >
+          <section>
 
             <div
-              class="w-11 h-11
-                     rounded-xl
-                     bg-teal-50
-                     text-teal-600
-                     flex items-center
-                     justify-center"
-            >
-              <i class="fa-solid fa-book-open"></i>
-            </div>
-
-            <h2
-              class="text-2xl
-                     font-black
-                     text-slate-900"
-            >
-              Study Notes
-            </h2>
-
-          </div>
-
-          <div
-            class="text-slate-700
-                   leading-8"
-          >
-
-            <p>
-              ${escapeHTML(lesson[1])}
-            </p>
-
-            <p class="mt-4">
-              This lesson focuses on
-              <strong>
-                ${escapeHTML(lesson[0])}
-              </strong>
-              as part of
-              <strong>
-                ${escapeHTML(subject.name)}
-              </strong>.
-            </p>
-
-          </div>
-
-        </section>
-
-        <!-- KEY POINTS -->
-
-        <section
-          class="bg-white
-                 rounded-3xl
-                 border border-slate-200
-                 shadow-sm
-                 p-6 sm:p-8
-                 mt-6"
-        >
-
-          <div
-            class="flex items-center
-                   gap-3 mb-5"
-          >
-
-            <div
-              class="w-11 h-11
-                     rounded-xl
-                     bg-amber-50
-                     text-amber-600
-                     flex items-center
-                     justify-center"
-            >
-              <i class="fa-solid fa-brain"></i>
-            </div>
-
-            <h2
-              class="text-2xl
-                     font-black
-                     text-slate-900"
-            >
-              Key Points
-            </h2>
-
-          </div>
-
-          <ul class="space-y-3">
-
-            <li class="flex gap-3 items-start">
-
-              <span
-                class="w-6 h-6 mt-1
-                       rounded-full
-                       bg-teal-50
-                       text-teal-600
-                       flex items-center
-                       justify-center
-                       flex-shrink-0"
-              >
-                <i
-                  class="fa-solid fa-check text-xs"
-                ></i>
-              </span>
-
-              <span class="text-slate-700">
-                Understand the main concepts of
-                ${escapeHTML(lesson[0])}.
-              </span>
-
-            </li>
-
-            <li class="flex gap-3 items-start">
-
-              <span
-                class="w-6 h-6 mt-1
-                       rounded-full
-                       bg-teal-50
-                       text-teal-600
-                       flex items-center
-                       justify-center
-                       flex-shrink-0"
-              >
-                <i
-                  class="fa-solid fa-check text-xs"
-                ></i>
-              </span>
-
-              <span class="text-slate-700">
-                Relate the topic to
-                ${escapeHTML(subject.name)}
-                and nursing practice.
-              </span>
-
-            </li>
-
-            <li class="flex gap-3 items-start">
-
-              <span
-                class="w-6 h-6 mt-1
-                       rounded-full
-                       bg-teal-50
-                       text-teal-600
-                       flex items-center
-                       justify-center
-                       flex-shrink-0"
-              >
-                <i
-                  class="fa-solid fa-check text-xs"
-                ></i>
-              </span>
-
-              <span class="text-slate-700">
-                Review the lesson before attempting
-                the practice question.
-              </span>
-
-            </li>
-
-          </ul>
-
-        </section>
-
-        <!-- PRACTICE QUESTION -->
-
-        <section
-          class="bg-white
-                 rounded-3xl
-                 border border-slate-200
-                 shadow-sm
-                 p-6 sm:p-8
-                 mt-6"
-        >
-
-          <div
-            class="flex items-center
-                   gap-3 mb-5"
-          >
-
-            <div
-              class="w-11 h-11
-                     rounded-xl
-                     bg-purple-50
-                     text-purple-600
-                     flex items-center
-                     justify-center"
-            >
-              <i
-                class="fa-solid
-                       fa-circle-question"
-              ></i>
-            </div>
-
-            <h2
-              class="text-2xl
-                     font-black
-                     text-slate-900"
-            >
-              Practice Question
-            </h2>
-
-          </div>
-
-          <div
-            class="rounded-2xl
-                   border border-slate-200
-                   p-5"
-          >
-
-            <p
-              class="font-bold
-                     text-slate-800"
-            >
-              What is the main purpose of studying
-              ${escapeHTML(lesson[0])}
-              in ${escapeHTML(subject.name)}?
-            </p>
-
-            <button
-              type="button"
-              onclick="
-                this.nextElementSibling
-                  .classList.toggle('hidden')
+              style="
+                margin-bottom:20px;
               "
-              class="mt-4 px-4 py-2
-                     rounded-xl
-                     bg-slate-900
-                     text-white
-                     text-sm font-bold
-                     hover:bg-teal-600"
-            >
-              <i class="fa-solid fa-eye mr-2"></i>
-              Show Answer
-            </button>
-
-            <div
-              class="hidden mt-4 p-4
-                     rounded-xl
-                     bg-teal-50
-                     border border-teal-100
-                     text-teal-900"
             >
 
-              <strong>Answer:</strong>
+              <h2
+                style="
+                  font-size:26px;
+                  font-weight:900;
+                  margin:0 0 6px;
+                "
+              >
+                Course Lessons
+              </h2>
 
-              ${escapeHTML(lesson[2])}
+              <p
+                style="
+                  color:#6b7280;
+                  margin:0;
+                "
+              >
+                Work through each lesson and complete the practice questions.
+              </p>
 
             </div>
 
+            ${lessonsHTML}
+
+          </section>
+
+          <!-- COMPLETION -->
+
+          <div
+            id="pulseprepCompletionMessage"
+            style="
+              display:none;
+              background:#ffffff;
+              border:1px solid #e5e7eb;
+              border-radius:20px;
+              padding:30px;
+              margin-top:30px;
+              text-align:center;
+            "
+          >
+
+            <div
+              style="
+                font-size:48px;
+                margin-bottom:10px;
+              "
+            >
+              🎉
+            </div>
+
+            <h2
+              style="
+                font-size:25px;
+                font-weight:900;
+                margin-bottom:8px;
+              "
+            >
+              Subject Completed!
+            </h2>
+
+            <p style="color:#6b7280;">
+              Great work. You have completed all available lessons in this subject.
+            </p>
+
           </div>
-
-        </section>
-
-        <!-- LESSON NAVIGATION -->
-
-        <div
-          class="flex flex-col
-                 sm:flex-row
-                 gap-3
-                 justify-between
-                 mt-6"
-        >
-
-          ${
-            previousLesson
-              ? `
-                <button
-                  type="button"
-                  onclick="
-                    openPulsePrepLesson(
-                      '${escapeHTML(subject.id)}',
-                      ${previousLesson}
-                    )
-                  "
-                  class="flex-1 py-4
-                         rounded-xl
-                         border border-slate-200
-                         bg-white
-                         text-slate-700
-                         font-bold"
-                >
-                  <i
-                    class="fa-solid
-                           fa-arrow-left mr-2"
-                  ></i>
-                  Previous Lesson
-                </button>
-              `
-              : `
-                <div class="flex-1"></div>
-              `
-          }
-
-          ${
-            nextLesson
-              ? `
-                <button
-                  type="button"
-                  onclick="
-                    openPulsePrepLesson(
-                      '${escapeHTML(subject.id)}',
-                      ${nextLesson}
-                    )
-                  "
-                  class="flex-1 py-4
-                         rounded-xl
-                         bg-teal-600
-                         text-white
-                         font-bold
-                         hover:bg-teal-700"
-                >
-                  Next Lesson
-                  <i
-                    class="fa-solid
-                           fa-arrow-right ml-2"
-                  ></i>
-                </button>
-              `
-              : `
-                <button
-                  type="button"
-                  onclick="
-                    openPulsePrepSubjectPage(
-                      '${escapeHTML(subject.id)}'
-                    )
-                  "
-                  class="flex-1 py-4
-                         rounded-xl
-                         bg-teal-600
-                         text-white
-                         font-bold"
-                >
-                  <i
-                    class="fa-solid
-                           fa-check mr-2"
-                  ></i>
-                  Back to Course
-                </button>
-              `
-          }
 
         </div>
 
       </div>
     `;
 
-    goToSubjectPageTab();
-    scrollTop();
+    attachLessonEvents(subject.id, lessons.length);
+  }
+
+  // ==========================================================
+  // LESSON EVENTS
+  // ==========================================================
+
+  function attachLessonEvents(subjectId, lessonCount) {
+    const page = getPage();
+
+    if (!page) {
+      return;
+    }
+
+    const buttons = page.querySelectorAll(
+      ".pulseprep-answer-option"
+    );
+
+    buttons.forEach(function (button) {
+      button.addEventListener("click", function () {
+
+        const lesson = button.closest(".pulseprep-lesson");
+
+        if (!lesson) {
+          return;
+        }
+
+        const allOptions = lesson.querySelectorAll(
+          ".pulseprep-answer-option"
+        );
+
+        const feedback = lesson.querySelector(
+          ".pulseprep-answer-feedback"
+        );
+
+        const correct = button.dataset.correct === "true";
+
+        allOptions.forEach(function (option) {
+          option.disabled = true;
+          option.style.cursor = "default";
+        });
+
+        if (correct) {
+          button.style.borderColor = "#16a34a";
+          button.style.background = "#f0fdf4";
+
+          feedback.style.display = "block";
+          feedback.style.background = "#f0fdf4";
+          feedback.style.color = "#166534";
+
+          feedback.innerHTML = `
+            <strong>✓ Correct!</strong>
+            <p style="margin:6px 0 0;">
+              Excellent work. Review the explanation and continue.
+            </p>
+          `;
+
+          lesson.dataset.completed = "true";
+
+        } else {
+
+          button.style.borderColor = "#dc2626";
+          button.style.background = "#fef2f2";
+
+          const correctOption = lesson.querySelector(
+            '[data-correct="true"]'
+          );
+
+          if (correctOption) {
+            correctOption.style.borderColor = "#16a34a";
+            correctOption.style.background = "#f0fdf4";
+          }
+
+          feedback.style.display = "block";
+          feedback.style.background = "#fef2f2";
+          feedback.style.color = "#991b1b";
+
+          const content = SUBJECT_CONTENT[subjectId];
+
+          let explanation = "";
+
+          if (content && content.lessons) {
+            const lessons = Array.from(
+              page.querySelectorAll(".pulseprep-lesson")
+            );
+
+            const lessonIndex = lessons.indexOf(lesson);
+
+            if (
+              lessonIndex >= 0 &&
+              content.lessons[lessonIndex]
+            ) {
+              explanation =
+                content.lessons[lessonIndex].explanation || "";
+            }
+          }
+
+          feedback.innerHTML = `
+            <strong>Not quite.</strong>
+
+            ${
+              explanation
+                ? `
+                  <p style="margin:6px 0 0;">
+                    ${escapeHTML(explanation)}
+                  </p>
+                `
+                : ""
+            }
+          `;
+        }
+
+        updateProgress();
+      });
+    });
+
+    function updateProgress() {
+      const completed = page.querySelectorAll(
+        '.pulseprep-lesson[data-completed="true"]'
+      ).length;
+
+      const total = lessonCount || 1;
+
+      const percentage = Math.round(
+        (completed / total) * 100
+      );
+
+      const progressBar = page.querySelector(
+        "#pulseprepProgressBar"
+      );
+
+      const progressText = page.querySelector(
+        "#pulseprepProgressText"
+      );
+
+      if (progressBar) {
+        progressBar.style.width = percentage + "%";
+      }
+
+      if (progressText) {
+        progressText.textContent = percentage + "%";
+      }
+
+      if (percentage >= 100) {
+        const completion = page.querySelector(
+          "#pulseprepCompletionMessage"
+        );
+
+        if (completion) {
+          completion.style.display = "block";
+        }
+      }
+    }
+  }
+
+  // ==========================================================
+  // PUBLIC API
+  // ==========================================================
+
+  window.openPulsePrepSubjectPage = function (subjectId) {
+
+    console.log(
+      "PulsePrep: Opening subject:",
+      subjectId
+    );
+
+    const subject = getSubject(subjectId);
+
+    if (!subject) {
+      console.error(
+        "PulsePrep: Subject not found:",
+        subjectId
+      );
+    }
+
+    ensurePage();
+
+    showSubjectTab();
+
+    renderSubjectPage(subjectId);
+
+    setTimeout(function () {
+      scrollToTop();
+    }, 50);
   };
+
+  // Compatibility aliases
+  window.renderSubjectPage =
+    window.openPulsePrepSubjectPage;
+
+  window.openSubjectPage =
+    window.openPulsePrepSubjectPage;
+
+  // ==========================================================
+  // RETURN TO SUBJECT LIBRARY
+  // ==========================================================
+
+  window.showPulsePrepSubjects = function () {
+
+    if (typeof window.showTab === "function") {
+      try {
+        window.showTab("subject-library");
+      } catch (error) {
+        console.warn(
+          "PulsePrep: Could not open subject-library tab.",
+          error
+        );
+      }
+    }
+
+    const library =
+      document.getElementById("subject-library") ||
+      document.getElementById("pulseprepSubjectLibrary");
+
+    if (library) {
+      library.style.display = "";
+      library.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    }
+
+    if (typeof window.renderPulsePrepSubjects === "function") {
+      try {
+        window.renderPulsePrepSubjects();
+      } catch (error) {
+        console.warn(
+          "PulsePrep: Could not refresh subjects.",
+          error
+        );
+      }
+    }
+  };
+
+  // ==========================================================
+  // DEBUG / STATUS
+  // ==========================================================
+
+  window.PulsePrepSubjectEngine = {
+    version: "2.0.0",
+    subjects: function () {
+      return getSubjects();
+    },
+    content: function () {
+      return SUBJECT_CONTENT;
+    },
+    open: function (subjectId) {
+      window.openPulsePrepSubjectPage(subjectId);
+    }
+  };
+
+  console.log(
+    "PulsePrep Subject Engine loaded successfully."
+  );
 
 })();
