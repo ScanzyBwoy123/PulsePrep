@@ -847,41 +847,23 @@
 
       const session =
         data?.session;
+// Always require a fresh admin login when this page is opened.
+// An existing Supabase session must NOT automatically open the dashboard.
 
+if (session && session.user) {
+  await supabaseClient.auth.signOut();
+}
 
-      if (!session || !session.user) {
+currentUser = null;
 
-        return;
+// Keep the login screen visible.
+document
+  .getElementById("adminApp")
+  .classList.add("hidden");
 
-      }
-
-
-      const email =
-        (
-          session.user.email ||
-          ""
-        ).toLowerCase();
-
-
-      if (!isAdminEmail(email)) {
-
-        await supabaseClient.auth.signOut();
-
-        showLoginMessage(
-          "This account does not have administrator access.",
-          "error"
-        );
-
-        return;
-
-      }
-
-
-      currentUser =
-        session.user;
-
-
-      await showAdminDashboard(email);
+document
+  .getElementById("loginScreen")
+  .classList.remove("hidden");
 
 
     } catch (error) {
