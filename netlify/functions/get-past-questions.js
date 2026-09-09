@@ -5,9 +5,6 @@ exports.handler = async (event) => {
   if (event.httpMethod !== "GET") {
     return {
       statusCode: 405,
-      headers: {
-        "Content-Type": "application/json"
-      },
       body: JSON.stringify({
         error: "Method not allowed"
       })
@@ -23,16 +20,15 @@ exports.handler = async (event) => {
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return {
         statusCode: 401,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           error: "You must be logged in."
         })
       };
     }
 
-    const accessToken = authHeader.substring(7).trim();
+    const accessToken = authHeader
+      .substring(7)
+      .trim();
 
     const supabase = createClient(
       process.env.SUPABASE_URL,
@@ -45,59 +41,49 @@ exports.handler = async (event) => {
       }
     );
 
-    // Verify the logged-in user
+    // Verify logged-in user
     const {
       data: { user },
       error: userError
     } = await supabase.auth.getUser(accessToken);
 
     if (userError || !user) {
-      console.error("USER VERIFICATION ERROR:", userError);
+      console.error(
+        "USER VERIFICATION ERROR:",
+        userError
+      );
 
       return {
         statusCode: 401,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           error: "Invalid or expired login session."
         })
       };
     }
 
-    // Use the exact same email normalization
-    // as the working Premium system.
+    // Normalize email exactly like the working Premium system
     const email = user.email?.trim().toLowerCase();
 
     if (!email) {
       return {
         statusCode: 403,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           error: "Account email not available."
         })
       };
     }
 
-    // Check the same successful subscription
-    // used by the working Premium system.
+    // Use the same simple subscription lookup
+    // used by the original working Question/Premium system.
     const {
-      data: subscription,
+      data: subscriptions,
       error: subscriptionError
     } = await supabase
       .from("subscriptions")
-      .select(
-        "email, reference, amount, status, plan, paid_at"
-      )
+      .select("email,status")
       .eq("email", email)
       .eq("status", "success")
-      .order("paid_at", {
-        ascending: false
-      })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
 
     if (subscriptionError) {
       console.error(
@@ -107,21 +93,15 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 500,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           error: "Unable to verify premium access."
         })
       };
     }
 
-    if (!subscription) {
+    if (!subscriptions || subscriptions.length === 0) {
       return {
         statusCode: 403,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           error: "Premium access required."
         })
@@ -161,9 +141,6 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 500,
-        headers: {
-          "Content-Type": "application/json"
-        },
         body: JSON.stringify({
           error: "Unable to load past questions."
         })
@@ -179,7 +156,6 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         success: true,
         premium: true,
-        plan: subscription.plan || null,
         questions: questions || []
       })
     };
@@ -193,9 +169,6 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 500,
-      headers: {
-        "Content-Type": "application/json"
-      },
       body: JSON.stringify({
         error: "Server error while loading questions."
       })
