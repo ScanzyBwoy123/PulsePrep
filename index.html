@@ -4571,9 +4571,85 @@ function escapeHtml(value) {
 
 async function openPastQuestion(id) {
 
-  alert(
-    "The question file is securely stored. File viewing will be connected next."
-  );
+  try {
+
+    const supabase = window.pulseprepSupabase;
+
+    if (!supabase) {
+      alert("PulsePrep is still loading. Please try again.");
+      return;
+    }
+
+    const {
+      data: { session },
+      error: sessionError
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session) {
+      alert("Please log in to view this question.");
+      showTab("account");
+      return;
+    }
+
+    const response = await fetch(
+      `/.netlify/functions/get-past-question-file?id=${encodeURIComponent(id)}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+
+      if (response.status === 403) {
+        alert("Premium access is required to view this question.");
+        showTab("payment");
+        return;
+      }
+
+      if (response.status === 401) {
+        alert("Your login session has expired. Please log in again.");
+        showTab("account");
+        return;
+      }
+
+      alert(
+        result.error ||
+        "Unable to open this question right now."
+      );
+
+      return;
+    }
+
+    if (!result.success || !result.url) {
+      alert("The question file could not be opened.");
+      return;
+    }
+
+    // Open the private file using the temporary signed URL.
+    window.open(
+      result.url,
+      "_blank",
+      "noopener,noreferrer"
+    );
+
+  } catch (error) {
+
+    console.error(
+      "openPastQuestion error:",
+      error
+    );
+
+    alert(
+      "Unable to open the question right now. Please try again."
+    );
+
+  }
+
 }
 
 
