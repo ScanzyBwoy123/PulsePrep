@@ -4230,9 +4230,11 @@ async function loadQuestionBank() {
   container.innerHTML = `
     <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
       <div class="text-3xl mb-3">⏳</div>
+
       <h3 class="text-lg font-bold">
         Loading Question Bank...
       </h3>
+
       <p class="text-sm text-gray-500 mt-2">
         Please wait while we load the available questions.
       </p>
@@ -4241,32 +4243,108 @@ async function loadQuestionBank() {
 
   try {
 
-    if (typeof supabaseClient === "undefined") {
-      throw new Error("Supabase client is not available.");
+    // Get the current logged-in user
+    const supabase = window.pulseprepSupabase;
+
+    if (!supabase) {
+      throw new Error("PulsePrep Supabase client is not available.");
     }
 
     const {
-      data,
-      error
-    } = await supabaseClient
-      .from("past_question_submissions")
-      .select("*")
-      .eq("status", "approved")
-      .order("created_at", {
-        ascending: false
-      });
+      data: sessionData,
+      error: sessionError
+    } = await supabase.auth.getSession();
 
-    if (error) {
-      throw error;
+    if (sessionError) {
+      throw sessionError;
     }
 
-    window.questionBankItems = data || [];
+    const session = sessionData?.session;
 
-    if (!data || data.length === 0) {
+    if (!session) {
 
       container.innerHTML = `
-        <div class="bg-white rounded-2xl border
-                    border-gray-200 p-8 text-center">
+        <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
+
+          <div class="text-4xl mb-3">🔐</div>
+
+          <h3 class="text-xl font-extrabold">
+            Premium Access Required
+          </h3>
+
+          <p class="text-gray-500 mt-2">
+            Please log in and subscribe to access the Premium Question Bank.
+          </p>
+
+          <button
+            onclick="showTab('login')"
+            class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
+          >
+            Login
+          </button>
+
+        </div>
+      `;
+
+      return;
+    }
+
+    // Call the secure Netlify function
+    const response = await fetch(
+      "/.netlify/functions/get-past-questions",
+      {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${session.access_token}`
+        }
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok) {
+
+      if (response.status === 403) {
+
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
+
+            <div class="text-4xl mb-3">🔒</div>
+
+            <h3 class="text-xl font-extrabold">
+              Premium Question Bank
+            </h3>
+
+            <p class="text-gray-500 mt-2">
+              Subscribe to access verified past examination questions.
+            </p>
+
+            <button
+              onclick="showTab('payment')"
+              class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
+            >
+              Unlock Premium
+            </button>
+
+          </div>
+        `;
+
+        return;
+      }
+
+      throw new Error(
+        result.error || "Unable to load questions."
+      );
+    }
+
+    const questions = result.questions || [];
+
+    window.questionBankItems = questions;
+
+    if (questions.length === 0) {
+
+      container.innerHTML = `
+        <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
 
           <div class="text-4xl mb-3">📝</div>
 
@@ -4275,7 +4353,7 @@ async function loadQuestionBank() {
           </h3>
 
           <p class="text-gray-500 mt-2">
-            Approved questions will appear here.
+            Approved questions will appear here once they are added.
           </p>
 
         </div>
@@ -4284,197 +4362,259 @@ async function loadQuestionBank() {
       return;
     }
 
-    container.innerHTML = "";
+    // Build subject filter
+    const subjectSelect =
+      document.getElementById("questionBankSubject");
 
-    data.forEach(item => {
+    if (subjectSelect) {
 
-      const card =
-        document.createElement("div");
+      const subjects = [
+        ...new Set(
+          questions
+            .map(q => q.subject)
+            .filter(Boolean)
+        )
+      ].sort();
 
-      card.className =
-        "bg-white rounded-2xl border border-slate-200 p-5 mb-4 shadow-sm";
+      subjectSelect.innerHTML =
+        `<option value="">All Subjects</option>` +
+        subjects
+          .map(
+            subject =>
+              `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}</option>`
+          )
+          .join("");
+    }
 
-      card.innerHTML = `
-
-        <div class="flex items-start justify-between gap-4">
-
-          <div>
-
-            <span class="inline-flex items-center gap-1
-                         px-3 py-1 rounded-full
-                         bg-blue-50 text-blue-700
-                         text-xs font-bold">
-
-              <i class="fa-solid fa-book-open"></i>
-
-              ${escapeHtml(item.subject || "Nursing")}
-
-            </span>
-
-            <h3 class="text-lg font-extrabold
-                       text-slate-900 mt-3">
-
-              ${escapeHtml(
-                item.file_name ||
-                "Past Examination Questions"
-              )}
-
-            </h3>
-
-            <p class="text-sm text-slate-500 mt-2">
-
-              ${escapeHtml(
-                item.school || "Nursing School"
-              )}
-
-              ${item.level
-                ? " • " + escapeHtml(item.level)
-                : ""}
-
-              ${item.academic_year
-                ? " • " + escapeHtml(item.academic_year)
-                : ""}
-
-            </p>
-
-          </div>
-
-          <span class="px-3 py-1 rounded-full
-                       bg-amber-50 text-amber-700
-                       text-xs font-bold">
-
-            🔒 PREMIUM
-
-          </span>
-
-        </div>
-
-        <button
-          onclick="openQuestionBankFile('${item.id}')"
-          class="w-full mt-5 px-5 py-3 rounded-xl
-                 bg-blue-600 hover:bg-blue-700
-                 text-white font-bold">
-
-          <i class="fa-solid fa-file-arrow-up mr-2"></i>
-          Open Questions
-
-        </button>
-
-      `;
-
-      container.appendChild(card);
-
-    });
+    renderQuestionBank(questions);
 
   } catch (error) {
 
-    console.error(
-      "Question Bank error:",
-      error
-    );
+    console.error("Question Bank error:", error);
 
     container.innerHTML = `
-      <div class="bg-red-50 border border-red-200
-                  text-red-700 rounded-2xl p-6 text-center">
+      <div class="bg-white rounded-2xl border border-red-200 p-8 text-center">
 
-        <i class="fa-solid fa-circle-exclamation text-2xl"></i>
+        <div class="text-4xl mb-3">⚠️</div>
 
-        <h3 class="font-bold mt-2">
-          Could not load Question Bank
+        <h3 class="text-xl font-extrabold text-red-600">
+          Unable to Load Question Bank
         </h3>
 
-        <p class="text-sm mt-2">
-          ${escapeHtml(
-            error.message ||
-            "An unexpected error occurred."
-          )}
+        <p class="text-gray-500 mt-2">
+          ${escapeHtml(error.message || "Something went wrong.")}
+        </p>
+
+        <button
+          onclick="loadQuestionBank()"
+          class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
+        >
+          Try Again
+        </button>
+
+      </div>
+    `;
+  }
+}
+
+
+function renderQuestionBank(items) {
+
+  const container =
+    document.getElementById("questionBankContent");
+
+  if (!container) return;
+
+  const search =
+    document.getElementById("questionBankSearch")?.value
+      ?.toLowerCase()
+      .trim() || "";
+
+  const subject =
+    document.getElementById("questionBankSubject")?.value || "";
+
+  const level =
+    document.getElementById("questionBankLevel")?.value || "";
+
+  const examType =
+    document.getElementById("questionBankExamType")?.value || "";
+
+  const filtered = items.filter(question => {
+
+    const text =
+      `${question.school || ""}
+       ${question.programme || ""}
+       ${question.subject || ""}
+       ${question.question_type || ""}
+       ${question.academic_year || ""}
+       ${question.exam_type || ""}`
+        .toLowerCase();
+
+    return (
+      (!search || text.includes(search)) &&
+      (!subject || question.subject === subject) &&
+      (!level || question.level === level) &&
+      (!examType || question.exam_type === examType)
+    );
+  });
+
+  if (filtered.length === 0) {
+
+    container.innerHTML = `
+      <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
+
+        <div class="text-4xl mb-3">🔎</div>
+
+        <h3 class="text-xl font-extrabold">
+          No Matching Questions
+        </h3>
+
+        <p class="text-gray-500 mt-2">
+          Try changing your search or filters.
         </p>
 
       </div>
     `;
 
-  }
-
-}
-
-
-async function openQuestionBankFile(id) {
-
-  const question =
-    (window.questionBankItems || [])
-      .find(item => item.id === id);
-
-  if (!question || !question.file_path) {
-
-    alert("Question file could not be found.");
-
     return;
-
   }
 
-  try {
+  container.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
 
-    const {
-      data,
-      error
-    } = await supabaseClient
-      .storage
-      .from("past-questions")
-      .createSignedUrl(
-        question.file_path,
-        300
-      );
+      ${filtered.map(question => `
+        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
 
-    if (error) {
-      throw error;
-    }
+          <div class="flex items-start justify-between gap-3">
 
-    if (!data?.signedUrl) {
-      throw new Error("No file URL was returned.");
-    }
+            <div>
+              <div class="text-xs font-extrabold uppercase text-blue-600">
+                ${escapeHtml(question.subject || "Nursing")}
+              </div>
 
-    window.open(
-      data.signedUrl,
-      "_blank",
-      "noopener,noreferrer"
-    );
+              <h3 class="text-lg font-extrabold mt-1">
+                ${escapeHtml(question.file_name || "Past Question")}
+              </h3>
+            </div>
 
-  } catch (error) {
+            <span class="text-xs font-bold bg-green-50 text-green-700 px-2 py-1 rounded-lg">
+              APPROVED
+            </span>
 
-    console.error(
-      "Question file error:",
-      error
-    );
+          </div>
 
-    alert("Could not open the question file.");
+          <div class="mt-4 space-y-2 text-sm text-gray-600">
 
-  }
+            <p>
+              <strong>School:</strong>
+              ${escapeHtml(question.school || "Not specified")}
+            </p>
 
+            <p>
+              <strong>Programme:</strong>
+              ${escapeHtml(question.programme || "Not specified")}
+            </p>
+
+            <p>
+              <strong>Level:</strong>
+              ${escapeHtml(question.level || "Not specified")}
+            </p>
+
+            <p>
+              <strong>Exam:</strong>
+              ${escapeHtml(question.exam_type || "Not specified")}
+            </p>
+
+            <p>
+              <strong>Academic Year:</strong>
+              ${escapeHtml(question.academic_year || "Not specified")}
+            </p>
+
+          </div>
+
+          <div class="mt-5">
+
+            <button
+              type="button"
+              onclick="openPastQuestion('${escapeHtml(question.id)}')"
+              class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold"
+            >
+              View Question
+            </button>
+
+          </div>
+
+        </div>
+      `).join("")}
+
+    </div>
+  `;
 }
 
 
-document.addEventListener(
-  "DOMContentLoaded",
-  function() {
+function escapeHtml(value) {
 
-    const questionBankButton =
-      document.querySelector(
-        '[onclick="showTab(\'question-bank\')"]'
-      );
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
-    if (questionBankButton) {
 
-      questionBankButton.addEventListener(
-        "click",
-        function() {
-          loadQuestionBank();
-        }
-      );
+async function openPastQuestion(id) {
 
-    }
+  alert(
+    "The question file is securely stored. File viewing will be connected next."
+  );
+}
+
+
+// Question Bank filters
+[
+  "questionBankSearch",
+  "questionBankSubject",
+  "questionBankLevel",
+  "questionBankExamType"
+].forEach(id => {
+
+  const element = document.getElementById(id);
+
+  if (element) {
+
+    element.addEventListener("input", () => {
+      renderQuestionBank(window.questionBankItems || []);
+    });
+
+    element.addEventListener("change", () => {
+      renderQuestionBank(window.questionBankItems || []);
+    });
 
   }
-);
+
+});
+
+
+// Load when Question Bank tab is opened
+const originalShowTab =
+  window.showTab;
+
+if (typeof originalShowTab === "function") {
+
+  window.showTab = function(tabName) {
+
+    originalShowTab.apply(this, arguments);
+
+    if (tabName === "question-bank") {
+      setTimeout(() => {
+        loadQuestionBank();
+      }, 100);
+    }
+
+  };
+
+}
 </script>
 </body>
 </html>
