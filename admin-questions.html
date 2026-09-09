@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulsePrep Admin — Past Questions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      background: #f8fafc;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .status-pending {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .status-approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .status-rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body class="text-slate-800">
+  <!-- ACCESS DENIED / LOADING -->
+  <div id="loadingScreen"
+       class="min-h-screen flex items-center justify-center p-6">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-slate-600">Checking admin access...</p>
+    </div>
+  </div>
+  <!-- ADMIN APP -->
+  <div id="adminApp" class="hidden">
+    <!-- HEADER -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-bold text-blue-700">
+              PulsePrep Admin
+            </h1>
+            <p class="text-sm text-slate-500">
+              Past Questions Management
+            </p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span id="adminEmail"
+                  class="hidden sm:inline text-sm text-slate-600">
+            </span>
+            <button
+              onclick="logout()"
+              class="px-4 py-2 rounded-lg bg-slate-900 text-white text-sm font-semibold hover:bg-slate-700">
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- MAIN -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <!-- PAGE TITLE -->
+      <div class="mb-8">
+        <h2 class="text-3xl font-bold text-slate-900">
+          Past Questions
+        </h2>
+        <p class="mt-2 text-slate-600">
+          Review student submissions before adding questions to the PulsePrep Premium Question Bank.
+        </p>
+      </div>
+      <!-- STATISTICS -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <p class="text-sm text-slate-500">
+            Pending
+          </p>
+          <p id="pendingCount"
+             class="text-3xl font-bold text-amber-600 mt-2">
+            0
+          </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <p class="text-sm text-slate-500">
+            Approved
+          </p>
+          <p id="approvedCount"
+             class="text-3xl font-bold text-green-600 mt-2">
+            0
+          </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <p class="text-sm text-slate-500">
+            Rejected
+          </p>
+          <p id="rejectedCount"
+             class="text-3xl font-bold text-red-600 mt-2">
+            0
+          </p>
+        </div>
+      </div>
+      <!-- FILTERS -->
+      <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- SEARCH -->
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              Search
+            </label>
+            <input
+              id="searchInput"
+              type="text"
+              placeholder="Search school, subject..."
+              class="w-full border border-slate-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              oninput="renderSubmissions()">
+          </div>
+          <!-- STATUS -->
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              Status
+            </label>
+            <select
+              id="statusFilter"
+              onchange="renderSubmissions()"
+              class="w-full border border-slate-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="all">
+                All
+              </option>
+              <option value="pending">
+                Pending
+              </option>
+              <option value="approved">
+                Approved
+              </option>
+              <option value="rejected">
+                Rejected
+              </option>
+            </select>
+          </div>
+          <!-- SUBJECT -->
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              Subject
+            </label>
+            <select
+              id="subjectFilter"
+              onchange="renderSubmissions()"
+              class="w-full border border-slate-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="all">
+                All Subjects
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="mt-4 flex justify-end">
+          <button
+            onclick="loadSubmissions()"
+            class="px-5 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700">
+            Refresh
+          </button>
+        </div>
+      </div>
+      <!-- MESSAGE -->
+      <div id="messageBox"
+           class="hidden mb-6 p-4 rounded-xl">
+      </div>
+      <!-- SUBMISSIONS -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-200">
+          <h3 class="font-bold text-lg">
+            Submitted Past Questions
+          </h3>
+        </div>
+        <!-- DESKTOP TABLE -->
+        <div class="hidden md:block overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-slate-50 border-b border-slate-200">
+              <tr>
+                <th class="text-left px-5 py-4 text-sm font-semibold">
+                  School
+                </th>
+                <th class="text-left px-5 py-4 text-sm font-semibold">
+                  Subject
+                </th>
+                <th class="text-left px-5 py-4 text-sm font-semibold">
+                  Level
+                </th>
+                <th class="text-left px-5 py-4 text-sm font-semibold">
+                  Year
+                </th>
+                <th class="text-left px-5 py-4 text-sm font-semibold">
+                  Status
+                </th>
+                <th class="text-left px-5 py-4 text-sm font-semibold">
+                  Date
+                </th>
+                <th class="text-right px-5 py-4 text-sm font-semibold">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody id="submissionsTableBody">
+            </tbody>
+          </table>
+        </div>
+        <!-- MOBILE CARDS -->
+        <div id="mobileSubmissions"
+             class="md:hidden">
+        </div>
+        <!-- EMPTY -->
+        <div id="emptyState"
+             class="hidden p-10 text-center">
+          <div class="text-4xl mb-3">
+            📚
+          </div>
+          <h3 class="font-bold text-lg">
+            No submissions found
+          </h3>
+          <p class="text-slate-500 mt-2">
+            Student submissions will appear here.
+          </p>
+        </div>
+      </div>
+    </main>
+  </div>
+  <!-- DETAILS MODAL -->
+  <div id="detailsModal"
+       class="hidden fixed inset-0 bg-black/50 z-50 p-4 overflow-y-auto">
+    <div class="min-h-full flex items-center justify-center">
+      <div class="bg-white rounded-2xl max-w-3xl w-full shadow-xl">
+        <!-- MODAL HEADER -->
+        <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold">
+              Submission Details
+            </h2>
+            <p id="modalSubmissionId"
+               class="text-xs text-slate-400 mt-1">
+            </p>
+          </div>
+          <button
+            onclick="closeModal()"
+            class="text-slate-500 hover:text-slate-900 text-2xl">
+            ×
+          </button>
+        </div>
+        <!-- MODAL CONTENT -->
+        <div class="p-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <p class="text-xs text-slate-500 uppercase font-semibold">
+                School
+              </p>
+              <p id="modalSchool"
+                 class="font-semibold mt-1">
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase font-semibold">
+                Programme
+              </p>
+              <p id="modalProgramme"
+                 class="font-semibold mt-1">
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase font-semibold">
+                Level
+              </p>
+              <p id="modalLevel"
+                 class="font-semibold mt-1">
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase font-semibold">
+                Subject
+              </p>
+              <p id="modalSubject"
+                 class="font-semibold mt-1">
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase font-semibold">
+                Question Type
+              </p>
+              <p id="modalQuestionType"
+                 class="font-semibold mt-1">
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase font-semibold">
+                Academic Year
+              </p>
+              <p id="modalAcademicYear"
+                 class="font-semibold mt-1">
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase font-semibold">
+                Semester
+              </p>
+              <p id="modalSemester"
+                 class="font-semibold mt-1">
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 uppercase font-semibold">
+                Exam Type
+              </p>
+              <p id="modalExamType"
+                 class="font-semibold mt-1">
+              </p>
+            </div>
+          </div>
+          <!-- FILE -->
+          <div class="mt-6 p-4 bg-slate-50 rounded-xl">
+            <p class="text-xs text-slate-500 uppercase font-semibold">
+              Uploaded File
+            </p>
+            <p id="modalFileName"
+               class="font-semibold mt-1">
+            </p>
+            <button
+              id="openFileButton"
+              onclick="openSubmissionFile()"
+              class="mt-3 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">
+              Open File
+            </button>
+          </div>
+          <!-- ADDITIONAL INFORMATION -->
+          <div class="mt-6">
+            <p class="text-xs text-slate-500 uppercase font-semibold">
+              Additional Information
+            </p>
+            <div id="modalAdditionalInformation"
+                 class="mt-2 p-4 bg-slate-50 rounded-xl text-sm whitespace-pre-wrap">
+            </div>
+          </div>
+          <!-- STATUS -->
+          <div class="mt-6">
+            <p class="text-xs text-slate-500 uppercase font-semibold">
+              Current Status
+            </p>
+            <div id="modalStatus"
+                 class="mt-2">
+            </div>
+          </div>
+        </div>
+        <!-- MODAL ACTIONS -->
+        <div class="px-6 py-5 border-t border-slate-200 flex flex-col sm:flex-row gap-3 sm:justify-end">
+          <button
+            onclick="rejectCurrentSubmission()"
+            class="px-5 py-3 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">
+            Reject
+          </button>
+          <button
+            onclick="approveCurrentSubmission()"
+            class="px-5 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700">
+            Approve
+          </button>
+          <button
+            onclick="closeModal()"
+            class="px-5 py-3 rounded-lg bg-slate-200 text-slate-800 font-semibold hover:bg-slate-300">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+  /* =========================================================
+     PULSEPREP SUPABASE CONFIGURATION
+     ========================================================= */
+  const SUPABASE_URL =
+    "https://eskwphjtiogguhvtktmh.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs";
+  /* =========================================================
+     ADMIN EMAILS
+     ========================================================= */
+  const ADMIN_EMAILS = [
+    "scanzybwoy8@gmail.com"
+  ];
+  /* =========================================================
+     SUPABASE CLIENT
+     ========================================================= */
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
+  /* =========================================================
+     GLOBAL VARIABLES
+     ========================================================= */
+  let submissions = [];
+  let currentSubmission = null;
+  /* =========================================================
+     INITIALIZE
+     ========================================================= */
+  document.addEventListener("DOMContentLoaded", async function () {
+    await checkAdminAccess();
+  });
+  /* =========================================================
+     CHECK ADMIN ACCESS
+     ========================================================= */
+  async function checkAdminAccess() {
+    try {
+      const {
+        data: {
+          session
+        }
+      } = await supabaseClient.auth.getSession();
+      if (!session || !session.user) {
+        showAccessDenied(
+          "You must be logged in to access the admin panel."
+        );
+        return;
+      }
+      const email =
+        (session.user.email || "").toLowerCase();
+      const isAdmin =
+        ADMIN_EMAILS
+          .map(e => e.toLowerCase())
+          .includes(email);
+      if (!isAdmin) {
+        showAccessDenied(
+          "This account does not have administrator access."
+        );
+        return;
+      }
+      document.getElementById("adminEmail").textContent =
+        email;
+      document.getElementById("loadingScreen").classList.add("hidden");
+      document.getElementById("adminApp").classList.remove("hidden");
+      await loadSubmissions();
+    } catch (error) {
+      console.error(error);
+      showAccessDenied(
+        "Unable to verify administrator access."
+      );
+    }
+  }
+  /* =========================================================
+     ACCESS DENIED
+     ========================================================= */
+  function showAccessDenied(message) {
+    document.getElementById("loadingScreen").innerHTML = `
+      <div class="max-w-md w-full bg-white rounded-2xl shadow-lg border border-slate-200 p-8 text-center">
+        <div class="text-5xl mb-4">
+          🔒
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900">
+          Access Restricted
+        </h2>
+        <p class="text-slate-600 mt-3">
+          ${escapeHtml(message)}
+        </p>
+        <div class="mt-6 flex flex-col gap-3">
+          <a
+            href="/"
+            class="px-5 py-3 rounded-lg bg-blue-600 text-white font-semibold">
+            Go to PulsePrep
+          </a>
+          <button
+            onclick="login()"
+            class="px-5 py-3 rounded-lg bg-slate-200 text-slate-800 font-semibold">
+            Login
+          </button>
+        </div>
+      </div>
+    `;
+  }
+  /* =========================================================
+     LOGIN
+     ========================================================= */
+  async function login() {
+    const redirectUrl =
+      window.location.origin +
+      "/admin-questions.html";
+    const {
+      error
+    } = await supabaseClient.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: redirectUrl
+      }
+    });
+    if (error) {
+      alert(
+        "Login error: " +
+        error.message
+      );
+    }
+  }
+  /* =========================================================
+     LOGOUT
+     ========================================================= */
+  async function logout() {
+    await supabaseClient.auth.signOut();
+    window.location.reload();
+  }
+  /* =========================================================
+     LOAD SUBMISSIONS
+     ========================================================= */
+  async function loadSubmissions() {
+    showMessage(
+      "Loading submissions...",
+      "info"
+    );
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("past_question_submissions")
+      .select("*")
+      .order(
+        "created_at",
+        {
+          ascending: false
+        }
+      );
+    if (error) {
+      console.error(error);
+      showMessage(
+        "Could not load submissions. Check your Supabase RLS policies.",
+        "error"
+      );
+      return;
+    }
+    submissions = data || [];
+    updateStatistics();
+    populateSubjectFilter();
+    renderSubmissions();
+    hideMessage();
+  }
+  /* =========================================================
+     STATISTICS
+     ========================================================= */
+  function updateStatistics() {
+    const pending =
+      submissions.filter(
+        item => item.status === "pending"
+      ).length;
+    const approved =
+      submissions.filter(
+        item => item.status === "approved"
+      ).length;
+    const rejected =
+      submissions.filter(
+        item => item.status === "rejected"
+      ).length;
+    document.getElementById("pendingCount").textContent =
+      pending;
+    document.getElementById("approvedCount").textContent =
+      approved;
+    document.getElementById("rejectedCount").textContent =
+      rejected;
+  }
+  /* =========================================================
+     SUBJECT FILTER
+     ========================================================= */
+  function populateSubjectFilter() {
+    const select =
+      document.getElementById("subjectFilter");
+    const currentValue =
+      select.value;
+    const subjects =
+      [...new Set(
+        submissions
+          .map(item => item.subject)
+          .filter(Boolean)
+      )]
+      .sort();
+    select.innerHTML = `
+      <option value="all">
+        All Subjects
+      </option>
+    `;
+    subjects.forEach(subject => {
+      const option =
+        document.createElement("option");
+      option.value = subject;
+      option.textContent = subject;
+      select.appendChild(option);
+    });
+    select.value =
+      subjects.includes(currentValue)
+        ? currentValue
+        : "all";
+  }
+  /* =========================================================
+     RENDER SUBMISSIONS
+     ========================================================= */
+  function renderSubmissions() {
+    const search =
+      document.getElementById("searchInput")
+        .value
+        .toLowerCase()
+        .trim();
+    const status =
+      document.getElementById("statusFilter")
+        .value;
+    const subject =
+      document.getElementById("subjectFilter")
+        .value;
+    const filtered =
+      submissions.filter(item => {
+        const searchable = [
+          item.school,
+          item.programme,
+          item.level,
+          item.subject,
+          item.question_type,
+          item.academic_year,
+          item.semester,
+          item.exam_type,
+          item.file_name
+        ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+        const matchesSearch =
+          !search ||
+          searchable.includes(search);
+        const matchesStatus =
+          status === "all" ||
+          item.status === status;
+        const matchesSubject =
+          subject === "all" ||
+          item.subject === subject;
+        return (
+          matchesSearch &&
+          matchesStatus &&
+          matchesSubject
+        );
+      });
+    renderDesktop(filtered);
+    renderMobile(filtered);
+    const emptyState =
+      document.getElementById("emptyState");
+    if (filtered.length === 0) {
+      emptyState.classList.remove("hidden");
+    } else {
+      emptyState.classList.add("hidden");
+    }
+  }
+  /* =========================================================
+     DESKTOP TABLE
+     ========================================================= */
+  function renderDesktop(items) {
+    const tbody =
+      document.getElementById("submissionsTableBody");
+    tbody.innerHTML = "";
+    items.forEach(item => {
+      const row =
+        document.createElement("tr");
+      row.className =
+        "border-b border-slate-100 hover:bg-slate-50";
+      row.innerHTML = `
+        <td class="px-5 py-4">
+          <div class="font-semibold">
+            ${escapeHtml(item.school)}
+          </div>
+          <div class="text-xs text-slate-500">
+            ${escapeHtml(item.programme)}
+          </div>
+        </td>
+        <td class="px-5 py-4">
+          ${escapeHtml(item.subject)}
+        </td>
+        <td class="px-5 py-4">
+          ${escapeHtml(item.level)}
+        </td>
+        <td class="px-5 py-4">
+          ${escapeHtml(item.academic_year)}
+        </td>
+        <td class="px-5 py-4">
+          ${statusBadge(item.status)}
+        </td>
+        <td class="px-5 py-4 text-sm text-slate-500">
+          ${formatDate(item.created_at)}
+        </td>
+        <td class="px-5 py-4 text-right">
+          <button
+            onclick="openSubmission('${item.id}')"
+            class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">
+            Review
+          </button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+  /* =========================================================
+     MOBILE CARDS
+     ========================================================= */
+  function renderMobile(items) {
+    const container =
+      document.getElementById("mobileSubmissions");
+    container.innerHTML = "";
+    items.forEach(item => {
+      const card =
+        document.createElement("div");
+      card.className =
+        "p-5 border-b border-slate-200";
+      card.innerHTML = `
+        <div class="flex justify-between gap-4">
+          <div>
+            <h4 class="font-bold">
+              ${escapeHtml(item.school)}
+            </h4>
+            <p class="text-sm text-slate-500">
+              ${escapeHtml(item.programme)}
+            </p>
+          </div>
+          ${statusBadge(item.status)}
+        </div>
+        <div class="mt-4 space-y-1 text-sm">
+          <p>
+            <strong>Subject:</strong>
+            ${escapeHtml(item.subject)}
+          </p>
+          <p>
+            <strong>Level:</strong>
+            ${escapeHtml(item.level)}
+          </p>
+          <p>
+            <strong>Year:</strong>
+            ${escapeHtml(item.academic_year)}
+          </p>
+        </div>
+        <button
+          onclick="openSubmission('${item.id}')"
+          class="mt-4 w-full px-4 py-3 rounded-lg bg-blue-600 text-white font-semibold">
+          Review Submission
+        </button>
+      `;
+      container.appendChild(card);
+    });
+  }
+  /* =========================================================
+     OPEN SUBMISSION
+     ========================================================= */
+  async function openSubmission(id) {
+    const item =
+      submissions.find(
+        submission => submission.id === id
+      );
+    if (!item) {
+      alert("Submission not found.");
+      return;
+    }
+    currentSubmission = item;
+    document.getElementById("modalSubmissionId").textContent =
+      "ID: " + item.id;
+    document.getElementById("modalSchool").textContent =
+      item.school || "-";
+    document.getElementById("modalProgramme").textContent =
+      item.programme || "-";
+    document.getElementById("modalLevel").textContent =
+      item.level || "-";
+    document.getElementById("modalSubject").textContent =
+      item.subject || "-";
+    document.getElementById("modalQuestionType").textContent =
+      item.question_type || "-";
+    document.getElementById("modalAcademicYear").textContent =
+      item.academic_year || "-";
+    document.getElementById("modalSemester").textContent =
+      item.semester || "-";
+    document.getElementById("modalExamType").textContent =
+      item.exam_type || "-";
+    document.getElementById("modalFileName").textContent =
+      item.file_name || "-";
+    document.getElementById("modalAdditionalInformation").textContent =
+      item.additional_information ||
+      "No additional information provided.";
+    document.getElementById("modalStatus").innerHTML =
+      statusBadge(item.status);
+    document.getElementById("detailsModal")
+      .classList.remove("hidden");
+  }
+  /* =========================================================
+     CLOSE MODAL
+     ========================================================= */
+  function closeModal() {
+    document.getElementById("detailsModal")
+      .classList.add("hidden");
+    currentSubmission = null;
+  }
+  /* =========================================================
+     OPEN PRIVATE STORAGE FILE
+     ========================================================= */
+  async function openSubmissionFile() {
+    if (!currentSubmission) {
+      return;
+    }
+    const button =
+      document.getElementById("openFileButton");
+    button.disabled = true;
+    button.textContent =
+      "Preparing file...";
+    try {
+      const {
+        data,
+        error
+      } = await supabaseClient
+        .storage
+        .from("past-questions")
+        .createSignedUrl(
+          currentSubmission.file_path,
+          3600
+        );
+      if (error) {
+        console.error(error);
+        alert(
+          "Could not open the file. Check your Storage RLS policies."
+        );
+        return;
+      }
+      if (!data || !data.signedUrl) {
+        alert(
+          "No file URL was returned."
+        );
+        return;
+      }
+      window.open(
+        data.signedUrl,
+        "_blank"
+      );
+    } finally {
+      button.disabled = false;
+      button.textContent =
+        "Open File";
+    }
+  }
+  /* =========================================================
+     APPROVE
+     ========================================================= */
+  async function approveCurrentSubmission() {
+    if (!currentSubmission) {
+      return;
+    }
+    const confirmed =
+      confirm(
+        "Approve this submission?"
+      );
+    if (!confirmed) {
+      return;
+    }
+    await updateSubmissionStatus(
+      currentSubmission.id,
+      "approved"
+    );
+  }
+  /* =========================================================
+     REJECT
+     ========================================================= */
+  async function rejectCurrentSubmission() {
+    if (!currentSubmission) {
+      return;
+    }
+    const confirmed =
+      confirm(
+        "Reject this submission?"
+      );
+    if (!confirmed) {
+      return;
+    }
+    await updateSubmissionStatus(
+      currentSubmission.id,
+      "rejected"
+    );
+  }
+  /* =========================================================
+     UPDATE STATUS
+     ========================================================= */
+  async function updateSubmissionStatus(
+    id,
+    status
+  ) {
+    const {
+      error
+    } = await supabaseClient
+      .from("past_question_submissions")
+      .update({
+        status: status
+      })
+      .eq(
+        "id",
+        id
+      );
+    if (error) {
+      console.error(error);
+      showMessage(
+        "Could not update submission. Check your Supabase RLS policies.",
+        "error"
+      );
+      return;
+    }
+    showMessage(
+      "Submission status updated successfully.",
+      "success"
+    );
+    closeModal();
+    await loadSubmissions();
+  }
+  /* =========================================================
+     STATUS BADGE
+     ========================================================= */
+  function statusBadge(status) {
+    const safeStatus =
+      status || "pending";
+    let className =
+      "status-pending";
+    if (safeStatus === "approved") {
+      className =
+        "status-approved";
+    }
+    if (safeStatus === "rejected") {
+      className =
+        "status-rejected";
+    }
+    return `
+      <span class="status-badge ${className}">
+        ${escapeHtml(
+          safeStatus.charAt(0).toUpperCase() +
+          safeStatus.slice(1)
+        )}
+      </span>
+    `;
+  }
+  /* =========================================================
+     FORMAT DATE
+     ========================================================= */
+  function formatDate(dateString) {
+    if (!dateString) {
+      return "-";
+    }
+    const date =
+      new Date(dateString);
+    return date.toLocaleDateString(
+      undefined,
+      {
+        year: "numeric",
+        month: "short",
+        day: "numeric"
+      }
+    );
+  }
+  /* =========================================================
+     MESSAGES
+     ========================================================= */
+  function showMessage(
+    message,
+    type
+  ) {
+    const box =
+      document.getElementById("messageBox");
+    box.classList.remove(
+      "hidden",
+      "bg-blue-50",
+      "text-blue-700",
+      "bg-red-50",
+      "text-red-700",
+      "bg-green-50",
+      "text-green-700"
+    );
+    if (type === "error") {
+      box.classList.add(
+        "bg-red-50",
+        "text-red-700"
+      );
+    } else if (type === "success") {
+      box.classList.add(
+        "bg-green-50",
+        "text-green-700"
+      );
+    } else {
+      box.classList.add(
+        "bg-blue-50",
+        "text-blue-700"
+      );
+    }
+    box.textContent =
+      message;
+  }
+  function hideMessage() {
+    document.getElementById("messageBox")
+      .classList.add("hidden");
+  }
+  /* =========================================================
+     ESCAPE HTML
+     ========================================================= */
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+</script>
+</body>
+</html>
