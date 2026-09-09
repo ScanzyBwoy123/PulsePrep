@@ -4219,12 +4219,7 @@ if (typeof pulsePrepOriginalShowTab === "function") {
 
 }
 </script>
-  <script>
-/* =========================================================
-   PULSEP﻿REP QUESTION BANK
-   Loads approved submissions from Supabase
-   ========================================================= */
-
+<script>
 async function loadQuestionBank() {
 
   const container =
@@ -4235,7 +4230,9 @@ async function loadQuestionBank() {
   container.innerHTML = `
     <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
       <div class="text-3xl mb-3">⏳</div>
-      <h3 class="text-lg font-bold">Loading Question Bank...</h3>
+      <h3 class="text-lg font-bold">
+        Loading Question Bank...
+      </h3>
       <p class="text-sm text-gray-500 mt-2">
         Please wait while we load the available questions.
       </p>
@@ -4243,6 +4240,10 @@ async function loadQuestionBank() {
   `;
 
   try {
+
+    if (typeof supabaseClient === "undefined") {
+      throw new Error("Supabase client is not available.");
+    }
 
     const {
       data,
@@ -4256,25 +4257,10 @@ async function loadQuestionBank() {
       });
 
     if (error) {
-      console.error("Question Bank error:", error);
-
-      container.innerHTML = `
-        <div class="bg-red-50 border border-red-200
-                    text-red-700 rounded-2xl p-6 text-center">
-          <i class="fa-solid fa-circle-exclamation text-2xl"></i>
-
-          <h3 class="font-bold mt-2">
-            Could not load Question Bank
-          </h3>
-
-          <p class="text-sm mt-1">
-            Please try again later.
-          </p>
-        </div>
-      `;
-
-      return;
+      throw error;
     }
+
+    window.questionBankItems = data || [];
 
     if (!data || data.length === 0) {
 
@@ -4282,17 +4268,14 @@ async function loadQuestionBank() {
         <div class="bg-white rounded-2xl border
                     border-gray-200 p-8 text-center">
 
-          <div class="text-4xl mb-3">
-            📝
-          </div>
+          <div class="text-4xl mb-3">📝</div>
 
           <h3 class="text-xl font-extrabold">
             No Questions Available Yet
           </h3>
 
           <p class="text-gray-500 mt-2">
-            Approved questions will appear here when they are
-            added to the PulsePrep Question Bank.
+            Approved questions will appear here.
           </p>
 
         </div>
@@ -4301,196 +4284,129 @@ async function loadQuestionBank() {
       return;
     }
 
-    renderQuestionBank(data);
+    container.innerHTML = "";
 
-  } catch (error) {
+    data.forEach(item => {
 
-    console.error(
-      "Question Bank loading error:",
-      error
-    );
+      const card =
+        document.createElement("div");
 
-  }
+      card.className =
+        "bg-white rounded-2xl border border-slate-200 p-5 mb-4 shadow-sm";
 
-}
+      card.innerHTML = `
 
+        <div class="flex items-start justify-between gap-4">
 
-/* =========================================================
-   RENDER QUESTIONS
-   ========================================================= */
+          <div>
 
-function renderQuestionBank(items) {
+            <span class="inline-flex items-center gap-1
+                         px-3 py-1 rounded-full
+                         bg-blue-50 text-blue-700
+                         text-xs font-bold">
 
-  const container =
-    document.getElementById("questionBankContent");
+              <i class="fa-solid fa-book-open"></i>
 
-  if (!container) return;
+              ${escapeHtml(item.subject || "Nursing")}
 
-  container.innerHTML = "";
+            </span>
 
-  items.forEach(item => {
+            <h3 class="text-lg font-extrabold
+                       text-slate-900 mt-3">
 
-    const card =
-      document.createElement("div");
+              ${escapeHtml(
+                item.file_name ||
+                "Past Examination Questions"
+              )}
 
-    card.className =
-      "bg-white rounded-2xl border border-slate-200 " +
-      "p-5 mb-4 shadow-sm";
+            </h3>
 
-    card.innerHTML = `
+            <p class="text-sm text-slate-500 mt-2">
 
-      <div class="flex flex-col sm:flex-row
-                  sm:items-start sm:justify-between gap-4">
+              ${escapeHtml(
+                item.school || "Nursing School"
+              )}
 
-        <div>
+              ${item.level
+                ? " • " + escapeHtml(item.level)
+                : ""}
 
-          <span class="inline-flex items-center
-                       px-3 py-1 rounded-full
-                       bg-blue-50 text-blue-700
-                       text-xs font-bold uppercase">
+              ${item.academic_year
+                ? " • " + escapeHtml(item.academic_year)
+                : ""}
 
-            <i class="fa-solid fa-book-open mr-1"></i>
-
-            ${escapeHtml(item.subject || "Nursing")}
-
-          </span>
-
-          <h3 class="text-lg font-extrabold
-                     text-slate-900 mt-3">
-
-            ${escapeHtml(
-              item.file_name ||
-              "Past Examination Questions"
-            )}
-
-          </h3>
-
-          <div class="text-sm text-slate-500 mt-2">
-
-            ${escapeHtml(item.school || "Nursing School")}
-
-            ${item.level
-              ? " • " + escapeHtml(item.level)
-              : ""}
-
-            ${item.academic_year
-              ? " • " + escapeHtml(item.academic_year)
-              : ""}
+            </p>
 
           </div>
-
-        </div>
-
-
-        <div class="flex items-center gap-2">
 
           <span class="px-3 py-1 rounded-full
                        bg-amber-50 text-amber-700
                        text-xs font-bold">
 
-            <i class="fa-solid fa-crown mr-1"></i>
-            PREMIUM
+            🔒 PREMIUM
 
           </span>
 
         </div>
 
-      </div>
-
-
-      <div class="mt-5 pt-4 border-t border-slate-100">
-
         <button
           onclick="openQuestionBankFile('${item.id}')"
-          class="w-full sm:w-auto
-                 px-5 py-3 rounded-xl
-                 bg-medical-600
-                 hover:bg-medical-700
+          class="w-full mt-5 px-5 py-3 rounded-xl
+                 bg-blue-600 hover:bg-blue-700
                  text-white font-bold">
 
-          <i class="fa-solid fa-file-arrow-down mr-2"></i>
+          <i class="fa-solid fa-file-arrow-up mr-2"></i>
           Open Questions
 
         </button>
 
-      </div>
+      `;
 
+      container.appendChild(card);
+
+    });
+
+  } catch (error) {
+
+    console.error(
+      "Question Bank error:",
+      error
+    );
+
+    container.innerHTML = `
+      <div class="bg-red-50 border border-red-200
+                  text-red-700 rounded-2xl p-6 text-center">
+
+        <i class="fa-solid fa-circle-exclamation text-2xl"></i>
+
+        <h3 class="font-bold mt-2">
+          Could not load Question Bank
+        </h3>
+
+        <p class="text-sm mt-2">
+          ${escapeHtml(
+            error.message ||
+            "An unexpected error occurred."
+          )}
+        </p>
+
+      </div>
     `;
 
-    container.appendChild(card);
-
-  });
+  }
 
 }
 
-
-/* =========================================================
-   OPEN APPROVED QUESTION FILE
-   ========================================================= */
 
 async function openQuestionBankFile(id) {
 
   const question =
-    window.questionBankItems?.find(
-      item => item.id === id
-    );
+    (window.questionBankItems || [])
+      .find(item => item.id === id);
 
-  if (!question) {
+  if (!question || !question.file_path) {
 
-    /*
-      If the item is not cached, retrieve it directly.
-    */
-
-    try {
-
-      const {
-        data,
-        error
-      } = await supabaseClient
-        .from("past_question_submissions")
-        .select("*")
-        .eq("id", id)
-        .eq("status", "approved")
-        .single();
-
-      if (error || !data) {
-
-        alert("Question could not be found.");
-
-        return;
-
-      }
-
-      await createQuestionFileUrl(data);
-
-    } catch (error) {
-
-      console.error(error);
-
-      alert("Unable to open the question file.");
-
-    }
-
-    return;
-
-  }
-
-  await createQuestionFileUrl(question);
-
-}
-
-
-/* =========================================================
-   CREATE SECURE FILE URL
-   ========================================================= */
-
-async function createQuestionFileUrl(question) {
-
-  if (!question.file_path) {
-
-    alert(
-      "This question does not have an uploaded file."
-    );
+    alert("Question file could not be found.");
 
     return;
 
@@ -4510,28 +4426,11 @@ async function createQuestionFileUrl(question) {
       );
 
     if (error) {
-
-      console.error(
-        "Question file error:",
-        error
-      );
-
-      alert(
-        "Could not open this question file."
-      );
-
-      return;
-
+      throw error;
     }
 
     if (!data?.signedUrl) {
-
-      alert(
-        "No secure file URL was returned."
-      );
-
-      return;
-
+      throw new Error("No file URL was returned.");
     }
 
     window.open(
@@ -4543,45 +4442,16 @@ async function createQuestionFileUrl(question) {
   } catch (error) {
 
     console.error(
-      "Secure file error:",
+      "Question file error:",
       error
     );
 
-    alert(
-      "Something went wrong while opening the file."
-    );
+    alert("Could not open the question file.");
 
   }
 
 }
 
-
-/* =========================================================
-   SAVE QUESTION BANK ITEMS
-   ========================================================= */
-
-window.questionBankItems = [];
-
-
-/* =========================================================
-   UPDATED RENDER FUNCTION
-   ========================================================= */
-
-const originalRenderQuestionBank =
-  renderQuestionBank;
-
-renderQuestionBank = function(items) {
-
-  window.questionBankItems = items;
-
-  originalRenderQuestionBank(items);
-
-};
-
-
-/* =========================================================
-   LOAD WHEN QUESTION BANK TAB IS OPENED
-   ========================================================= */
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -4597,9 +4467,7 @@ document.addEventListener(
       questionBankButton.addEventListener(
         "click",
         function() {
-
           loadQuestionBank();
-
         }
       );
 
