@@ -4277,11 +4277,17 @@ async function loadQuestionBank() {
           </p>
 
           <button
-            onclick="showTab('account')"
-            class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
-          >
-            Login
-          </button>
+  type="button"
+  onclick="showTab('account'); setTimeout(() => {
+    document.getElementById('account')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  }, 50);"
+  class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
+>
+  Login
+</button>
 
         </div>
       `;
