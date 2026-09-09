@@ -32,16 +32,12 @@ exports.handler = async (event) => {
 
     const accessToken = authHeader.substring(7);
 
-    const supabaseUrl =
-      process.env.SUPABASE_URL;
-
+    const supabaseUrl = process.env.SUPABASE_URL;
     const serviceRoleKey =
       process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !serviceRoleKey) {
-      console.error(
-        "Missing Supabase server environment variables."
-      );
+      console.error("Missing Supabase environment variables");
 
       return {
         statusCode: 500,
@@ -49,47 +45,43 @@ exports.handler = async (event) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: "Server configuration error"
+          error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY"
         })
       };
     }
 
-    const supabaseAdmin =
-      createClient(
-        supabaseUrl,
-        serviceRoleKey,
-        {
-          auth: {
-            autoRefreshToken: false,
-            persistSession: false
-          }
+    const supabaseAdmin = createClient(
+      supabaseUrl,
+      serviceRoleKey,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
         }
-      );
-
-    // Verify the student's Supabase access token.
-    const {
-      data: {
-        user
-      },
-      error: userError
-    } = await supabaseAdmin.auth.getUser(
-      accessToken
+      }
     );
 
+    const {
+      data: { user },
+      error: userError
+    } = await supabaseAdmin.auth.getUser(accessToken);
+
     if (userError || !user) {
+      console.error("USER VERIFICATION ERROR:", userError);
+
       return {
         statusCode: 401,
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: "Invalid or expired session"
+          error: "Invalid or expired session",
+          details: userError?.message || "No user returned"
         })
       };
     }
 
-    const email =
-      user.email?.trim().toLowerCase();
+    const email = user.email?.trim().toLowerCase();
 
     if (!email) {
       return {
@@ -103,7 +95,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // Find the student's successful subscription.
     const {
       data: subscription,
       error: subscriptionError
@@ -122,7 +113,7 @@ exports.handler = async (event) => {
 
     if (subscriptionError) {
       console.error(
-        "Subscription lookup failed:",
+        "SUBSCRIPTION ERROR:",
         subscriptionError
       );
 
@@ -132,7 +123,8 @@ exports.handler = async (event) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: "Unable to check premium status"
+          error: "Subscription lookup failed",
+          details: subscriptionError.message
         })
       };
     }
@@ -155,11 +147,7 @@ exports.handler = async (event) => {
     };
 
   } catch (error) {
-
-    console.error(
-      "Premium verification error:",
-      error
-    );
+    console.error("CHECK PREMIUM CRASH:", error);
 
     return {
       statusCode: 500,
@@ -167,7 +155,8 @@ exports.handler = async (event) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        error: "Internal server error"
+        error: "Internal server error",
+        details: error.message
       })
     };
   }
