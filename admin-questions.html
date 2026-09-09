@@ -726,7 +726,6 @@
 
   </div>
 
-
 <script>
 
   /* =========================================================
@@ -766,6 +765,7 @@
 
   let submissions = [];
   let currentSubmission = null;
+  let currentUser = null;
 
 
   /* =========================================================
@@ -783,22 +783,70 @@
 
 
   /* =========================================================
+     ADMIN CHECK
+     ========================================================= */
+
+  function isAdminEmail(email) {
+
+    if (!email) {
+      return false;
+    }
+
+    return ADMIN_EMAILS
+      .map(item => item.toLowerCase())
+      .includes(email.toLowerCase());
+
+  }
+
+
+  /* =========================================================
      INITIALIZE ADMIN PAGE
      ========================================================= */
 
   async function initializeAdminPage() {
 
     document
+      .getElementById("adminApp")
+      .classList.add("hidden");
+
+    document
+      .getElementById("loadingScreen")
+      .classList.add("hidden");
+
+    document
       .getElementById("loginScreen")
       .classList.remove("hidden");
+
+    hideLoginMessage();
+
 
     try {
 
       const {
-        data: {
-          session
-        }
+        data,
+        error
       } = await supabaseClient.auth.getSession();
+
+
+      if (error) {
+
+        console.error(
+          "Session check error:",
+          error
+        );
+
+        showLoginMessage(
+          "Unable to check your login session. Please sign in again.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const session =
+        data?.session;
 
 
       if (!session || !session.user) {
@@ -809,16 +857,13 @@
 
 
       const email =
-        (session.user.email || "").toLowerCase();
+        (
+          session.user.email ||
+          ""
+        ).toLowerCase();
 
 
-      const isAdmin =
-        ADMIN_EMAILS
-          .map(email => email.toLowerCase())
-          .includes(email);
-
-
-      if (!isAdmin) {
+      if (!isAdminEmail(email)) {
 
         await supabaseClient.auth.signOut();
 
@@ -832,7 +877,12 @@
       }
 
 
-      showAdminDashboard(email);
+      currentUser =
+        session.user;
+
+
+      await showAdminDashboard(email);
+
 
     } catch (error) {
 
@@ -875,7 +925,9 @@
 
 
     const loginButton =
-      document.getElementById("loginButton");
+      document.getElementById(
+        "loginButton"
+      );
 
 
     if (!email || !password) {
@@ -890,13 +942,7 @@
     }
 
 
-    const isAdmin =
-      ADMIN_EMAILS
-        .map(item => item.toLowerCase())
-        .includes(email);
-
-
-    if (!isAdmin) {
+    if (!isAdminEmail(email)) {
 
       showLoginMessage(
         "This email is not authorized to access the admin panel.",
@@ -922,13 +968,14 @@
       const {
         data,
         error
-      } = await supabaseClient.auth.signInWithPassword({
+      } =
+        await supabaseClient.auth.signInWithPassword({
 
-        email: email,
+          email: email,
 
-        password: password
+          password: password
 
-      });
+        });
 
 
       if (error) {
@@ -962,14 +1009,13 @@
 
 
       const loggedInEmail =
-        (data.user.email || "").toLowerCase();
+        (
+          data.user.email ||
+          ""
+        ).toLowerCase();
 
 
-      if (
-        !ADMIN_EMAILS
-          .map(item => item.toLowerCase())
-          .includes(loggedInEmail)
-      ) {
+      if (!isAdminEmail(loggedInEmail)) {
 
         await supabaseClient.auth.signOut();
 
@@ -983,12 +1029,16 @@
       }
 
 
+      currentUser =
+        data.user;
+
+
       document
         .getElementById("loginForm")
         .reset();
 
 
-      showAdminDashboard(
+      await showAdminDashboard(
         loggedInEmail
       );
 
@@ -1060,8 +1110,14 @@
         error
       );
 
+
       document
         .getElementById("loadingScreen")
+        .classList.add("hidden");
+
+
+      document
+        .getElementById("adminApp")
         .classList.add("hidden");
 
 
@@ -1089,15 +1145,16 @@
     const {
       data,
       error
-    } = await supabaseClient
-      .from("past_question_submissions")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
+    } =
+      await supabaseClient
+        .from("past_question_submissions")
+        .select("*")
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        );
 
 
     if (error) {
@@ -1206,7 +1263,9 @@
       subject => {
 
         const option =
-          document.createElement("option");
+          document.createElement(
+            "option"
+          );
 
 
         option.value =
@@ -1354,7 +1413,9 @@
       item => {
 
         const row =
-          document.createElement("tr");
+          document.createElement(
+            "tr"
+          );
 
 
         row.className =
@@ -1663,7 +1724,9 @@
 
     document
       .getElementById("detailsModal")
-      .classList.remove("hidden");
+      .classList.remove(
+        "hidden"
+      );
 
   }
 
@@ -1676,7 +1739,9 @@
 
     document
       .getElementById("detailsModal")
-      .classList.add("hidden");
+      .classList.add(
+        "hidden"
+      );
 
 
     currentSubmission =
@@ -1715,13 +1780,14 @@
       const {
         data,
         error
-      } = await supabaseClient
-        .storage
-        .from("past-questions")
-        .createSignedUrl(
-          currentSubmission.file_path,
-          300
-        );
+      } =
+        await supabaseClient
+          .storage
+          .from("past-questions")
+          .createSignedUrl(
+            currentSubmission.file_path,
+            300
+          );
 
 
       if (error) {
@@ -1858,22 +1924,52 @@
 
   async function updateSubmissionStatus(
     id,
-    status
+    newStatus
   ) {
+
+    if (!currentUser) {
+
+      showMessage(
+        "Admin authentication is required.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    if (!isAdminEmail(currentUser.email)) {
+
+      showMessage(
+        "Your account is not authorized to update submissions.",
+        "error"
+      );
+
+      return;
+
+    }
+
 
     try {
 
       const {
+        data,
         error
-      } = await supabaseClient
-        .from("past_question_submissions")
-        .update({
-          status: status
-        })
-        .eq(
-          "id",
-          id
-        );
+      } =
+        await supabaseClient
+          .from("past_question_submissions")
+          .update({
+            status: newStatus
+          })
+          .eq(
+            "id",
+            id
+          )
+          .select(
+            "id,status"
+          )
+          .single();
 
 
       if (error) {
@@ -1884,7 +1980,8 @@
         );
 
         showMessage(
-          "Could not update the submission. Check your Supabase RLS policies.",
+          "Could not update the submission: " +
+          error.message,
           "error"
         );
 
@@ -1893,8 +1990,46 @@
       }
 
 
+      if (!data) {
+
+        showMessage(
+          "Supabase did not return the updated submission.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      if (data.status !== newStatus) {
+
+        showMessage(
+          "The database did not confirm the requested status.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      const localSubmission =
+        submissions.find(
+          item => item.id === id
+        );
+
+
+      if (localSubmission) {
+
+        localSubmission.status =
+          newStatus;
+
+      }
+
+
       showMessage(
-        `Submission marked as ${status}.`,
+        `Submission successfully marked as ${newStatus}.`,
         "success"
       );
 
@@ -1913,7 +2048,8 @@
       );
 
       showMessage(
-        "Something went wrong while updating the submission.",
+        "Something went wrong while updating the submission: " +
+        error.message,
         "error"
       );
 
@@ -1941,6 +2077,8 @@
 
     }
 
+
+    currentUser = null;
 
     submissions = [];
 
@@ -2174,7 +2312,32 @@
       session
     ) {
 
+      if (event === "SIGNED_IN") {
+
+        if (
+          session &&
+          session.user &&
+          isAdminEmail(session.user.email)
+        ) {
+
+          currentUser =
+            session.user;
+
+        }
+
+      }
+
+
       if (event === "SIGNED_OUT") {
+
+        currentUser =
+          null;
+
+        submissions = [];
+
+        currentSubmission =
+          null;
+
 
         document
           .getElementById("adminApp")
