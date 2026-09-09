@@ -214,3 +214,137 @@ async function checkPulsePrepPremium() {
 // Make it available to PulsePrep
 window.checkPulsePrepPremium =
   checkPulsePrepPremium;
+// ============================================================
+// PAYMENT EMAIL FIX
+// ============================================================
+// Always use the email of the logged-in PulsePrep account.
+// This prevents payment/subscription email mismatches.
+// ============================================================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  window.startPayment = async function startPayment(amount, plan) {
+
+    const status = document.getElementById("paymentStatus");
+
+    if (!status) {
+      console.error("Payment status element not found.");
+      return;
+    }
+
+    const supabase = window.pulseprepSupabase;
+
+    if (!supabase) {
+      status.className =
+        "max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm bg-red-50 border border-red-200 text-red-800";
+
+      status.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation mr-2"></i>
+        PulsePrep is still loading. Please try again in a moment.
+      `;
+
+      status.classList.remove("hidden");
+      return;
+    }
+
+    const {
+      data: { session },
+      error: sessionError
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session?.user) {
+
+      status.className =
+        "max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm bg-red-50 border border-red-200 text-red-800";
+
+      status.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation mr-2"></i>
+        Please log in to your PulsePrep account before subscribing.
+      `;
+
+      status.classList.remove("hidden");
+
+      showTab("account");
+      return;
+    }
+
+    const email =
+      session.user.email?.trim().toLowerCase();
+
+    if (!email) {
+
+      status.className =
+        "max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm bg-red-50 border border-red-200 text-red-800";
+
+      status.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation mr-2"></i>
+        Your account email could not be found. Please log in again.
+      `;
+
+      status.classList.remove("hidden");
+      return;
+    }
+
+    status.className =
+      "max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm bg-blue-50 border border-blue-200 text-blue-800";
+
+    status.innerHTML = `
+      <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+      Preparing secure payment for ${escapeHTML(plan)}...
+    `;
+
+    status.classList.remove("hidden");
+
+    try {
+
+      const response = await fetch(
+        "/.netlify/functions/initialize-payment",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify({
+            amount: amount,
+            plan: plan,
+            email: email
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error || "Unable to initialize payment."
+        );
+      }
+
+      if (!data.authorization_url) {
+        throw new Error(
+          "Payment gateway did not return a checkout URL."
+        );
+      }
+
+      window.location.href =
+        data.authorization_url;
+
+    } catch (error) {
+
+      status.className =
+        "max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm bg-red-50 border border-red-200 text-red-800";
+
+      status.innerHTML = `
+        <i class="fa-solid fa-circle-exclamation mr-2"></i>
+        ${escapeHTML(error.message)}
+      `;
+
+      status.classList.remove("hidden");
+
+    }
+
+  };
+
+});
