@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>Submit Past Questions | PulsePrep</title>
 
@@ -28,6 +31,27 @@
       background: rgba(255, 255, 255, 0.92);
       backdrop-filter: blur(12px);
     }
+
+    .file-ready {
+      border-color: #16a34a !important;
+      background: #f0fdf4 !important;
+    }
+
+    .restore-notice {
+      animation: pulseprepFadeIn 0.25s ease;
+    }
+
+    @keyframes pulseprepFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 
@@ -35,12 +59,15 @@
 
   <!-- HEADER -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+    <div
+      class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between"
+    >
 
       <a
         href="index.html"
         class="flex items-center gap-3"
       >
+
         <div
           class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center"
         >
@@ -48,6 +75,7 @@
         </div>
 
         <div>
+
           <h1 class="font-bold text-xl text-slate-900">
             PulsePrep
           </h1>
@@ -55,7 +83,9 @@
           <p class="text-xs text-slate-500">
             Nursing Education Platform
           </p>
+
         </div>
+
       </a>
 
       <a
@@ -82,7 +112,9 @@
         <i class="fa-solid fa-file-circle-plus text-2xl"></i>
       </div>
 
-      <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900">
+      <h2
+        class="text-3xl md:text-4xl font-extrabold text-slate-900"
+      >
         Submit Past Questions
       </h2>
 
@@ -98,6 +130,7 @@
     <div
       class="mb-6 rounded-2xl border border-green-200 bg-green-50 p-5"
     >
+
       <div class="flex gap-3">
 
         <div class="text-green-600 mt-1">
@@ -105,6 +138,7 @@
         </div>
 
         <div>
+
           <h3 class="font-bold text-green-800">
             Submission is completely FREE
           </h3>
@@ -114,9 +148,11 @@
             questions. Your submission will be reviewed before it is added
             to the PulsePrep question bank.
           </p>
+
         </div>
 
       </div>
+
     </div>
 
 
@@ -141,7 +177,9 @@
           Submission Received!
         </h2>
 
-        <p class="text-slate-600 mt-3 max-w-lg mx-auto">
+        <p
+          class="text-slate-600 mt-3 max-w-lg mx-auto"
+        >
           Thank you for contributing to PulsePrep. Your past questions have
           been submitted successfully and will be reviewed before publication.
         </p>
@@ -157,6 +195,44 @@
       </div>
 
 
+      <!-- RESTORE NOTICE -->
+      <div
+        id="restoreNotice"
+        class="hidden restore-notice mb-6 rounded-2xl border border-blue-200 bg-blue-50 p-4"
+      >
+
+        <div class="flex items-start gap-3">
+
+          <div class="text-blue-600 mt-1">
+            <i class="fa-solid fa-rotate-left"></i>
+          </div>
+
+          <div class="flex-1">
+
+            <h3 class="font-bold text-blue-800">
+              Your previous submission was restored
+            </h3>
+
+            <p class="text-sm text-blue-700 mt-1">
+              Your information and uploaded file were recovered so you can
+              continue your submission.
+            </p>
+
+          </div>
+
+          <button
+            id="clearSavedDataButton"
+            type="button"
+            class="text-xs font-bold text-blue-700 underline"
+          >
+            Clear
+          </button>
+
+        </div>
+
+      </div>
+
+
       <!-- SUBMISSION FORM -->
       <form
         id="submissionForm"
@@ -165,6 +241,7 @@
 
         <!-- SCHOOL -->
         <div>
+
           <label
             for="school"
             class="block text-sm font-bold text-slate-700 mb-2"
@@ -176,14 +253,17 @@
             id="school"
             type="text"
             required
+            autocomplete="organization"
             placeholder="e.g. University of Ghana"
             class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
+
         </div>
 
 
         <!-- PROGRAMME -->
         <div>
+
           <label
             for="programme"
             class="block text-sm font-bold text-slate-700 mb-2"
@@ -196,18 +276,39 @@
             required
             class="w-full rounded-xl border border-slate-300 px-4 py-3 bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
-            <option value="">Select programme</option>
-            <option value="General Nursing">General Nursing</option>
-            <option value="Midwifery">Midwifery</option>
-            <option value="Mental Health Nursing">Mental Health Nursing</option>
-            <option value="Community Health Nursing">Community Health Nursing</option>
-            <option value="Other">Other</option>
+
+            <option value="">
+              Select programme
+            </option>
+
+            <option value="General Nursing">
+              General Nursing
+            </option>
+
+            <option value="Midwifery">
+              Midwifery
+            </option>
+
+            <option value="Mental Health Nursing">
+              Mental Health Nursing
+            </option>
+
+            <option value="Community Health Nursing">
+              Community Health Nursing
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
           </select>
+
         </div>
 
 
         <!-- LEVEL -->
         <div>
+
           <label
             for="level"
             class="block text-sm font-bold text-slate-700 mb-2"
@@ -220,18 +321,39 @@
             required
             class="w-full rounded-xl border border-slate-300 px-4 py-3 bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
-            <option value="">Select level</option>
-            <option value="100">Level 100</option>
-            <option value="200">Level 200</option>
-            <option value="300">Level 300</option>
-            <option value="400">Level 400</option>
-            <option value="Other">Other</option>
+
+            <option value="">
+              Select level
+            </option>
+
+            <option value="100">
+              Level 100
+            </option>
+
+            <option value="200">
+              Level 200
+            </option>
+
+            <option value="300">
+              Level 300
+            </option>
+
+            <option value="400">
+              Level 400
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
           </select>
+
         </div>
 
 
         <!-- SUBJECT -->
         <div>
+
           <label
             for="subject"
             class="block text-sm font-bold text-slate-700 mb-2"
@@ -244,31 +366,97 @@
             required
             class="w-full rounded-xl border border-slate-300 px-4 py-3 bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
-            <option value="">Select subject</option>
 
-            <option>Anatomy & Physiology</option>
-            <option>Microbiology</option>
-            <option>First Aid & Emergency Care</option>
-            <option>Fundamentals of Nursing</option>
-            <option>Medical-Surgical Nursing</option>
-            <option>Pharmacology</option>
-            <option>Pathophysiology</option>
-            <option>Community Health Nursing</option>
-            <option>Maternal & Child Health</option>
-            <option>Midwifery</option>
-            <option>Paediatric Nursing</option>
-            <option>Mental Health/Psychiatric Nursing</option>
-            <option>Nutrition & Dietetics</option>
-            <option>Health Assessment</option>
-            <option>Nursing Ethics & Professional Practice</option>
-            <option>Research Methods</option>
-            <option>Biostatistics</option>
-            <option>Public Health</option>
-            <option>Health Promotion</option>
-            <option>Infection Prevention & Control</option>
-            <option>Other</option>
+            <option value="">
+              Select subject
+            </option>
+
+            <option>
+              Anatomy & Physiology
+            </option>
+
+            <option>
+              Microbiology
+            </option>
+
+            <option>
+              First Aid & Emergency Care
+            </option>
+
+            <option>
+              Fundamentals of Nursing
+            </option>
+
+            <option>
+              Medical-Surgical Nursing
+            </option>
+
+            <option>
+              Pharmacology
+            </option>
+
+            <option>
+              Pathophysiology
+            </option>
+
+            <option>
+              Community Health Nursing
+            </option>
+
+            <option>
+              Maternal & Child Health
+            </option>
+
+            <option>
+              Midwifery
+            </option>
+
+            <option>
+              Paediatric Nursing
+            </option>
+
+            <option>
+              Mental Health/Psychiatric Nursing
+            </option>
+
+            <option>
+              Nutrition & Dietetics
+            </option>
+
+            <option>
+              Health Assessment
+            </option>
+
+            <option>
+              Nursing Ethics & Professional Practice
+            </option>
+
+            <option>
+              Research Methods
+            </option>
+
+            <option>
+              Biostatistics
+            </option>
+
+            <option>
+              Public Health
+            </option>
+
+            <option>
+              Health Promotion
+            </option>
+
+            <option>
+              Infection Prevention & Control
+            </option>
+
+            <option>
+              Other
+            </option>
 
           </select>
+
         </div>
 
 
@@ -281,51 +469,76 @@
             Question Type *
           </label>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-3"
+          >
 
             <label
               class="flex items-center gap-3 border border-slate-300 rounded-xl p-4 cursor-pointer hover:bg-slate-50"
             >
+
               <input
                 type="radio"
                 name="question_type"
                 value="Objective/MCQ"
                 required
               >
-              <span>Objective / MCQ</span>
+
+              <span>
+                Objective / MCQ
+              </span>
+
             </label>
+
 
             <label
               class="flex items-center gap-3 border border-slate-300 rounded-xl p-4 cursor-pointer hover:bg-slate-50"
             >
+
               <input
                 type="radio"
                 name="question_type"
                 value="Theory/Essay"
               >
-              <span>Theory / Essay</span>
+
+              <span>
+                Theory / Essay
+              </span>
+
             </label>
+
 
             <label
               class="flex items-center gap-3 border border-slate-300 rounded-xl p-4 cursor-pointer hover:bg-slate-50"
             >
+
               <input
                 type="radio"
                 name="question_type"
                 value="Short Answer"
               >
-              <span>Short Answer</span>
+
+              <span>
+                Short Answer
+              </span>
+
             </label>
+
 
             <label
               class="flex items-center gap-3 border border-slate-300 rounded-xl p-4 cursor-pointer hover:bg-slate-50"
             >
+
               <input
                 type="radio"
                 name="question_type"
                 value="Mixed"
               >
-              <span>Mixed</span>
+
+              <span>
+                Mixed
+              </span>
+
             </label>
 
           </div>
@@ -335,6 +548,7 @@
 
         <!-- ACADEMIC YEAR -->
         <div>
+
           <label
             for="academicYear"
             class="block text-sm font-bold text-slate-700 mb-2"
@@ -346,14 +560,17 @@
             id="academicYear"
             type="text"
             required
+            autocomplete="off"
             placeholder="e.g. 2025/2026"
             class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
+
         </div>
 
 
         <!-- SEMESTER -->
         <div>
+
           <label
             for="semester"
             class="block text-sm font-bold text-slate-700 mb-2"
@@ -366,19 +583,43 @@
             required
             class="w-full rounded-xl border border-slate-300 px-4 py-3 bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
-            <option value="">Select semester</option>
-            <option value="First Semester">First Semester</option>
-            <option value="Second Semester">Second Semester</option>
-            <option value="Trimester 1">Trimester 1</option>
-            <option value="Trimester 2">Trimester 2</option>
-            <option value="Trimester 3">Trimester 3</option>
-            <option value="Other">Other</option>
+
+            <option value="">
+              Select semester
+            </option>
+
+            <option value="First Semester">
+              First Semester
+            </option>
+
+            <option value="Second Semester">
+              Second Semester
+            </option>
+
+            <option value="Trimester 1">
+              Trimester 1
+            </option>
+
+            <option value="Trimester 2">
+              Trimester 2
+            </option>
+
+            <option value="Trimester 3">
+              Trimester 3
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
           </select>
+
         </div>
 
 
         <!-- EXAM TYPE -->
         <div>
+
           <label
             for="examType"
             class="block text-sm font-bold text-slate-700 mb-2"
@@ -391,13 +632,33 @@
             required
             class="w-full rounded-xl border border-slate-300 px-4 py-3 bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
-            <option value="">Select examination type</option>
-            <option value="Mid-Semester">Mid-Semester</option>
-            <option value="End of Semester">End of Semester</option>
-            <option value="Mock">Mock Examination</option>
-            <option value="Revision">Revision Questions</option>
-            <option value="Other">Other</option>
+
+            <option value="">
+              Select examination type
+            </option>
+
+            <option value="Mid-Semester">
+              Mid-Semester
+            </option>
+
+            <option value="End of Semester">
+              End of Semester
+            </option>
+
+            <option value="Mock">
+              Mock Examination
+            </option>
+
+            <option value="Revision">
+              Revision Questions
+            </option>
+
+            <option value="Other">
+              Other
+            </option>
+
           </select>
+
         </div>
 
 
@@ -412,14 +673,19 @@
           </label>
 
           <div
+            id="fileDropArea"
             class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:border-blue-400 transition"
           >
 
             <i
+              id="fileIcon"
               class="fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-3"
             ></i>
 
-            <p class="font-semibold text-slate-700">
+            <p
+              id="fileTitle"
+              class="font-semibold text-slate-700"
+            >
               Upload your question file
             </p>
 
@@ -438,6 +704,11 @@
               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
               class="mt-5 block w-full text-sm text-slate-600"
             >
+
+            <p
+              id="fileStatus"
+              class="hidden text-sm font-semibold mt-3"
+            ></p>
 
           </div>
 
@@ -505,8 +776,11 @@
           type="submit"
           class="w-full rounded-xl bg-blue-600 text-white py-4 font-bold text-lg hover:bg-blue-700 transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
+
           <i class="fa-solid fa-paper-plane mr-2"></i>
+
           Submit Questions — Free
+
         </button>
 
 
@@ -523,268 +797,1572 @@
 
   <!-- FOOTER -->
   <footer class="border-t border-slate-200 bg-white mt-10">
-    <div class="max-w-6xl mx-auto px-4 py-6 text-center">
+
+    <div
+      class="max-w-6xl mx-auto px-4 py-6 text-center"
+    >
 
       <p class="text-sm text-slate-500">
         © 2026 PulsePrep. Nursing education made easier.
       </p>
 
     </div>
+
   </footer>
 
 
-  <!-- SUBMISSION SCRIPT -->
+  <!-- ========================================================
+       PULSEPREP SUBMISSION SCRIPT
+       ANDROID-SAFE FORM + FILE RECOVERY
+       ======================================================== -->
+
   <script>
 
-    const form = document.getElementById("submissionForm");
-    const button = document.getElementById("submitButton");
-    const message = document.getElementById("formMessage");
-    const success = document.getElementById("successMessage");
+    "use strict";
 
 
-    form.addEventListener("submit", async function(event) {
+    /* ========================================================
+       ELEMENTS
+       ======================================================== */
 
-      event.preventDefault();
+    const form =
+      document.getElementById("submissionForm");
 
+    const button =
+      document.getElementById("submitButton");
 
-      const fileInput =
-        document.getElementById("questionFile");
+    const message =
+      document.getElementById("formMessage");
 
-      const file =
-        fileInput.files[0];
+    const success =
+      document.getElementById("successMessage");
 
+    const fileInput =
+      document.getElementById("questionFile");
 
-      if (!file) {
+    const fileDropArea =
+      document.getElementById("fileDropArea");
 
-        message.textContent =
-          "Please select a file.";
+    const fileStatus =
+      document.getElementById("fileStatus");
 
-        message.className =
-          "text-center text-sm font-semibold text-red-600";
+    const fileTitle =
+      document.getElementById("fileTitle");
 
-        return;
-      }
+    const fileIcon =
+      document.getElementById("fileIcon");
 
+    const restoreNotice =
+      document.getElementById("restoreNotice");
 
-      /*
-        Keep the file below 5 MB because the file is converted
-        to Base64 before being sent to the Netlify Function.
-      */
-
-      if (file.size > 5 * 1024 * 1024) {
-
-        message.textContent =
-          "Please upload a file smaller than 5 MB.";
-
-        message.className =
-          "text-center text-sm font-semibold text-red-600";
-
-        return;
-      }
+    const clearSavedDataButton =
+      document.getElementById("clearSavedDataButton");
 
 
-      button.disabled = true;
+    /* ========================================================
+       STORAGE
+       ======================================================== */
 
-      button.innerHTML =
-        '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Uploading...';
+    const STORAGE_KEY =
+      "pulseprep_past_question_submission";
 
+    const DB_NAME =
+      "PulsePrepSubmissionDB";
 
-      message.className =
-        "text-center text-sm font-semibold text-slate-500";
+    const DB_VERSION =
+      1;
 
-      message.textContent =
-        "Uploading your questions. Please wait...";
-
-
-      try {
-
-        /*
-          Convert the selected file to Base64.
-        */
-
-        const fileData =
-          await new Promise((resolve, reject) => {
-
-            const reader =
-              new FileReader();
+    const STORE_NAME =
+      "submission";
 
 
-            reader.onload = () => {
+    let database = null;
 
-              resolve(reader.result);
 
+    /* ========================================================
+       OPEN INDEXEDDB
+       ======================================================== */
+
+    function openDatabase() {
+
+      return new Promise(function(resolve, reject) {
+
+        if (!("indexedDB" in window)) {
+
+          resolve(null);
+
+          return;
+        }
+
+
+        const request =
+          indexedDB.open(
+            DB_NAME,
+            DB_VERSION
+          );
+
+
+        request.onupgradeneeded = function(event) {
+
+          const db =
+            event.target.result;
+
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+
+            db.createObjectStore(
+              STORE_NAME
+            );
+
+          }
+
+        };
+
+
+        request.onsuccess = function(event) {
+
+          database =
+            event.target.result;
+
+          resolve(database);
+
+        };
+
+
+        request.onerror = function() {
+
+          console.warn(
+            "PulsePrep: IndexedDB could not be opened."
+          );
+
+          resolve(null);
+
+        };
+
+      });
+
+    }
+
+
+    /* ========================================================
+       SAVE DATA TO INDEXEDDB
+       ======================================================== */
+
+    function saveToDatabase(key, value) {
+
+      return new Promise(function(resolve) {
+
+        if (!database) {
+
+          resolve(false);
+
+          return;
+        }
+
+
+        try {
+
+          const transaction =
+            database.transaction(
+              [STORE_NAME],
+              "readwrite"
+            );
+
+          const store =
+            transaction.objectStore(
+              STORE_NAME
+            );
+
+          store.put(
+            value,
+            key
+          );
+
+
+          transaction.oncomplete =
+            function() {
+              resolve(true);
             };
 
 
-            reader.onerror = () => {
+          transaction.onerror =
+            function() {
+              resolve(false);
+            };
 
-              reject(
-                new Error("Could not read the file.")
+        } catch (error) {
+
+          console.warn(
+            "PulsePrep: Could not save data.",
+            error
+          );
+
+          resolve(false);
+
+        }
+
+      });
+
+    }
+
+
+    /* ========================================================
+       GET DATA FROM INDEXEDDB
+       ======================================================== */
+
+    function getFromDatabase(key) {
+
+      return new Promise(function(resolve) {
+
+        if (!database) {
+
+          resolve(null);
+
+          return;
+        }
+
+
+        try {
+
+          const transaction =
+            database.transaction(
+              [STORE_NAME],
+              "readonly"
+            );
+
+          const store =
+            transaction.objectStore(
+              STORE_NAME
+            );
+
+          const request =
+            store.get(key);
+
+
+          request.onsuccess =
+            function() {
+
+              resolve(
+                request.result || null
               );
 
             };
 
 
-            reader.readAsDataURL(file);
+          request.onerror =
+            function() {
 
-          });
+              resolve(null);
 
+            };
 
-        /*
-          Get selected question type.
-        */
+        } catch (error) {
 
-        const questionType =
-          document.querySelector(
-            'input[name="question_type"]:checked'
-          )?.value;
+          console.warn(
+            "PulsePrep: Could not read saved data.",
+            error
+          );
 
+          resolve(null);
 
-        /*
-          Build submission payload.
-        */
+        }
 
-        const payload = {
+      });
 
-          school:
-            document
-              .getElementById("school")
-              .value
-              .trim(),
-
-          programme:
-            document
-              .getElementById("programme")
-              .value,
-
-          level:
-            document
-              .getElementById("level")
-              .value,
-
-          subject:
-            document
-              .getElementById("subject")
-              .value,
-
-          question_type:
-            questionType,
-
-          academic_year:
-            document
-              .getElementById("academicYear")
-              .value
-              .trim(),
-
-          semester:
-            document
-              .getElementById("semester")
-              .value,
-
-          exam_type:
-            document
-              .getElementById("examType")
-              .value,
-
-          file_name:
-            file.name,
-
-          file_type:
-            file.type,
-
-          file_data:
-            fileData,
-
-          additional_information:
-            document
-              .getElementById("additionalInfo")
-              .value
-              .trim()
-
-        };
+    }
 
 
-        /*
-          Send the submission to our Netlify Function.
-        */
+    /* ========================================================
+       DELETE SAVED DATA
+       ======================================================== */
 
-        const response =
-          await fetch(
-            "/.netlify/functions/submit-questions",
-            {
-              method: "POST",
+    function deleteSavedData() {
 
-              headers: {
-                "Content-Type":
-                  "application/json"
-              },
+      return new Promise(function(resolve) {
 
-              body:
-                JSON.stringify(payload)
-            }
+        if (!database) {
+
+          resolve(false);
+
+          return;
+        }
+
+
+        try {
+
+          const transaction =
+            database.transaction(
+              [STORE_NAME],
+              "readwrite"
+            );
+
+          const store =
+            transaction.objectStore(
+              STORE_NAME
+            );
+
+          store.delete(
+            "submission"
           );
 
 
-        const result =
-          await response.json();
+          transaction.oncomplete =
+            function() {
+              resolve(true);
+            };
 
 
-        if (
-          !response.ok ||
-          !result.success
-        ) {
+          transaction.onerror =
+            function() {
+              resolve(false);
+            };
 
-          throw new Error(
-            result.error ||
-            "The submission could not be completed."
+        } catch (error) {
+
+          resolve(false);
+
+        }
+
+      });
+
+    }
+
+
+    /* ========================================================
+       FORM DATA OBJECT
+       ======================================================== */
+
+    function getFormData() {
+
+      const questionType =
+        document.querySelector(
+          'input[name="question_type"]:checked'
+        );
+
+
+      return {
+
+        school:
+          document.getElementById("school").value,
+
+        programme:
+          document.getElementById("programme").value,
+
+        level:
+          document.getElementById("level").value,
+
+        subject:
+          document.getElementById("subject").value,
+
+        question_type:
+          questionType
+            ? questionType.value
+            : "",
+
+        academic_year:
+          document.getElementById("academicYear").value,
+
+        semester:
+          document.getElementById("semester").value,
+
+        exam_type:
+          document.getElementById("examType").value,
+
+        additional_information:
+          document.getElementById("additionalInfo").value,
+
+        permission:
+          document.getElementById("permission").checked
+
+      };
+
+    }
+
+
+    /* ========================================================
+       SAVE FORM INFORMATION
+       ======================================================== */
+
+    let saveTimer = null;
+
+
+    function saveFormInformation() {
+
+      clearTimeout(saveTimer);
+
+
+      saveTimer =
+        setTimeout(async function() {
+
+          const data =
+            getFormData();
+
+
+          try {
+
+            localStorage.setItem(
+              STORAGE_KEY,
+              JSON.stringify(data)
+            );
+
+          } catch (error) {
+
+            console.warn(
+              "PulsePrep: localStorage save failed.",
+              error
+            );
+
+          }
+
+
+          await saveToDatabase(
+            "form",
+            data
+          );
+
+        }, 100);
+
+    }
+
+
+    /* ========================================================
+       SHOW FILE STATUS
+       ======================================================== */
+
+    function showFileStatus(file) {
+
+      if (!file) {
+
+        fileStatus.classList.add(
+          "hidden"
+        );
+
+        fileDropArea.classList.remove(
+          "file-ready"
+        );
+
+        fileTitle.textContent =
+          "Upload your question file";
+
+        fileIcon.className =
+          "fa-solid fa-cloud-arrow-up text-3xl text-blue-500 mb-3";
+
+        return;
+      }
+
+
+      fileStatus.classList.remove(
+        "hidden"
+      );
+
+
+      fileStatus.className =
+        "text-sm font-semibold mt-3 text-green-700";
+
+
+      fileStatus.innerHTML =
+        '<i class="fa-solid fa-circle-check mr-1"></i>' +
+        " File ready: " +
+        escapeHTML(file.name);
+
+
+      fileDropArea.classList.add(
+        "file-ready"
+      );
+
+
+      fileTitle.textContent =
+        "File selected successfully";
+
+
+      fileIcon.className =
+        "fa-solid fa-file-circle-check text-3xl text-green-600 mb-3";
+
+    }
+
+
+    /* ========================================================
+       ESCAPE HTML
+       ======================================================== */
+
+    function escapeHTML(value) {
+
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+    }
+
+
+    /* ========================================================
+       SAVE SELECTED FILE
+       ======================================================== */
+
+    async function saveSelectedFile(file) {
+
+      if (!file) {
+
+        return false;
+
+      }
+
+
+      if (file.size > 5 * 1024 * 1024) {
+
+        return false;
+
+      }
+
+
+      try {
+
+        /*
+          Store the actual file in IndexedDB.
+          This is much safer than putting a 5 MB Base64
+          file into localStorage.
+        */
+
+        await saveToDatabase(
+          "file",
+          {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            lastModified: file.lastModified,
+            blob: file
+          }
+        );
+
+
+        /*
+          Store a small description as well so that
+          the page knows a file was already selected.
+        */
+
+        try {
+
+          localStorage.setItem(
+            "pulseprep_saved_file",
+            JSON.stringify({
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              lastModified: file.lastModified
+            })
+          );
+
+        } catch (error) {
+
+          console.warn(
+            "PulsePrep: Could not save file information.",
+            error
           );
 
         }
 
 
-        /*
-          Hide form and show success message.
-        */
+        showFileStatus(file);
 
-        form.classList.add("hidden");
+        return true;
 
-        success.classList.remove("hidden");
-
-
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-
-      }
-
-
-      catch (error) {
+      } catch (error) {
 
         console.error(
-          "Past question submission error:",
+          "PulsePrep: File could not be saved.",
           error
         );
 
-
-        message.textContent =
-          error.message ||
-          "Something went wrong. Please try again.";
-
-
-        message.className =
-          "text-center text-sm font-semibold text-red-600";
-
-
-        button.disabled = false;
-
-
-        button.innerHTML =
-          '<i class="fa-solid fa-paper-plane mr-2"></i> Submit Questions — Free';
+        return false;
 
       }
 
+    }
+
+
+    /* ========================================================
+       RESTORE FORM INFORMATION
+       ======================================================== */
+
+    function restoreFormInformation(data) {
+
+      if (!data) {
+
+        return false;
+
+      }
+
+
+      const school =
+        document.getElementById("school");
+
+      const programme =
+        document.getElementById("programme");
+
+      const level =
+        document.getElementById("level");
+
+      const subject =
+        document.getElementById("subject");
+
+      const academicYear =
+        document.getElementById("academicYear");
+
+      const semester =
+        document.getElementById("semester");
+
+      const examType =
+        document.getElementById("examType");
+
+      const additionalInfo =
+        document.getElementById("additionalInfo");
+
+      const permission =
+        document.getElementById("permission");
+
+
+      if (school) {
+        school.value =
+          data.school || "";
+      }
+
+      if (programme) {
+        programme.value =
+          data.programme || "";
+      }
+
+      if (level) {
+        level.value =
+          data.level || "";
+      }
+
+      if (subject) {
+        subject.value =
+          data.subject || "";
+      }
+
+      if (academicYear) {
+        academicYear.value =
+          data.academic_year || "";
+      }
+
+      if (semester) {
+        semester.value =
+          data.semester || "";
+      }
+
+      if (examType) {
+        examType.value =
+          data.exam_type || "";
+      }
+
+      if (additionalInfo) {
+        additionalInfo.value =
+          data.additional_information || "";
+      }
+
+      if (permission) {
+        permission.checked =
+          data.permission === true;
+      }
+
+
+      if (data.question_type) {
+
+        const radio =
+          document.querySelector(
+            'input[name="question_type"][value="' +
+            CSS.escape(data.question_type) +
+            '"]'
+          );
+
+        if (radio) {
+
+          radio.checked = true;
+
+        }
+
+      }
+
+
+      return true;
+
+    }
+
+
+    /* ========================================================
+       RESTORE FILE INPUT
+       ======================================================== */
+
+    async function restoreSavedFile() {
+
+      const savedFile =
+        await getFromDatabase("file");
+
+
+      if (
+        !savedFile ||
+        !savedFile.blob
+      ) {
+
+        return false;
+
+      }
+
+
+      try {
+
+        const restoredFile =
+          new File(
+            [savedFile.blob],
+            savedFile.name,
+            {
+              type:
+                savedFile.type ||
+                savedFile.blob.type ||
+                "application/octet-stream",
+
+              lastModified:
+                savedFile.lastModified ||
+                Date.now()
+            }
+          );
+
+
+        /*
+          Browsers do not normally allow JavaScript to assign
+          directly to input.files.
+
+          DataTransfer provides a safe way to place the
+          restored File object back into the file input.
+        */
+
+        if (
+          typeof DataTransfer !== "undefined"
+        ) {
+
+          const dataTransfer =
+            new DataTransfer();
+
+          dataTransfer.items.add(
+            restoredFile
+          );
+
+          fileInput.files =
+            dataTransfer.files;
+
+          showFileStatus(
+            restoredFile
+          );
+
+          return true;
+
+        }
+
+
+        /*
+          Older browsers cannot programmatically restore
+          the file input. The saved file still remains in
+          IndexedDB, and the student can select it again.
+        */
+
+        fileStatus.classList.remove(
+          "hidden"
+        );
+
+        fileStatus.className =
+          "text-sm font-semibold mt-3 text-amber-700";
+
+        fileStatus.innerHTML =
+          '<i class="fa-solid fa-triangle-exclamation mr-1"></i>' +
+          " Your previous file was saved. Please select it again.";
+
+        return false;
+
+      } catch (error) {
+
+        console.error(
+          "PulsePrep: Could not restore file.",
+          error
+        );
+
+        return false;
+
+      }
+
+    }
+
+
+    /* ========================================================
+       RESTORE EVERYTHING
+       ======================================================== */
+
+    async function restoreSavedSubmission() {
+
+      try {
+
+        let formData =
+          await getFromDatabase("form");
+
+
+        /*
+          Fallback to localStorage if IndexedDB does
+          not contain the form information.
+        */
+
+        if (!formData) {
+
+          try {
+
+            const saved =
+              localStorage.getItem(
+                STORAGE_KEY
+              );
+
+            if (saved) {
+
+              formData =
+                JSON.parse(saved);
+
+            }
+
+          } catch (error) {
+
+            console.warn(
+              "PulsePrep: Saved form data could not be read.",
+              error
+            );
+
+          }
+
+        }
+
+
+        let restoredAnything =
+          false;
+
+
+        if (formData) {
+
+          restoredAnything =
+            restoreFormInformation(
+              formData
+            ) || restoredAnything;
+
+        }
+
+
+        const restoredFile =
+          await restoreSavedFile();
+
+
+        restoredAnything =
+          restoredFile ||
+          restoredAnything;
+
+
+        if (restoredAnything) {
+
+          restoreNotice.classList.remove(
+            "hidden"
+          );
+
+        }
+
+      } catch (error) {
+
+        console.warn(
+          "PulsePrep: Restore process failed.",
+          error
+        );
+
+      }
+
+    }
+
+
+    /* ========================================================
+       CLEAR SAVED SUBMISSION
+       ======================================================== */
+
+    async function clearSavedSubmission() {
+
+      try {
+
+        localStorage.removeItem(
+          STORAGE_KEY
+        );
+
+        localStorage.removeItem(
+          "pulseprep_saved_file"
+        );
+
+      } catch (error) {
+
+        console.warn(
+          "PulsePrep: Could not clear local storage.",
+          error
+        );
+
+      }
+
+
+      await deleteSavedData();
+
+
+      form.reset();
+
+
+      fileInput.value = "";
+
+
+      showFileStatus(
+        null
+      );
+
+
+      restoreNotice.classList.add(
+        "hidden"
+      );
+
+
+      message.textContent = "";
+
+
+      message.className =
+        "text-center text-sm font-semibold";
+
+    }
+
+
+    /* ========================================================
+       AUTOMATIC FORM SAVING
+       ======================================================== */
+
+    const saveFields = [
+      "school",
+      "programme",
+      "level",
+      "subject",
+      "academicYear",
+      "semester",
+      "examType",
+      "additionalInfo",
+      "permission"
+    ];
+
+
+    saveFields.forEach(function(id) {
+
+      const element =
+        document.getElementById(id);
+
+
+      if (!element) {
+
+        return;
+
+      }
+
+
+      element.addEventListener(
+        "input",
+        saveFormInformation
+      );
+
+
+      element.addEventListener(
+        "change",
+        saveFormInformation
+      );
+
     });
+
+
+    document
+      .querySelectorAll(
+        'input[name="question_type"]'
+      )
+      .forEach(function(radio) {
+
+        radio.addEventListener(
+          "change",
+          saveFormInformation
+        );
+
+      });
+
+
+    /* ========================================================
+       FILE CHANGE EVENT
+       ======================================================== */
+
+    fileInput.addEventListener(
+      "change",
+      async function() {
+
+        const file =
+          fileInput.files &&
+          fileInput.files[0];
+
+
+        if (!file) {
+
+          showFileStatus(
+            null
+          );
+
+          return;
+
+        }
+
+
+        if (
+          file.size >
+          5 * 1024 * 1024
+        ) {
+
+          message.textContent =
+            "Please upload a file smaller than 5 MB.";
+
+          message.className =
+            "text-center text-sm font-semibold text-red-600";
+
+          fileInput.value =
+            "";
+
+          showFileStatus(
+            null
+          );
+
+          return;
+
+        }
+
+
+        message.textContent =
+          "File selected. Your information has been saved.";
+
+        message.className =
+          "text-center text-sm font-semibold text-green-600";
+
+
+        const saved =
+          await saveSelectedFile(
+            file
+          );
+
+
+        if (!saved) {
+
+          message.textContent =
+            "The file could not be saved. Please select it again.";
+
+          message.className =
+            "text-center text-sm font-semibold text-red-600";
+
+          return;
+
+        }
+
+
+        /*
+          Save the form immediately after the file is selected.
+        */
+
+        await saveToDatabase(
+          "form",
+          getFormData()
+        );
+
+      }
+    );
+
+
+    /* ========================================================
+       SAVE BEFORE PAGE IS HIDDEN
+       ======================================================== */
+
+    document.addEventListener(
+      "visibilitychange",
+      function() {
+
+        if (
+          document.visibilityState === "hidden"
+        ) {
+
+          /*
+            Save form fields synchronously to localStorage
+            before Android suspends the page.
+          */
+
+          try {
+
+            localStorage.setItem(
+              STORAGE_KEY,
+              JSON.stringify(
+                getFormData()
+              )
+            );
+
+          } catch (error) {
+
+            console.warn(
+              "PulsePrep: Could not save form before page hide.",
+              error
+            );
+
+          }
+
+        }
+
+      }
+    );
+
+
+    /* ========================================================
+       CLEAR BUTTON
+       ======================================================== */
+
+    clearSavedDataButton.addEventListener(
+      "click",
+      async function() {
+
+        const confirmed =
+          window.confirm(
+            "Clear your saved submission information and uploaded file?"
+          );
+
+
+        if (!confirmed) {
+
+          return;
+
+        }
+
+
+        await clearSavedSubmission();
+
+      }
+    );
+
+
+    /* ========================================================
+       SUBMIT FORM
+       ======================================================== */
+
+    form.addEventListener(
+      "submit",
+      async function(event) {
+
+        /*
+          VERY IMPORTANT:
+          Prevent the browser's normal form navigation.
+          This keeps the submission inside JavaScript.
+        */
+
+        event.preventDefault();
+        event.stopPropagation();
+
+
+        const file =
+          fileInput.files &&
+          fileInput.files[0];
+
+
+        if (!file) {
+
+          /*
+            Try one more time to recover the saved file
+            before telling the student there is no file.
+          */
+
+          const recovered =
+            await restoreSavedFile();
+
+
+          if (
+            recovered &&
+            fileInput.files &&
+            fileInput.files[0]
+          {
+
+            /*
+              File successfully recovered.
+            */
+
+          } else {
+
+            message.textContent =
+              "Please select a file.";
+
+            message.className =
+              "text-center text-sm font-semibold text-red-600";
+
+            return;
+
+          }
+
+        }
+
+
+        const currentFile =
+          fileInput.files &&
+          fileInput.files[0];
+
+
+        if (!currentFile) {
+
+          message.textContent =
+            "Please select a file.";
+
+          message.className =
+            "text-center text-sm font-semibold text-red-600";
+
+          return;
+
+        }
+
+
+        /*
+          Keep the file below 5 MB because the file is
+          converted to Base64 before being sent to the
+          Netlify Function.
+        */
+
+        if (
+          currentFile.size >
+          5 * 1024 * 1024
+        ) {
+
+          message.textContent =
+            "Please upload a file smaller than 5 MB.";
+
+          message.className =
+            "text-center text-sm font-semibold text-red-600";
+
+          return;
+
+        }
+
+
+        /*
+          Check the normal HTML required fields.
+        */
+
+        if (
+          !form.checkValidity()
+        ) {
+
+          form.reportValidity();
+
+          return;
+
+        }
+
+
+        button.disabled =
+          true;
+
+
+        button.innerHTML =
+          '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Uploading...';
+
+
+        message.className =
+          "text-center text-sm font-semibold text-slate-500";
+
+
+        message.textContent =
+          "Uploading your questions. Please wait...";
+
+
+        try {
+
+          /*
+            Save everything before beginning the upload.
+            This gives us a recovery copy if anything goes wrong.
+          */
+
+          await saveToDatabase(
+            "form",
+            getFormData()
+          );
+
+          await saveSelectedFile(
+            currentFile
+          );
+
+
+          /*
+            Convert the selected file to Base64.
+          */
+
+          const fileData =
+            await new Promise(
+              function(resolve, reject) {
+
+                const reader =
+                  new FileReader();
+
+
+                reader.onload =
+                  function() {
+
+                    resolve(
+                      reader.result
+                    );
+
+                  };
+
+
+                reader.onerror =
+                  function() {
+
+                    reject(
+                      new Error(
+                        "Could not read the file."
+                      )
+                    );
+
+                  };
+
+
+                reader.readAsDataURL(
+                  currentFile
+                );
+
+              }
+            );
+
+
+          /*
+            Get selected question type.
+          */
+
+          const questionTypeElement =
+            document.querySelector(
+              'input[name="question_type"]:checked'
+            );
+
+
+          const questionType =
+            questionTypeElement
+              ? questionTypeElement.value
+              : null;
+
+
+          /*
+            Build the same submission payload
+            expected by the existing Netlify Function.
+          */
+
+          const payload = {
+
+            school:
+              document
+                .getElementById("school")
+                .value
+                .trim(),
+
+            programme:
+              document
+                .getElementById("programme")
+                .value,
+
+            level:
+              document
+                .getElementById("level")
+                .value,
+
+            subject:
+              document
+                .getElementById("subject")
+                .value,
+
+            question_type:
+              questionType,
+
+            academic_year:
+              document
+                .getElementById("academicYear")
+                .value
+                .trim(),
+
+            semester:
+              document
+                .getElementById("semester")
+                .value,
+
+            exam_type:
+              document
+                .getElementById("examType")
+                .value,
+
+            file_name:
+              currentFile.name,
+
+            file_type:
+              currentFile.type,
+
+            file_data:
+              fileData,
+
+            additional_information:
+              document
+                .getElementById("additionalInfo")
+                .value
+                .trim()
+
+          };
+
+
+          /*
+            Send the submission to our existing
+            Netlify Function.
+          */
+
+          const response =
+            await fetch(
+              "/.netlify/functions/submit-questions",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify(
+                    payload
+                  )
+              }
+            );
+
+
+          /*
+            Read the response safely.
+          */
+
+          let result = {};
+
+          try {
+
+            result =
+              await response.json();
+
+          } catch (error) {
+
+            throw new Error(
+              "The server returned an invalid response. Please try again."
+            );
+
+          }
+
+
+          if (
+            !response.ok ||
+            !result.success
+          ) {
+
+            throw new Error(
+              result.error ||
+              "The submission could not be completed."
+            );
+
+          }
+
+
+          /*
+            SUCCESS
+          */
+
+          form.classList.add(
+            "hidden"
+          );
+
+
+          success.classList.remove(
+            "hidden"
+          );
+
+
+          /*
+            The submission is complete.
+            Remove the temporary recovery copy.
+          */
+
+          await deleteSavedData();
+
+
+          try {
+
+            localStorage.removeItem(
+              STORAGE_KEY
+            );
+
+            localStorage.removeItem(
+              "pulseprep_saved_file"
+            );
+
+          } catch (error) {
+
+            console.warn(
+              "PulsePrep: Could not clear saved submission.",
+              error
+            );
+
+          }
+
+
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+          });
+
+        } catch (error) {
+
+          console.error(
+            "Past question submission error:",
+            error
+          );
+
+
+          message.textContent =
+            error.message ||
+            "Something went wrong. Please try again.";
+
+
+          message.className =
+            "text-center text-sm font-semibold text-red-600";
+
+
+          button.disabled =
+            false;
+
+
+          button.innerHTML =
+            '<i class="fa-solid fa-paper-plane mr-2"></i> Submit Questions — Free';
+
+        }
+
+      }
+    );
+
+
+    /* ========================================================
+       STARTUP
+       ======================================================== */
+
+    (async function initializePulsePrepSubmission() {
+
+      await openDatabase();
+
+      await restoreSavedSubmission();
+
+    })();
 
   </script>
 
