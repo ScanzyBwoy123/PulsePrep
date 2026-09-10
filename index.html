@@ -3808,14 +3808,7 @@ document.addEventListener(
 
       showTab("mcq");
     }
-            try {
-        await checkPremiumAccess();
-      } catch (premiumError) {
-        console.error(
-          "Premium status refresh error:",
-          premiumError
-        );
-      }
+            checkPremiumAccess();
 
       window.history.replaceState(
         {},
