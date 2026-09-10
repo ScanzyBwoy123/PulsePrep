@@ -23,11 +23,9 @@ exports.handler = async (event) => {
       };
     }
 
-    // Paystack secret key
     const paystackKey =
       process.env.PAYSTACK_API_KEY;
 
-    // Supabase credentials
     const supabaseUrl =
       process.env.SUPABASE_URL;
 
@@ -54,7 +52,7 @@ exports.handler = async (event) => {
       };
     }
 
-    // Verify payment with Paystack
+    // Verify transaction with Paystack
     const response = await fetch(
       `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
       {
@@ -68,7 +66,7 @@ exports.handler = async (event) => {
 
     const data = await response.json();
 
-    if (!response.ok || !data.status) {
+    if (!response.ok || !data.status || !data.data) {
       return {
         statusCode: 400,
         body: JSON.stringify({
@@ -82,11 +80,8 @@ exports.handler = async (event) => {
 
     const transaction = data.data;
 
-    // Make sure payment was actually successful
-    const successful =
-      transaction.status === "success";
-
-    if (!successful) {
+    // Payment must actually be successful
+    if (transaction.status !== "success") {
       return {
         statusCode: 200,
         body: JSON.stringify({
@@ -97,7 +92,15 @@ exports.handler = async (event) => {
       };
     }
 
-    // Save successful payment to Supabase
+    const email =
+      transaction.customer?.email
+        ?.trim()
+        .toLowerCase() || null;
+
+    const plan =
+      transaction.metadata?.plan || null;
+
+    // Save successful payment/subscription
     const supabaseResponse = await fetch(
       `${supabaseUrl}/rest/v1/subscriptions`,
       {
@@ -109,10 +112,11 @@ exports.handler = async (event) => {
           Prefer: "resolution=merge-duplicates"
         },
         body: JSON.stringify({
-          email: transaction.customer?.email || null,
+          email,
           reference: transaction.reference,
           amount: transaction.amount,
           status: "success",
+          plan,
           paid_at:
             transaction.paid_at ||
             new Date().toISOString()
@@ -133,12 +137,13 @@ exports.handler = async (event) => {
         statusCode: 500,
         body: JSON.stringify({
           success: false,
-          error: "Payment verified but could not save subscription."
+          error:
+            "Payment verified but could not save subscription."
         })
       };
     }
 
-    // Return successful payment
+    // Payment verified and subscription saved
     return {
       statusCode: 200,
       headers: {
@@ -149,10 +154,8 @@ exports.handler = async (event) => {
         reference: transaction.reference,
         amount: transaction.amount,
         currency: transaction.currency,
-        email:
-          transaction.customer?.email || null,
-        plan:
-          transaction.metadata?.plan || null,
+        email,
+        plan,
         paidAt:
           transaction.paid_at || null
       })
