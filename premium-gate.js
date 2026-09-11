@@ -109,14 +109,31 @@
 
   window.PulsePrepOpenPremiumPlans = function () {
 
-    if (typeof window.showTab === "function") {
-      try {
-        window.showTab("pricing");
-        return;
-      } catch (error) {
-        console.warn(error);
-      }
+  if (typeof window.showTab === "function") {
+    try {
+      window.showTab("payment");
+      return;
+    } catch (error) {
+      console.warn(error);
     }
+  }
+
+  const payment = document.getElementById("payment");
+
+  if (payment) {
+
+    document.querySelectorAll(".tab").forEach(function (tab) {
+      tab.style.display = "none";
+    });
+
+    payment.style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+};
 
     const pricing =
       document.getElementById("pricing");
