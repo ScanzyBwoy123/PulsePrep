@@ -1,0 +1,105 @@
+/* ==========================================================
+   PulsePrep Exam Vault
+   Large, Student-Friendly Question Typography
+   ========================================================== */
+
+#questionBankContent {
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* Question card */
+#questionBankContent .exam-vault-question,
+#questionBankContent .question-card {
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+/* Main question */
+#questionBankContent .exam-vault-question-text,
+#questionBankContent .question-text {
+  font-size: 20px !important;
+  line-height: 1.65 !important;
+  font-weight: 800 !important;
+  margin-bottom: 20px;
+}
+
+/* Answer options */
+#questionBankContent .exam-vault-option,
+#questionBankContent .question-option,
+#questionBankContent label {
+  font-size: 18px !important;
+  line-height: 1.55 !important;
+}
+
+/* Individual option box */
+#questionBankContent .exam-vault-option {
+  padding: 16px 18px !important;
+  margin-bottom: 12px;
+  border-radius: 14px;
+}
+
+/* Radio buttons */
+#questionBankContent .exam-vault-option input,
+#questionBankContent .question-option input {
+  transform: scale(1.2);
+  margin-right: 10px;
+}
+
+/* Explanation */
+#questionBankContent .exam-vault-explanation,
+#questionBankContent .question-explanation,
+#questionBankContent .explanation {
+  font-size: 17px !important;
+  line-height: 1.7 !important;
+}
+
+/* Correct answer */
+#questionBankContent .exam-vault-answer,
+#questionBankContent .correct-answer {
+  font-size: 18px !important;
+  line-height: 1.6 !important;
+  font-weight: 700;
+}
+
+/* Buttons */
+#questionBankContent button {
+  font-size: 16px;
+}
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width: 640px) {
+
+  #questionBankContent {
+    font-size: 17px;
+  }
+
+  /* Question */
+  #questionBankContent .exam-vault-question-text,
+  #questionBankContent .question-text {
+    font-size: 19px !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Options */
+  #questionBankContent .exam-vault-option,
+  #questionBankContent .question-option,
+  #questionBankContent label {
+    font-size: 17px !important;
+    line-height: 1.55 !important;
+  }
+
+  #questionBankContent .exam-vault-option {
+    padding: 15px 14px !important;
+  }
+
+  /* Explanation */
+  #questionBankContent .exam-vault-explanation,
+  #questionBankContent .question-explanation,
+  #questionBankContent .explanation {
+    font-size: 16px !important;
+  }
+}
