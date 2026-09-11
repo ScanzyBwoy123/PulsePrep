@@ -319,20 +319,38 @@
 // ============================================================
 // PULSEP﻿REP — APPROVED PAST EXAMINATION PAPERS
 // ============================================================
+
 (function () {
   "use strict";
+
+  let pastPapersLoaded = false;
+  let loadingPastPapers = false;
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
   async function loadApprovedPastPapers() {
+
+    if (loadingPastPapers) return;
+
     const container =
       document.getElementById("questionBankContent");
-    if (!container) {
-      console.warn(
-        "PulsePrep: questionBankContent not found."
-      );
-      return;
-    }
+
+    if (!container) return;
+
+    loadingPastPapers = true;
+
     try {
-      // Wait for Supabase session
+
+      // Wait for Supabase
       let attempts = 0;
+
       while (
         !window.pulseprepSupabase &&
         attempts < 50
@@ -340,96 +358,152 @@
         await new Promise(resolve =>
           setTimeout(resolve, 100)
         );
+
         attempts++;
       }
+
       if (!window.pulseprepSupabase) {
         console.warn(
-          "PulsePrep: Supabase is not ready."
+          "PulsePrep: Supabase client not ready."
         );
         return;
       }
+
       const {
         data: sessionData,
         error: sessionError
       } =
         await window.pulseprepSupabase.auth.getSession();
-      if (
-        sessionError ||
-        !sessionData?.session?.access_token
-      ) {
+
+      if (sessionError) {
+        console.error(
+          "PulsePrep session error:",
+          sessionError
+        );
         return;
       }
-      const token =
-        sessionData.session.access_token;
+
+      const session =
+        sessionData?.session;
+
+      if (!session) {
+        return;
+      }
+
       const response = await fetch(
         "/.netlify/functions/get-past-questions",
         {
           method: "GET",
+
           headers: {
             "Authorization":
-              `Bearer ${token}`
+              `Bearer ${session.access_token}`
           }
         }
       );
-      const result =
-        await response.json();
-      if (!response.ok) {
-        console.warn(
-          "PulsePrep past papers error:",
-          result
+
+      let result = {};
+
+      try {
+        result = await response.json();
+      } catch (error) {
+        console.error(
+          "PulsePrep: invalid past-paper response.",
+          error
         );
         return;
       }
+
+      if (!response.ok) {
+
+        console.error(
+          "PulsePrep past-paper request failed:",
+          result
+        );
+
+        return;
+      }
+
       const papers =
         Array.isArray(result.questions)
           ? result.questions
           : [];
-      // Find or create the past-paper section
+
       let section =
         document.getElementById(
           "pulsePrepPastPapers"
         );
+
       if (!section) {
+
         section =
           document.createElement("div");
+
         section.id =
           "pulsePrepPastPapers";
+
         section.className =
           "mt-10";
+
         container.appendChild(section);
       }
-      // No approved papers yet
+
+      // Remove previous content before rebuilding.
+      section.innerHTML = "";
+
+      // No approved papers
       if (papers.length === 0) {
+
         section.innerHTML = `
           <div class="bg-white rounded-2xl
                       border border-slate-200
                       p-6">
+
             <div class="flex items-center gap-3">
-              <div class="w-11 h-11 rounded-xl
+
+              <div class="w-12 h-12 rounded-xl
                           bg-slate-100
                           flex items-center
                           justify-center">
-                <i class="fa-solid fa-folder-open
-                          text-slate-500"></i>
+
+                <i class="fa-solid fa-file-pdf
+                          text-slate-500
+                          text-xl"></i>
+
               </div>
+
               <div>
+
                 <h3 class="text-xl font-extrabold
                            text-slate-800">
+
                   Past Examination Papers
+
                 </h3>
-                <p class="text-sm text-slate-500">
-                  No approved past papers are
-                  available yet.
+
+                <p class="text-sm text-slate-500 mt-1">
+
+                  No approved past examination
+                  papers are available yet.
+
                 </p>
+
               </div>
+
             </div>
+
           </div>
         `;
+
+        pastPapersLoaded = true;
         return;
       }
+
       // Render approved papers
       section.innerHTML = `
+
         <div class="mb-5">
+
           <div class="inline-flex items-center
                       gap-2 px-3 py-1
                       rounded-full
@@ -437,172 +511,533 @@
                       text-emerald-700
                       text-xs font-extrabold
                       uppercase">
+
             <i class="fa-solid fa-file-pdf"></i>
+
             Past Examination Papers
+
           </div>
+
           <h3 class="text-2xl font-extrabold
                      text-slate-900 mt-3">
+
             Approved Past Papers
+
           </h3>
+
           <p class="text-slate-500 mt-1">
-            Practice with examination papers
-            submitted and approved by PulsePrep.
+
+            Practice with approved past
+            examination papers.
+
           </p>
+
         </div>
+
         <div class="grid grid-cols-1
                     md:grid-cols-2
                     gap-5">
-          ${papers.map(paper => `
-            <div class="bg-white rounded-2xl
-                        border border-slate-200
-                        shadow-sm
-                        hover:shadow-md
-                        transition
-                        p-5">
-              <div class="flex items-start
-                          justify-between gap-4">
-                <div class="flex items-start
-                            gap-3 min-w-0">
-                  <div class="w-12 h-12
-                              rounded-xl
-                              bg-red-50
-                              text-red-600
-                              flex items-center
-                              justify-center
-                              flex-shrink-0">
-                    <i class="fa-solid
-                              fa-file-pdf
-                              text-xl"></i>
-                  </div>
-                  <div class="min-w-0">
-                    <h4 class="font-extrabold
-                               text-slate-800
-                               truncate">
-                      ${escapePastPaperHtml(
-                        paper.file_name ||
-                        "Past Examination Paper"
-                      )}
-                    </h4>
-                    <p class="text-sm
-                              text-slate-500
-                              mt-1">
-                      ${escapePastPaperHtml(
-                        paper.school ||
-                        "Nursing School"
-                      )}
-                    </p>
-                  </div>
+
+          ${papers.map((paper) => `
+
+            <div
+              class="bg-white rounded-2xl
+                     border border-slate-200
+                     shadow-sm
+                     p-5"
+            >
+
+              <div class="flex items-start gap-3">
+
+                <div
+                  class="w-12 h-12 rounded-xl
+                         bg-red-50
+                         text-red-600
+                         flex items-center
+                         justify-center
+                         flex-shrink-0"
+                >
+
+                  <i class="fa-solid
+                            fa-file-pdf
+                            text-xl"></i>
+
                 </div>
+
+                <div class="min-w-0">
+
+                  <h4
+                    class="font-extrabold
+                           text-slate-800
+                           break-words"
+                  >
+                    ${escapeHtml(
+                      paper.file_name ||
+                      "Past Examination Paper"
+                    )}
+                  </h4>
+
+                  <p
+                    class="text-sm
+                           text-slate-500
+                           mt-1"
+                  >
+                    ${escapeHtml(
+                      paper.school ||
+                      "Nursing School"
+                    )}
+                  </p>
+
+                </div>
+
               </div>
-              <div class="flex flex-wrap
-                          gap-2 mt-4">
+
+              <div class="flex flex-wrap gap-2 mt-4">
+
                 ${
                   paper.subject
                     ? `
-                      <span class="px-2.5 py-1
-                                   rounded-lg
-                                   bg-blue-50
-                                   text-blue-700
-                                   text-xs
-                                   font-semibold">
-                        ${escapePastPaperHtml(
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-blue-50
+                               text-blue-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
                           paper.subject
                         )}
                       </span>
                     `
                     : ""
                 }
+
                 ${
                   paper.level
                     ? `
-                      <span class="px-2.5 py-1
-                                   rounded-lg
-                                   bg-purple-50
-                                   text-purple-700
-                                   text-xs
-                                   font-semibold">
-                        ${escapePastPaperHtml(
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-purple-50
+                               text-purple-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
                           paper.level
                         )}
                       </span>
                     `
                     : ""
                 }
+
                 ${
                   paper.exam_type
                     ? `
-                      <span class="px-2.5 py-1
-                                   rounded-lg
-                                   bg-amber-50
-                                   text-amber-700
-                                   text-xs
-                                   font-semibold">
-                        ${escapePastPaperHtml(
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-amber-50
+                               text-amber-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
                           paper.exam_type
                         )}
                       </span>
                     `
                     : ""
                 }
+
                 ${
                   paper.academic_year
                     ? `
-                      <span class="px-2.5 py-1
-                                   rounded-lg
-                                   bg-slate-100
-                                   text-slate-700
-                                   text-xs
-                                   font-semibold">
-                        ${escapePastPaperHtml(
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-slate-100
+                               text-slate-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
                           paper.academic_year
                         )}
                       </span>
                     `
                     : ""
                 }
+
               </div>
+
               ${
                 paper.programme
                   ? `
-                    <p class="text-sm
-                              text-slate-500
-                              mt-4">
+                    <p
+                      class="text-sm
+                             text-slate-500
+                             mt-4"
+                    >
                       <strong>Programme:</strong>
-                      ${escapePastPaperHtml(
+                      ${escapeHtml(
                         paper.programme
                       )}
                     </p>
                   `
                   : ""
               }
+
               <button
                 type="button"
-                onclick="openPulsePrepPastPaper('${escapePastPaperHtml(
-                  paper.id
-                )}')"
                 class="w-full mt-5
                        bg-teal-600
                        hover:bg-teal-700
                        text-white
-                       py-3 rounded-xl
+                       py-3
+                       rounded-xl
                        font-bold
-                       transition">
+                       transition"
+                onclick="openPulsePrepPastPaper('${escapeHtml(
+                  paper.id
+                )}')"
+              >
+
                 <i class="fa-solid
-                          fa-arrow-up-right-from-square
+                          fa-folder-open
                           mr-2"></i>
+
                 Open Past Paper
+
               </button>
+
             </div>
+
           `).join("")}
+
         </div>
       `;
+
+      pastPapersLoaded = true;
+
+      console.log(
+        "PulsePrep: approved past papers loaded:",
+        papers.length
+      );
+
     } catch (error) {
+
       console.error(
-        "PulsePrep past papers error:",
+        "PulsePrep past-paper loading error:",
         error
       );
+
+    } finally {
+
+      loadingPastPapers = false;
     }
   }
+
+
+  // ==========================================================
+  // OPEN PAST PAPER
+  // ==========================================================
+
+  window.openPulsePrepPastPaper =
+    async function (paperId) {
+
+      try {
+
+        if (!paperId) {
+          alert(
+            "Past paper ID is missing."
+          );
+          return;
+        }
+
+        let attempts = 0;
+
+        while (
+          !window.pulseprepSupabase &&
+          attempts < 50
+        ) {
+
+          await new Promise(resolve =>
+            setTimeout(resolve, 100)
+          );
+
+          attempts++;
+        }
+
+        if (!window.pulseprepSupabase) {
+
+          alert(
+            "PulsePrep is still loading. Please try again."
+          );
+
+          return;
+        }
+
+        const {
+          data: sessionData,
+          error: sessionError
+        } =
+          await window.pulseprepSupabase.auth.getSession();
+
+        if (
+          sessionError ||
+          !sessionData?.session
+        ) {
+
+          alert(
+            "Please log in to open this past paper."
+          );
+
+          return;
+        }
+
+        const token =
+          sessionData.session.access_token;
+
+        const response =
+          await fetch(
+            `/.netlify/functions/get-past-question-file?id=${encodeURIComponent(
+              paperId
+            )}`,
+            {
+              method: "GET",
+
+              headers: {
+                "Authorization":
+                  `Bearer ${token}`
+              }
+            }
+          );
+
+        const result =
+          await response.json();
+
+        if (!response.ok) {
+
+          if (response.status === 403) {
+
+            alert(
+              "Premium access is required to open this past paper."
+            );
+
+            if (
+              typeof window.showTab ===
+              "function"
+            ) {
+              window.showTab("payment");
+            }
+
+            return;
+          }
+
+          if (response.status === 401) {
+
+            alert(
+              "Your login session has expired. Please log in again."
+            );
+
+            if (
+              typeof window.showTab ===
+              "function"
+            ) {
+              window.showTab("account");
+            }
+
+            return;
+          }
+
+          alert(
+            result.error ||
+            "Unable to open this past paper."
+          );
+
+          return;
+        }
+
+        if (
+          !result ||
+          !result.success ||
+          !result.url
+        ) {
+
+          alert(
+            "The past paper file could not be opened."
+          );
+
+          return;
+        }
+
+        window.open(
+          result.url,
+          "_blank",
+          "noopener,noreferrer"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "PulsePrep open past paper error:",
+          error
+        );
+
+        alert(
+          "Unable to open the past paper right now."
+        );
+      }
+    };
+
+
+  // ==========================================================
+  // WATCH FOR QUESTION BANK
+  // ==========================================================
+
+  function setupQuestionBankWatcher() {
+
+    let attempts = 0;
+
+    const timer =
+      setInterval(() => {
+
+        attempts++;
+
+        const container =
+          document.getElementById(
+            "questionBankContent"
+          );
+
+        if (!container) {
+
+          if (attempts > 120) {
+            clearInterval(timer);
+          }
+
+          return;
+        }
+
+        clearInterval(timer);
+
+        /*
+         * Load immediately if the Question Bank
+         * already exists.
+         */
+        loadApprovedPastPapers();
+
+        /*
+         * Watch the Question Bank for changes.
+         *
+         * The main Question Bank renderer can
+         * rebuild its HTML. When that happens,
+         * make sure the past-paper section is
+         * still present.
+         */
+        const observer =
+          new MutationObserver(() => {
+
+            if (
+              document.getElementById(
+                "questionBankContent"
+              ) &&
+              !document.getElementById(
+                "pulsePrepPastPapers"
+              )
+            ) {
+
+              if (!loadingPastPapers) {
+                loadApprovedPastPapers();
+              }
+
+            }
+
+          });
+
+        observer.observe(
+          container,
+          {
+            childList: true,
+            subtree: true
+          }
+        );
+
+      }, 250);
+  }
+
+
+  setupQuestionBankWatcher();
+
+
+  // ==========================================================
+  // ALSO LOAD WHEN QUESTION BANK TAB IS OPENED
+  // ==========================================================
+
+  function watchShowTab() {
+
+    if (
+      typeof window.showTab !==
+      "function"
+    ) {
+
+      setTimeout(
+        watchShowTab,
+        300
+      );
+
+      return;
+    }
+
+    if (
+      window.showTab
+        .__pulsePrepPastPaperWrapped
+    ) {
+      return;
+    }
+
+    const originalShowTab =
+      window.showTab;
+
+    window.showTab =
+      function () {
+
+        const result =
+          originalShowTab.apply(
+            this,
+            arguments
+          );
+
+        const tabName =
+          arguments[0];
+
+        if (
+          tabName === "question-bank"
+        ) {
+
+          setTimeout(
+            loadApprovedPastPapers,
+            300
+          );
+
+          setTimeout(
+            loadApprovedPastPapers,
+            1000
+          );
+        }
+
+        return result;
+      };
+
+    window.showTab
+      .__pulsePrepPastPaperWrapped = true;
+  }
+
+
+  watchShowTab();
+
+})();
   // ==========================================================
   // OPEN APPROVED PAST PAPER
   // ==========================================================
