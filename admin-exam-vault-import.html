@@ -1,0 +1,2247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>PulsePrep Exam Vault Bulk Import</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+  >
+
+  <style>
+    body {
+      background: #f1f5f9;
+    }
+
+    .hidden-screen {
+      display: none !important;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      min-width: 1100px;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-slate-800">
+
+  <!-- =====================================================
+       LOGIN SCREEN
+  ====================================================== -->
+
+  <div
+    id="loginScreen"
+    class="min-h-screen flex items-center justify-center px-4"
+  >
+
+    <div
+      class="bg-white w-full max-w-md rounded-2xl shadow-xl p-8"
+    >
+
+      <div class="text-center mb-8">
+
+        <div
+          class="w-16 h-16 mx-auto mb-4 rounded-2xl
+                 bg-blue-600 text-white flex items-center
+                 justify-center text-2xl"
+        >
+          <i class="fa-solid fa-file-import"></i>
+        </div>
+
+        <h1 class="text-2xl font-bold text-slate-900">
+          PulsePrep Exam Vault
+        </h1>
+
+        <p class="text-slate-500 mt-2">
+          Bulk Question Import
+        </p>
+
+      </div>
+
+
+      <form id="loginForm" class="space-y-5">
+
+        <div>
+
+          <label
+            class="block text-sm font-semibold mb-2"
+          >
+            Admin Email
+          </label>
+
+          <input
+            id="loginEmail"
+            type="email"
+            required
+            autocomplete="email"
+            class="w-full border border-slate-300
+                   rounded-xl px-4 py-3
+                   focus:outline-none
+                   focus:ring-2 focus:ring-blue-500"
+            placeholder="Admin email"
+          >
+
+        </div>
+
+
+        <div>
+
+          <label
+            class="block text-sm font-semibold mb-2"
+          >
+            Password
+          </label>
+
+          <input
+            id="loginPassword"
+            type="password"
+            required
+            autocomplete="current-password"
+            class="w-full border border-slate-300
+                   rounded-xl px-4 py-3
+                   focus:outline-none
+                   focus:ring-2 focus:ring-blue-500"
+            placeholder="Password"
+          >
+
+        </div>
+
+
+        <button
+          id="loginButton"
+          type="submit"
+          class="w-full bg-blue-600 hover:bg-blue-700
+                 text-white font-semibold rounded-xl
+                 px-4 py-3 transition"
+        >
+          <i class="fa-solid fa-right-to-bracket mr-2"></i>
+          Sign In
+        </button>
+
+      </form>
+
+
+      <p
+        id="loginMessage"
+        class="text-center text-sm mt-5"
+      ></p>
+
+    </div>
+
+  </div>
+
+
+  <!-- =====================================================
+       ADMIN APP
+  ====================================================== -->
+
+  <div
+    id="adminApp"
+    class="hidden-screen"
+  >
+
+    <!-- HEADER -->
+
+    <header class="bg-slate-900 text-white shadow-lg">
+
+      <div
+        class="max-w-7xl mx-auto px-4 py-4
+               flex flex-col md:flex-row
+               md:items-center md:justify-between gap-4"
+      >
+
+        <div>
+
+          <div class="flex items-center gap-3">
+
+            <div
+              class="w-11 h-11 rounded-xl bg-blue-600
+                     flex items-center justify-center"
+            >
+              <i class="fa-solid fa-file-import"></i>
+            </div>
+
+            <div>
+
+              <h1 class="text-xl font-bold">
+                PulsePrep Exam Vault
+              </h1>
+
+              <p class="text-xs text-slate-300">
+                Bulk Question Import
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="flex items-center gap-3">
+
+          <span
+            id="adminEmailDisplay"
+            class="text-sm text-slate-300 hidden md:block"
+          ></span>
+
+          <button
+            id="logoutButton"
+            class="bg-red-500 hover:bg-red-600
+                   px-4 py-2 rounded-lg text-sm
+                   font-semibold"
+          >
+            <i class="fa-solid fa-right-from-bracket mr-1"></i>
+            Logout
+          </button>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+
+      <!-- INTRO -->
+
+      <div class="mb-8">
+
+        <h2
+          class="text-3xl font-bold text-slate-900"
+        >
+          Bulk Question Import
+        </h2>
+
+        <p class="text-slate-500 mt-2">
+          Upload hundreds of Exam Vault questions
+          using a CSV file instead of entering them one
+          at a time.
+        </p>
+
+      </div>
+
+
+      <!-- IMPORTANT NOTICE -->
+
+      <div
+        class="bg-blue-50 border border-blue-200
+               rounded-2xl p-5 mb-8"
+      >
+
+        <div class="flex gap-3">
+
+          <div class="text-blue-600 text-xl">
+            <i class="fa-solid fa-circle-info"></i>
+          </div>
+
+          <div>
+
+            <h3
+              class="font-bold text-blue-900"
+            >
+              How this works
+            </h3>
+
+            <p
+              class="text-sm text-blue-800 mt-1"
+            >
+              Download the CSV template, add your questions,
+              upload the completed file, review the preview,
+              then import the valid questions. Imported
+              questions will normally be marked
+              <strong>Pending</strong> so you can review
+              them before students see them.
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- STEP 1 -->
+
+      <section
+        class="bg-white rounded-2xl shadow-sm
+               p-6 mb-6"
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="w-10 h-10 rounded-full bg-blue-600
+                   text-white flex items-center
+                   justify-center font-bold shrink-0"
+          >
+            1
+          </div>
+
+          <div class="flex-1">
+
+            <h3
+              class="text-xl font-bold text-slate-900"
+            >
+              Download CSV Template
+            </h3>
+
+            <p class="text-slate-500 mt-1 mb-4">
+              Use this template so PulsePrep knows
+              which column contains each piece of
+              question information.
+            </p>
+
+            <button
+              id="downloadTemplateButton"
+              type="button"
+              class="bg-blue-600 hover:bg-blue-700
+                     text-white font-semibold
+                     px-5 py-3 rounded-xl"
+            >
+              <i class="fa-solid fa-download mr-2"></i>
+              Download CSV Template
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- STEP 2 -->
+
+      <section
+        class="bg-white rounded-2xl shadow-sm
+               p-6 mb-6"
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="w-10 h-10 rounded-full bg-blue-600
+                   text-white flex items-center
+                   justify-center font-bold shrink-0"
+          >
+            2
+          </div>
+
+          <div class="flex-1">
+
+            <h3
+              class="text-xl font-bold text-slate-900"
+            >
+              Select Your CSV File
+            </h3>
+
+            <p class="text-slate-500 mt-1 mb-4">
+              Your CSV should contain the same column
+              headings as the template.
+            </p>
+
+            <input
+              id="csvFile"
+              type="file"
+              accept=".csv,text/csv"
+              class="block w-full border border-slate-300
+                     rounded-xl p-3 bg-white"
+            >
+
+            <p
+              id="fileInformation"
+              class="text-sm text-slate-500 mt-3"
+            >
+              No file selected.
+            </p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- STEP 3 -->
+
+      <section
+        class="bg-white rounded-2xl shadow-sm
+               p-6 mb-6"
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="w-10 h-10 rounded-full bg-blue-600
+                   text-white flex items-center
+                   justify-center font-bold shrink-0"
+          >
+            3
+          </div>
+
+          <div class="flex-1">
+
+            <h3
+              class="text-xl font-bold text-slate-900"
+            >
+              Validate File
+            </h3>
+
+            <p class="text-slate-500 mt-1 mb-4">
+              PulsePrep will check every row before
+              anything is added to the database.
+            </p>
+
+            <button
+              id="validateButton"
+              type="button"
+              class="bg-slate-800 hover:bg-slate-900
+                     text-white font-semibold
+                     px-5 py-3 rounded-xl"
+            >
+              <i class="fa-solid fa-check-double mr-2"></i>
+              Validate CSV
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- VALIDATION SUMMARY -->
+
+      <section
+        id="validationSection"
+        class="hidden bg-white rounded-2xl
+               shadow-sm p-6 mb-6"
+      >
+
+        <h3
+          class="text-xl font-bold text-slate-900 mb-5"
+        >
+          Validation Results
+        </h3>
+
+
+        <div
+          class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6"
+        >
+
+          <div
+            class="rounded-xl bg-slate-100 p-5"
+          >
+
+            <p class="text-sm text-slate-500">
+              Total Rows
+            </p>
+
+            <p
+              id="totalRows"
+              class="text-3xl font-bold mt-1"
+            >
+              0
+            </p>
+
+          </div>
+
+
+          <div
+            class="rounded-xl bg-green-50 p-5"
+          >
+
+            <p class="text-sm text-green-700">
+              Valid Rows
+            </p>
+
+            <p
+              id="validRows"
+              class="text-3xl font-bold
+                     text-green-700 mt-1"
+            >
+              0
+            </p>
+
+          </div>
+
+
+          <div
+            class="rounded-xl bg-red-50 p-5"
+          >
+
+            <p class="text-sm text-red-700">
+              Invalid Rows
+            </p>
+
+            <p
+              id="invalidRows"
+              class="text-3xl font-bold
+                     text-red-700 mt-1"
+            >
+              0
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          id="validationMessage"
+          class="text-sm mb-5"
+        ></div>
+
+
+        <!-- ERRORS -->
+
+        <div
+          id="errorsContainer"
+          class="hidden"
+        >
+
+          <h4
+            class="font-bold text-red-700 mb-3"
+          >
+            Errors Found
+          </h4>
+
+          <div
+            id="errorsList"
+            class="space-y-2"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- PREVIEW -->
+
+      <section
+        id="previewSection"
+        class="hidden bg-white rounded-2xl
+               shadow-sm p-6 mb-6"
+      >
+
+        <div
+          class="flex flex-col md:flex-row
+                 md:items-center
+                 md:justify-between gap-3 mb-5"
+        >
+
+          <div>
+
+            <h3
+              class="text-xl font-bold text-slate-900"
+            >
+              Question Preview
+            </h3>
+
+            <p class="text-sm text-slate-500 mt-1">
+              Review the first rows before importing.
+            </p>
+
+          </div>
+
+          <span
+            id="previewCount"
+            class="text-sm font-semibold
+                   bg-blue-100 text-blue-700
+                   px-3 py-2 rounded-lg"
+          >
+            0 questions
+          </span>
+
+        </div>
+
+
+        <div class="table-wrap">
+
+          <table
+            class="w-full border-collapse text-sm"
+          >
+
+            <thead>
+
+              <tr class="bg-slate-100">
+
+                <th class="border p-3 text-left">
+                  #
+                </th>
+
+                <th class="border p-3 text-left">
+                  Subject
+                </th>
+
+                <th class="border p-3 text-left">
+                  Topic
+                </th>
+
+                <th class="border p-3 text-left">
+                  Question
+                </th>
+
+                <th class="border p-3 text-left">
+                  Correct
+                </th>
+
+                <th class="border p-3 text-left">
+                  Difficulty
+                </th>
+
+                <th class="border p-3 text-left">
+                  Status
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="previewTableBody"></tbody>
+
+          </table>
+
+        </div>
+
+      </section>
+
+
+      <!-- STEP 4 -->
+
+      <section
+        id="importSection"
+        class="hidden bg-white rounded-2xl
+               shadow-sm p-6 mb-8"
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            class="w-10 h-10 rounded-full
+                   bg-green-600 text-white
+                   flex items-center justify-center
+                   font-bold shrink-0"
+          >
+            4
+          </div>
+
+          <div class="flex-1">
+
+            <h3
+              class="text-xl font-bold text-slate-900"
+            >
+              Import Questions
+            </h3>
+
+            <p class="text-slate-500 mt-1 mb-5">
+              Valid questions will be added to the
+              Exam Vault as <strong>Pending</strong>.
+            </p>
+
+
+            <div
+              class="bg-amber-50 border
+                     border-amber-200
+                     rounded-xl p-4 mb-5"
+            >
+
+              <p class="text-sm text-amber-800">
+
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+
+                Imported questions will not immediately
+                become available to students. Review and
+                approve them from the Exam Vault Admin page
+                first.
+
+              </p>
+
+            </div>
+
+
+            <button
+              id="importButton"
+              type="button"
+              class="bg-green-600 hover:bg-green-700
+                     text-white font-bold
+                     px-6 py-3 rounded-xl"
+            >
+              <i class="fa-solid fa-cloud-arrow-up mr-2"></i>
+              Import Valid Questions
+            </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- RESULT -->
+
+      <section
+        id="resultSection"
+        class="hidden rounded-2xl p-6 mb-8"
+      >
+
+        <div class="flex items-start gap-4">
+
+          <div
+            id="resultIcon"
+            class="text-3xl"
+          ></div>
+
+          <div>
+
+            <h3
+              id="resultTitle"
+              class="text-xl font-bold"
+            ></h3>
+
+            <p
+              id="resultMessage"
+              class="mt-2 text-sm"
+            ></p>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- NAVIGATION -->
+
+      <div
+        class="flex flex-col sm:flex-row gap-3"
+      >
+
+        <a
+          href="/admin-exam-vault.html"
+          class="inline-flex items-center
+                 justify-center
+                 bg-slate-800 hover:bg-slate-900
+                 text-white font-semibold
+                 px-5 py-3 rounded-xl"
+        >
+          <i class="fa-solid fa-vault mr-2"></i>
+          Open Exam Vault Manager
+        </a>
+
+        <button
+          id="clearButton"
+          type="button"
+          class="bg-white hover:bg-slate-50
+                 border border-slate-300
+                 font-semibold px-5 py-3
+                 rounded-xl"
+        >
+          <i class="fa-solid fa-rotate-left mr-2"></i>
+          Clear Import
+        </button>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <script>
+
+    // =========================================================
+    // PULSEPREP BULK EXAM VAULT IMPORTER
+    // =========================================================
+
+    const SUPABASE_URL =
+      "https://eskwphjtiogguhvtktmh.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs";
+
+    const ADMIN_EMAILS = [
+      "scanzybwoy8@gmail.com"
+    ];
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+
+    // =========================================================
+    // SUBJECTS
+    // =========================================================
+
+    const SUBJECTS = [
+      "Anatomy & Physiology",
+      "Microbiology",
+      "Behavioral Science",
+      "Fundamentals of Nursing",
+      "Nursing Process",
+      "First Aid & Emergency Care",
+      "Health Assessment",
+      "Pharmacology",
+      "Medicine and Medical Nursing 1",
+      "Surgery and Surgical Nursing 1",
+      "Medical-Surgical Nursing",
+      "Advanced Nursing 2",
+      "Therapeutic and Pharmacovigilance 1",
+      "Therapeutic Communication",
+      "Professionalism",
+      "Pathophysiology",
+      "Maternal & Child Health",
+      "Midwifery",
+      "Paediatric Nursing",
+      "Mental Health/Psychiatric Nursing",
+      "Nutrition & Dietetics",
+      "Infection Prevention & Control",
+      "Community Health Nursing",
+      "Health Promotion",
+      "Health Promotion and Community-Based Rehabilitation",
+      "Public Health",
+      "Nursing Ethics & Professional Practice",
+      "Research Methods",
+      "Biostatistics",
+      "Statistics"
+    ];
+
+
+    // =========================================================
+    // STATE
+    // =========================================================
+
+    let parsedRows = [];
+
+    let validRows = [];
+
+    let invalidRows = [];
+
+
+    // =========================================================
+    // DOM
+    // =========================================================
+
+    const loginScreen =
+      document.getElementById("loginScreen");
+
+    const adminApp =
+      document.getElementById("adminApp");
+
+    const loginForm =
+      document.getElementById("loginForm");
+
+    const loginMessage =
+      document.getElementById("loginMessage");
+
+    const loginEmail =
+      document.getElementById("loginEmail");
+
+    const loginPassword =
+      document.getElementById("loginPassword");
+
+    const csvFile =
+      document.getElementById("csvFile");
+
+    const fileInformation =
+      document.getElementById("fileInformation");
+
+    const validationSection =
+      document.getElementById("validationSection");
+
+    const previewSection =
+      document.getElementById("previewSection");
+
+    const importSection =
+      document.getElementById("importSection");
+
+    const resultSection =
+      document.getElementById("resultSection");
+
+
+    // =========================================================
+    // AUTH
+    // =========================================================
+
+    async function checkExistingSession() {
+
+      const {
+        data: {
+          session
+        }
+      } = await supabaseClient.auth.getSession();
+
+      if (
+        session &&
+        session.user &&
+        ADMIN_EMAILS.includes(
+          session.user.email.toLowerCase()
+        )
+      ) {
+
+        showAdminApp(
+          session.user.email
+        );
+
+      }
+
+    }
+
+
+    function showAdminApp(email) {
+
+      loginScreen.classList.add(
+        "hidden-screen"
+      );
+
+      adminApp.classList.remove(
+        "hidden-screen"
+      );
+
+      document.getElementById(
+        "adminEmailDisplay"
+      ).textContent = email;
+
+    }
+
+
+    loginForm.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+        loginMessage.textContent =
+          "Signing in...";
+
+        loginMessage.className =
+          "text-center text-sm mt-5 text-slate-500";
+
+
+        const email =
+          loginEmail.value.trim().toLowerCase();
+
+        const password =
+          loginPassword.value;
+
+
+        if (!ADMIN_EMAILS.includes(email)) {
+
+          loginMessage.textContent =
+            "This account is not authorized as an administrator.";
+
+          loginMessage.className =
+            "text-center text-sm mt-5 text-red-600";
+
+          return;
+
+        }
+
+
+        const {
+          data,
+          error
+        } = await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+
+        if (error) {
+
+          loginMessage.textContent =
+            error.message;
+
+          loginMessage.className =
+            "text-center text-sm mt-5 text-red-600";
+
+          return;
+
+        }
+
+
+        if (
+          !data.user ||
+          !ADMIN_EMAILS.includes(
+            data.user.email.toLowerCase()
+          )
+        ) {
+
+          await supabaseClient.auth.signOut();
+
+          loginMessage.textContent =
+            "Administrator access denied.";
+
+          loginMessage.className =
+            "text-center text-sm mt-5 text-red-600";
+
+          return;
+
+        }
+
+
+        showAdminApp(
+          data.user.email
+        );
+
+      }
+    );
+
+
+    document.getElementById(
+      "logoutButton"
+    ).addEventListener(
+      "click",
+      async function() {
+
+        await supabaseClient.auth.signOut();
+
+        window.location.reload();
+
+      }
+    );
+
+
+    // =========================================================
+    // CSV TEMPLATE
+    // =========================================================
+
+    const CSV_HEADERS = [
+      "subject",
+      "topic",
+      "question",
+      "option_a",
+      "option_b",
+      "option_c",
+      "option_d",
+      "correct_answer",
+      "explanation",
+      "difficulty",
+      "source",
+      "school",
+      "academic_year",
+      "status"
+    ];
+
+
+    function csvEscape(value) {
+
+      const text =
+        String(value ?? "");
+
+      return '"' +
+        text.replace(
+          /"/g,
+          '""'
+        ) +
+        '"';
+
+    }
+
+
+    function downloadCSV(
+      filename,
+      rows
+    ) {
+
+      const csv = rows
+        .map(row =>
+          row.map(csvEscape).join(",")
+        )
+        .join("\n");
+
+      const blob =
+        new Blob(
+          [csv],
+          {
+            type: "text/csv;charset=utf-8;"
+          }
+        );
+
+      const url =
+        URL.createObjectURL(blob);
+
+      const link =
+        document.createElement("a");
+
+      link.href = url;
+
+      link.download = filename;
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      document.body.removeChild(link);
+
+      URL.revokeObjectURL(url);
+
+    }
+
+
+    document.getElementById(
+      "downloadTemplateButton"
+    ).addEventListener(
+      "click",
+      function() {
+
+        const sample = [
+          CSV_HEADERS,
+
+          [
+            "Maternal & Child Health",
+            "Antenatal Care",
+            "Which vitamin is routinely recommended during pregnancy to help prevent neural tube defects?",
+            "Vitamin A",
+            "Folic acid",
+            "Vitamin C",
+            "Vitamin K",
+            "B",
+            "Folic acid helps prevent neural tube defects when taken before conception and during early pregnancy.",
+            "easy",
+            "PulsePrep Sample",
+            "",
+            "2026",
+            "pending"
+          ]
+        ];
+
+        downloadCSV(
+          "pulseprep-exam-vault-template.csv",
+          sample
+        );
+
+      }
+    );
+
+
+    // =========================================================
+    // FILE SELECTION
+    // =========================================================
+
+    csvFile.addEventListener(
+      "change",
+      function() {
+
+        const file =
+          csvFile.files[0];
+
+        parsedRows = [];
+
+        validRows = [];
+
+        invalidRows = [];
+
+        validationSection.classList.add(
+          "hidden"
+        );
+
+        previewSection.classList.add(
+          "hidden"
+        );
+
+        importSection.classList.add(
+          "hidden"
+        );
+
+        resultSection.classList.add(
+          "hidden"
+        );
+
+
+        if (!file) {
+
+          fileInformation.textContent =
+            "No file selected.";
+
+          return;
+
+        }
+
+
+        fileInformation.textContent =
+          `${file.name} — ${formatBytes(file.size)}`;
+
+      }
+    );
+
+
+    function formatBytes(bytes) {
+
+      if (bytes === 0) {
+        return "0 Bytes";
+      }
+
+      const units = [
+        "Bytes",
+        "KB",
+        "MB",
+        "GB"
+      ];
+
+      const index =
+        Math.floor(
+          Math.log(bytes) /
+          Math.log(1024)
+        );
+
+      return (
+        parseFloat(
+          (bytes /
+            Math.pow(1024, index))
+            .toFixed(2)
+        ) +
+        " " +
+        units[index]
+      );
+
+    }
+
+
+    // =========================================================
+    // CSV PARSER
+    // =========================================================
+
+    function parseCSV(text) {
+
+      const rows = [];
+
+      let row = [];
+
+      let value = "";
+
+      let insideQuotes = false;
+
+
+      for (
+        let i = 0;
+        i < text.length;
+        i++
+      ) {
+
+        const char =
+          text[i];
+
+        const next =
+          text[i + 1];
+
+
+        if (
+          char === '"' &&
+          insideQuotes &&
+          next === '"'
+        ) {
+
+          value += '"';
+
+          i++;
+
+          continue;
+
+        }
+
+
+        if (char === '"') {
+
+          insideQuotes =
+            !insideQuotes;
+
+          continue;
+
+        }
+
+
+        if (
+          char === "," &&
+          !insideQuotes
+        ) {
+
+          row.push(value);
+
+          value = "";
+
+          continue;
+
+        }
+
+
+        if (
+          (char === "\n" ||
+           char === "\r") &&
+          !insideQuotes
+        ) {
+
+          if (
+            char === "\r" &&
+            next === "\n"
+          ) {
+            i++;
+          }
+
+          row.push(value);
+
+          value = "";
+
+
+          if (
+            row.some(
+              cell =>
+                cell.trim() !== ""
+            )
+          ) {
+
+            rows.push(row);
+
+          }
+
+
+          row = [];
+
+          continue;
+
+        }
+
+
+        value += char;
+
+      }
+
+
+      if (
+        value !== "" ||
+        row.length > 0
+      ) {
+
+        row.push(value);
+
+        if (
+          row.some(
+            cell =>
+              cell.trim() !== ""
+          )
+        ) {
+
+          rows.push(row);
+
+        }
+
+      }
+
+
+      return rows;
+
+    }
+
+
+    // =========================================================
+    // NORMALIZE HEADER
+    // =========================================================
+
+    function normalizeHeader(value) {
+
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "_");
+
+    }
+
+
+    // =========================================================
+    // VALIDATION
+    // =========================================================
+
+    document.getElementById(
+      "validateButton"
+    ).addEventListener(
+      "click",
+      async function() {
+
+        await validateCSV();
+
+      }
+    );
+
+
+    async function validateCSV() {
+
+      const file =
+        csvFile.files[0];
+
+
+      if (!file) {
+
+        alert(
+          "Please select a CSV file first."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        !file.name
+          .toLowerCase()
+          .endsWith(".csv")
+      ) {
+
+        alert(
+          "Please upload a CSV file."
+        );
+
+        return;
+
+      }
+
+
+      try {
+
+        const text =
+          await file.text();
+
+        const rows =
+          parseCSV(text);
+
+
+        if (rows.length < 2) {
+
+          alert(
+            "The CSV does not contain any question rows."
+          );
+
+          return;
+
+        }
+
+
+        const headers =
+          rows[0].map(
+            normalizeHeader
+          );
+
+
+        const missingHeaders =
+          CSV_HEADERS.filter(
+            header =>
+              !headers.includes(header)
+          );
+
+
+        if (missingHeaders.length > 0) {
+
+          showValidationError(
+            "Missing required columns: " +
+            missingHeaders.join(", ")
+          );
+
+          return;
+
+        }
+
+
+        parsedRows = [];
+
+
+        for (
+          let i = 1;
+          i < rows.length;
+          i++
+        ) {
+
+          const rawRow =
+            rows[i];
+
+          const item = {};
+
+
+          headers.forEach(
+            (header, index) => {
+
+              item[header] =
+                String(
+                  rawRow[index] || ""
+                ).trim();
+
+            }
+          );
+
+
+          item._rowNumber =
+            i + 1;
+
+
+          parsedRows.push(item);
+
+        }
+
+
+        validRows = [];
+
+        invalidRows = [];
+
+
+        parsedRows.forEach(
+          function(item) {
+
+            const errors =
+              validateQuestionRow(item);
+
+            if (errors.length > 0) {
+
+              invalidRows.push({
+                row: item._rowNumber,
+                errors
+              });
+
+            } else {
+
+              validRows.push(
+                prepareQuestionRow(item)
+              );
+
+            }
+
+          }
+        );
+
+
+        renderValidationResults();
+
+        renderPreview();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Unable to read the CSV file."
+        );
+
+      }
+
+    }
+
+
+    function validateQuestionRow(row) {
+
+      const errors = [];
+
+
+      if (!row.subject) {
+
+        errors.push(
+          "Subject is empty."
+        );
+
+      } else if (
+        !SUBJECTS.includes(row.subject)
+      ) {
+
+        errors.push(
+          `Unknown subject: "${row.subject}".`
+        );
+
+      }
+
+
+      if (!row.question) {
+
+        errors.push(
+          "Question is empty."
+        );
+
+      }
+
+
+      if (!row.option_a) {
+
+        errors.push(
+          "Option A is empty."
+        );
+
+      }
+
+
+      if (!row.option_b) {
+
+        errors.push(
+          "Option B is empty."
+        );
+
+      }
+
+
+      if (!row.option_c) {
+
+        errors.push(
+          "Option C is empty."
+        );
+
+      }
+
+
+      if (!row.option_d) {
+
+        errors.push(
+          "Option D is empty."
+        );
+
+      }
+
+
+      const answer =
+        row.correct_answer
+          .toUpperCase();
+
+
+      if (
+        !["A", "B", "C", "D"]
+          .includes(answer)
+      ) {
+
+        errors.push(
+          "Correct answer must be A, B, C or D."
+        );
+
+      }
+
+
+      const difficulty =
+        row.difficulty
+          ? row.difficulty.toLowerCase()
+          : "medium";
+
+
+      if (
+        !["easy", "medium", "hard"]
+          .includes(difficulty)
+      ) {
+
+        errors.push(
+          "Difficulty must be easy, medium or hard."
+        );
+
+      }
+
+
+      if (
+        row.status &&
+        !["pending", "approved", "rejected"]
+          .includes(
+            row.status.toLowerCase()
+          )
+      ) {
+
+        errors.push(
+          "Status must be pending, approved or rejected."
+        );
+
+      }
+
+
+      return errors;
+
+    }
+
+
+    function prepareQuestionRow(row) {
+
+      return {
+
+        subject:
+          row.subject,
+
+        topic:
+          row.topic || null,
+
+        question:
+          row.question,
+
+        option_a:
+          row.option_a,
+
+        option_b:
+          row.option_b,
+
+        option_c:
+          row.option_c,
+
+        option_d:
+          row.option_d,
+
+        correct_answer:
+          row.correct_answer.toUpperCase(),
+
+        explanation:
+          row.explanation || null,
+
+        difficulty:
+          (
+            row.difficulty ||
+            "medium"
+          ).toLowerCase(),
+
+        source:
+          row.source || null,
+
+        school:
+          row.school || null,
+
+        academic_year:
+          row.academic_year || null,
+
+        // IMPORTANT:
+        // Bulk imports always start pending.
+        status:
+          "pending"
+
+      };
+
+    }
+
+
+    // =========================================================
+    // VALIDATION DISPLAY
+    // =========================================================
+
+    function renderValidationResults() {
+
+      validationSection.classList.remove(
+        "hidden"
+      );
+
+
+      document.getElementById(
+        "totalRows"
+      ).textContent =
+        parsedRows.length;
+
+
+      document.getElementById(
+        "validRows"
+      ).textContent =
+        validRows.length;
+
+
+      document.getElementById(
+        "invalidRows"
+      ).textContent =
+        invalidRows.length;
+
+
+      const validationMessage =
+        document.getElementById(
+          "validationMessage"
+        );
+
+
+      if (invalidRows.length === 0) {
+
+        validationMessage.textContent =
+          "All questions passed validation.";
+
+        validationMessage.className =
+          "text-sm mb-5 text-green-700 font-semibold";
+
+      } else {
+
+        validationMessage.textContent =
+          "Some rows contain errors. Fix them in your CSV and validate again.";
+
+        validationMessage.className =
+          "text-sm mb-5 text-red-700 font-semibold";
+
+      }
+
+
+      const errorsContainer =
+        document.getElementById(
+          "errorsContainer"
+        );
+
+      const errorsList =
+        document.getElementById(
+          "errorsList"
+        );
+
+
+      errorsList.innerHTML = "";
+
+
+      if (invalidRows.length === 0) {
+
+        errorsContainer.classList.add(
+          "hidden"
+        );
+
+        return;
+
+      }
+
+
+      errorsContainer.classList.remove(
+        "hidden"
+      );
+
+
+      invalidRows.forEach(
+        function(item) {
+
+          const div =
+            document.createElement("div");
+
+          div.className =
+            "bg-red-50 border border-red-200 " +
+            "rounded-lg p-3 text-sm text-red-800";
+
+
+          div.innerHTML =
+            `<strong>Row ${item.row}:</strong> ` +
+            escapeHTML(
+              item.errors.join(" ")
+            );
+
+
+          errorsList.appendChild(div);
+
+        }
+      );
+
+    }
+
+
+    // =========================================================
+    // PREVIEW
+    // =========================================================
+
+    function renderPreview() {
+
+      const tbody =
+        document.getElementById(
+          "previewTableBody"
+        );
+
+
+      tbody.innerHTML = "";
+
+
+      const previewRows =
+        validRows.slice(0, 25);
+
+
+      previewRows.forEach(
+        function(row, index) {
+
+          const tr =
+            document.createElement("tr");
+
+
+          tr.innerHTML = `
+
+            <td class="border p-3">
+              ${index + 1}
+            </td>
+
+            <td class="border p-3">
+              ${escapeHTML(row.subject)}
+            </td>
+
+            <td class="border p-3">
+              ${escapeHTML(row.topic || "—")}
+            </td>
+
+            <td class="border p-3 max-w-md">
+              ${escapeHTML(row.question)}
+            </td>
+
+            <td class="border p-3 font-bold">
+              ${escapeHTML(row.correct_answer)}
+            </td>
+
+            <td class="border p-3">
+              ${escapeHTML(row.difficulty)}
+            </td>
+
+            <td class="border p-3">
+              Pending
+            </td>
+
+          `;
+
+
+          tbody.appendChild(tr);
+
+        }
+      );
+
+
+      document.getElementById(
+        "previewCount"
+      ).textContent =
+        `${validRows.length} valid question(s)`;
+
+
+      previewSection.classList.remove(
+        "hidden"
+      );
+
+
+      if (
+        validRows.length > 0 &&
+        invalidRows.length === 0
+      ) {
+
+        importSection.classList.remove(
+          "hidden"
+        );
+
+      } else {
+
+        importSection.classList.add(
+          "hidden"
+        );
+
+      }
+
+    }
+
+
+    // =========================================================
+    // IMPORT
+    // =========================================================
+
+    document.getElementById(
+      "importButton"
+    ).addEventListener(
+      "click",
+      async function() {
+
+        await importQuestions();
+
+      }
+    );
+
+
+    async function importQuestions() {
+
+      if (validRows.length === 0) {
+
+        alert(
+          "There are no valid questions to import."
+        );
+
+        return;
+
+      }
+
+
+      const confirmed =
+        confirm(
+          `Import ${validRows.length} question(s) into the Exam Vault?`
+        );
+
+
+      if (!confirmed) {
+
+        return;
+
+      }
+
+
+      const button =
+        document.getElementById(
+          "importButton"
+        );
+
+
+      button.disabled = true;
+
+      button.innerHTML =
+        `<i class="fa-solid fa-spinner fa-spin mr-2"></i>
+         Importing...`;
+
+
+      try {
+
+        const batchSize = 50;
+
+        let inserted = 0;
+
+
+        for (
+          let i = 0;
+          i < validRows.length;
+          i += batchSize
+        ) {
+
+          const batch =
+            validRows.slice(
+              i,
+              i + batchSize
+            );
+
+
+          const {
+            error
+          } = await supabaseClient
+            .from("exam_vault_questions")
+            .insert(batch);
+
+
+          if (error) {
+
+            throw error;
+
+          }
+
+
+          inserted += batch.length;
+
+        }
+
+
+        showResult(
+          true,
+          "Import Successful",
+          `${inserted} question(s) were imported successfully as Pending.`
+        );
+
+
+        validRows = [];
+
+        invalidRows = [];
+
+        parsedRows = [];
+
+
+        importSection.classList.add(
+          "hidden"
+        );
+
+
+        document.getElementById(
+          "csvFile"
+        ).value = "";
+
+
+        fileInformation.textContent =
+          "Import completed. You can upload another CSV.";
+
+      } catch (error) {
+
+        console.error(
+          "Import error:",
+          error
+        );
+
+
+        showResult(
+          false,
+          "Import Failed",
+          error.message ||
+          "The questions could not be imported."
+        );
+
+      } finally {
+
+        button.disabled = false;
+
+        button.innerHTML =
+          `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>
+           Import Valid Questions`;
+
+      }
+
+    }
+
+
+    // =========================================================
+    // RESULT
+    // =========================================================
+
+    function showResult(
+      success,
+      title,
+      message
+    ) {
+
+      resultSection.classList.remove(
+        "hidden"
+      );
+
+
+      if (success) {
+
+        resultSection.className =
+          "bg-green-50 border border-green-200 " +
+          "rounded-2xl p-6 mb-8";
+
+
+        document.getElementById(
+          "resultIcon"
+        ).innerHTML =
+          `<i class="fa-solid fa-circle-check text-green-600"></i>`;
+
+
+        document.getElementById(
+          "resultTitle"
+        ).className =
+          "text-xl font-bold text-green-800";
+
+
+      } else {
+
+        resultSection.className =
+          "bg-red-50 border border-red-200 " +
+          "rounded-2xl p-6 mb-8";
+
+
+        document.getElementById(
+          "resultIcon"
+        ).innerHTML =
+          `<i class="fa-solid fa-circle-xmark text-red-600"></i>`;
+
+
+        document.getElementById(
+          "resultTitle"
+        ).className =
+          "text-xl font-bold text-red-800";
+
+      }
+
+
+      document.getElementById(
+        "resultTitle"
+      ).textContent =
+        title;
+
+
+      document.getElementById(
+        "resultMessage"
+      ).textContent =
+        message;
+
+    }
+
+
+    // =========================================================
+    // CLEAR
+    // =========================================================
+
+    document.getElementById(
+      "clearButton"
+    ).addEventListener(
+      "click",
+      function() {
+
+        parsedRows = [];
+
+        validRows = [];
+
+        invalidRows = [];
+
+
+        csvFile.value = "";
+
+
+        fileInformation.textContent =
+          "No file selected.";
+
+
+        validationSection.classList.add(
+          "hidden"
+        );
+
+        previewSection.classList.add(
+          "hidden"
+        );
+
+        importSection.classList.add(
+          "hidden"
+        );
+
+        resultSection.classList.add(
+          "hidden"
+        );
+
+
+        document.getElementById(
+          "previewTableBody"
+        ).innerHTML = "";
+
+
+        document.getElementById(
+          "errorsList"
+        ).innerHTML = "";
+
+      }
+    );
+
+
+    // =========================================================
+    // ESCAPE HTML
+    // =========================================================
+
+    function escapeHTML(value) {
+
+      return String(value ?? "")
+        .replace(
+          /&/g,
+          "&amp;"
+        )
+        .replace(
+          /</g,
+          "&lt;"
+        )
+        .replace(
+          />/g,
+          "&gt;"
+        )
+        .replace(
+          /"/g,
+          "&quot;"
+        )
+        .replace(
+          /'/g,
+          "&#039;"
+        );
+
+    }
+
+
+    // =========================================================
+    // START
+    // =========================================================
+
+    checkExistingSession();
+
+  </script>
+
+</body>
+</html>
