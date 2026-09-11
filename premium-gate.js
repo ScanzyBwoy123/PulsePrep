@@ -743,156 +743,196 @@
   // ==========================================================
   // OPEN PAST PAPER
   // ==========================================================
+window.openPulsePrepPastPaper =
+  async function (paperId) {
 
-  window.openPulsePrepPastPaper =
-    async function (paperId) {
+    try {
 
-      try {
+      if (!paperId) {
+        alert("Past paper ID is missing.");
+        return;
+      }
 
-        if (!paperId) {
-          alert(
-            "Past paper ID is missing."
-          );
-          return;
-        }
+      let attempts = 0;
 
-        let attempts = 0;
+      while (
+        !window.pulseprepSupabase &&
+        attempts < 50
+      ) {
 
-        while (
-          !window.pulseprepSupabase &&
-          attempts < 50
-        ) {
-
-          await new Promise(resolve =>
-            setTimeout(resolve, 100)
-          );
-
-          attempts++;
-        }
-
-        if (!window.pulseprepSupabase) {
-
-          alert(
-            "PulsePrep is still loading. Please try again."
-          );
-
-          return;
-        }
-
-        const {
-          data: sessionData,
-          error: sessionError
-        } =
-          await window.pulseprepSupabase.auth.getSession();
-
-        if (
-          sessionError ||
-          !sessionData?.session
-        ) {
-
-          alert(
-            "Please log in to open this past paper."
-          );
-
-          return;
-        }
-
-        const token =
-          sessionData.session.access_token;
-
-        const response =
-          await fetch(
-            `/.netlify/functions/get-past-question-file?id=${encodeURIComponent(
-              paperId
-            )}`,
-            {
-              method: "GET",
-
-              headers: {
-                "Authorization":
-                  `Bearer ${token}`
-              }
-            }
-          );
-
-        const result =
-          await response.json();
-
-        if (!response.ok) {
-
-          if (response.status === 403) {
-
-            alert(
-              "Premium access is required to open this past paper."
-            );
-
-            if (
-              typeof window.showTab ===
-              "function"
-            ) {
-              window.showTab("payment");
-            }
-
-            return;
-          }
-
-          if (response.status === 401) {
-
-            alert(
-              "Your login session has expired. Please log in again."
-            );
-
-            if (
-              typeof window.showTab ===
-              "function"
-            ) {
-              window.showTab("account");
-            }
-
-            return;
-          }
-
-          alert(
-            result.error ||
-            "Unable to open this past paper."
-          );
-
-          return;
-        }
-
-        if (
-          !result ||
-          !result.success ||
-          !result.url
-        ) {
-
-          alert(
-            "The past paper file could not be opened."
-          );
-
-          return;
-        }
-
-        window.open(
-          result.url,
-          "_blank",
-          "noopener,noreferrer"
+        await new Promise(resolve =>
+          setTimeout(resolve, 100)
         );
 
-      } catch (error) {
+        attempts++;
+      }
+
+      if (!window.pulseprepSupabase) {
+
+        alert(
+          "PulsePrep is still loading. Please try again."
+        );
+
+        return;
+      }
+
+      const {
+        data: sessionData,
+        error: sessionError
+      } =
+        await window.pulseprepSupabase.auth.getSession();
+
+      if (
+        sessionError ||
+        !sessionData?.session
+      ) {
+
+        alert(
+          "Please log in to open this past paper."
+        );
+
+        return;
+      }
+
+      const token =
+        sessionData.session.access_token;
+
+      const response =
+        await fetch(
+          `/.netlify/functions/get-past-question-file?id=${encodeURIComponent(
+            paperId
+          )}`,
+          {
+            method: "GET",
+
+            headers: {
+              "Authorization":
+                `Bearer ${token}`
+            }
+          }
+        );
+
+      let result = {};
+
+      try {
+        result = await response.json();
+      } catch (jsonError) {
 
         console.error(
-          "PulsePrep open past paper error:",
-          error
+          "Invalid past-paper response:",
+          jsonError
         );
 
         alert(
-          "Unable to open the past paper right now."
+          "The past paper service returned an invalid response."
         );
+
+        return;
       }
-    };
 
+      if (!response.ok) {
 
+        if (response.status === 403) {
+
+          alert(
+            "Premium access is required to open this past paper."
+          );
+
+          if (
+            typeof window.showTab ===
+            "function"
+          ) {
+            window.showTab("payment");
+          }
+
+          return;
+        }
+
+        if (response.status === 401) {
+
+          alert(
+            "Your login session has expired. Please log in again."
+          );
+
+          if (
+            typeof window.showTab ===
+            "function"
+          ) {
+            window.showTab("account");
+          }
+
+          return;
+        }
+
+        alert(
+          result.error ||
+          "Unable to open this past paper."
+        );
+
+        return;
+      }
+
+      if (
+        !result ||
+        result.success !== true ||
+        !result.url
+      ) {
+
+        console.error(
+          "Past paper URL missing:",
+          result
+        );
+
+        alert(
+          "The past paper file could not be opened."
+        );
+
+        return;
+      }
+
+      /*
+       * IMPORTANT:
+       * Use an actual anchor element instead of
+       * window.open() after an asynchronous request.
+       *
+       * This works more reliably on iPhone/Safari.
+       */
+
+      const link =
+        document.createElement("a");
+
+      link.href = result.url;
+
+      link.target = "_blank";
+
+      link.rel =
+        "noopener noreferrer";
+
+      link.style.display = "none";
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      setTimeout(() => {
+
+        link.remove();
+
+      }, 1000);
+
+    } catch (error) {
+
+      console.error(
+        "PulsePrep open past paper error:",
+        error
+      );
+
+      alert(
+        "Unable to open the past paper right now. Please try again."
+      );
+    }
+  };
+  
   // ==========================================================
   // WATCH FOR QUESTION BANK
   // ==========================================================
