@@ -2652,34 +2652,55 @@
         try {
 
           const {
-            error
-          } =
-            await supabaseClient
-              .from("exam_vault_questions")
-              .delete()
-              .eq(
-                "id",
-                id
-              );
+  data: updatedRows,
+  error
+} = await supabaseClient
+  .from("exam_vault_questions")
+  .update({
+    status: newStatus
+  })
+  .eq("id", id)
+  .select("id, status");
 
+if (error) {
+  console.error("Supabase status update error:", {
+    message: error.message,
+    details: error.details,
+    hint: error.hint,
+    code: error.code
+  });
 
-          if (error) {
+  throw error;
+}
 
-            throw error;
+/*
+  IMPORTANT:
+  If Supabase returns zero rows, the update did not
+  actually affect the question.
+*/
+if (!updatedRows || updatedRows.length === 0) {
 
-          }
+  console.error(
+    "Status update affected 0 rows.",
+    {
+      id,
+      newStatus,
+      currentUser: currentUser?.email
+    }
+  );
 
+  throw new Error(
+    "The question was not updated. Supabase matched 0 rows. " +
+    "Your admin session or RLS policy is preventing this update."
+  );
+}
 
-          if (
-            editingQuestionId === id
-          ) {
+console.log(
+  "Exam Vault status updated successfully:",
+  updatedRows
+);
 
-            resetQuestionForm();
-
-          }
-
-
-          await loadQuestions();
+await loadQuestions();
 
         } catch (error) {
 
