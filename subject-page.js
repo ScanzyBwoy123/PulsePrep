@@ -12205,35 +12205,866 @@
     // 7. PATHOPHYSIOLOGY
     // ========================================================
 
-    "pathophysiology": {
-      lessons: [
-        {
-          title: "Introduction to Pathophysiology",
-          description: "Understand how disease changes normal body function.",
-          notes: `
-            <p>Pathophysiology examines functional changes associated with disease
-            or injury.</p>
+ "pathophysiology": {
+  title: "Pathophysiology",
+  description:
+    "A comprehensive nursing-focused study of how disease, injury and abnormal processes alter normal body structure and function, with emphasis on clinical manifestations, disease mechanisms, assessment and nursing care.",
 
-            <p>Understanding these changes helps nurses connect signs and symptoms
-            with underlying disease processes.</p>
-          `,
-          keyPoints: [
-            "Pathophysiology studies abnormal body function.",
-            "Disease can disturb normal homeostasis.",
-            "Signs and symptoms reflect underlying changes."
-          ],
-          question: "What does pathophysiology focus on?",
+  lessons: [
+
+    // ========================================================
+    // MODULE 1
+    // ========================================================
+
+    {
+      title: "Module 1 — Introduction to Pathophysiology",
+
+      explanation: `
+        <p><strong>Pathophysiology</strong> is the study of the functional changes
+        that occur in the body as a result of disease, injury or other abnormal
+        conditions.</p>
+
+        <p>It connects normal anatomy and physiology with disease processes.
+        While anatomy explains the structure of the body and physiology explains
+        normal function, pathophysiology explains what happens when normal
+        function becomes disturbed.</p>
+
+        <p>For nurses, understanding pathophysiology is extremely important because
+        signs and symptoms are usually the result of specific changes occurring
+        inside the body.</p>
+
+        <p>For example, when a patient develops pneumonia, the infection causes
+        inflammation in the lungs. Fluid and inflammatory material may accumulate
+        in the alveoli, making gas exchange more difficult. The patient may
+        therefore develop cough, fever, difficulty breathing and reduced oxygen
+        saturation.</p>
+
+        <p>Pathophysiology helps the nurse understand the connection between the
+        disease process and these clinical manifestations.</p>
+
+        <p>Disease can affect cells, tissues, organs or entire body systems.
+        These changes may interfere with <strong>homeostasis</strong>, which is
+        the body's ability to maintain a relatively stable internal environment.</p>
+      `,
+
+      clinicalApplication: `
+        <p>A nurse caring for a patient with heart failure should understand that
+        reduced cardiac pumping ability can decrease tissue perfusion and cause
+        fluid accumulation.</p>
+
+        <p>This understanding helps the nurse recognize findings such as
+        shortness of breath, peripheral edema, fatigue, rapid weight gain and
+        reduced exercise tolerance.</p>
+
+        <p>Instead of simply memorizing symptoms, the nurse can understand
+        <strong>why</strong> those symptoms occur.</p>
+      `,
+
+      keyPoints: [
+        "Pathophysiology studies abnormal changes in body function.",
+        "Disease can disturb normal homeostasis.",
+        "Pathophysiology connects disease processes with clinical manifestations.",
+        "Changes may occur at cellular, tissue, organ or system levels.",
+        "Understanding disease mechanisms helps nurses provide appropriate care."
+      ],
+
+      examAlert:
+        "Remember: physiology explains normal function, while pathophysiology explains abnormal function caused by disease or injury.",
+
+      questions: [
+
+        {
+          question: "What does pathophysiology primarily study?",
+
           options: [
-            "Abnormal body function",
-            "Hospital construction",
-            "Food prices",
-            "Clothing"
+            "Abnormal changes in body function",
+            "Hospital architecture",
+            "Drug manufacturing",
+            "Food preparation"
           ],
+
           answer: 0,
-          explanation: "Pathophysiology focuses on functional changes associated with disease."
+
+          explanation:
+            "Pathophysiology focuses on functional changes that occur as a result of disease, injury or abnormal conditions."
+        },
+
+        {
+          question: "Which concept refers to the body's ability to maintain a relatively stable internal environment?",
+
+          options: [
+            "Metabolism",
+            "Homeostasis",
+            "Digestion",
+            "Filtration"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Homeostasis is the body's ability to maintain relatively stable internal conditions despite changes inside or outside the body."
+        },
+
+        {
+          question: "Why is pathophysiology important in nursing?",
+
+          options: [
+            "It eliminates the need for patient assessment.",
+            "It helps nurses understand why signs and symptoms occur.",
+            "It is only useful to laboratory scientists.",
+            "It replaces clinical experience."
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Understanding disease mechanisms allows nurses to connect clinical manifestations with underlying pathological changes."
+        },
+
+        {
+          question: "Which example best represents a pathological change?",
+
+          options: [
+            "Normal breathing at rest",
+            "Normal digestion after a meal",
+            "Inflammation caused by infection",
+            "Normal heart contraction"
+          ],
+
+          answer: 2,
+
+          explanation:
+            "Inflammation caused by infection is an abnormal response associated with disease and therefore represents a pathological change."
+        },
+
+        {
+          question: "A patient with pneumonia develops difficulty breathing mainly because the disease affects which function?",
+
+          options: [
+            "Gas exchange",
+            "Bone formation",
+            "Urine production",
+            "Blood clotting"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Pneumonia can cause inflammation and fluid accumulation in the lungs, interfering with normal gas exchange."
         }
+
       ]
     },
+
+    // ========================================================
+    // MODULE 2
+    // ========================================================
+
+    {
+      title: "Module 2 — Cellular Injury and Adaptation",
+
+      explanation: `
+        <p>Cells are the basic structural and functional units of the human body.
+        When cells are exposed to harmful conditions, they may adapt, become
+        injured or die.</p>
+
+        <p>Cellular injury may occur because of inadequate oxygen, infection,
+        physical trauma, chemicals, nutritional problems, extreme temperatures
+        or other harmful influences.</p>
+
+        <p>Cells can sometimes adapt to stress. Common forms of cellular
+        adaptation include <strong>hypertrophy, hyperplasia, atrophy and
+        metaplasia</strong>.</p>
+
+        <p><strong>Hypertrophy</strong> refers to an increase in cell size.
+        <strong>Hyperplasia</strong> refers to an increase in cell number.
+        <strong>Atrophy</strong> refers to a reduction in cell size or tissue
+        mass.</p>
+
+        <p>If harmful conditions are severe or prolonged, cellular injury may
+        become irreversible and the cell may die.</p>
+
+        <p>Two important forms of cell death are <strong>necrosis</strong> and
+        <strong>apoptosis</strong>. Necrosis generally results from significant
+        injury, while apoptosis is a regulated form of programmed cell death.</p>
+      `,
+
+      clinicalApplication: `
+        <p>Immobility can contribute to muscle atrophy because muscles are not
+        being used normally.</p>
+
+        <p>A nurse can help reduce complications associated with prolonged
+        immobility through appropriate positioning, mobility exercises and
+        prescribed physiotherapy.</p>
+      `,
+
+      keyPoints: [
+        "Cells are the basic functional units of the body.",
+        "Cellular injury can result from many harmful factors.",
+        "Hypertrophy = increase in cell size.",
+        "Hyperplasia = increase in cell number.",
+        "Atrophy = reduction in cell size or tissue mass.",
+        "Necrosis is associated with significant cellular injury.",
+        "Apoptosis is programmed cell death."
+      ],
+
+      examAlert:
+        "Do not confuse hypertrophy with hyperplasia: hypertrophy increases cell size, while hyperplasia increases cell number.",
+
+      questions: [
+
+        {
+          question: "What is hypertrophy?",
+
+          options: [
+            "Increase in cell size",
+            "Increase in cell number",
+            "Decrease in blood pressure",
+            "Cell death"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Hypertrophy is an increase in the size of individual cells."
+        },
+
+        {
+          question: "What is hyperplasia?",
+
+          options: [
+            "Decrease in cell size",
+            "Increase in cell number",
+            "Programmed cell death",
+            "Loss of oxygen"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Hyperplasia occurs when the number of cells in a tissue increases."
+        },
+
+        {
+          question: "Which condition is commonly associated with prolonged disuse of muscles?",
+
+          options: [
+            "Hypertrophy",
+            "Atrophy",
+            "Hyperplasia",
+            "Metaplasia"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Prolonged lack of muscle use can cause muscle atrophy."
+        },
+
+        {
+          question: "Which type of cell death is considered programmed cell death?",
+
+          options: [
+            "Necrosis",
+            "Apoptosis",
+            "Inflammation",
+            "Edema"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Apoptosis is a regulated process of programmed cell death."
+        }
+
+      ]
+    },
+
+    // ========================================================
+    // MODULE 3
+    // ========================================================
+
+    {
+      title: "Module 3 — Inflammation",
+
+      explanation: `
+        <p><strong>Inflammation</strong> is a protective response of living
+        tissues to injury, infection or other harmful stimuli.</p>
+
+        <p>The purpose of inflammation is to eliminate the harmful cause,
+        remove damaged tissue and begin the process of repair.</p>
+
+        <p>Classic signs of acute inflammation include
+        <strong>redness, heat, swelling, pain and loss of function</strong>.</p>
+
+        <p>During inflammation, blood vessels change and immune cells move toward
+        the affected area. Chemical mediators help coordinate this response.</p>
+
+        <p>Acute inflammation generally develops rapidly and is usually relatively
+        short-lived. Chronic inflammation may continue for a longer period and
+        can contribute to tissue damage.</p>
+      `,
+
+      clinicalApplication: `
+        <p>A patient with an infected wound may develop redness, warmth, swelling,
+        pain and discharge around the affected area.</p>
+
+        <p>The nurse should assess the wound carefully, monitor the patient's
+        temperature and other vital signs, maintain appropriate wound care and
+        report findings suggesting worsening infection.</p>
+      `,
+
+      keyPoints: [
+        "Inflammation is a protective response to injury or harmful stimuli.",
+        "Classic signs include redness, heat, swelling, pain and loss of function.",
+        "Acute inflammation develops relatively quickly.",
+        "Chronic inflammation can persist for a prolonged period.",
+        "Inflammation contributes to tissue repair."
+      ],
+
+      examAlert:
+        "The five classic signs of inflammation are redness, heat, swelling, pain and loss of function.",
+
+      questions: [
+
+        {
+          question: "Which of the following is a classic sign of inflammation?",
+
+          options: [
+            "Cyanosis only",
+            "Redness",
+            "Hair growth",
+            "Weight gain only"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Redness is one of the classic signs of inflammation."
+        },
+
+        {
+          question: "What is one major purpose of inflammation?",
+
+          options: [
+            "To prevent all immune responses",
+            "To eliminate harmful stimuli and begin tissue repair",
+            "To stop blood circulation permanently",
+            "To destroy all healthy cells"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Inflammation helps remove harmful stimuli and damaged tissue while initiating repair."
+        },
+
+        {
+          question: "Which finding may indicate inflammation at a wound site?",
+
+          options: [
+            "Redness and warmth",
+            "Normal skin colour only",
+            "No pain or swelling",
+            "Improved circulation everywhere"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Redness and warmth are common local signs of inflammation."
+        }
+
+      ]
+    },
+
+    // ========================================================
+    // MODULE 4
+    // ========================================================
+
+    {
+      title: "Module 4 — Infection and the Body's Response",
+
+      explanation: `
+        <p>An <strong>infection</strong> occurs when microorganisms enter the body,
+        survive or multiply, and produce a response or damage in the host.</p>
+
+        <p>Common infectious agents include bacteria, viruses, fungi and
+        parasites.</p>
+
+        <p>The body's defense mechanisms include physical barriers such as the
+        skin and mucous membranes, as well as innate and adaptive immune
+        responses.</p>
+
+        <p>When the immune system recognizes harmful organisms, inflammatory and
+        immune responses may occur.</p>
+
+        <p>Systemic infection can cause generalized manifestations such as fever,
+        weakness, increased heart rate and changes in the patient's overall
+        condition.</p>
+      `,
+
+      clinicalApplication: `
+        <p>Nurses play an important role in preventing healthcare-associated
+        infections through hand hygiene, appropriate use of personal protective
+        equipment, safe injection practices, environmental cleaning and proper
+        handling of clinical waste.</p>
+      `,
+
+      keyPoints: [
+        "Infections may be caused by bacteria, viruses, fungi or parasites.",
+        "The skin and mucous membranes provide important physical barriers.",
+        "The immune system responds to harmful microorganisms.",
+        "Systemic infection may produce generalized symptoms.",
+        "Infection prevention is an important nursing responsibility."
+      ],
+
+      examAlert:
+        "Always distinguish between infection and inflammation. Infection involves microorganisms or other infectious agents; inflammation is a protective tissue response that may occur because of infection or other injury.",
+
+      questions: [
+
+        {
+          question: "Which organism can cause an infection?",
+
+          options: [
+            "Bacteria",
+            "Viruses",
+            "Fungi",
+            "All of the above"
+          ],
+
+          answer: 3,
+
+          explanation:
+            "Bacteria, viruses and fungi can all cause infections."
+        },
+
+        {
+          question: "Which is an important first-line physical defense against infection?",
+
+          options: [
+            "Skin",
+            "Bones",
+            "Hair colour",
+            "Blood pressure"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Intact skin provides an important physical barrier against microorganisms."
+        },
+
+        {
+          question: "Which nursing action is especially important for preventing healthcare-associated infections?",
+
+          options: [
+            "Ignoring hand hygiene",
+            "Appropriate hand hygiene",
+            "Sharing needles",
+            "Reusing contaminated equipment"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Proper hand hygiene is one of the most important measures for preventing transmission of infection."
+        }
+
+      ]
+    },
+
+    // ========================================================
+    // MODULE 5
+    // ========================================================
+
+    {
+      title: "Module 5 — Fluid, Electrolyte and Acid-Base Imbalance",
+
+      explanation: `
+        <p>The human body requires an appropriate balance of water, electrolytes
+        and acids and bases for normal cellular function.</p>
+
+        <p>Important electrolytes include sodium, potassium, calcium, magnesium,
+        chloride and bicarbonate.</p>
+
+        <p>Fluid imbalance can occur when the body loses too much fluid, receives
+        excessive fluid or cannot regulate fluid appropriately.</p>
+
+        <p><strong>Dehydration</strong> occurs when fluid loss exceeds fluid
+        intake. Possible findings include thirst, dry mucous membranes, reduced
+        urine output, weakness and changes in vital signs.</p>
+
+        <p>Electrolyte abnormalities can affect muscles, nerves, the heart and
+        other organs.</p>
+
+        <p>The kidneys and lungs play major roles in maintaining acid-base
+        balance. Severe disturbances can interfere with normal cellular function.</p>
+      `,
+
+      clinicalApplication: `
+        <p>A patient experiencing severe diarrhea and vomiting may lose large
+        amounts of water and electrolytes.</p>
+
+        <p>The nurse should monitor intake and output, vital signs, mental status,
+        urine output and laboratory results as ordered, while reporting signs of
+        deterioration promptly.</p>
+      `,
+
+      keyPoints: [
+        "Water and electrolytes are essential for normal cellular function.",
+        "Sodium and potassium are important electrolytes.",
+        "Dehydration occurs when fluid loss exceeds intake.",
+        "The kidneys help regulate fluid and electrolyte balance.",
+        "The lungs and kidneys contribute to acid-base regulation."
+      ],
+
+      examAlert:
+        "Patients with vomiting or diarrhea are at risk of fluid and electrolyte imbalance.",
+
+      questions: [
+
+        {
+          question: "Which organ plays a major role in regulating fluid and electrolyte balance?",
+
+          options: [
+            "Kidneys",
+            "Skin only",
+            "Eyes",
+            "Ears"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "The kidneys regulate water and electrolyte excretion and are essential for maintaining fluid balance."
+        },
+
+        {
+          question: "Which patient is at increased risk of dehydration?",
+
+          options: [
+            "A patient with prolonged vomiting and diarrhea",
+            "A healthy person drinking adequate fluids",
+            "A patient with normal fluid intake",
+            "A patient with stable hydration"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Vomiting and diarrhea can cause significant fluid loss and increase the risk of dehydration."
+        },
+
+        {
+          question: "Which electrolyte is especially important for normal cardiac and neuromuscular function?",
+
+          options: [
+            "Potassium",
+            "Oxygen",
+            "Glucose",
+            "Urea"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Potassium is essential for normal nerve, muscle and cardiac function."
+        }
+
+      ]
+    },
+
+    // ========================================================
+    // MODULE 6
+    // ========================================================
+
+    {
+      title: "Module 6 — Hemodynamic Disorders",
+
+      explanation: `
+        <p>Hemodynamics refers to the movement of blood through the
+        cardiovascular system.</p>
+
+        <p>Normal tissue function depends on adequate blood flow and oxygen
+        delivery. Problems with circulation can reduce tissue perfusion and
+        cause organ dysfunction.</p>
+
+        <p><strong>Edema</strong> is an abnormal accumulation of fluid in the
+        tissues. It may occur because of increased hydrostatic pressure,
+        reduced plasma oncotic pressure, lymphatic obstruction or increased
+        vascular permeability.</p>
+
+        <p><strong>Thrombosis</strong> refers to formation of a blood clot within
+        a blood vessel. A clot can interfere with normal blood flow.</p>
+
+        <p><strong>Shock</strong> is a serious condition in which tissue
+        perfusion becomes inadequate to meet the body's needs.</p>
+      `,
+
+      clinicalApplication: `
+        <p>A patient experiencing shock may develop hypotension, rapid pulse,
+        altered mental status, cool skin and reduced urine output depending on
+        the cause and stage.</p>
+
+        <p>Rapid recognition and prompt intervention are essential because
+        prolonged inadequate tissue perfusion can lead to organ failure.</p>
+      `,
+
+      keyPoints: [
+        "Adequate blood flow is necessary for tissue oxygenation.",
+        "Edema is abnormal accumulation of fluid in tissues.",
+        "Thrombosis is formation of a clot within a blood vessel.",
+        "Shock involves inadequate tissue perfusion.",
+        "Severe circulatory problems can lead to organ dysfunction."
+      ],
+
+      examAlert:
+        "Shock is a medical emergency because inadequate tissue perfusion can rapidly progress to organ dysfunction and death.",
+
+      questions: [
+
+        {
+          question: "What is edema?",
+
+          options: [
+            "Accumulation of fluid in tissues",
+            "Complete absence of blood",
+            "Increase in bone density",
+            "Loss of muscle movement"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Edema refers to abnormal accumulation of fluid in the interstitial tissues."
+        },
+
+        {
+          question: "What is thrombosis?",
+
+          options: [
+            "Formation of a blood clot within a vessel",
+            "Normal digestion",
+            "Lung expansion",
+            "Bone growth"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Thrombosis is the formation of a blood clot within a blood vessel."
+        },
+
+        {
+          question: "Why is shock dangerous?",
+
+          options: [
+            "It always improves blood flow.",
+            "It can cause inadequate tissue perfusion and organ dysfunction.",
+            "It increases oxygen delivery to every tissue.",
+            "It only affects the skin."
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Shock causes inadequate tissue perfusion, which can lead to cellular injury and organ dysfunction."
+        }
+
+      ]
+    },
+
+    // ========================================================
+    // MODULE 7
+    // ========================================================
+
+    {
+      title: "Module 7 — Pain and Fever",
+
+      explanation: `
+        <p><strong>Pain</strong> is an unpleasant sensory and emotional experience
+        associated with actual or potential tissue damage.</p>
+
+        <p>Pain may be acute or chronic. Acute pain usually develops suddenly
+        and is often associated with injury, surgery or illness. Chronic pain
+        persists or recurs over a prolonged period.</p>
+
+        <p><strong>Fever</strong> occurs when the body's temperature-regulating
+        system is reset to a higher level, commonly in response to infection or
+        inflammation.</p>
+
+        <p>Fever may increase metabolic demands and can be accompanied by chills,
+        sweating, weakness and increased heart rate.</p>
+
+        <p>Nurses should assess pain using appropriate pain assessment tools and
+        monitor temperature and other clinical findings in patients with fever.</p>
+      `,
+
+      clinicalApplication: `
+        <p>A patient recovering from surgery may experience acute pain.
+        Appropriate assessment helps the nurse determine the severity,
+        location, quality and duration of the pain and evaluate the response
+        to prescribed interventions.</p>
+      `,
+
+      keyPoints: [
+        "Pain is both a sensory and emotional experience.",
+        "Acute pain usually has a relatively recent onset.",
+        "Chronic pain persists or recurs over a prolonged period.",
+        "Fever commonly occurs in response to infection or inflammation.",
+        "Pain should be assessed systematically."
+      ],
+
+      examAlert:
+        "Pain is subjective. Always assess the patient's report of pain rather than assuming its severity from appearance alone.",
+
+      questions: [
+
+        {
+          question: "Which statement about pain is most accurate?",
+
+          options: [
+            "Pain is always visible.",
+            "Pain is subjective.",
+            "Pain can only occur after surgery.",
+            "Pain is never influenced by emotions."
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Pain is a subjective experience and should be assessed from the patient's report together with other clinical findings."
+        },
+
+        {
+          question: "Fever commonly occurs as a response to:",
+
+          options: [
+            "Infection or inflammation",
+            "Normal hydration",
+            "Healthy sleep",
+            "Normal digestion only"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Fever commonly occurs when the body responds to infection or inflammatory processes."
+        }
+
+      ]
+    },
+
+    // ========================================================
+    // MODULE 8
+    // ========================================================
+
+    {
+      title: "Module 8 — Applying Pathophysiology to Nursing Practice",
+
+      explanation: `
+        <p>Pathophysiology becomes most useful when nurses apply disease
+        mechanisms to patient assessment and care.</p>
+
+        <p>A nurse should think about the relationship between the patient's
+        diagnosis, underlying disease process, signs and symptoms, laboratory
+        findings, treatment and response to treatment.</p>
+
+        <p>For example, a patient with diabetes mellitus may have persistently
+        elevated blood glucose because of inadequate insulin production,
+        impaired insulin action or a combination of both.</p>
+
+        <p>Persistent hyperglycemia can contribute to damage of blood vessels,
+        nerves, kidneys, eyes and other tissues.</p>
+
+        <p>Understanding these mechanisms helps nurses recognize the importance
+        of blood glucose monitoring, medication adherence, nutrition, foot care,
+        patient education and prevention of complications.</p>
+
+        <p>Good nursing care therefore requires more than memorizing disease
+        names. The nurse should understand the process occurring inside the
+        patient's body and use that knowledge during assessment, planning,
+        implementation and evaluation.</p>
+      `,
+
+      clinicalApplication: `
+        <p>When caring for a patient with diabetes, the nurse should monitor
+        blood glucose as prescribed, assess for symptoms of hypo- or
+        hyperglycemia, reinforce appropriate medication and nutrition guidance,
+        and assess for complications such as foot problems when indicated.</p>
+
+        <p>The nurse should also recognize that patient education is an important
+        part of preventing long-term complications.</p>
+      `,
+
+      keyPoints: [
+        "Pathophysiology helps connect disease mechanisms with patient findings.",
+        "Nurses use pathophysiology during assessment and clinical decision-making.",
+        "Diabetes can cause long-term complications when poorly controlled.",
+        "Understanding disease mechanisms improves patient education.",
+        "The goal is to connect cause, mechanism, manifestation and nursing care."
+      ],
+
+      examAlert:
+        "When studying any disease, ask four questions: What caused it? What is happening inside the body? What signs and symptoms result? What should the nurse monitor and do?",
+
+      questions: [
+
+        {
+          question: "Why should nurses study pathophysiology?",
+
+          options: [
+            "To memorize disease names only",
+            "To understand the relationship between disease processes and patient findings",
+            "To replace patient assessment",
+            "To avoid learning pharmacology"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Pathophysiology helps nurses understand how disease processes produce clinical manifestations and complications."
+        },
+
+        {
+          question: "Which approach best demonstrates application of pathophysiology?",
+
+          options: [
+            "Memorizing symptoms without understanding them",
+            "Connecting a disease mechanism with the patient's signs and symptoms",
+            "Ignoring laboratory findings",
+            "Treating every patient the same"
+          ],
+
+          answer: 1,
+
+          explanation:
+            "Applying pathophysiology means connecting the underlying disease mechanism with clinical findings and nursing care."
+        },
+
+        {
+          question: "Persistent hyperglycemia can contribute to:",
+
+          options: [
+            "Long-term tissue and organ complications",
+            "Permanent improvement in circulation",
+            "Guaranteed absence of disease",
+            "Normal blood glucose without treatment"
+          ],
+
+          answer: 0,
+
+          explanation:
+            "Persistent hyperglycemia can damage blood vessels and nerves and contribute to complications involving organs such as the kidneys and eyes."
+        }
+
+      ]
+    }
+
+  ]
+},
 
     // ========================================================
     // 8. COMMUNITY HEALTH NURSING
