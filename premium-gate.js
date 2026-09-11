@@ -746,9 +746,19 @@
 window.openPulsePrepPastPaper =
   async function (paperId) {
 
+    // Open immediately from the user's tap.
+    // This prevents iPhone/Safari popup blocking.
+    const paperWindow =
+      window.open("about:blank", "_blank");
+
     try {
 
       if (!paperId) {
+
+        if (paperWindow) {
+          paperWindow.close();
+        }
+
         alert("Past paper ID is missing.");
         return;
       }
@@ -769,6 +779,10 @@ window.openPulsePrepPastPaper =
 
       if (!window.pulseprepSupabase) {
 
+        if (paperWindow) {
+          paperWindow.close();
+        }
+
         alert(
           "PulsePrep is still loading. Please try again."
         );
@@ -786,6 +800,10 @@ window.openPulsePrepPastPaper =
         sessionError ||
         !sessionData?.session
       ) {
+
+        if (paperWindow) {
+          paperWindow.close();
+        }
 
         alert(
           "Please log in to open this past paper."
@@ -823,6 +841,10 @@ window.openPulsePrepPastPaper =
           jsonError
         );
 
+        if (paperWindow) {
+          paperWindow.close();
+        }
+
         alert(
           "The past paper service returned an invalid response."
         );
@@ -831,6 +853,10 @@ window.openPulsePrepPastPaper =
       }
 
       if (!response.ok) {
+
+        if (paperWindow) {
+          paperWindow.close();
+        }
 
         if (response.status === 403) {
 
@@ -879,9 +905,13 @@ window.openPulsePrepPastPaper =
       ) {
 
         console.error(
-          "Past paper URL missing:",
+          "Past paper signed URL missing:",
           result
         );
+
+        if (paperWindow) {
+          paperWindow.close();
+        }
 
         alert(
           "The past paper file could not be opened."
@@ -891,34 +921,21 @@ window.openPulsePrepPastPaper =
       }
 
       /*
-       * IMPORTANT:
-       * Use an actual anchor element instead of
-       * window.open() after an asynchronous request.
-       *
-       * This works more reliably on iPhone/Safari.
+       * The blank window was opened directly from
+       * the user's tap. Now load the signed URL into it.
        */
+      if (paperWindow) {
 
-      const link =
-        document.createElement("a");
+        paperWindow.location.href =
+          result.url;
 
-      link.href = result.url;
+      } else {
 
-      link.target = "_blank";
-
-      link.rel =
-        "noopener noreferrer";
-
-      link.style.display = "none";
-
-      document.body.appendChild(link);
-
-      link.click();
-
-      setTimeout(() => {
-
-        link.remove();
-
-      }, 1000);
+        // Fallback if the browser did not allow
+        // the blank window.
+        window.location.href =
+          result.url;
+      }
 
     } catch (error) {
 
@@ -927,12 +944,15 @@ window.openPulsePrepPastPaper =
         error
       );
 
+      if (paperWindow) {
+        paperWindow.close();
+      }
+
       alert(
         "Unable to open the past paper right now. Please try again."
       );
     }
   };
-  
   // ==========================================================
   // WATCH FOR QUESTION BANK
   // ==========================================================
