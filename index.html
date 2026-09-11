@@ -4115,66 +4115,49 @@ if (typeof pulsePrepOriginalShowTab === "function") {
 </script>
 <script>
 async function loadQuestionBank() {
-
   const container =
     document.getElementById("questionBankContent");
-
   if (!container) return;
-
   container.innerHTML = `
     <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
       <div class="text-3xl mb-3">⏳</div>
-
       <h3 class="text-lg font-bold">
         Loading PulsePrep Exam Vault...
       </h3>
-
       <p class="text-sm text-gray-500 mt-2">
-        Please wait while we load your premium examination questions.
+        Please wait while we load your premium examination questions and past papers.
       </p>
     </div>
   `;
-
   try {
-
     const supabase =
       window.pulseprepSupabase;
-
     if (!supabase) {
       throw new Error(
         "PulsePrep Supabase client is not available."
       );
     }
-
     const {
       data: sessionData,
       error: sessionError
     } =
       await supabase.auth.getSession();
-
     if (sessionError) {
       throw sessionError;
     }
-
     const session =
       sessionData?.session;
-
     if (!session) {
-
       container.innerHTML = `
         <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-
           <div class="text-4xl mb-3">🔐</div>
-
           <h3 class="text-xl font-extrabold">
             Premium Access Required
           </h3>
-
           <p class="text-gray-500 mt-2">
             Log in and subscribe to PulsePrep Exam Vault
-            to access premium examination questions.
+            to access premium examination questions and past papers.
           </p>
-
           <button
             type="button"
             onclick="
@@ -4190,63 +4173,49 @@ async function loadQuestionBank() {
           >
             Login
           </button>
-
         </div>
       `;
-
       return;
     }
-
-    /*
-     * IMPORTANT:
-     * The Question Bank now uses the NEW secure
-     * Exam Vault endpoint.
-     */
-    const response =
+    const authHeaders = {
+      "Authorization":
+        `Bearer ${session.access_token}`,
+      "Content-Type":
+        "application/json"
+    };
+    // ==========================================================
+    // 1. LOAD APPROVED OBJ / MCQ QUESTIONS
+    // ==========================================================
+    const examVaultResponse =
       await fetch(
         "/.netlify/functions/get-exam-vault-questions",
         {
           method: "GET",
-
-          headers: {
-            "Authorization":
-              `Bearer ${session.access_token}`,
-            "Content-Type":
-              "application/json"
-          }
+          headers: authHeaders
         }
       );
-
-    let result = {};
-
+    let examVaultResult = {};
     try {
-      result =
-        await response.json();
-    } catch (jsonError) {
+      examVaultResult =
+        await examVaultResponse.json();
+    } catch (error) {
       console.error(
         "Unable to read Exam Vault response:",
-        jsonError
+        error
       );
     }
-
-    if (!response.ok) {
-
-      if (response.status === 401) {
-
+    if (!examVaultResponse.ok) {
+      if (examVaultResponse.status === 401) {
         container.innerHTML = `
           <div class="bg-white rounded-2xl border border-yellow-200 p-8 text-center">
-
             <div class="text-4xl mb-3">🔐</div>
-
             <h3 class="text-xl font-extrabold">
               Login Required
             </h3>
-
             <p class="text-gray-500 mt-2">
               Your login session has expired.
               Please log in again to continue.
             </p>
-
             <button
               type="button"
               onclick="showTab('account')"
@@ -4254,29 +4223,21 @@ async function loadQuestionBank() {
             >
               Login Again
             </button>
-
           </div>
         `;
-
         return;
       }
-
-      if (response.status === 403) {
-
+      if (examVaultResponse.status === 403) {
         container.innerHTML = `
           <div class="bg-white rounded-2xl border border-blue-200 p-8 text-center">
-
             <div class="text-4xl mb-3">🔒</div>
-
             <h3 class="text-xl font-extrabold">
               PulsePrep Exam Vault
             </h3>
-
             <p class="text-gray-500 mt-2">
               Unlock premium examination questions,
-              answers and explanations by subscribing.
+              answers, explanations and past papers by subscribing.
             </p>
-
             <button
               type="button"
               onclick="showTab('payment')"
@@ -4284,69 +4245,82 @@ async function loadQuestionBank() {
             >
               Unlock Premium
             </button>
-
           </div>
         `;
-
         return;
       }
-
       throw new Error(
-        result.error ||
+        examVaultResult.error ||
         "Unable to load the Exam Vault."
       );
     }
-
-    const questions =
-      Array.isArray(result.questions)
-        ? result.questions
+    const mcqQuestions =
+      Array.isArray(examVaultResult.questions)
+        ? examVaultResult.questions
         : [];
-
-    window.questionBankItems =
-      questions;
-
-    if (questions.length === 0) {
-
-      container.innerHTML = `
-        <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-
-          <div class="text-4xl mb-3">📝</div>
-
-          <h3 class="text-xl font-extrabold">
-            Exam Vault Is Growing
-          </h3>
-
-          <p class="text-gray-500 mt-2">
-            There are no approved examination questions
-            available yet. New approved questions will
-            appear here automatically.
-          </p>
-
-        </div>
-      `;
-
-      return;
+    // ==========================================================
+    // 2. LOAD APPROVED PAST EXAMINATION PAPERS
+    // ==========================================================
+    let pastPapers = [];
+    try {
+      const pastPaperResponse =
+        await fetch(
+          "/.netlify/functions/get-past-questions",
+          {
+            method: "GET",
+            headers: authHeaders
+          }
+        );
+      let pastPaperResult = {};
+      try {
+        pastPaperResult =
+          await pastPaperResponse.json();
+      } catch (error) {
+        console.error(
+          "Unable to read past-paper response:",
+          error
+        );
+      }
+      if (pastPaperResponse.ok) {
+        pastPapers =
+          Array.isArray(pastPaperResult.questions)
+            ? pastPaperResult.questions
+            : [];
+      } else {
+        console.warn(
+          "Past papers could not be loaded:",
+          pastPaperResult
+        );
+      }
+    } catch (pastPaperError) {
+      console.error(
+        "Past paper loading error:",
+        pastPaperError
+      );
+      // Do not prevent OBJ questions from loading.
+      pastPapers = [];
     }
-
-    /*
-     * Build the subject filter from the actual
-     * Exam Vault questions.
-     */
+    // ==========================================================
+    // SAVE BOTH TYPES IN MEMORY
+    // ==========================================================
+    window.questionBankItems =
+      mcqQuestions;
+    window.pulsePrepPastPapers =
+      pastPapers;
+    // ==========================================================
+    // SUBJECT FILTER
+    // ==========================================================
     const subjectSelect =
       document.getElementById(
         "questionBankSubject"
       );
-
     if (subjectSelect) {
-
       const subjects = [
-        ...new Set(
-          questions
-            .map(q => q.subject)
-            .filter(Boolean)
-        )
+        ...new Set([
+          ...mcqQuestions.map(q => q.subject),
+          ...pastPapers.map(q => q.subject)
+        ].filter(Boolean))
       ].sort();
-
       subjectSelect.innerHTML =
         `<option value="">All Subjects</option>` +
         subjects
@@ -4357,29 +4331,24 @@ async function loadQuestionBank() {
           `)
           .join("");
     }
-
-    /*
-     * Build the level/difficulty filter
-     * using the Exam Vault difficulty field.
-     */
+    // ==========================================================
+    // LEVEL / DIFFICULTY FILTER
+    // ==========================================================
     const levelSelect =
       document.getElementById(
         "questionBankLevel"
       );
-
     if (levelSelect) {
-
-      const difficulties = [
+      const levels = [
         ...new Set(
-          questions
+          mcqQuestions
             .map(q => q.difficulty)
             .filter(Boolean)
         )
       ].sort();
-
       levelSelect.innerHTML =
         `<option value="">All Levels</option>` +
-        difficulties
+        levels
           .map(level => `
             <option value="${escapeHtml(level)}">
               ${escapeHtml(level)}
@@ -4387,53 +4356,44 @@ async function loadQuestionBank() {
           `)
           .join("");
     }
-
-    /*
-     * The new Exam Vault stores question types
-     * differently from the old past-question system.
-     * Keep the existing filter usable by presenting
-     * MCQ as the available examination type.
-     */
+    // ==========================================================
+    // EXAM TYPE FILTER
+    // ==========================================================
     const examTypeSelect =
       document.getElementById(
         "questionBankExamType"
       );
-
     if (examTypeSelect) {
-
       examTypeSelect.innerHTML = `
         <option value="">All Exam Types</option>
         <option value="MCQ">MCQ / Objective</option>
+        <option value="PAST_PAPER">Past Examination Papers</option>
       `;
     }
-
+    // ==========================================================
+    // RENDER EVERYTHING
+    // ==========================================================
     renderQuestionBank(
-      questions
+      mcqQuestions,
+      pastPapers
     );
-
   } catch (error) {
-
     console.error(
       "PulsePrep Exam Vault error:",
       error
     );
-
     container.innerHTML = `
       <div class="bg-white rounded-2xl border border-red-200 p-8 text-center">
-
         <div class="text-4xl mb-3">⚠️</div>
-
         <h3 class="text-xl font-extrabold text-red-600">
           Unable to Load Question Bank
         </h3>
-
         <p class="text-gray-500 mt-2">
           ${escapeHtml(
             error.message ||
             "Something went wrong while loading the Exam Vault."
           )}
         </p>
-
         <button
           type="button"
           onclick="loadQuestionBank()"
@@ -4441,303 +4401,618 @@ async function loadQuestionBank() {
         >
           Try Again
         </button>
-
       </div>
     `;
   }
 }
-
-
-function renderQuestionBank(items) {
-
+function renderQuestionBank(
+  items = [],
+  pastPapers = []
+) {
   const container =
     document.getElementById(
       "questionBankContent"
     );
-
   if (!container) return;
-
+  // ==========================================================
+  // FILTER VALUES
+  // ==========================================================
   const search =
     document.getElementById(
       "questionBankSearch"
     )?.value
       ?.toLowerCase()
       .trim() || "";
-
   const subject =
     document.getElementById(
       "questionBankSubject"
     )?.value || "";
-
   const level =
     document.getElementById(
       "questionBankLevel"
     )?.value || "";
-
   const examType =
     document.getElementById(
       "questionBankExamType"
     )?.value || "";
-
-  const filtered =
+  // ==========================================================
+  // FILTER MCQs
+  // ==========================================================
+  const filteredMCQs =
     items.filter(question => {
-
-      const text =
-        `
-          ${question.school || ""}
-          ${question.subject || ""}
-          ${question.topic || ""}
-          ${question.question || ""}
-          ${question.difficulty || ""}
-          ${question.source || ""}
-          ${question.academic_year || ""}
-        `
-          .toLowerCase();
-
+      const text = `
+        ${question.school || ""}
+        ${question.subject || ""}
+        ${question.topic || ""}
+        ${question.question || ""}
+        ${question.difficulty || ""}
+        ${question.source || ""}
+        ${question.academic_year || ""}
+      `.toLowerCase();
       const questionExamType =
         "MCQ";
-
       return (
         (!search ||
           text.includes(search)) &&
-
         (!subject ||
           question.subject === subject) &&
-
         (!level ||
           question.difficulty === level) &&
-
         (!examType ||
-          questionExamType === examType)
+          examType === "MCQ")
       );
     });
-
-  if (filtered.length === 0) {
-
+  // ==========================================================
+  // FILTER PAST PAPERS
+  // ==========================================================
+  const filteredPastPapers =
+    pastPapers.filter(paper => {
+      const text = `
+        ${paper.school || ""}
+        ${paper.programme || ""}
+        ${paper.level || ""}
+        ${paper.subject || ""}
+        ${paper.question_type || ""}
+        ${paper.academic_year || ""}
+        ${paper.semester || ""}
+        ${paper.exam_type || ""}
+        ${paper.file_name || ""}
+        ${paper.additional_information || ""}
+      `.toLowerCase();
+      return (
+        (!search ||
+          text.includes(search)) &&
+        (!subject ||
+          paper.subject === subject) &&
+        (!level ||
+          paper.level === level ||
+          paper.difficulty === level) &&
+        (!examType ||
+          examType === "PAST_PAPER")
+      );
+    });
+  // ==========================================================
+  // NOTHING FOUND
+  // ==========================================================
+  if (
+    filteredMCQs.length === 0 &&
+    filteredPastPapers.length === 0
+  ) {
     container.innerHTML = `
-      <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-
+      <div class="bg-white rounded-2xl
+                  border border-gray-200
+                  p-8 text-center">
         <div class="text-4xl mb-3">🔎</div>
-
         <h3 class="text-xl font-extrabold">
-          No Matching Questions
+          No Matching Questions or Past Papers
         </h3>
-
         <p class="text-gray-500 mt-2">
           Try changing your search or filters.
         </p>
-
       </div>
     `;
-
     return;
   }
-
-  container.innerHTML = `
-    <div class="mb-5 bg-blue-50 border border-blue-100 rounded-2xl p-4">
-
+  // ==========================================================
+  // BUILD QUESTION BANK
+  // ==========================================================
+  let html = `
+    <div class="mb-6
+                bg-blue-50
+                border border-blue-100
+                rounded-2xl
+                p-5">
       <div class="flex items-center gap-3">
-
-        <div class="text-2xl">
+        <div class="text-3xl">
           🔐
         </div>
-
         <div>
-          <h3 class="font-extrabold text-blue-900">
+          <h3 class="font-extrabold
+                     text-blue-900
+                     text-lg">
             PulsePrep Exam Vault
           </h3>
-
-          <p class="text-sm text-blue-700 mt-1">
-            ${filtered.length}
-            approved examination
-            ${filtered.length === 1 ? "question" : "questions"}
+          <p class="text-sm
+                    text-blue-700
+                    mt-1">
+            ${filteredMCQs.length}
+            objective question${filteredMCQs.length === 1 ? "" : "s"}
+            and
+            ${filteredPastPapers.length}
+            past examination paper${filteredPastPapers.length === 1 ? "" : "s"}
             available.
           </p>
         </div>
-
       </div>
-
-    </div>
-
-    <div class="grid grid-cols-1 gap-5">
-
-      ${filtered.map((question, index) => `
-
-        <div
-          class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
-        >
-
-          <div class="flex items-start justify-between gap-3">
-
-            <div class="flex-1">
-
-              <div class="flex flex-wrap gap-2 mb-2">
-
-                <span
-                  class="text-xs font-extrabold uppercase
-                         text-blue-600 bg-blue-50
-                         px-2 py-1 rounded-lg"
-                >
-                  ${escapeHtml(
-                    question.subject ||
-                    "Nursing"
-                  )}
-                </span>
-
-                <span
-                  class="text-xs font-bold
-                         bg-green-50 text-green-700
-                         px-2 py-1 rounded-lg"
-                >
-                  APPROVED
-                </span>
-
-                <span
-                  class="text-xs font-bold
-                         bg-purple-50 text-purple-700
-                         px-2 py-1 rounded-lg"
-                >
-                  MCQ
-                </span>
-
-              </div>
-
-              <h3
-                class="text-lg font-extrabold text-slate-800"
-              >
-                Question ${index + 1}
-              </h3>
-
-            </div>
-
-          </div>
-
-          <div class="mt-5">
-
-            <p
-              class="text-base md:text-lg
-                     font-semibold text-slate-800
-                     leading-7"
-            >
-              ${escapeHtml(
-                question.question ||
-                "Question text unavailable."
-              )}
-            </p>
-
-          </div>
-
-          <div class="mt-5 space-y-3">
-
-            ${renderExamVaultOption(
-              "A",
-              question.option_a
-            )}
-
-            ${renderExamVaultOption(
-              "B",
-              question.option_b
-            )}
-
-            ${renderExamVaultOption(
-              "C",
-              question.option_c
-            )}
-
-            ${renderExamVaultOption(
-              "D",
-              question.option_d
-            )}
-
-          </div>
-
-          <div
-            class="mt-5 pt-4
-                   border-t border-gray-100
-                   grid grid-cols-1 md:grid-cols-3
-                   gap-2 text-xs text-gray-500"
-          >
-
-            <span>
-              <strong>Topic:</strong>
-              ${escapeHtml(
-                question.topic ||
-                "General"
-              )}
-            </span>
-
-            <span>
-              <strong>Difficulty:</strong>
-              ${escapeHtml(
-                question.difficulty ||
-                "Not specified"
-              )}
-            </span>
-
-            <span>
-              <strong>School:</strong>
-              ${escapeHtml(
-                question.school ||
-                "Not specified"
-              )}
-            </span>
-
-          </div>
-
-          <button
-            type="button"
-            onclick="toggleExamVaultAnswer('${escapeHtml(question.id)}')"
-            class="mt-5 w-full
-                   bg-blue-600 hover:bg-blue-700
-                   text-white py-3 rounded-xl
-                   font-bold transition"
-          >
-            Show Answer & Explanation
-          </button>
-
-          <div
-            id="examVaultAnswer-${escapeHtml(question.id)}"
-            class="hidden mt-4"
-          >
-
-            <div
-              class="bg-green-50
-                     border border-green-200
-                     rounded-xl p-4"
-            >
-
-              <p class="font-extrabold text-green-800">
-                Correct Answer:
-                ${escapeHtml(
-                  String(
-                    question.correct_answer ||
-                    ""
-                  ).toUpperCase()
-                )}
-              </p>
-
-              <p
-                class="mt-3 text-sm
-                       leading-6 text-green-900"
-              >
-                <strong>Explanation:</strong>
-                ${escapeHtml(
-                  question.explanation ||
-                  "No explanation has been added yet."
-                )}
-              </p>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      `).join("")}
-
     </div>
   `;
+  // ==========================================================
+  // OBJECTIVE QUESTIONS
+  // ==========================================================
+  if (
+    filteredMCQs.length > 0 &&
+    examType !== "PAST_PAPER"
+  ) {
+    html += `
+      <div class="mb-8">
+        <div class="flex items-center
+                    gap-3 mb-4">
+          <div class="w-11 h-11
+                      rounded-xl
+                      bg-blue-50
+                      text-blue-600
+                      flex items-center
+                      justify-center">
+            <i class="fa-solid
+                      fa-circle-question"></i>
+          </div>
+          <div>
+            <h3 class="text-xl
+                       font-extrabold
+                       text-slate-900">
+              Objective / MCQ Questions
+            </h3>
+            <p class="text-sm
+                      text-slate-500">
+              Practice verified nursing
+              objective questions.
+            </p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1
+                    gap-5">
+          ${filteredMCQs.map((question, index) => `
+            <div
+              class="bg-white
+                     rounded-2xl
+                     border border-gray-200
+                     p-5
+                     shadow-sm"
+            >
+              <div class="flex items-start
+                          justify-between gap-3">
+                <div class="flex-1">
+                  <div class="flex flex-wrap
+                              gap-2 mb-2">
+                    <span
+                      class="text-xs
+                             font-extrabold
+                             uppercase
+                             text-blue-600
+                             bg-blue-50
+                             px-2 py-1
+                             rounded-lg"
+                    >
+                      ${escapeHtml(
+                        question.subject ||
+                        "Nursing"
+                      )}
+                    </span>
+                    <span
+                      class="text-xs
+                             font-bold
+                             bg-green-50
+                             text-green-700
+                             px-2 py-1
+                             rounded-lg"
+                    >
+                      APPROVED
+                    </span>
+                    <span
+                      class="text-xs
+                             font-bold
+                             bg-purple-50
+                             text-purple-700
+                             px-2 py-1
+                             rounded-lg"
+                    >
+                      MCQ
+                    </span>
+                  </div>
+                  <h3
+                    class="text-lg
+                           font-extrabold
+                           text-slate-800"
+                  >
+                    Question ${index + 1}
+                  </h3>
+                </div>
+              </div>
+              <div class="mt-5">
+                <p
+                  class="text-base md:text-lg
+                         font-semibold
+                         text-slate-800
+                         leading-7"
+                >
+                  ${escapeHtml(
+                    question.question ||
+                    "Question text unavailable."
+                  )}
+                </p>
+              </div>
+              <div class="mt-5 space-y-3">
+                ${renderExamVaultOption(
+                  "A",
+                  question.option_a
+                )}
+                ${renderExamVaultOption(
+                  "B",
+                  question.option_b
+                )}
+                ${renderExamVaultOption(
+                  "C",
+                  question.option_c
+                )}
+                ${renderExamVaultOption(
+                  "D",
+                  question.option_d
+                )}
+              </div>
+              <div
+                class="mt-5 pt-4
+                       border-t border-gray-100
+                       grid grid-cols-1
+                       md:grid-cols-3
+                       gap-2
+                       text-xs
+                       text-gray-500"
+              >
+                <span>
+                  <strong>Topic:</strong>
+                  ${escapeHtml(
+                    question.topic ||
+                    "General"
+                  )}
+                </span>
+                <span>
+                  <strong>Difficulty:</strong>
+                  ${escapeHtml(
+                    question.difficulty ||
+                    "Not specified"
+                  )}
+                </span>
+                <span>
+                  <strong>School:</strong>
+                  ${escapeHtml(
+                    question.school ||
+                    "Not specified"
+                  )}
+                </span>
+              </div>
+              <button
+                type="button"
+                onclick="toggleExamVaultAnswer('${escapeHtml(
+                  question.id
+                )}')"
+                class="mt-5 w-full
+                       bg-blue-600
+                       hover:bg-blue-700
+                       text-white
+                       py-3
+                       rounded-xl
+                       font-bold
+                       transition"
+              >
+                Show Answer & Explanation
+              </button>
+              <div
+                id="examVaultAnswer-${escapeHtml(
+                  question.id
+                )}"
+                class="hidden mt-4"
+              >
+                <div
+                  class="bg-green-50
+                         border border-green-200
+                         rounded-xl
+                         p-4"
+                >
+                  <p
+                    class="font-extrabold
+                           text-green-800"
+                  >
+                    Correct Answer:
+                    ${escapeHtml(
+                      String(
+                        question.correct_answer ||
+                        ""
+                      ).toUpperCase()
+                    )}
+                  </p>
+                  <p
+                    class="mt-3
+                           text-sm
+                           leading-6
+                           text-green-900"
+                  >
+                    <strong>Explanation:</strong>
+                    ${escapeHtml(
+                      question.explanation ||
+                      "No explanation has been added yet."
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+  // ==========================================================
+  // PAST EXAMINATION PAPERS
+  // ==========================================================
+  if (
+    filteredPastPapers.length > 0 &&
+    examType !== "MCQ"
+  ) {
+    html += `
+      <div class="mt-10">
+        <div class="flex items-center
+                    gap-3 mb-4">
+          <div
+            class="w-11 h-11
+                   rounded-xl
+                   bg-red-50
+                   text-red-600
+                   flex items-center
+                   justify-center"
+          >
+            <i class="fa-solid
+                      fa-file-pdf"></i>
+          </div>
+          <div>
+            <h3
+              class="text-xl
+                     font-extrabold
+                     text-slate-900"
+            >
+              Past Examination Papers
+            </h3>
+            <p
+              class="text-sm
+                     text-slate-500"
+            >
+              Approved examination papers
+              submitted to PulsePrep.
+            </p>
+          </div>
+        </div>
+        <div
+          class="grid grid-cols-1
+                 md:grid-cols-2
+                 gap-5"
+        >
+          ${filteredPastPapers.map(paper => `
+            <div
+              class="bg-white
+                     rounded-2xl
+                     border border-gray-200
+                     p-5
+                     shadow-sm"
+            >
+              <div
+                class="flex items-start
+                       gap-3"
+              >
+                <div
+                  class="w-12 h-12
+                         rounded-xl
+                         bg-red-50
+                         text-red-600
+                         flex items-center
+                         justify-center
+                         flex-shrink-0"
+                >
+                  <i
+                    class="fa-solid
+                           fa-file-pdf
+                           text-xl"
+                  ></i>
+                </div>
+                <div class="min-w-0">
+                  <h4
+                    class="font-extrabold
+                           text-slate-800
+                           break-words"
+                  >
+                    ${escapeHtml(
+                      paper.file_name ||
+                      "Past Examination Paper"
+                    )}
+                  </h4>
+                  <p
+                    class="text-sm
+                           text-slate-500
+                           mt-1"
+                  >
+                    ${escapeHtml(
+                      paper.school ||
+                      "Nursing School"
+                    )}
+                  </p>
+                </div>
+              </div>
+              <div
+                class="flex flex-wrap
+                       gap-2
+                       mt-4"
+              >
+                ${
+                  paper.subject
+                    ? `
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-blue-50
+                               text-blue-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
+                          paper.subject
+                        )}
+                      </span>
+                    `
+                    : ""
+                }
+                ${
+                  paper.programme
+                    ? `
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-purple-50
+                               text-purple-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
+                          paper.programme
+                        )}
+                      </span>
+                    `
+                    : ""
+                }
+                ${
+                  paper.level
+                    ? `
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-indigo-50
+                               text-indigo-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
+                          paper.level
+                        )}
+                      </span>
+                    `
+                    : ""
+                }
+                ${
+                  paper.exam_type
+                    ? `
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-amber-50
+                               text-amber-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
+                          paper.exam_type
+                        )}
+                      </span>
+                    `
+                    : ""
+                }
+                ${
+                  paper.academic_year
+                    ? `
+                      <span
+                        class="px-2.5 py-1
+                               rounded-lg
+                               bg-slate-100
+                               text-slate-700
+                               text-xs
+                               font-semibold"
+                      >
+                        ${escapeHtml(
+                          paper.academic_year
+                        )}
+                      </span>
+                    `
+                    : ""
+                }
+              </div>
+              <button
+                type="button"
+                onclick="openPulsePrepPastPaper('${escapeHtml(
+                  paper.id
+                )}')"
+                class="w-full
+                       mt-5
+                       bg-teal-600
+                       hover:bg-teal-700
+                       text-white
+                       py-3
+                       rounded-xl
+                       font-bold
+                       transition"
+              >
+                <i
+                  class="fa-solid
+                         fa-folder-open
+                         mr-2"
+                ></i>
+                Open Past Paper
+              </button>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+  container.innerHTML =
+    html;
 }
+// ============================================================
+// QUESTION BANK FILTERS
+// ============================================================
+[
+  "questionBankSearch",
+  "questionBankSubject",
+  "questionBankLevel",
+  "questionBankExamType"
+].forEach(id => {
+  const element =
+    document.getElementById(id);
+  if (element) {
+    element.addEventListener(
+      "input",
+      () => {
+        renderQuestionBank(
+          window.questionBankItems || [],
+          window.pulsePrepPastPapers || []
+        );
+      }
+    );
+    element.addEventListener(
+      "change",
+      () => {
+        renderQuestionBank(
+          window.questionBankItems || [],
+          window.pulsePrepPastPapers || []
+        );
+      }
+    );
+  }
+});
 
 
 function renderExamVaultOption(
