@@ -107,7 +107,11 @@
   // PREMIUM PLANS
   // ==========================================================
 
-  window.PulsePrepOpenPremiumPlans = function () {
+  // ==========================================================
+// PREMIUM PLANS
+// ==========================================================
+
+window.PulsePrepOpenPremiumPlans = function () {
 
   if (typeof window.showTab === "function") {
     try {
@@ -118,7 +122,8 @@
     }
   }
 
-  const payment = document.getElementById("payment");
+  const payment =
+    document.getElementById("payment");
 
   if (payment) {
 
@@ -132,26 +137,33 @@
       top: 0,
       behavior: "smooth"
     });
+
+    return;
   }
+
+  const pricing =
+    document.getElementById("pricing");
+
+  if (pricing) {
+
+    document.querySelectorAll(".tab").forEach(function (tab) {
+      tab.style.display = "none";
+    });
+
+    pricing.style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+    return;
+  }
+
+  console.warn(
+    "PulsePrep: payment/pricing section was not found."
+  );
 };
-
-    const pricing =
-      document.getElementById("pricing");
-
-    if (pricing) {
-
-      document.querySelectorAll(".tab").forEach(function (tab) {
-        tab.style.display = "none";
-      });
-
-      pricing.style.display = "block";
-
-      window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-      });
-    }
-  };
 
 
   // ==========================================================
