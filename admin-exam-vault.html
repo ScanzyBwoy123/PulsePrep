@@ -2389,89 +2389,97 @@
        EDIT QUESTION
     ========================================================== */
 
-    window.editQuestion =
-      function(id) {
+    window.deleteQuestion =
+  async function(id) {
 
-        const question =
-          questions.find(
-            item => item.id === id
-          );
+    if (
+      !currentUser ||
+      !isAdminEmail(currentUser.email)
+    ) {
 
+      alert(
+        "Administrator authentication required."
+      );
 
-        if (!question) {
+      await logoutAdmin();
 
-          alert(
-            "Question could not be found."
-          );
-
-          return;
-        }
-
-
-        editingQuestionId =
-          id;
+      return;
+    }
 
 
-        $("editingQuestionId").value =
-          id;
-
-        $("subject").value =
-          question.subject || "";
-
-        $("topic").value =
-          question.topic || "";
-
-        $("question").value =
-          question.question || "";
-
-        $("optionA").value =
-          question.option_a || "";
-
-        $("optionB").value =
-          question.option_b || "";
-
-        $("optionC").value =
-          question.option_c || "";
-
-        $("optionD").value =
-          question.option_d || "";
-
-        $("correctAnswer").value =
-          question.correct_answer || "";
-
-        $("difficulty").value =
-          question.difficulty || "medium";
-
-        $("status").value =
-          question.status || "pending";
-
-        $("explanation").value =
-          question.explanation || "";
-
-        $("source").value =
-          question.source || "";
-
-        $("school").value =
-          question.school || "";
-
-        $("academicYear").value =
-          question.academic_year || "";
+    const question =
+      questions.find(
+        item => item.id === id
+      );
 
 
-        $("formTitle").textContent =
-          "Edit Exam Vault Question";
+    if (!question) {
 
-        $("cancelEditButton")
-          .classList.remove("hidden");
+      alert(
+        "Question could not be found."
+      );
+
+      return;
+    }
 
 
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
+    if (
+      !confirm(
+        "Delete this question permanently?"
+      )
+    ) {
 
-      };
+      return;
 
+    }
+
+
+    try {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from("exam_vault_questions")
+          .delete()
+          .eq("id", id);
+
+
+      if (error) {
+
+        console.error(
+          "Delete error:",
+          error
+        );
+
+        throw error;
+      }
+
+
+      await loadQuestions();
+
+
+      alert(
+        "Question deleted successfully."
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Delete error:",
+        error
+      );
+
+
+      alert(
+        error.message ||
+        "Unable to delete question."
+      );
+
+    }
+
+  };
 
     /* ==========================================================
        CANCEL EDIT
@@ -2525,89 +2533,201 @@
     ========================================================== */
 
     window.changeQuestionStatus =
-      async function(id, newStatus) {
+  async function(id, newStatus) {
 
-        if (!currentUser ||
-            !isAdminEmail(currentUser.email)) {
+    if (
+      !currentUser ||
+      !isAdminEmail(currentUser.email)
+    ) {
 
-          alert(
-            "Administrator authentication required."
-          );
+      alert(
+        "Administrator authentication required."
+      );
 
-          await logoutAdmin();
+      await logoutAdmin();
 
-          return;
+      return;
+    }
+
+
+    /* ----------------------------------------------------------
+       VERIFY THE REAL SUPABASE AUTHENTICATED USER
+    ---------------------------------------------------------- */
+
+    const {
+      data: userData,
+      error: userError
+    } = await supabaseClient.auth.getUser();
+
+    if (userError) {
+
+      console.error(
+        "Authenticated user check failed:",
+        userError
+      );
+
+      alert(
+        "Unable to verify your administrator session."
+      );
+
+      return;
+    }
+
+    const authenticatedUser =
+      userData?.user;
+
+    const authenticatedEmail =
+      normalizeEmail(
+        authenticatedUser?.email
+      );
+
+    console.log(
+      "PulsePrep Exam Vault authenticated user:",
+      authenticatedEmail
+    );
+
+    if (
+      !authenticatedUser ||
+      !isAdminEmail(authenticatedEmail)
+    ) {
+
+      alert(
+        "The current Supabase session is not authorized as an administrator."
+      );
+
+      await logoutAdmin();
+
+      return;
+    }
+
+
+    const question =
+      questions.find(
+        item => item.id === id
+      );
+
+
+    if (!question) {
+
+      alert(
+        "Question could not be found."
+      );
+
+      return;
+    }
+
+
+    const actionText =
+      newStatus === "approved"
+        ? "approve"
+        : "reject";
+
+
+    if (
+      !confirm(
+        `Are you sure you want to ${actionText} this question?`
+      )
+    ) {
+
+      return;
+
+    }
+
+
+    try {
+
+      console.log(
+        "Attempting Exam Vault status update:",
+        {
+          questionId: id,
+          newStatus,
+          authenticatedEmail
         }
+      );
 
 
-        const question =
-          questions.find(
-            item => item.id === id
-          );
+      const {
+        data: updatedRows,
+        error
+      } =
+        await supabaseClient
+          .from("exam_vault_questions")
+          .update({
+            status: newStatus
+          })
+          .eq("id", id)
+          .select("id, status");
 
 
-        if (!question) return;
+      if (error) {
 
-
-        const actionText =
-          newStatus === "approved"
-            ? "approve"
-            : "reject";
-
-
-        if (
-          !confirm(
-            `Are you sure you want to ${actionText} this question?`
-          )
-        ) {
-
-          return;
-
-        }
-
-
-        try {
-
-          const {
-            error
-          } =
-            await supabaseClient
-              .from("exam_vault_questions")
-              .update({
-                status: newStatus
-              })
-              .eq(
-                "id",
-                id
-              );
-
-
-          if (error) {
-
-            throw error;
-
+        console.error(
+          "Supabase status update error:",
+          {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
           }
+        );
+
+        throw error;
+      }
 
 
-          await loadQuestions();
+      if (
+        !updatedRows ||
+        updatedRows.length === 0
+      ) {
 
-        } catch (error) {
+        console.error(
+          "Exam Vault status update affected 0 rows:",
+          {
+            questionId: id,
+            newStatus,
+            authenticatedEmail
+          }
+        );
 
-          console.error(
-            "Status update error:",
-            error
-          );
+        throw new Error(
+          "Supabase matched 0 rows. " +
+          "The question was not updated."
+        );
+      }
 
 
-          alert(
-            error.message ||
-            "Unable to update question status."
-          );
+      console.log(
+        "Exam Vault status update successful:",
+        updatedRows
+      );
 
-        }
 
-      };
+      await loadQuestions();
 
+
+      alert(
+        newStatus === "approved"
+          ? "Question approved successfully."
+          : "Question rejected successfully."
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Status update error:",
+        error
+      );
+
+
+      alert(
+        error.message ||
+        "Unable to update question status."
+      );
+
+    }
+
+  };
 
     /* ==========================================================
        DELETE QUESTION
