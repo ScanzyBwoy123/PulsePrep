@@ -4126,34 +4126,38 @@ async function loadQuestionBank() {
       <div class="text-3xl mb-3">⏳</div>
 
       <h3 class="text-lg font-bold">
-        Loading Question Bank...
+        Loading PulsePrep Exam Vault...
       </h3>
 
       <p class="text-sm text-gray-500 mt-2">
-        Please wait while we load the available questions.
+        Please wait while we load your premium examination questions.
       </p>
     </div>
   `;
 
   try {
 
-    // Get the current logged-in user
-    const supabase = window.pulseprepSupabase;
+    const supabase =
+      window.pulseprepSupabase;
 
     if (!supabase) {
-      throw new Error("PulsePrep Supabase client is not available.");
+      throw new Error(
+        "PulsePrep Supabase client is not available."
+      );
     }
 
     const {
       data: sessionData,
       error: sessionError
-    } = await supabase.auth.getSession();
+    } =
+      await supabase.auth.getSession();
 
     if (sessionError) {
       throw sessionError;
     }
 
-    const session = sessionData?.session;
+    const session =
+      sessionData?.session;
 
     if (!session) {
 
@@ -4167,21 +4171,25 @@ async function loadQuestionBank() {
           </h3>
 
           <p class="text-gray-500 mt-2">
-            Please log in and subscribe to access the Premium Question Bank.
+            Log in and subscribe to PulsePrep Exam Vault
+            to access premium examination questions.
           </p>
 
           <button
-  type="button"
-  onclick="showTab('account'); setTimeout(() => {
-    document.getElementById('account')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  }, 50);"
-  class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
->
-  Login
-</button>
+            type="button"
+            onclick="
+              showTab('account');
+              setTimeout(() => {
+                document.getElementById('account')?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start'
+                });
+              }, 50);
+            "
+            class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
+          >
+            Login
+          </button>
 
         </div>
       `;
@@ -4189,37 +4197,88 @@ async function loadQuestionBank() {
       return;
     }
 
-    // Call the secure Netlify function
-    const response = await fetch(
-      "/.netlify/functions/get-past-questions",
-      {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${session.access_token}`
-        }
-      }
-    );
+    /*
+     * IMPORTANT:
+     * The Question Bank now uses the NEW secure
+     * Exam Vault endpoint.
+     */
+    const response =
+      await fetch(
+        "/.netlify/functions/get-exam-vault-questions",
+        {
+          method: "GET",
 
-    const result = await response.json();
+          headers: {
+            "Authorization":
+              `Bearer ${session.access_token}`,
+            "Content-Type":
+              "application/json"
+          }
+        }
+      );
+
+    let result = {};
+
+    try {
+      result =
+        await response.json();
+    } catch (jsonError) {
+      console.error(
+        "Unable to read Exam Vault response:",
+        jsonError
+      );
+    }
 
     if (!response.ok) {
+
+      if (response.status === 401) {
+
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl border border-yellow-200 p-8 text-center">
+
+            <div class="text-4xl mb-3">🔐</div>
+
+            <h3 class="text-xl font-extrabold">
+              Login Required
+            </h3>
+
+            <p class="text-gray-500 mt-2">
+              Your login session has expired.
+              Please log in again to continue.
+            </p>
+
+            <button
+              type="button"
+              onclick="showTab('account')"
+              class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
+            >
+              Login Again
+            </button>
+
+          </div>
+        `;
+
+        return;
+      }
 
       if (response.status === 403) {
 
         container.innerHTML = `
-          <div class="bg-white rounded-2xl border border-gray-200 p-8 text-center">
+          <div class="bg-white rounded-2xl border border-blue-200 p-8 text-center">
 
             <div class="text-4xl mb-3">🔒</div>
 
             <h3 class="text-xl font-extrabold">
-              Premium Question Bank
+              PulsePrep Exam Vault
             </h3>
 
             <p class="text-gray-500 mt-2">
-              Subscribe to access verified past examination questions.
+              Unlock premium examination questions,
+              answers and explanations by subscribing.
             </p>
 
             <button
+              type="button"
               onclick="showTab('payment')"
               class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
             >
@@ -4233,13 +4292,18 @@ async function loadQuestionBank() {
       }
 
       throw new Error(
-        result.error || "Unable to load questions."
+        result.error ||
+        "Unable to load the Exam Vault."
       );
     }
 
-    const questions = result.questions || [];
+    const questions =
+      Array.isArray(result.questions)
+        ? result.questions
+        : [];
 
-    window.questionBankItems = questions;
+    window.questionBankItems =
+      questions;
 
     if (questions.length === 0) {
 
@@ -4249,11 +4313,13 @@ async function loadQuestionBank() {
           <div class="text-4xl mb-3">📝</div>
 
           <h3 class="text-xl font-extrabold">
-            No Questions Available Yet
+            Exam Vault Is Growing
           </h3>
 
           <p class="text-gray-500 mt-2">
-            Approved questions will appear here once they are added.
+            There are no approved examination questions
+            available yet. New approved questions will
+            appear here automatically.
           </p>
 
         </div>
@@ -4262,9 +4328,14 @@ async function loadQuestionBank() {
       return;
     }
 
-    // Build subject filter
+    /*
+     * Build the subject filter from the actual
+     * Exam Vault questions.
+     */
     const subjectSelect =
-      document.getElementById("questionBankSubject");
+      document.getElementById(
+        "questionBankSubject"
+      );
 
     if (subjectSelect) {
 
@@ -4279,18 +4350,73 @@ async function loadQuestionBank() {
       subjectSelect.innerHTML =
         `<option value="">All Subjects</option>` +
         subjects
-          .map(
-            subject =>
-              `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}</option>`
-          )
+          .map(subject => `
+            <option value="${escapeHtml(subject)}">
+              ${escapeHtml(subject)}
+            </option>
+          `)
           .join("");
     }
 
-    renderQuestionBank(questions);
+    /*
+     * Build the level/difficulty filter
+     * using the Exam Vault difficulty field.
+     */
+    const levelSelect =
+      document.getElementById(
+        "questionBankLevel"
+      );
+
+    if (levelSelect) {
+
+      const difficulties = [
+        ...new Set(
+          questions
+            .map(q => q.difficulty)
+            .filter(Boolean)
+        )
+      ].sort();
+
+      levelSelect.innerHTML =
+        `<option value="">All Levels</option>` +
+        difficulties
+          .map(level => `
+            <option value="${escapeHtml(level)}">
+              ${escapeHtml(level)}
+            </option>
+          `)
+          .join("");
+    }
+
+    /*
+     * The new Exam Vault stores question types
+     * differently from the old past-question system.
+     * Keep the existing filter usable by presenting
+     * MCQ as the available examination type.
+     */
+    const examTypeSelect =
+      document.getElementById(
+        "questionBankExamType"
+      );
+
+    if (examTypeSelect) {
+
+      examTypeSelect.innerHTML = `
+        <option value="">All Exam Types</option>
+        <option value="MCQ">MCQ / Objective</option>
+      `;
+    }
+
+    renderQuestionBank(
+      questions
+    );
 
   } catch (error) {
 
-    console.error("Question Bank error:", error);
+    console.error(
+      "PulsePrep Exam Vault error:",
+      error
+    );
 
     container.innerHTML = `
       <div class="bg-white rounded-2xl border border-red-200 p-8 text-center">
@@ -4302,10 +4428,14 @@ async function loadQuestionBank() {
         </h3>
 
         <p class="text-gray-500 mt-2">
-          ${escapeHtml(error.message || "Something went wrong.")}
+          ${escapeHtml(
+            error.message ||
+            "Something went wrong while loading the Exam Vault."
+          )}
         </p>
 
         <button
+          type="button"
           onclick="loadQuestionBank()"
           class="mt-5 bg-blue-600 text-white px-5 py-3 rounded-xl font-bold"
         >
@@ -4321,42 +4451,66 @@ async function loadQuestionBank() {
 function renderQuestionBank(items) {
 
   const container =
-    document.getElementById("questionBankContent");
+    document.getElementById(
+      "questionBankContent"
+    );
 
   if (!container) return;
 
   const search =
-    document.getElementById("questionBankSearch")?.value
+    document.getElementById(
+      "questionBankSearch"
+    )?.value
       ?.toLowerCase()
       .trim() || "";
 
   const subject =
-    document.getElementById("questionBankSubject")?.value || "";
+    document.getElementById(
+      "questionBankSubject"
+    )?.value || "";
 
   const level =
-    document.getElementById("questionBankLevel")?.value || "";
+    document.getElementById(
+      "questionBankLevel"
+    )?.value || "";
 
   const examType =
-    document.getElementById("questionBankExamType")?.value || "";
+    document.getElementById(
+      "questionBankExamType"
+    )?.value || "";
 
-  const filtered = items.filter(question => {
+  const filtered =
+    items.filter(question => {
 
-    const text =
-      `${question.school || ""}
-       ${question.programme || ""}
-       ${question.subject || ""}
-       ${question.question_type || ""}
-       ${question.academic_year || ""}
-       ${question.exam_type || ""}`
-        .toLowerCase();
+      const text =
+        `
+          ${question.school || ""}
+          ${question.subject || ""}
+          ${question.topic || ""}
+          ${question.question || ""}
+          ${question.difficulty || ""}
+          ${question.source || ""}
+          ${question.academic_year || ""}
+        `
+          .toLowerCase();
 
-    return (
-      (!search || text.includes(search)) &&
-      (!subject || question.subject === subject) &&
-      (!level || question.level === level) &&
-      (!examType || question.exam_type === examType)
-    );
-  });
+      const questionExamType =
+        "MCQ";
+
+      return (
+        (!search ||
+          text.includes(search)) &&
+
+        (!subject ||
+          question.subject === subject) &&
+
+        (!level ||
+          question.difficulty === level) &&
+
+        (!examType ||
+          questionExamType === examType)
+      );
+    });
 
   if (filtered.length === 0) {
 
@@ -4380,71 +4534,205 @@ function renderQuestionBank(items) {
   }
 
   container.innerHTML = `
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="mb-5 bg-blue-50 border border-blue-100 rounded-2xl p-4">
 
-      ${filtered.map(question => `
-        <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+      <div class="flex items-center gap-3">
+
+        <div class="text-2xl">
+          🔐
+        </div>
+
+        <div>
+          <h3 class="font-extrabold text-blue-900">
+            PulsePrep Exam Vault
+          </h3>
+
+          <p class="text-sm text-blue-700 mt-1">
+            ${filtered.length}
+            approved examination
+            ${filtered.length === 1 ? "question" : "questions"}
+            available.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 gap-5">
+
+      ${filtered.map((question, index) => `
+
+        <div
+          class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm"
+        >
 
           <div class="flex items-start justify-between gap-3">
 
-            <div>
-              <div class="text-xs font-extrabold uppercase text-blue-600">
-                ${escapeHtml(question.subject || "Nursing")}
+            <div class="flex-1">
+
+              <div class="flex flex-wrap gap-2 mb-2">
+
+                <span
+                  class="text-xs font-extrabold uppercase
+                         text-blue-600 bg-blue-50
+                         px-2 py-1 rounded-lg"
+                >
+                  ${escapeHtml(
+                    question.subject ||
+                    "Nursing"
+                  )}
+                </span>
+
+                <span
+                  class="text-xs font-bold
+                         bg-green-50 text-green-700
+                         px-2 py-1 rounded-lg"
+                >
+                  APPROVED
+                </span>
+
+                <span
+                  class="text-xs font-bold
+                         bg-purple-50 text-purple-700
+                         px-2 py-1 rounded-lg"
+                >
+                  MCQ
+                </span>
+
               </div>
 
-              <h3 class="text-lg font-extrabold mt-1">
-                ${escapeHtml(question.file_name || "Past Question")}
+              <h3
+                class="text-lg font-extrabold text-slate-800"
+              >
+                Question ${index + 1}
               </h3>
+
             </div>
-
-            <span class="text-xs font-bold bg-green-50 text-green-700 px-2 py-1 rounded-lg">
-              APPROVED
-            </span>
-
-          </div>
-
-          <div class="mt-4 space-y-2 text-sm text-gray-600">
-
-            <p>
-              <strong>School:</strong>
-              ${escapeHtml(question.school || "Not specified")}
-            </p>
-
-            <p>
-              <strong>Programme:</strong>
-              ${escapeHtml(question.programme || "Not specified")}
-            </p>
-
-            <p>
-              <strong>Level:</strong>
-              ${escapeHtml(question.level || "Not specified")}
-            </p>
-
-            <p>
-              <strong>Exam:</strong>
-              ${escapeHtml(question.exam_type || "Not specified")}
-            </p>
-
-            <p>
-              <strong>Academic Year:</strong>
-              ${escapeHtml(question.academic_year || "Not specified")}
-            </p>
 
           </div>
 
           <div class="mt-5">
 
-            <button
-              type="button"
-              onclick="openPastQuestion('${escapeHtml(question.id)}')"
-              class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold"
+            <p
+              class="text-base md:text-lg
+                     font-semibold text-slate-800
+                     leading-7"
             >
-              View Question
-            </button>
+              ${escapeHtml(
+                question.question ||
+                "Question text unavailable."
+              )}
+            </p>
+
+          </div>
+
+          <div class="mt-5 space-y-3">
+
+            ${renderExamVaultOption(
+              "A",
+              question.option_a
+            )}
+
+            ${renderExamVaultOption(
+              "B",
+              question.option_b
+            )}
+
+            ${renderExamVaultOption(
+              "C",
+              question.option_c
+            )}
+
+            ${renderExamVaultOption(
+              "D",
+              question.option_d
+            )}
+
+          </div>
+
+          <div
+            class="mt-5 pt-4
+                   border-t border-gray-100
+                   grid grid-cols-1 md:grid-cols-3
+                   gap-2 text-xs text-gray-500"
+          >
+
+            <span>
+              <strong>Topic:</strong>
+              ${escapeHtml(
+                question.topic ||
+                "General"
+              )}
+            </span>
+
+            <span>
+              <strong>Difficulty:</strong>
+              ${escapeHtml(
+                question.difficulty ||
+                "Not specified"
+              )}
+            </span>
+
+            <span>
+              <strong>School:</strong>
+              ${escapeHtml(
+                question.school ||
+                "Not specified"
+              )}
+            </span>
+
+          </div>
+
+          <button
+            type="button"
+            onclick="toggleExamVaultAnswer('${escapeHtml(question.id)}')"
+            class="mt-5 w-full
+                   bg-blue-600 hover:bg-blue-700
+                   text-white py-3 rounded-xl
+                   font-bold transition"
+          >
+            Show Answer & Explanation
+          </button>
+
+          <div
+            id="examVaultAnswer-${escapeHtml(question.id)}"
+            class="hidden mt-4"
+          >
+
+            <div
+              class="bg-green-50
+                     border border-green-200
+                     rounded-xl p-4"
+            >
+
+              <p class="font-extrabold text-green-800">
+                Correct Answer:
+                ${escapeHtml(
+                  String(
+                    question.correct_answer ||
+                    ""
+                  ).toUpperCase()
+                )}
+              </p>
+
+              <p
+                class="mt-3 text-sm
+                       leading-6 text-green-900"
+              >
+                <strong>Explanation:</strong>
+                ${escapeHtml(
+                  question.explanation ||
+                  "No explanation has been added yet."
+                )}
+              </p>
+
+            </div>
 
           </div>
 
         </div>
+
       `).join("")}
 
     </div>
@@ -4452,98 +4740,84 @@ function renderQuestionBank(items) {
 }
 
 
-function escapeHtml(value) {
+function renderExamVaultOption(
+  letter,
+  value
+) {
 
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  return `
+    <div
+      class="flex items-start gap-3
+             border border-gray-200
+             rounded-xl p-3
+             bg-gray-50"
+    >
+
+      <span
+        class="flex-shrink-0
+               w-8 h-8
+               flex items-center justify-center
+               rounded-lg
+               bg-white
+               border border-gray-200
+               font-extrabold
+               text-blue-700"
+      >
+        ${letter}
+      </span>
+
+      <span
+        class="text-sm md:text-base
+               text-gray-700
+               leading-6"
+      >
+        ${escapeHtml(
+          value ||
+          "Option not available."
+        )}
+      </span>
+
+    </div>
+  `;
 }
 
 
-async function openPastQuestion(id) {
+function toggleExamVaultAnswer(id) {
 
-  try {
-
-    const supabase = window.pulseprepSupabase;
-
-    if (!supabase) {
-      alert("PulsePrep is still loading. Please try again.");
-      return;
-    }
-
-    const {
-      data: { session },
-      error: sessionError
-    } = await supabase.auth.getSession();
-
-    if (sessionError || !session) {
-      alert("Please log in to view this question.");
-      showTab("account");
-      return;
-    }
-
-    const response = await fetch(
-      `/.netlify/functions/get-past-question-file?id=${encodeURIComponent(id)}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
-      }
+  const answer =
+    document.getElementById(
+      `examVaultAnswer-${id}`
     );
 
-    const result = await response.json();
+  if (!answer) return;
 
-    if (!response.ok) {
+  answer.classList.toggle("hidden");
+}
 
-      if (response.status === 403) {
-        alert("Premium access is required to view this question.");
-        showTab("payment");
-        return;
-      }
 
-      if (response.status === 401) {
-        alert("Your login session has expired. Please log in again.");
-        showTab("account");
-        return;
-      }
+function escapeHtml(value) {
 
-      alert(
-        result.error ||
-        "Unable to open this question right now."
-      );
-
-      return;
-    }
-
-    if (!result.success || !result.url) {
-      alert("The question file could not be opened.");
-      return;
-    }
-
-    // Open the private file using the temporary signed URL.
-    window.open(
-      result.url,
-      "_blank",
-      "noopener,noreferrer"
+  return String(value ?? "")
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
     );
-
-  } catch (error) {
-
-    console.error(
-      "openPastQuestion error:",
-      error
-    );
-
-    alert(
-      "Unable to open the question right now. Please try again."
-    );
-
-  }
-
 }
 
 
@@ -4555,17 +4829,28 @@ async function openPastQuestion(id) {
   "questionBankExamType"
 ].forEach(id => {
 
-  const element = document.getElementById(id);
+  const element =
+    document.getElementById(id);
 
   if (element) {
 
-    element.addEventListener("input", () => {
-      renderQuestionBank(window.questionBankItems || []);
-    });
+    element.addEventListener(
+      "input",
+      () => {
+        renderQuestionBank(
+          window.questionBankItems || []
+        );
+      }
+    );
 
-    element.addEventListener("change", () => {
-      renderQuestionBank(window.questionBankItems || []);
-    });
+    element.addEventListener(
+      "change",
+      () => {
+        renderQuestionBank(
+          window.questionBankItems || []
+        );
+      }
+    );
 
   }
 
@@ -4576,19 +4861,29 @@ async function openPastQuestion(id) {
 const originalShowTab =
   window.showTab;
 
-if (typeof originalShowTab === "function") {
+if (
+  typeof originalShowTab === "function"
+) {
 
-  window.showTab = function(tabName) {
+  window.showTab =
+    function(tabName) {
 
-    originalShowTab.apply(this, arguments);
+      originalShowTab.apply(
+        this,
+        arguments
+      );
 
-    if (tabName === "question-bank") {
-      setTimeout(() => {
-        loadQuestionBank();
-      }, 100);
-    }
+      if (
+        tabName === "question-bank"
+      ) {
 
-  };
+        setTimeout(() => {
+          loadQuestionBank();
+        }, 100);
+
+      }
+
+    };
 
 }
 </script>
