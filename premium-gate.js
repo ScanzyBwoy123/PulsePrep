@@ -645,555 +645,321 @@ async function loadApprovedPastPapers() {
 
       grouped[subject].push(question);
     });
-// --------------------------------------------------------
-// QUESTION BANK SEARCH + SUBJECT FILTER
-// --------------------------------------------------------
 
-const subjects = Object.keys(grouped).sort((a, b) =>
-  a.localeCompare(b)
-);
+    // --------------------------------------------------------
+    // RENDER EXAM VAULT
+    // --------------------------------------------------------
 
-section.innerHTML = `
-  <div class="mb-6">
+    section.innerHTML = `
 
-    <div class="inline-flex items-center gap-2 px-3 py-1
-                rounded-full bg-emerald-50 text-emerald-700
-                text-xs font-extrabold uppercase">
+      <div class="mb-6">
 
-      <i class="fa-solid fa-shield-check"></i>
+        <div class="inline-flex items-center
+                    gap-2 px-3 py-1
+                    rounded-full
+                    bg-emerald-50
+                    text-emerald-700
+                    text-xs
+                    font-extrabold
+                    uppercase">
 
-      Exam Vault
+          <i class="fa-solid fa-shield-check"></i>
 
-    </div>
-
-    <h3 class="text-2xl font-extrabold text-slate-900 mt-3">
-      Approved Exam Questions
-    </h3>
-
-    <p class="text-slate-500 mt-1">
-      ${papers.length} approved questions available.
-    </p>
-
-  </div>
-
-  <!-- SEARCH + FILTERS -->
-
-  <div class="bg-white border border-slate-200
-              rounded-2xl p-4 md:p-5 mb-6 shadow-sm">
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-      <!-- SEARCH -->
-
-      <div>
-
-        <label
-          for="pulsePrepQuestionSearch"
-          class="block text-sm font-bold text-slate-700 mb-2"
-        >
-          🔎 Search Questions
-        </label>
-
-        <div class="relative">
-
-          <input
-            id="pulsePrepQuestionSearch"
-            type="search"
-            placeholder="Search question, topic, school, year..."
-            class="w-full border border-slate-300
-                   rounded-xl px-4 py-3
-                   outline-none
-                   focus:ring-2 focus:ring-teal-500
-                   focus:border-teal-500"
-            autocomplete="off"
-          >
+          Exam Vault
 
         </div>
 
-      </div>
+        <h3 class="text-2xl
+                   font-extrabold
+                   text-slate-900
+                   mt-3">
 
-      <!-- SUBJECT -->
+          Approved Exam Questions
 
-      <div>
-
-        <label
-          for="pulsePrepSubjectFilter"
-          class="block text-sm font-bold text-slate-700 mb-2"
-        >
-          📚 Subject
-        </label>
-
-        <select
-          id="pulsePrepSubjectFilter"
-          class="w-full border border-slate-300
-                 rounded-xl px-4 py-3
-                 bg-white
-                 outline-none
-                 focus:ring-2 focus:ring-teal-500
-                 focus:border-teal-500"
-        >
-
-          <option value="">
-            All Subjects
-          </option>
-
-          ${subjects.map(subject => `
-            <option value="${escapeHtml(subject)}">
-              ${escapeHtml(subject)}
-            </option>
-          `).join("")}
-
-        </select>
-
-      </div>
-
-    </div>
-
-    <!-- RESULT COUNT -->
-
-    <div
-      id="pulsePrepQuestionResultCount"
-      class="mt-4 text-sm font-semibold text-slate-500"
-    >
-      Showing ${papers.length} questions
-    </div>
-
-  </div>
-
-  <!-- QUESTIONS -->
-
-  <div
-    id="pulsePrepFilteredQuestions"
-    class="space-y-6"
-  ></div>
-`;
-
-const questionContainer =
-  document.getElementById(
-    "pulsePrepFilteredQuestions"
-  );
-
-const searchInput =
-  document.getElementById(
-    "pulsePrepQuestionSearch"
-  );
-
-const subjectFilter =
-  document.getElementById(
-    "pulsePrepSubjectFilter"
-  );
-
-const resultCount =
-  document.getElementById(
-    "pulsePrepQuestionResultCount"
-  );
-
-
-// --------------------------------------------------------
-// RENDER FILTERED QUESTIONS
-// --------------------------------------------------------
-
-function renderFilteredQuestions() {
-
-  const searchTerm =
-    (searchInput?.value || "")
-      .toLowerCase()
-      .trim();
-
-  const selectedSubject =
-    subjectFilter?.value || "";
-
-  const filtered =
-    papers.filter(question => {
-
-      const subject =
-        String(
-          question.subject || ""
-        );
-
-      const topic =
-        String(
-          question.topic || ""
-        );
-
-      const questionText =
-        String(
-          question.question || ""
-        );
-
-      const source =
-        String(
-          question.source || ""
-        );
-
-      const school =
-        String(
-          question.school || ""
-        );
-
-      const academicYear =
-        String(
-          question.academic_year || ""
-        );
-
-      // SUBJECT FILTER
-
-      if (
-        selectedSubject &&
-        subject !== selectedSubject
-      ) {
-        return false;
-      }
-
-      // SEARCH
-
-      if (!searchTerm) {
-        return true;
-      }
-
-      const searchableText =
-        `
-          ${subject}
-          ${topic}
-          ${questionText}
-          ${source}
-          ${school}
-          ${academicYear}
-        `.toLowerCase();
-
-      return searchableText.includes(
-        searchTerm
-      );
-
-    });
-
-
-  // ------------------------------------------------------
-  // RESULT COUNT
-  // ------------------------------------------------------
-
-  if (resultCount) {
-
-    resultCount.textContent =
-      `Showing ${filtered.length} of ${papers.length} questions`;
-
-  }
-
-
-  // ------------------------------------------------------
-  // NO RESULTS
-  // ------------------------------------------------------
-
-  if (!filtered.length) {
-
-    questionContainer.innerHTML = `
-
-      <div class="bg-white border border-slate-200
-                  rounded-2xl p-8 text-center">
-
-        <div class="text-4xl mb-4">
-          🔎
-        </div>
-
-        <h3 class="text-xl font-extrabold text-slate-800">
-          No questions found
         </h3>
 
-        <p class="text-slate-500 mt-2">
-          Try another search term or select
-          "All Subjects".
+        <p class="text-slate-500 mt-1">
+
+          ${papers.length} approved questions
+          available for Premium students.
+
         </p>
 
       </div>
 
-    `;
+      <div class="space-y-6">
 
-    return;
-  }
+        ${Object.entries(grouped)
+          .map(([subject, questions]) => `
 
+            <div class="bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        shadow-sm
+                        overflow-hidden">
 
-  // ------------------------------------------------------
-  // RENDER QUESTIONS
-  // ------------------------------------------------------
+              <div class="px-5 py-4
+                          bg-slate-50
+                          border-b
+                          border-slate-200">
 
-  questionContainer.innerHTML =
-    filtered.map((question, index) => {
+                <div class="flex
+                            items-center
+                            justify-between
+                            gap-3">
 
-      const subject =
-        escapeHtml(
-          question.subject || "Other"
-        );
+                  <h4 class="font-extrabold
+                             text-slate-800">
 
-      const topic =
-        escapeHtml(
-          question.topic || ""
-        );
+                    ${escapeHtml(subject)}
 
-      const questionText =
-        escapeHtml(
-          question.question || ""
-        );
+                  </h4>
 
-      const optionA =
-        escapeHtml(
-          question.option_a || ""
-        );
+                  <span class="px-3 py-1
+                               rounded-full
+                               bg-teal-50
+                               text-teal-700
+                               text-xs
+                               font-bold">
 
-      const optionB =
-        escapeHtml(
-          question.option_b || ""
-        );
+                    ${questions.length}
+                    questions
 
-      const optionC =
-        escapeHtml(
-          question.option_c || ""
-        );
-
-      const optionD =
-        escapeHtml(
-          question.option_d || ""
-        );
-
-      const correctAnswer =
-        escapeHtml(
-          question.correct_answer || ""
-        );
-
-      const explanation =
-        escapeHtml(
-          question.explanation || ""
-        );
-
-      const difficulty =
-        escapeHtml(
-          question.difficulty || ""
-        );
-
-      const source =
-        escapeHtml(
-          question.source || ""
-        );
-
-      const school =
-        escapeHtml(
-          question.school || ""
-        );
-
-      const academicYear =
-        escapeHtml(
-          question.academic_year || ""
-        );
-
-      return `
-
-        <article
-          class="bg-white border border-slate-200
-                 rounded-2xl p-5 md:p-6 shadow-sm"
-        >
-
-          <!-- QUESTION HEADER -->
-
-          <div class="flex flex-wrap items-center
-                      justify-between gap-3 mb-4">
-
-            <div class="flex flex-wrap gap-2">
-
-              <span
-                class="px-3 py-1 rounded-full
-                       bg-teal-50 text-teal-700
-                       text-xs font-bold"
-              >
-                ${subject}
-              </span>
-
-              ${
-                topic
-                  ? `
-                    <span
-                      class="px-3 py-1 rounded-full
-                             bg-slate-100 text-slate-600
-                             text-xs font-semibold"
-                    >
-                      ${topic}
-                    </span>
-                  `
-                  : ""
-              }
-
-            </div>
-
-            ${
-              difficulty
-                ? `
-                  <span
-                    class="px-3 py-1 rounded-full
-                           bg-amber-50 text-amber-700
-                           text-xs font-bold"
-                  >
-                    ${difficulty}
                   </span>
-                `
-                : ""
-            }
-
-          </div>
-
-
-          <!-- QUESTION -->
-
-          <h4 class="text-lg md:text-xl
-                     font-extrabold
-                     text-slate-900
-                     leading-7">
-
-            ${index + 1}.
-            ${questionText}
-
-          </h4>
-
-
-          <!-- OPTIONS -->
-
-          <div class="mt-5 space-y-3">
-
-            <div class="p-3 rounded-xl bg-slate-50">
-              <strong>A.</strong>
-              ${optionA}
-            </div>
-
-            <div class="p-3 rounded-xl bg-slate-50">
-              <strong>B.</strong>
-              ${optionB}
-            </div>
-
-            <div class="p-3 rounded-xl bg-slate-50">
-              <strong>C.</strong>
-              ${optionC}
-            </div>
-
-            <div class="p-3 rounded-xl bg-slate-50">
-              <strong>D.</strong>
-              ${optionD}
-            </div>
-
-          </div>
-
-
-          <!-- ANSWER -->
-
-          <div
-            class="mt-5 p-4 rounded-xl
-                   bg-emerald-50
-                   border border-emerald-200"
-          >
-
-            <p class="font-bold text-emerald-800">
-              Correct Answer
-            </p>
-
-            <p class="mt-1 text-emerald-700">
-              ${correctAnswer}
-            </p>
-
-          </div>
-
-
-          <!-- EXPLANATION -->
-
-          ${
-            explanation
-              ? `
-                <div class="mt-4 p-4 rounded-xl
-                            bg-blue-50
-                            border border-blue-200">
-
-                  <p class="font-bold text-blue-800">
-                    Explanation
-                  </p>
-
-                  <p class="mt-2 text-slate-700 leading-7">
-                    ${explanation}
-                  </p>
 
                 </div>
-              `
-              : ""
-          }
 
+              </div>
 
-          <!-- SOURCE -->
+              <div class="divide-y
+                          divide-slate-100">
 
-          ${
-            source ||
-            school ||
-            academicYear
-              ? `
-                <div
-                  class="mt-4 pt-4
-                         border-t border-slate-100
-                         text-xs text-slate-500"
-                >
+                ${questions
+                  .map((question, index) => `
 
-                  ${
-                    source
-                      ? `<span>Source: ${source}</span>`
-                      : ""
-                  }
+                    <div class="p-5">
 
-                  ${
-                    school
-                      ? `<span class="ml-3">School: ${school}</span>`
-                      : ""
-                  }
+                      <div class="flex
+                                  items-start
+                                  gap-3">
 
-                  ${
-                    academicYear
-                      ? `<span class="ml-3">Year: ${academicYear}</span>`
-                      : ""
-                  }
+                        <div class="w-8 h-8
+                                    rounded-lg
+                                    bg-teal-50
+                                    text-teal-700
+                                    flex
+                                    items-center
+                                    justify-center
+                                    font-bold
+                                    text-sm
+                                    flex-shrink-0">
 
-                </div>
-              `
-              : ""
-          }
+                          ${index + 1}
 
-        </article>
+                        </div>
 
-      `;
+                        <div class="min-w-0
+                                    flex-1">
 
-    }).join("");
+                          <p class="font-bold
+                                    text-slate-800
+                                    leading-7">
 
-}
+                            ${escapeHtml(
+                              question.question ||
+                              ""
+                            )}
 
+                          </p>
 
-// --------------------------------------------------------
-// SEARCH EVENTS
-// --------------------------------------------------------
+                          <div class="grid
+                                      grid-cols-1
+                                      sm:grid-cols-2
+                                      gap-2
+                                      mt-4">
 
-if (searchInput) {
+                            <div class="p-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        border
+                                        border-slate-100">
 
-  searchInput.addEventListener(
-    "input",
-    renderFilteredQuestions
-  );
+                              <strong>A.</strong>
+                              ${escapeHtml(
+                                question.option_a ||
+                                ""
+                              )}
 
-}
+                            </div>
 
-if (subjectFilter) {
+                            <div class="p-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        border
+                                        border-slate-100">
 
-  subjectFilter.addEventListener(
-    "change",
-    renderFilteredQuestions
-  );
+                              <strong>B.</strong>
+                              ${escapeHtml(
+                                question.option_b ||
+                                ""
+                              )}
 
-}
+                            </div>
 
+                            <div class="p-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        border
+                                        border-slate-100">
 
-// --------------------------------------------------------
-// INITIAL RENDER
-// --------------------------------------------------------
+                              <strong>C.</strong>
+                              ${escapeHtml(
+                                question.option_c ||
+                                ""
+                              )}
 
-renderFilteredQuestions();
+                            </div>
+
+                            <div class="p-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        border
+                                        border-slate-100">
+
+                              <strong>D.</strong>
+                              ${escapeHtml(
+                                question.option_d ||
+                                ""
+                              )}
+
+                            </div>
+
+                          </div>
+
+                          <div class="flex
+                                      flex-wrap
+                                      gap-2
+                                      mt-4">
+
+                            ${
+                              question.topic
+                                ? `
+                                  <span
+                                    class="px-2.5
+                                           py-1
+                                           rounded-lg
+                                           bg-blue-50
+                                           text-blue-700
+                                           text-xs
+                                           font-semibold">
+
+                                    ${escapeHtml(
+                                      question.topic
+                                    )}
+
+                                  </span>
+                                `
+                                : ""
+                            }
+
+                            ${
+                              question.difficulty
+                                ? `
+                                  <span
+                                    class="px-2.5
+                                           py-1
+                                           rounded-lg
+                                           bg-purple-50
+                                           text-purple-700
+                                           text-xs
+                                           font-semibold">
+
+                                    ${escapeHtml(
+                                      question.difficulty
+                                    )}
+
+                                  </span>
+                                `
+                                : ""
+                            }
+
+                            ${
+                              question.academic_year
+                                ? `
+                                  <span
+                                    class="px-2.5
+                                           py-1
+                                           rounded-lg
+                                           bg-amber-50
+                                           text-amber-700
+                                           text-xs
+                                           font-semibold">
+
+                                    ${escapeHtml(
+                                      question.academic_year
+                                    )}
+
+                                  </span>
+                                `
+                                : ""
+                            }
+
+                          </div>
+
+                          ${
+                            question.explanation
+                              ? `
+                                <div
+                                  class="mt-4
+                                         p-4
+                                         rounded-xl
+                                         bg-emerald-50
+                                         border
+                                         border-emerald-100">
+
+                                  <p class="text-sm
+                                            font-bold
+                                            text-emerald-800
+                                            mb-1">
+
+                                    Explanation
+
+                                  </p>
+
+                                  <p class="text-sm
+                                            text-emerald-900
+                                            leading-6">
+
+                                    ${escapeHtml(
+                                      question.explanation
+                                    )}
+
+                                  </p>
+
+                                </div>
+                              `
+                              : ""
+                          }
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  `)
+                  .join("")}
+
+              </div>
+
+            </div>
+
+          `)
+          .join("")}
+
+      </div>
+    `;
 
     pastPapersLoaded = true;
 
