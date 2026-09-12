@@ -52,11 +52,26 @@ exports.handler = async (event) => {
     // CHECK ENVIRONMENT VARIABLES
     // --------------------------------------------------------
 
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const serviceRoleKey =
-      process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const supabaseUrl =
+  process.env.SUPABASE_URL ||
+  "https://eskwphjtiogguhvtktmh.supabase.co";
 
-    if (!supabaseUrl || !serviceRoleKey) {
+const serviceRoleKey =
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!serviceRoleKey) {
+  console.error(
+    "Missing SUPABASE_SERVICE_ROLE_KEY environment variable."
+  );
+
+  return {
+    statusCode: 500,
+    headers,
+    body: JSON.stringify({
+      error: "Server configuration error."
+    })
+  };
+}
       console.error(
         "Missing Supabase environment variables."
       );
