@@ -1396,7 +1396,11 @@ async function enterAdmin() {
   hide($("accessDeniedScreen"));
 
   show($("adminApp"));
-
+if (!adminInitialized) {
+  adminInitialized = true;
+  populateSubjects();
+  attachEventListeners();
+}
 
   $("adminEmailDisplay").textContent =
     currentUser.email;
