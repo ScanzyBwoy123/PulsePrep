@@ -52,7 +52,11 @@ exports.handler = async (event) => {
     // CHECK ENVIRONMENT VARIABLES
     // --------------------------------------------------------
 
-    const supabaseUrl =
+    // --------------------------------------------------------
+// CHECK ENVIRONMENT VARIABLES
+// --------------------------------------------------------
+
+const supabaseUrl =
   process.env.SUPABASE_URL ||
   "https://eskwphjtiogguhvtktmh.supabase.co";
 
@@ -72,18 +76,6 @@ if (!serviceRoleKey) {
     })
   };
 }
-      console.error(
-        "Missing Supabase environment variables."
-      );
-
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          error: "Server configuration error."
-        })
-      };
-    }
 
     // --------------------------------------------------------
     // CREATE SERVER-SIDE SUPABASE CLIENT
