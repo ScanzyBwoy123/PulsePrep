@@ -3644,52 +3644,38 @@ function escapeAttribute(value) {
 supabaseClient.auth.onAuthStateChange(
   async (event, session) => {
 
-    if (
-      event === "SIGNED_OUT"
-    ) {
+    console.log(
+      "Supabase auth event:",
+      event
+    );
+
+    // Do not independently authorize or reject
+    // the user here.
+    //
+    // checkAuth() and the login handler are the
+    // single places responsible for administrator
+    // authorization.
+
+    if (!session || !session.user) {
 
       currentUser = null;
 
       hide($("adminApp"));
       hide($("accessDeniedScreen"));
-
       show($("loginScreen"));
 
       return;
     }
 
+    currentUser = session.user;
 
-    if (
-      session &&
-      session.user
-    ) {
+    console.log(
+      "Authenticated Supabase user:",
+      currentUser.email
+    );
 
-      currentUser =
-        session.user;
-
-
-      if (
-        isAdminEmail(
-          currentUser.email
-        )
-      ) {
-
-        await enterAdmin();
-
-      } else {
-
-        hide($("authLoading"));
-        hide($("loginScreen"));
-        show($("accessDeniedScreen"));
-
-        $("accessDeniedMessage").textContent =
-          `This account (${currentUser.email}) is not authorized as a PulsePrep administrator.`;
-      }
-    }
   }
 );
-
-
 /* ============================================================
    INITIAL START
 ============================================================ */
