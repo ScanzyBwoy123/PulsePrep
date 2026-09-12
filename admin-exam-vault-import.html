@@ -1455,7 +1455,7 @@ async function login() {
 
 
     currentUser = data.user;
-
+alert("Supabase email: " + (data.user.email || "NO EMAIL"));
 // Use the email entered during a successful Supabase login.
 // Supabase has already verified the email + password.
 const authenticatedEmail =
