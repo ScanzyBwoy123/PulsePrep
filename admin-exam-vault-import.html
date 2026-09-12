@@ -3473,15 +3473,6 @@ function normalizeCorrectAnswer(value) {
 
 function attachEventListeners() {
 
-  $("loginForm")
-    .addEventListener(
-      "submit",
-      event => {
-        event.preventDefault();
-        login();
-      }
-    );
-
 
   $("logoutButton")
     .addEventListener(
@@ -3689,10 +3680,20 @@ document.addEventListener(
         new Date().getFullYear()
       );
 
+    // Attach the login handler BEFORE checkAuth().
+    // Otherwise the browser submits the form normally
+    // and refreshes the page.
+    $("loginForm").addEventListener(
+      "submit",
+      event => {
+        event.preventDefault();
+        login();
+      }
+    );
+
     await checkAuth();
   }
 );
-
 </script>
 
 </body>
