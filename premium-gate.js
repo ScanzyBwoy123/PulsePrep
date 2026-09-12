@@ -1435,33 +1435,5 @@ window.openPulsePrepPastPaper =
   // ==========================================================
   // AUTOMATICALLY LOAD PAST PAPERS
   // ==========================================================
-  function installPastPaperLoader() {
-    if (
-      typeof window.loadQuestionBank !==
-      "function"
-    ) {
-      setTimeout(
-        installPastPaperLoader,
-        500
-      );
-      return;
-    }
-    if (
-      window.loadQuestionBank
-        .__pulsePrepPastPapersWrapped
-    ) {
-      return;
-    }
-    const originalLoadQuestionBank =
-      window.loadQuestionBank;
-    async function combinedQuestionBankLoader() {
-      await originalLoadQuestionBank();
-      await loadApprovedPastPapers();
-    }
-    combinedQuestionBankLoader
-      .__pulsePrepPastPapersWrapped = true;
-    window.loadQuestionBank =
-      combinedQuestionBankLoader;
-  }
-  installPastPaperLoader();
+  
 })();
