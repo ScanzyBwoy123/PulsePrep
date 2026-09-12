@@ -1642,8 +1642,12 @@ function updateStats() {
   $("rejectedCount").textContent =
     rejected;
 
-  $("approveAllPendingCount").textContent =
-    pending;
+ const approveAllPendingCount =
+  $("approveAllPendingCount");
+
+if (approveAllPendingCount) {
+  approveAllPendingCount.textContent = pending;
+} 
 
 
   const button =
