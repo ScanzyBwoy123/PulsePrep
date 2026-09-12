@@ -331,6 +331,91 @@ window.PulsePrepOpenPremiumPlans = function () {
   installGate();
 
 })();
+// ============================================================
+// PULSEP﻿REP — APPROVED PAST EXAMINATION PAPERS
+// ============================================================
+
+(function () {
+  "use strict";
+
+  let pastPapersLoaded = false;
+  let loadingPastPapers = false;
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+async function loadApprovedPastPapers() {
+
+  if (loadingPastPapers) return;
+
+  const container =
+    document.getElementById("questionBankContent");
+
+  if (!container) return;
+
+  loadingPastPapers = true;
+
+  try {
+
+    // --------------------------------------------------------
+    // WAIT FOR SUPABASE
+    // --------------------------------------------------------
+
+    let attempts = 0;
+
+    while (
+      !window.pulseprepSupabase &&
+      attempts < 50
+    ) {
+      await new Promise(resolve =>
+        setTimeout(resolve, 100)
+      );
+
+      attempts++;
+    }
+
+    if (!window.pulseprepSupabase) {
+      console.warn(
+        "PulsePrep: Supabase client not ready."
+      );
+
+      return;
+    }
+
+    // --------------------------------------------------------
+    // GET CURRENT SESSION
+    // --------------------------------------------------------
+
+    const {
+      data: sessionData,
+      error: sessionError
+    } =
+      await window.pulseprepSupabase.auth.getSession();
+
+    if (sessionError) {
+      console.error(
+        "PulsePrep session error:",
+        sessionError
+      );
+
+      return;
+    }
+
+    const session =
+      sessionData?.session;
+
+    if (!session) {
+      console.warn(
+        "PulsePrep: No active session."
+      );
+
+      return;
+    }
 
     // --------------------------------------------------------
     // LOAD ALL APPROVED EXAM VAULT QUESTIONS
@@ -561,218 +646,134 @@ window.PulsePrepOpenPremiumPlans = function () {
       grouped[subject].push(question);
     });
 // --------------------------------------------------------
-// QUESTION BANK SEARCH + SUBJECT + LEVEL + EXAM TYPE FILTER
+// QUESTION BANK SEARCH + SUBJECT FILTER
 // --------------------------------------------------------
 
-// PulsePrep master subject list.
-// Keep this list independent from the questions currently loaded
-// so every subject appears in the dropdown even when it has 0 questions.
-const PULSEPREP_MASTER_SUBJECTS = [
-  "Anatomy & Physiology",
-  "Microbiology",
-  "Behavioral Science",
-  "Fundamentals of Nursing",
-  "Nursing Process",
-  "First Aid & Emergency Care",
-  "Health Assessment",
-  "Pharmacology",
-  "Medicine and Medical Nursing 1",
-  "Surgery and Surgical Nursing 1",
-  "Medical-Surgical Nursing",
-  "Advanced Nursing 2",
-  "Therapeutic and Pharmacovigilance 1",
-  "Therapeutic Communication",
-  "Professionalism",
-  "Pathophysiology",
-  "Maternal & Child Health",
-  "Midwifery",
-  "Paediatric Nursing",
-  "Mental Health/Psychiatric Nursing",
-  "Nutrition & Dietetics",
-  "Infection Prevention & Control",
-  "Community Health Nursing",
-  "Health Promotion",
-  "Health Promotion and Community-Based Rehabilitation",
-  "Public Health",
-  "Nursing Ethics & Professional Practice",
-  "Research Methods",
-  "Biostatistics",
-  "Statistics"
-];
-
-// --------------------------------------------------------
-// QUESTION BANK FILTER STATE
-// --------------------------------------------------------
-
-let pulsePrepQuestionSearch = "";
-let pulsePrepSelectedSubject = "";
-let pulsePrepSelectedLevel = "";
-let pulsePrepSelectedExamType = "";
-
-// --------------------------------------------------------
-// FILTER DATA
-// --------------------------------------------------------
-
-// Difficulty is currently the available "level" field.
-const pulsePrepLevels = [
-  ...new Set(
-    papers
-      .map(question =>
-        String(question.difficulty || "").trim()
-      )
-      .filter(Boolean)
-  )
-].sort((a, b) =>
+const subjects = Object.keys(grouped).sort((a, b) =>
   a.localeCompare(b)
 );
 
-// Source is currently the available "exam type/source" field.
-const pulsePrepExamTypes = [
-  ...new Set(
-    papers
-      .map(question =>
-        String(question.source || "").trim()
-      )
-      .filter(Boolean)
-  )
-].sort((a, b) =>
-  a.localeCompare(b)
-);
+section.innerHTML = `
+  <div class="mb-6">
 
-// --------------------------------------------------------
-// FILTER UI
-// --------------------------------------------------------
+    <div class="inline-flex items-center gap-2 px-3 py-1
+                rounded-full bg-emerald-50 text-emerald-700
+                text-xs font-extrabold uppercase">
 
-const filterContainer =
-  document.createElement("div");
+      <i class="fa-solid fa-shield-check"></i>
 
-filterContainer.className =
-  "bg-white border border-slate-200 rounded-2xl p-5 mb-6 shadow-sm";
+      Exam Vault
 
-filterContainer.innerHTML = `
-  <div class="mb-4">
-    <h3 class="text-lg font-bold text-slate-900">
-      Question Bank
+    </div>
+
+    <h3 class="text-2xl font-extrabold text-slate-900 mt-3">
+      Approved Exam Questions
     </h3>
 
-    <p class="text-sm text-slate-500 mt-1">
-      Search and filter approved questions by subject, level and exam type.
+    <p class="text-slate-500 mt-1">
+      ${papers.length} approved questions available.
     </p>
-  </div>
-
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-
-    <!-- SEARCH -->
-    <div class="lg:col-span-1">
-      <label
-        for="pulsePrepQuestionSearch"
-        class="block text-sm font-semibold text-slate-700 mb-2"
-      >
-        Search Questions
-      </label>
-
-      <input
-        id="pulsePrepQuestionSearch"
-        type="search"
-        placeholder="Search questions..."
-        class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
-
-    <!-- SUBJECT -->
-    <div>
-      <label
-        for="pulsePrepSubjectFilter"
-        class="block text-sm font-semibold text-slate-700 mb-2"
-      >
-        Subject
-      </label>
-
-      <select
-        id="pulsePrepSubjectFilter"
-        class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option value="">All Subjects</option>
-      </select>
-    </div>
-
-    <!-- LEVEL -->
-    <div>
-      <label
-        for="pulsePrepLevelFilter"
-        class="block text-sm font-semibold text-slate-700 mb-2"
-      >
-        Level
-      </label>
-
-      <select
-        id="pulsePrepLevelFilter"
-        class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option value="">All Levels</option>
-      </select>
-    </div>
-
-    <!-- EXAM TYPE -->
-    <div>
-      <label
-        for="pulsePrepExamTypeFilter"
-        class="block text-sm font-semibold text-slate-700 mb-2"
-      >
-        Exam Type
-      </label>
-
-      <select
-        id="pulsePrepExamTypeFilter"
-        class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option value="">All Exam Types</option>
-      </select>
-    </div>
 
   </div>
 
-  <!-- RESULT COUNT -->
-  <div class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+  <!-- SEARCH + FILTERS -->
 
-    <p
+  <div class="bg-white border border-slate-200
+              rounded-2xl p-4 md:p-5 mb-6 shadow-sm">
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <!-- SEARCH -->
+
+      <div>
+
+        <label
+          for="pulsePrepQuestionSearch"
+          class="block text-sm font-bold text-slate-700 mb-2"
+        >
+          🔎 Search Questions
+        </label>
+
+        <div class="relative">
+
+          <input
+            id="pulsePrepQuestionSearch"
+            type="search"
+            placeholder="Search question, topic, school, year..."
+            class="w-full border border-slate-300
+                   rounded-xl px-4 py-3
+                   outline-none
+                   focus:ring-2 focus:ring-teal-500
+                   focus:border-teal-500"
+            autocomplete="off"
+          >
+
+        </div>
+
+      </div>
+
+      <!-- SUBJECT -->
+
+      <div>
+
+        <label
+          for="pulsePrepSubjectFilter"
+          class="block text-sm font-bold text-slate-700 mb-2"
+        >
+          📚 Subject
+        </label>
+
+        <select
+          id="pulsePrepSubjectFilter"
+          class="w-full border border-slate-300
+                 rounded-xl px-4 py-3
+                 bg-white
+                 outline-none
+                 focus:ring-2 focus:ring-teal-500
+                 focus:border-teal-500"
+        >
+
+          <option value="">
+            All Subjects
+          </option>
+
+          ${subjects.map(subject => `
+            <option value="${escapeHtml(subject)}">
+              ${escapeHtml(subject)}
+            </option>
+          `).join("")}
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <!-- RESULT COUNT -->
+
+    <div
       id="pulsePrepQuestionResultCount"
-      class="text-sm font-semibold text-slate-600"
+      class="mt-4 text-sm font-semibold text-slate-500"
     >
-      Showing 0 questions
-    </p>
-
-    <button
-      type="button"
-      id="pulsePrepClearFilters"
-      class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-50 text-sm font-semibold text-slate-700"
-    >
-      Clear Filters
-    </button>
+      Showing ${papers.length} questions
+    </div>
 
   </div>
+
+  <!-- QUESTIONS -->
+
+  <div
+    id="pulsePrepFilteredQuestions"
+    class="space-y-6"
+  ></div>
 `;
 
-// Insert filter UI before the question container.
-const questionBankParent =
-  document.querySelector("#pastPapersContainer") ||
-  document.querySelector("#examVaultQuestions") ||
-  document.querySelector("#pastPapers") ||
-  document.querySelector(".past-papers-container");
-
-if (questionBankParent) {
-  questionBankParent.prepend(filterContainer);
-} else {
-  console.warn(
-    "PulsePrep Question Bank container was not found."
+const questionContainer =
+  document.getElementById(
+    "pulsePrepFilteredQuestions"
   );
-}
 
-// --------------------------------------------------------
-// GET FILTER ELEMENTS
-// --------------------------------------------------------
-
-const questionSearchInput =
+const searchInput =
   document.getElementById(
     "pulsePrepQuestionSearch"
   );
@@ -782,190 +783,11 @@ const subjectFilter =
     "pulsePrepSubjectFilter"
   );
 
-const levelFilter =
-  document.getElementById(
-    "pulsePrepLevelFilter"
-  );
-
-const examTypeFilter =
-  document.getElementById(
-    "pulsePrepExamTypeFilter"
-  );
-
-const questionResultCount =
+const resultCount =
   document.getElementById(
     "pulsePrepQuestionResultCount"
   );
 
-const clearFiltersButton =
-  document.getElementById(
-    "pulsePrepClearFilters"
-  );
-
-// --------------------------------------------------------
-// POPULATE SUBJECT DROPDOWN
-// --------------------------------------------------------
-
-// IMPORTANT:
-// Use the complete master subject list rather than
-// Object.keys(grouped), so subjects with zero questions
-// still appear.
-PULSEPREP_MASTER_SUBJECTS
-  .slice()
-  .sort((a, b) =>
-    a.localeCompare(b)
-  )
-  .forEach(subject => {
-
-    const option =
-      document.createElement("option");
-
-    option.value = subject;
-    option.textContent = subject;
-
-    subjectFilter?.appendChild(option);
-  });
-
-// --------------------------------------------------------
-// POPULATE LEVEL DROPDOWN
-// --------------------------------------------------------
-
-pulsePrepLevels.forEach(level => {
-
-  const option =
-    document.createElement("option");
-
-  option.value = level;
-  option.textContent = level;
-
-  levelFilter?.appendChild(option);
-});
-
-// --------------------------------------------------------
-// POPULATE EXAM TYPE DROPDOWN
-// --------------------------------------------------------
-
-pulsePrepExamTypes.forEach(examType => {
-
-  const option =
-    document.createElement("option");
-
-  option.value = examType;
-  option.textContent = examType;
-
-  examTypeFilter?.appendChild(option);
-});
-
-// --------------------------------------------------------
-// QUESTION RESULTS CONTAINER
-// --------------------------------------------------------
-
-let filteredQuestionsContainer =
-  document.getElementById(
-    "pulsePrepFilteredQuestions"
-  );
-
-if (!filteredQuestionsContainer) {
-
-  filteredQuestionsContainer =
-    document.createElement("div");
-
-  filteredQuestionsContainer.id =
-    "pulsePrepFilteredQuestions";
-
-  if (questionBankParent) {
-    questionBankParent.appendChild(
-      filteredQuestionsContainer
-    );
-  }
-}
-
-// --------------------------------------------------------
-// ESCAPE HTML
-// --------------------------------------------------------
-
-function pulsePrepEscapeHtml(value) {
-
-  const div =
-    document.createElement("div");
-
-  div.textContent =
-    value == null ? "" : String(value);
-
-  return div.innerHTML;
-}
-
-// --------------------------------------------------------
-// FILTER QUESTIONS
-// --------------------------------------------------------
-
-function getPulsePrepFilteredQuestions() {
-
-  const search =
-    pulsePrepQuestionSearch
-      .trim()
-      .toLowerCase();
-
-  return papers.filter(question => {
-
-    const subject =
-      String(
-        question.subject || ""
-      ).trim();
-
-    const difficulty =
-      String(
-        question.difficulty || ""
-      ).trim();
-
-    const source =
-      String(
-        question.source || ""
-      ).trim();
-
-    // Search across the useful question metadata.
-    const searchableText = [
-      question.question,
-      question.topic,
-      question.subject,
-      question.source,
-      question.school,
-      question.academic_year,
-      question.option_a,
-      question.option_b,
-      question.option_c,
-      question.option_d
-    ]
-      .filter(value => value != null)
-      .map(value =>
-        String(value).toLowerCase()
-      )
-      .join(" ");
-
-    const matchesSearch =
-      !search ||
-      searchableText.includes(search);
-
-    const matchesSubject =
-      !pulsePrepSelectedSubject ||
-      subject === pulsePrepSelectedSubject;
-
-    const matchesLevel =
-      !pulsePrepSelectedLevel ||
-      difficulty === pulsePrepSelectedLevel;
-
-    const matchesExamType =
-      !pulsePrepSelectedExamType ||
-      source === pulsePrepSelectedExamType;
-
-    return (
-      matchesSearch &&
-      matchesSubject &&
-      matchesLevel &&
-      matchesExamType
-    );
-  });
-}
 
 // --------------------------------------------------------
 // RENDER FILTERED QUESTIONS
@@ -973,355 +795,406 @@ function getPulsePrepFilteredQuestions() {
 
 function renderFilteredQuestions() {
 
-  if (!filteredQuestionsContainer) {
-    return;
+  const searchTerm =
+    (searchInput?.value || "")
+      .toLowerCase()
+      .trim();
+
+  const selectedSubject =
+    subjectFilter?.value || "";
+
+  const filtered =
+    papers.filter(question => {
+
+      const subject =
+        String(
+          question.subject || ""
+        );
+
+      const topic =
+        String(
+          question.topic || ""
+        );
+
+      const questionText =
+        String(
+          question.question || ""
+        );
+
+      const source =
+        String(
+          question.source || ""
+        );
+
+      const school =
+        String(
+          question.school || ""
+        );
+
+      const academicYear =
+        String(
+          question.academic_year || ""
+        );
+
+      // SUBJECT FILTER
+
+      if (
+        selectedSubject &&
+        subject !== selectedSubject
+      ) {
+        return false;
+      }
+
+      // SEARCH
+
+      if (!searchTerm) {
+        return true;
+      }
+
+      const searchableText =
+        `
+          ${subject}
+          ${topic}
+          ${questionText}
+          ${source}
+          ${school}
+          ${academicYear}
+        `.toLowerCase();
+
+      return searchableText.includes(
+        searchTerm
+      );
+
+    });
+
+
+  // ------------------------------------------------------
+  // RESULT COUNT
+  // ------------------------------------------------------
+
+  if (resultCount) {
+
+    resultCount.textContent =
+      `Showing ${filtered.length} of ${papers.length} questions`;
+
   }
 
-  const filteredQuestions =
-    getPulsePrepFilteredQuestions();
 
-  // Update result count.
-  if (questionResultCount) {
+  // ------------------------------------------------------
+  // NO RESULTS
+  // ------------------------------------------------------
 
-    questionResultCount.textContent =
-      `Showing ${filteredQuestions.length} of ${papers.length} questions`;
-  }
+  if (!filtered.length) {
 
-  // Empty state.
-  if (filteredQuestions.length === 0) {
+    questionContainer.innerHTML = `
 
-    filteredQuestionsContainer.innerHTML = `
-      <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center">
-        <div class="text-4xl mb-3">
+      <div class="bg-white border border-slate-200
+                  rounded-2xl p-8 text-center">
+
+        <div class="text-4xl mb-4">
           🔎
         </div>
 
-        <h3 class="text-lg font-bold text-slate-900">
+        <h3 class="text-xl font-extrabold text-slate-800">
           No questions found
         </h3>
 
-        <p class="text-sm text-slate-500 mt-2">
-          Try changing your search or filters.
+        <p class="text-slate-500 mt-2">
+          Try another search term or select
+          "All Subjects".
         </p>
+
       </div>
+
     `;
 
     return;
   }
 
+
   // ------------------------------------------------------
   // RENDER QUESTIONS
   // ------------------------------------------------------
 
-  filteredQuestionsContainer.innerHTML =
-    filteredQuestions
-      .map((question, index) => {
+  questionContainer.innerHTML =
+    filtered.map((question, index) => {
 
-        const subject =
-          pulsePrepEscapeHtml(
-            question.subject || "Unknown Subject"
-          );
+      const subject =
+        escapeHtml(
+          question.subject || "Other"
+        );
 
-        const topic =
-          pulsePrepEscapeHtml(
-            question.topic || ""
-          );
+      const topic =
+        escapeHtml(
+          question.topic || ""
+        );
 
-        const questionText =
-          pulsePrepEscapeHtml(
-            question.question || ""
-          );
+      const questionText =
+        escapeHtml(
+          question.question || ""
+        );
 
-        const optionA =
-          pulsePrepEscapeHtml(
-            question.option_a || ""
-          );
+      const optionA =
+        escapeHtml(
+          question.option_a || ""
+        );
 
-        const optionB =
-          pulsePrepEscapeHtml(
-            question.option_b || ""
-          );
+      const optionB =
+        escapeHtml(
+          question.option_b || ""
+        );
 
-        const optionC =
-          pulsePrepEscapeHtml(
-            question.option_c || ""
-          );
+      const optionC =
+        escapeHtml(
+          question.option_c || ""
+        );
 
-        const optionD =
-          pulsePrepEscapeHtml(
-            question.option_d || ""
-          );
+      const optionD =
+        escapeHtml(
+          question.option_d || ""
+        );
 
-        const correctAnswer =
-          pulsePrepEscapeHtml(
-            question.correct_answer || ""
-          );
+      const correctAnswer =
+        escapeHtml(
+          question.correct_answer || ""
+        );
 
-        const explanation =
-          pulsePrepEscapeHtml(
-            question.explanation || ""
-          );
+      const explanation =
+        escapeHtml(
+          question.explanation || ""
+        );
 
-        const difficulty =
-          pulsePrepEscapeHtml(
-            question.difficulty || ""
-          );
+      const difficulty =
+        escapeHtml(
+          question.difficulty || ""
+        );
 
-        const source =
-          pulsePrepEscapeHtml(
-            question.source || ""
-          );
+      const source =
+        escapeHtml(
+          question.source || ""
+        );
 
-        const school =
-          pulsePrepEscapeHtml(
-            question.school || ""
-          );
+      const school =
+        escapeHtml(
+          question.school || ""
+        );
 
-        const academicYear =
-          pulsePrepEscapeHtml(
-            question.academic_year || ""
-          );
+      const academicYear =
+        escapeHtml(
+          question.academic_year || ""
+        );
 
-        return `
-          <article
-            class="bg-white border border-slate-200 rounded-2xl p-5 mb-5 shadow-sm"
+      return `
+
+        <article
+          class="bg-white border border-slate-200
+                 rounded-2xl p-5 md:p-6 shadow-sm"
+        >
+
+          <!-- QUESTION HEADER -->
+
+          <div class="flex flex-wrap items-center
+                      justify-between gap-3 mb-4">
+
+            <div class="flex flex-wrap gap-2">
+
+              <span
+                class="px-3 py-1 rounded-full
+                       bg-teal-50 text-teal-700
+                       text-xs font-bold"
+              >
+                ${subject}
+              </span>
+
+              ${
+                topic
+                  ? `
+                    <span
+                      class="px-3 py-1 rounded-full
+                             bg-slate-100 text-slate-600
+                             text-xs font-semibold"
+                    >
+                      ${topic}
+                    </span>
+                  `
+                  : ""
+              }
+
+            </div>
+
+            ${
+              difficulty
+                ? `
+                  <span
+                    class="px-3 py-1 rounded-full
+                           bg-amber-50 text-amber-700
+                           text-xs font-bold"
+                  >
+                    ${difficulty}
+                  </span>
+                `
+                : ""
+            }
+
+          </div>
+
+
+          <!-- QUESTION -->
+
+          <h4 class="text-lg md:text-xl
+                     font-extrabold
+                     text-slate-900
+                     leading-7">
+
+            ${index + 1}.
+            ${questionText}
+
+          </h4>
+
+
+          <!-- OPTIONS -->
+
+          <div class="mt-5 space-y-3">
+
+            <div class="p-3 rounded-xl bg-slate-50">
+              <strong>A.</strong>
+              ${optionA}
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-50">
+              <strong>B.</strong>
+              ${optionB}
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-50">
+              <strong>C.</strong>
+              ${optionC}
+            </div>
+
+            <div class="p-3 rounded-xl bg-slate-50">
+              <strong>D.</strong>
+              ${optionD}
+            </div>
+
+          </div>
+
+
+          <!-- ANSWER -->
+
+          <div
+            class="mt-5 p-4 rounded-xl
+                   bg-emerald-50
+                   border border-emerald-200"
           >
 
-            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+            <p class="font-bold text-emerald-800">
+              Correct Answer
+            </p>
 
-              <div>
-                <span
-                  class="inline-block px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold"
+            <p class="mt-1 text-emerald-700">
+              ${correctAnswer}
+            </p>
+
+          </div>
+
+
+          <!-- EXPLANATION -->
+
+          ${
+            explanation
+              ? `
+                <div class="mt-4 p-4 rounded-xl
+                            bg-blue-50
+                            border border-blue-200">
+
+                  <p class="font-bold text-blue-800">
+                    Explanation
+                  </p>
+
+                  <p class="mt-2 text-slate-700 leading-7">
+                    ${explanation}
+                  </p>
+
+                </div>
+              `
+              : ""
+          }
+
+
+          <!-- SOURCE -->
+
+          ${
+            source ||
+            school ||
+            academicYear
+              ? `
+                <div
+                  class="mt-4 pt-4
+                         border-t border-slate-100
+                         text-xs text-slate-500"
                 >
-                  Question ${index + 1}
-                </span>
 
-                <h3 class="text-sm font-bold text-slate-900 mt-3">
-                  ${subject}
-                </h3>
+                  ${
+                    source
+                      ? `<span>Source: ${source}</span>`
+                      : ""
+                  }
 
-                ${
-                  topic
-                    ? `
-                      <p class="text-xs text-slate-500 mt-1">
-                        Topic: ${topic}
-                      </p>
-                    `
-                    : ""
-                }
-              </div>
+                  ${
+                    school
+                      ? `<span class="ml-3">School: ${school}</span>`
+                      : ""
+                  }
 
-              <div class="flex flex-wrap gap-2">
+                  ${
+                    academicYear
+                      ? `<span class="ml-3">Year: ${academicYear}</span>`
+                      : ""
+                  }
 
-                ${
-                  difficulty
-                    ? `
-                      <span class="px-2 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
-                        ${difficulty}
-                      </span>
-                    `
-                    : ""
-                }
+                </div>
+              `
+              : ""
+          }
 
-                ${
-                  source
-                    ? `
-                      <span class="px-2 py-1 rounded-lg bg-purple-100 text-purple-700 text-xs font-semibold">
-                        ${source}
-                      </span>
-                    `
-                    : ""
-                }
+        </article>
 
-              </div>
+      `;
 
-            </div>
+    }).join("");
 
-            <div class="text-slate-900 font-semibold leading-relaxed mb-5">
-              ${questionText}
-            </div>
-
-            <div class="space-y-2 mb-5">
-
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <strong>A.</strong>
-                ${optionA}
-              </div>
-
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <strong>B.</strong>
-                ${optionB}
-              </div>
-
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <strong>C.</strong>
-                ${optionC}
-              </div>
-
-              <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
-                <strong>D.</strong>
-                ${optionD}
-              </div>
-
-            </div>
-
-            <div class="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
-
-              <p class="text-xs font-bold text-green-700 uppercase mb-1">
-                Correct Answer
-              </p>
-
-              <p class="text-sm font-semibold text-green-900">
-                ${correctAnswer}
-              </p>
-
-            </div>
-
-            ${
-              explanation
-                ? `
-                  <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-
-                    <p class="text-xs font-bold text-blue-700 uppercase mb-1">
-                      Explanation
-                    </p>
-
-                    <p class="text-sm text-blue-900 leading-relaxed">
-                      ${explanation}
-                    </p>
-
-                  </div>
-                `
-                : ""
-            }
-
-            ${
-              school ||
-              academicYear
-                ? `
-                  <div class="flex flex-wrap gap-3 text-xs text-slate-500">
-
-                    ${
-                      school
-                        ? `<span>School: ${school}</span>`
-                        : ""
-                    }
-
-                    ${
-                      academicYear
-                        ? `<span>Academic Year: ${academicYear}</span>`
-                        : ""
-                    }
-
-                  </div>
-                `
-                : ""
-            }
-
-          </article>
-        `;
-      })
-      .join("");
 }
 
-// --------------------------------------------------------
-// SEARCH EVENT
-// --------------------------------------------------------
-
-questionSearchInput?.addEventListener(
-  "input",
-  event => {
-
-    pulsePrepQuestionSearch =
-      event.target.value || "";
-
-    renderFilteredQuestions();
-  }
-);
 
 // --------------------------------------------------------
-// SUBJECT FILTER EVENT
+// SEARCH EVENTS
 // --------------------------------------------------------
 
-subjectFilter?.addEventListener(
-  "change",
-  event => {
+if (searchInput) {
 
-    pulsePrepSelectedSubject =
-      event.target.value || "";
+  searchInput.addEventListener(
+    "input",
+    renderFilteredQuestions
+  );
 
-    renderFilteredQuestions();
-  }
-);
+}
 
-// --------------------------------------------------------
-// LEVEL FILTER EVENT
-// --------------------------------------------------------
+if (subjectFilter) {
 
-levelFilter?.addEventListener(
-  "change",
-  event => {
+  subjectFilter.addEventListener(
+    "change",
+    renderFilteredQuestions
+  );
 
-    pulsePrepSelectedLevel =
-      event.target.value || "";
+}
 
-    renderFilteredQuestions();
-  }
-);
-
-// --------------------------------------------------------
-// EXAM TYPE FILTER EVENT
-// --------------------------------------------------------
-
-examTypeFilter?.addEventListener(
-  "change",
-  event => {
-
-    pulsePrepSelectedExamType =
-      event.target.value || "";
-
-    renderFilteredQuestions();
-  }
-);
-
-// --------------------------------------------------------
-// CLEAR FILTERS
-// --------------------------------------------------------
-
-clearFiltersButton?.addEventListener(
-  "click",
-  () => {
-
-    pulsePrepQuestionSearch = "";
-    pulsePrepSelectedSubject = "";
-    pulsePrepSelectedLevel = "";
-    pulsePrepSelectedExamType = "";
-
-    if (questionSearchInput) {
-      questionSearchInput.value = "";
-    }
-
-    if (subjectFilter) {
-      subjectFilter.value = "";
-    }
-
-    if (levelFilter) {
-      levelFilter.value = "";
-    }
-
-    if (examTypeFilter) {
-      examTypeFilter.value = "";
-    }
-
-    renderFilteredQuestions();
-  }
-);
 
 // --------------------------------------------------------
 // INITIAL RENDER
 // --------------------------------------------------------
 
 renderFilteredQuestions();
+
     pastPapersLoaded = true;
 
   } catch (error) {
