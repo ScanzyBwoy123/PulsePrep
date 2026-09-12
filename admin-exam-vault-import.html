@@ -2,16 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>PulsePrep Exam Vault Bulk Import</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulsePrep — Exam Vault Bulk Import</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <link
@@ -21,15 +15,49 @@
 
   <style>
     body {
-      background: #f1f5f9;
+      background: #f8fafc;
     }
 
-    .hidden-screen {
+    .hidden {
       display: none !important;
     }
 
-    textarea {
-      resize: vertical;
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .error-box {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+    }
+
+    .success-box {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #166534;
+    }
+
+    .warning-box {
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+    }
+
+    .info-box {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e40af;
     }
 
     .table-wrap {
@@ -37,792 +65,662 @@
     }
 
     table {
-      min-width: 1150px;
+      min-width: 100%;
     }
 
-    .status-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 9999px;
+    th,
+    td {
+      white-space: nowrap;
+    }
+
+    .drop-zone {
+      border: 2px dashed #cbd5e1;
+      transition: all 0.2s ease;
+    }
+
+    .drop-zone:hover {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .drop-zone.dragging {
+      border-color: #2563eb;
+      background: #dbeafe;
+    }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
       display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
     }
 
-    .diagnostic-item {
-      word-break: break-word;
-    }
-
-    .mono {
-      font-family:
-        ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        Monaco,
-        Consolas,
-        monospace;
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
   </style>
 </head>
 
 <body class="min-h-screen text-slate-800">
 
-<!-- =========================================================
-     LOGIN SCREEN
-========================================================= -->
+  <!-- LOGIN -->
+  <section id="loginScreen" class="min-h-screen flex items-center justify-center p-5">
+    <div class="card w-full max-w-md p-7">
 
-<div
-  id="loginScreen"
-  class="min-h-screen flex items-center justify-center px-4"
->
+      <div class="text-center mb-7">
+        <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <i class="fa-solid fa-book-medical text-2xl"></i>
+        </div>
 
-  <div
-    class="bg-white w-full max-w-md rounded-2xl shadow-xl p-8"
-  >
+        <h1 class="text-2xl font-bold text-slate-900">
+          PulsePrep Exam Vault
+        </h1>
 
-    <div class="text-center mb-8">
-
-      <div
-        class="w-16 h-16 mx-auto mb-4 rounded-2xl
-               bg-blue-600 text-white flex items-center
-               justify-center text-2xl"
-      >
-        <i class="fa-solid fa-file-import"></i>
+        <p class="text-sm text-slate-500 mt-2">
+          Administrator bulk question importer
+        </p>
       </div>
 
-      <h1 class="text-2xl font-bold text-slate-900">
-        PulsePrep Exam Vault
-      </h1>
+      <form id="loginForm" class="space-y-4">
 
-      <p class="text-slate-500 mt-2">
-        Bulk Question Import
-      </p>
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            Admin Email
+          </label>
 
-    </div>
-
-    <form id="loginForm" class="space-y-5">
-
-      <div>
-
-        <label class="block text-sm font-semibold mb-2">
-          Admin Email
-        </label>
-
-        <input
-          id="loginEmail"
-          type="email"
-          required
-          autocomplete="email"
-          class="w-full border border-slate-300
-                 rounded-xl px-4 py-3
-                 focus:outline-none
-                 focus:ring-2 focus:ring-blue-500"
-          placeholder="Admin email"
-        >
-
-      </div>
-
-      <div>
-
-        <label class="block text-sm font-semibold mb-2">
-          Password
-        </label>
-
-        <input
-          id="loginPassword"
-          type="password"
-          required
-          autocomplete="current-password"
-          class="w-full border border-slate-300
-                 rounded-xl px-4 py-3
-                 focus:outline-none
-                 focus:ring-2 focus:ring-blue-500"
-          placeholder="Password"
-        >
-
-      </div>
-
-      <button
-        id="loginButton"
-        type="submit"
-        class="w-full bg-blue-600 hover:bg-blue-700
-               text-white font-semibold rounded-xl
-               px-4 py-3 transition"
-      >
-        <i class="fa-solid fa-right-to-bracket mr-2"></i>
-        Sign In
-      </button>
-
-    </form>
-
-    <p
-      id="loginMessage"
-      class="text-center text-sm mt-5"
-    ></p>
-
-  </div>
-
-</div>
-
-
-<!-- =========================================================
-     ADMIN APP
-========================================================= -->
-
-<div id="adminApp" class="hidden-screen">
-
-  <!-- HEADER -->
-
-  <header class="bg-slate-900 text-white shadow-lg">
-
-    <div
-      class="max-w-7xl mx-auto px-4 py-4
-             flex flex-col md:flex-row
-             md:items-center md:justify-between gap-4"
-    >
-
-      <div class="flex items-center gap-3">
-
-        <div
-          class="w-11 h-11 rounded-xl bg-blue-600
-                 flex items-center justify-center"
-        >
-          <i class="fa-solid fa-file-import"></i>
+          <input
+            id="loginEmail"
+            type="email"
+            required
+            autocomplete="email"
+            class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Admin email"
+          >
         </div>
 
         <div>
+          <label class="block text-sm font-medium mb-1">
+            Password
+          </label>
 
-          <h1 class="text-xl font-bold">
-            PulsePrep Exam Vault
-          </h1>
-
-          <p class="text-xs text-slate-300">
-            Bulk Question Import
-          </p>
-
+          <input
+            id="loginPassword"
+            type="password"
+            required
+            autocomplete="current-password"
+            class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Password"
+          >
         </div>
-
-      </div>
-
-      <div class="flex items-center gap-3">
-
-        <span
-          id="adminEmailDisplay"
-          class="text-sm text-slate-300 hidden md:block"
-        ></span>
 
         <button
-          id="logoutButton"
-          type="button"
-          class="bg-red-500 hover:bg-red-600
-                 px-4 py-2 rounded-lg text-sm
-                 font-semibold"
+          id="loginButton"
+          type="submit"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl px-4 py-3 transition"
         >
-          <i class="fa-solid fa-right-from-bracket mr-1"></i>
-          Logout
+          <i class="fa-solid fa-right-to-bracket mr-2"></i>
+          Sign In
         </button>
 
-      </div>
-
-    </div>
-
-  </header>
-
-
-  <!-- MAIN -->
-
-  <main class="max-w-7xl mx-auto px-4 py-8">
-
-    <!-- INTRO -->
-
-    <div class="mb-8">
-
-      <h2 class="text-3xl font-bold text-slate-900">
-        Bulk Question Import
-      </h2>
-
-      <p class="text-slate-500 mt-2">
-        Upload hundreds of Exam Vault questions using
-        a CSV file instead of entering them one at a time.
-      </p>
-
-    </div>
-
-
-    <!-- FORMAT NOTICE -->
-
-    <div
-      class="bg-blue-50 border border-blue-200
-             rounded-2xl p-5 mb-8"
-    >
-
-      <div class="flex gap-3">
-
-        <div class="text-blue-600 text-xl">
-          <i class="fa-solid fa-circle-info"></i>
-        </div>
-
-        <div class="flex-1">
-
-          <h3 class="font-bold text-blue-900">
-            Required CSV Format
-          </h3>
-
-          <p class="text-sm text-blue-800 mt-1">
-            PulsePrep requires exactly these 14 fields.
-            You do not need to add an ID column.
-          </p>
-
-          <div
-            class="mt-3 bg-white/70 border border-blue-200
-                   rounded-xl p-3 overflow-x-auto"
-          >
-
-            <code
-              class="mono text-xs text-blue-900 whitespace-nowrap"
-            >
-              subject, topic, question, option_a, option_b,
-              option_c, option_d, correct_answer, explanation,
-              difficulty, source, school, academic_year, status
-            </code>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-
-    <!-- STEP 1 -->
-
-    <section
-      class="bg-white rounded-2xl shadow-sm
-             p-6 mb-6"
-    >
-
-      <div class="flex items-start gap-4">
-
         <div
-          class="w-10 h-10 rounded-full bg-blue-600
-                 text-white flex items-center
-                 justify-center font-bold shrink-0"
-        >
-          1
+          id="loginError"
+          class="hidden error-box rounded-xl p-4 text-sm"
+        ></div>
+
+      </form>
+    </div>
+  </section>
+
+
+  <!-- ADMIN APP -->
+  <section id="adminApp" class="hidden">
+
+    <!-- HEADER -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+
+        <div>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center">
+              <i class="fa-solid fa-book-medical"></i>
+            </div>
+
+            <div>
+              <h1 class="font-bold text-lg text-slate-900">
+                PulsePrep Exam Vault
+              </h1>
+
+              <p class="text-xs text-slate-500">
+                Bulk Question Import
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div class="flex-1">
+        <div class="flex items-center gap-3">
 
-          <h3 class="text-xl font-bold text-slate-900">
-            Download CSV Template
-          </h3>
-
-          <p class="text-slate-500 mt-1 mb-4">
-            Use the official PulsePrep 14-column template
-            when creating new question banks.
-          </p>
+          <a
+            href="index.html"
+            class="hidden sm:inline-flex items-center gap-2 border border-slate-300 hover:bg-slate-50 rounded-xl px-4 py-2 text-sm font-medium"
+          >
+            <i class="fa-solid fa-arrow-left"></i>
+            Back
+          </a>
 
           <button
-            id="downloadTemplateButton"
-            type="button"
-            class="bg-blue-600 hover:bg-blue-700
-                   text-white font-semibold
-                   px-5 py-3 rounded-xl"
+            id="logoutButton"
+            class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-4 py-2 text-sm font-medium"
           >
-            <i class="fa-solid fa-download mr-2"></i>
-            Download CSV Template
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Logout
           </button>
 
         </div>
+      </div>
+    </header>
 
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+
+      <!-- INTRO -->
+      <div class="mb-7">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">
+          Bulk Question Import
+        </h2>
+
+        <p class="text-slate-500 mt-2">
+          Upload a CSV containing nursing examination questions and validate it before importing into the Exam Vault.
+        </p>
       </div>
 
-    </section>
+
+      <!-- COMPATIBILITY NOTICE -->
+      <div class="info-box rounded-2xl p-5 mb-7">
+        <div class="flex gap-3">
+          <i class="fa-solid fa-circle-info mt-1"></i>
+
+          <div>
+            <h3 class="font-bold">
+              CSV format compatibility
+            </h3>
+
+            <p class="text-sm mt-1 leading-6">
+              PulsePrep accepts both the original 11-column question format and the newer 14-column format.
+              If your file contains an <strong>id</strong> column, it will be ignored and the database can generate its own ID.
+              Missing optional metadata such as source, school, academic year and status will be filled automatically.
+            </p>
+          </div>
+        </div>
+      </div>
 
 
-    <!-- STEP 2 -->
+      <!-- STEP 1 -->
+      <section class="card p-5 sm:p-7 mb-6">
 
-    <section
-      class="bg-white rounded-2xl shadow-sm
-             p-6 mb-6"
-    >
+        <div class="flex items-start gap-4 mb-5">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+            1
+          </div>
 
-      <div class="flex items-start gap-4">
+          <div>
+            <h3 class="text-lg font-bold">
+              Download CSV Template
+            </h3>
 
-        <div
-          class="w-10 h-10 rounded-full bg-blue-600
-                 text-white flex items-center
-                 justify-center font-bold shrink-0"
-        >
-          2
+            <p class="text-sm text-slate-500 mt-1">
+              Use the full template when creating new question files.
+            </p>
+          </div>
         </div>
 
-        <div class="flex-1">
+        <button
+          id="downloadTemplateButton"
+          class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl px-5 py-3"
+        >
+          <i class="fa-solid fa-download"></i>
+          Download 14-Column Template
+        </button>
 
-          <h3 class="text-xl font-bold text-slate-900">
-            Select Your CSV File
-          </h3>
+      </section>
 
-          <p class="text-slate-500 mt-1 mb-4">
-            Select your existing PulsePrep question bank.
+
+      <!-- STEP 2 -->
+      <section class="card p-5 sm:p-7 mb-6">
+
+        <div class="flex items-start gap-4 mb-5">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
+            2
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold">
+              Select CSV File
+            </h3>
+
+            <p class="text-sm text-slate-500 mt-1">
+              Existing 11-column files are also supported.
+            </p>
+          </div>
+        </div>
+
+
+        <div
+          id="dropZone"
+          class="drop-zone rounded-2xl p-8 text-center cursor-pointer"
+        >
+
+          <i class="fa-solid fa-file-csv text-4xl text-blue-500 mb-4"></i>
+
+          <p class="font-semibold text-slate-800">
+            Choose your CSV file
+          </p>
+
+          <p class="text-sm text-slate-500 mt-1">
+            or drag and drop it here
           </p>
 
           <input
             id="csvFile"
             type="file"
             accept=".csv,text/csv"
-            class="block w-full border border-slate-300
-                   rounded-xl p-3 bg-white"
+            class="hidden"
           >
-
-          <p
-            id="fileInformation"
-            class="text-sm text-slate-500 mt-3"
-          >
-            No file selected.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- STEP 3 -->
-
-    <section
-      class="bg-white rounded-2xl shadow-sm
-             p-6 mb-6"
-    >
-
-      <div class="flex items-start gap-4">
-
-        <div
-          class="w-10 h-10 rounded-full bg-blue-600
-                 text-white flex items-center
-                 justify-center font-bold shrink-0"
-        >
-          3
-        </div>
-
-        <div class="flex-1">
-
-          <h3 class="text-xl font-bold text-slate-900">
-            Validate File
-          </h3>
-
-          <p class="text-slate-500 mt-1 mb-4">
-            The importer checks the CSV structure and every
-            question before touching Supabase.
-          </p>
 
           <button
-            id="validateButton"
+            id="chooseFileButton"
             type="button"
-            class="bg-slate-800 hover:bg-slate-900
-                   text-white font-semibold
-                   px-5 py-3 rounded-xl"
+            class="mt-5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 py-3 font-medium"
           >
-            <i class="fa-solid fa-check-double mr-2"></i>
-            Validate CSV
+            <i class="fa-solid fa-folder-open mr-2"></i>
+            Choose CSV
           </button>
 
         </div>
 
-      </div>
 
-    </section>
+        <div
+          id="fileInfo"
+          class="hidden mt-4 rounded-xl bg-slate-50 border border-slate-200 p-4"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-3">
+
+            <div>
+              <p class="font-semibold" id="fileName">
+                —
+              </p>
+
+              <p class="text-sm text-slate-500" id="fileSize">
+                —
+              </p>
+            </div>
+
+            <button
+              id="removeFileButton"
+              type="button"
+              class="text-red-600 hover:text-red-700 font-medium text-sm"
+            >
+              <i class="fa-solid fa-trash mr-1"></i>
+              Remove
+            </button>
+
+          </div>
+        </div>
+
+      </section>
 
 
-    <!-- =====================================================
-         FILE DIAGNOSTICS
-    ====================================================== -->
+      <!-- STEP 3 -->
+      <section class="card p-5 sm:p-7 mb-6">
 
-    <section
-      id="diagnosticSection"
-      class="hidden bg-white rounded-2xl
-             shadow-sm p-6 mb-6"
-    >
+        <div class="flex items-start gap-4 mb-5">
+          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
+            3
+          </div>
 
-      <div class="flex items-center justify-between mb-5">
+          <div>
+            <h3 class="text-lg font-bold">
+              Validate CSV
+            </h3>
 
-        <div>
+            <p class="text-sm text-slate-500 mt-1">
+              PulsePrep will check the columns and every question before anything is imported.
+            </p>
+          </div>
+        </div>
 
-          <h3 class="text-xl font-bold text-slate-900">
+
+        <button
+          id="validateButton"
+          disabled
+          class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl px-6 py-3"
+        >
+          <i class="fa-solid fa-check-double mr-2"></i>
+          Validate CSV
+        </button>
+
+
+        <!-- CSV DIAGNOSTICS -->
+        <div
+          id="diagnosticsSection"
+          class="hidden mt-6"
+        >
+
+          <h4 class="font-bold text-lg mb-3">
             CSV Diagnostics
-          </h3>
+          </h4>
 
-          <p class="text-sm text-slate-500 mt-1">
+          <p class="text-sm text-slate-500 mb-4">
             What PulsePrep actually detected in your file.
-          </p>
-
-        </div>
-
-        <div
-          id="diagnosticOverall"
-          class="px-3 py-2 rounded-lg
-                 text-sm font-bold"
-        ></div>
-
-      </div>
-
-
-      <div
-        id="diagnosticList"
-        class="space-y-3"
-      ></div>
-
-    </section>
-
-
-    <!-- VALIDATION SUMMARY -->
-
-    <section
-      id="validationSection"
-      class="hidden bg-white rounded-2xl
-             shadow-sm p-6 mb-6"
-    >
-
-      <h3 class="text-xl font-bold text-slate-900 mb-5">
-        Validation Results
-      </h3>
-
-
-      <div
-        class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6"
-      >
-
-        <div class="rounded-xl bg-slate-100 p-5">
-
-          <p class="text-sm text-slate-500">
-            Total Questions
-          </p>
-
-          <p
-            id="totalRows"
-            class="text-3xl font-bold mt-1"
-          >
-            0
-          </p>
-
-        </div>
-
-
-        <div class="rounded-xl bg-green-50 p-5">
-
-          <p class="text-sm text-green-700">
-            Valid
-          </p>
-
-          <p
-            id="validRows"
-            class="text-3xl font-bold
-                   text-green-700 mt-1"
-          >
-            0
-          </p>
-
-        </div>
-
-
-        <div class="rounded-xl bg-red-50 p-5">
-
-          <p class="text-sm text-red-700">
-            Invalid
-          </p>
-
-          <p
-            id="invalidRows"
-            class="text-3xl font-bold
-                   text-red-700 mt-1"
-          >
-            0
-          </p>
-
-        </div>
-
-
-        <div class="rounded-xl bg-blue-50 p-5">
-
-          <p class="text-sm text-blue-700">
-            Columns
-          </p>
-
-          <p
-            id="columnCount"
-            class="text-3xl font-bold
-                   text-blue-700 mt-1"
-          >
-            0
-          </p>
-
-        </div>
-
-      </div>
-
-
-      <div
-        id="validationMessage"
-        class="text-sm mb-5"
-      ></div>
-
-
-      <!-- ERRORS -->
-
-      <div id="errorsContainer" class="hidden">
-
-        <h4 class="font-bold text-red-700 mb-3">
-          Errors Found
-        </h4>
-
-        <div
-          id="errorsList"
-          class="space-y-2"
-        ></div>
-
-      </div>
-
-    </section>
-
-
-    <!-- PREVIEW -->
-
-    <section
-      id="previewSection"
-      class="hidden bg-white rounded-2xl
-             shadow-sm p-6 mb-6"
-    >
-
-      <div
-        class="flex flex-col md:flex-row
-               md:items-center
-               md:justify-between gap-3 mb-5"
-      >
-
-        <div>
-
-          <h3 class="text-xl font-bold text-slate-900">
-            Question Preview
-          </h3>
-
-          <p class="text-sm text-slate-500 mt-1">
-            Showing the first valid questions.
-          </p>
-
-        </div>
-
-        <span
-          id="previewCount"
-          class="text-sm font-semibold
-                 bg-blue-100 text-blue-700
-                 px-3 py-2 rounded-lg"
-        >
-          0 questions
-        </span>
-
-      </div>
-
-
-      <div class="table-wrap">
-
-        <table
-          class="w-full border-collapse text-sm"
-        >
-
-          <thead>
-
-            <tr class="bg-slate-100">
-
-              <th class="border p-3 text-left">
-                #
-              </th>
-
-              <th class="border p-3 text-left">
-                Subject
-              </th>
-
-              <th class="border p-3 text-left">
-                Topic
-              </th>
-
-              <th class="border p-3 text-left">
-                Question
-              </th>
-
-              <th class="border p-3 text-left">
-                Correct
-              </th>
-
-              <th class="border p-3 text-left">
-                Difficulty
-              </th>
-
-              <th class="border p-3 text-left">
-                Status
-              </th>
-
-            </tr>
-
-          </thead>
-
-          <tbody id="previewTableBody"></tbody>
-
-        </table>
-
-      </div>
-
-    </section>
-
-
-    <!-- STEP 4 -->
-
-    <section
-      id="importSection"
-      class="hidden bg-white rounded-2xl
-             shadow-sm p-6 mb-8"
-    >
-
-      <div class="flex items-start gap-4">
-
-        <div
-          class="w-10 h-10 rounded-full
-                 bg-green-600 text-white
-                 flex items-center justify-center
-                 font-bold shrink-0"
-        >
-          4
-        </div>
-
-        <div class="flex-1">
-
-          <h3 class="text-xl font-bold text-slate-900">
-            Import Questions
-          </h3>
-
-          <p class="text-slate-500 mt-1 mb-5">
-            Valid questions will be added to the Exam Vault
-            as <strong>Pending</strong>.
           </p>
 
 
           <div
-            class="bg-amber-50 border
-                   border-amber-200
-                   rounded-xl p-4 mb-5"
-          >
+            id="diagnosticsStatus"
+            class="rounded-xl p-4 mb-5"
+          ></div>
 
-            <p class="text-sm text-amber-800">
 
-              <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
 
-              Questions will remain Pending until you
-              approve them in the Exam Vault Manager.
+            <div class="stat-card">
+              <p class="text-xs uppercase tracking-wide text-slate-500">
+                Detected Columns
+              </p>
 
-            </p>
+              <p id="detectedColumnCount" class="text-2xl font-bold mt-1">
+                0
+              </p>
+            </div>
+
+
+            <div class="stat-card">
+              <p class="text-xs uppercase tracking-wide text-slate-500">
+                Expected Columns
+              </p>
+
+              <p class="text-2xl font-bold mt-1">
+                14
+              </p>
+            </div>
+
+
+            <div class="stat-card">
+              <p class="text-xs uppercase tracking-wide text-slate-500">
+                Question Rows
+              </p>
+
+              <p id="detectedRowCount" class="text-2xl font-bold mt-1">
+                0
+              </p>
+            </div>
+
+
+            <div class="stat-card">
+              <p class="text-xs uppercase tracking-wide text-slate-500">
+                Unknown Columns
+              </p>
+
+              <p id="unknownColumnCount" class="text-2xl font-bold mt-1">
+                0
+              </p>
+            </div>
 
           </div>
 
 
-          <button
-            id="importButton"
-            type="button"
-            class="bg-green-600 hover:bg-green-700
-                   text-white font-bold
-                   px-6 py-3 rounded-xl"
-          >
-            <i class="fa-solid fa-cloud-arrow-up mr-2"></i>
-            Import Valid Questions
-          </button>
+          <!-- DETECTED HEADERS -->
+          <div class="border border-slate-200 rounded-xl overflow-hidden mb-5">
+
+            <div class="bg-slate-50 px-4 py-3 border-b border-slate-200">
+              <h5 class="font-semibold">
+                Headers detected by browser
+              </h5>
+            </div>
+
+            <div
+              id="detectedHeaders"
+              class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"
+            ></div>
+
+          </div>
+
+
+          <!-- REQUIRED COLUMNS -->
+          <div
+            id="requiredColumnsBox"
+            class="rounded-xl p-4 mb-5"
+          ></div>
+
+
+          <!-- UNKNOWN COLUMNS -->
+          <div
+            id="unknownColumnsBox"
+            class="hidden rounded-xl p-4 mb-5"
+          ></div>
 
         </div>
 
-      </div>
 
-    </section>
+        <!-- VALIDATION RESULTS -->
+        <div
+          id="validationSection"
+          class="hidden mt-8"
+        >
+
+          <h4 class="font-bold text-lg mb-4">
+            Validation Results
+          </h4>
 
 
-    <!-- RESULT -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
 
-    <section
-      id="resultSection"
-      class="hidden rounded-2xl p-6 mb-8"
-    >
+            <div class="stat-card">
+              <p class="text-xs uppercase tracking-wide text-slate-500">
+                Total Questions
+              </p>
 
-      <div class="flex items-start gap-4">
+              <p id="totalQuestions" class="text-2xl font-bold mt-1">
+                0
+              </p>
+            </div>
+
+
+            <div class="stat-card">
+              <p class="text-xs uppercase tracking-wide text-slate-500">
+                Valid
+              </p>
+
+              <p id="validQuestions" class="text-2xl font-bold text-green-600 mt-1">
+                0
+              </p>
+            </div>
+
+
+            <div class="stat-card">
+              <p class="text-xs uppercase tracking-wide text-slate-500">
+                Invalid
+              </p>
+
+              <p id="invalidQuestions" class="text-2xl font-bold text-red-600 mt-1">
+                0
+              </p>
+            </div>
+
+
+            <div class="stat-card">
+              <p class="text-xs uppercase tracking-wide text-slate-500">
+                Columns
+              </p>
+
+              <p id="validationColumnCount" class="text-2xl font-bold mt-1">
+                0
+              </p>
+            </div>
+
+          </div>
+
+
+          <div
+            id="validationMessage"
+            class="rounded-xl p-4 mb-5"
+          ></div>
+
+
+          <div
+            id="validationErrors"
+            class="hidden"
+          >
+            <h5 class="font-bold mb-3">
+              Problems Found
+            </h5>
+
+            <div
+              id="errorList"
+              class="space-y-2 max-h-96 overflow-y-auto"
+            ></div>
+          </div>
+
+        </div>
+
+
+        <!-- PREVIEW -->
+        <div
+          id="previewSection"
+          class="hidden mt-8"
+        >
+
+          <div class="flex items-center justify-between gap-3 mb-3">
+
+            <div>
+              <h4 class="font-bold text-lg">
+                Question Preview
+              </h4>
+
+              <p class="text-sm text-slate-500">
+                Showing the first valid questions.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="table-wrap border border-slate-200 rounded-xl">
+
+            <table class="text-sm">
+              <thead class="bg-slate-50">
+                <tr>
+                  <th class="text-left px-4 py-3">#</th>
+                  <th class="text-left px-4 py-3">Subject</th>
+                  <th class="text-left px-4 py-3">Topic</th>
+                  <th class="text-left px-4 py-3">Question</th>
+                  <th class="text-left px-4 py-3">Answer</th>
+                  <th class="text-left px-4 py-3">Difficulty</th>
+                  <th class="text-left px-4 py-3">Status</th>
+                </tr>
+              </thead>
+
+              <tbody id="previewBody"></tbody>
+            </table>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- STEP 4 -->
+      <section class="card p-5 sm:p-7 mb-6">
+
+        <div class="flex items-start gap-4 mb-5">
+          <div class="w-10 h-10 rounded-xl bg-green-100 text-green-700 flex items-center justify-center font-bold">
+            4
+          </div>
+
+          <div>
+            <h3 class="text-lg font-bold">
+              Import Questions
+            </h3>
+
+            <p class="text-sm text-slate-500 mt-1">
+              Only validated questions will be imported.
+            </p>
+          </div>
+        </div>
+
+
+        <div class="warning-box rounded-xl p-4 mb-5 text-sm">
+          <div class="flex gap-3">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+
+            <div>
+              <strong>Important:</strong>
+              Imported questions are saved with
+              <strong>pending</strong>
+              status so they can be reviewed before being published.
+            </div>
+          </div>
+        </div>
+
+
+        <button
+          id="importButton"
+          disabled
+          class="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl px-6 py-3"
+        >
+          <i class="fa-solid fa-cloud-arrow-up mr-2"></i>
+          Import Valid Questions
+        </button>
+
 
         <div
-          id="resultIcon"
-          class="text-3xl"
+          id="importResult"
+          class="hidden mt-5 rounded-xl p-4"
         ></div>
 
-        <div>
-
-          <h3
-            id="resultTitle"
-            class="text-xl font-bold"
-          ></h3>
-
-          <p
-            id="resultMessage"
-            class="mt-2 text-sm"
-          ></p>
-
-        </div>
-
-      </div>
-
-    </section>
+      </section>
 
 
-    <!-- NAVIGATION -->
-
-    <div class="flex flex-col sm:flex-row gap-3">
-
-      <a
-        href="/admin-exam-vault.html"
-        class="inline-flex items-center
-               justify-center
-               bg-slate-800 hover:bg-slate-900
-               text-white font-semibold
-               px-5 py-3 rounded-xl"
+      <!-- RESULT -->
+      <section
+        id="resultSection"
+        class="hidden card p-5 sm:p-7 mb-6"
       >
-        <i class="fa-solid fa-vault mr-2"></i>
-        Open Exam Vault Manager
-      </a>
+        <div id="resultContent"></div>
+      </section>
 
-      <button
-        id="clearButton"
-        type="button"
-        class="bg-white hover:bg-slate-50
-               border border-slate-300
-               font-semibold px-5 py-3
-               rounded-xl"
-      >
-        <i class="fa-solid fa-rotate-left mr-2"></i>
-        Clear Import
-      </button>
 
-    </div>
+      <!-- SUBJECTS -->
+      <section class="card p-5 sm:p-7">
 
-  </main>
+        <h3 class="font-bold text-lg mb-4">
+          Supported PulsePrep Subjects
+        </h3>
 
-</div>
+        <div
+          id="subjectList"
+          class="flex flex-wrap gap-2"
+        ></div>
+
+      </section>
+
+    </main>
+
+  </section>
 
 
 <script>
-
 /* ============================================================
-   PULSEPREP EXAM VAULT BULK IMPORTER
-   ROBUST 14-COLUMN CSV VERSION
-============================================================ */
+   PULSEPREP EXAM VAULT BULK CSV IMPORTER
+   ============================================================ */
 
-
-/* ============================================================
-   SUPABASE
-============================================================ */
-
-const SUPABASE_URL =
-  "https://eskwphjtiogguhvtktmh.supabase.co";
+const SUPABASE_URL = "https://eskwphjtiogguhvtktmh.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs";
@@ -831,38 +729,24 @@ const ADMIN_EMAILS = [
   "scanzybwoy8@gmail.com"
 ];
 
-const supabaseClient =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+const IMPORT_TABLE = "exam_vault_questions";
+
+const IMPORT_BATCH_SIZE = 50;
 
 
 /* ============================================================
-   REQUIRED CSV HEADERS
-============================================================ */
+   SUPABASE
+   ============================================================ */
 
-const CSV_HEADERS = [
-  "subject",
-  "topic",
-  "question",
-  "option_a",
-  "option_b",
-  "option_c",
-  "option_d",
-  "correct_answer",
-  "explanation",
-  "difficulty",
-  "source",
-  "school",
-  "academic_year",
-  "status"
-];
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
 
 /* ============================================================
    SUBJECTS
-============================================================ */
+   ============================================================ */
 
 const SUBJECTS = [
   "Anatomy & Physiology",
@@ -899,20 +783,64 @@ const SUBJECTS = [
 
 
 /* ============================================================
+   FULL CSV TEMPLATE HEADERS
+   ============================================================ */
+
+const CSV_HEADERS = [
+  "subject",
+  "topic",
+  "question",
+  "option_a",
+  "option_b",
+  "option_c",
+  "option_d",
+  "correct_answer",
+  "explanation",
+  "difficulty",
+  "source",
+  "school",
+  "academic_year",
+  "status"
+];
+
+
+/* ============================================================
+   SUPPORTED LEGACY FORMAT
+   ============================================================ */
+
+const LEGACY_HEADERS = [
+  "id",
+  "subject",
+  "topic",
+  "question",
+  "option_a",
+  "option_b",
+  "option_c",
+  "option_d",
+  "correct_answer",
+  "explanation",
+  "difficulty"
+];
+
+
+/* ============================================================
    STATE
-============================================================ */
+   ============================================================ */
+
+let selectedFile = null;
 
 let parsedRows = [];
+
 let validRows = [];
+
 let invalidRows = [];
 
 let detectedHeaders = [];
-let rawCSVText = "";
 
 
 /* ============================================================
    DOM
-============================================================ */
+   ============================================================ */
 
 const loginScreen =
   document.getElementById("loginScreen");
@@ -923,440 +851,145 @@ const adminApp =
 const loginForm =
   document.getElementById("loginForm");
 
-const loginMessage =
-  document.getElementById("loginMessage");
-
 const loginEmail =
   document.getElementById("loginEmail");
 
 const loginPassword =
   document.getElementById("loginPassword");
 
+const loginButton =
+  document.getElementById("loginButton");
+
+const loginError =
+  document.getElementById("loginError");
+
+const logoutButton =
+  document.getElementById("logoutButton");
+
 const csvFile =
   document.getElementById("csvFile");
 
-const fileInformation =
-  document.getElementById("fileInformation");
+const chooseFileButton =
+  document.getElementById("chooseFileButton");
 
-const diagnosticSection =
-  document.getElementById("diagnosticSection");
+const removeFileButton =
+  document.getElementById("removeFileButton");
+
+const dropZone =
+  document.getElementById("dropZone");
+
+const validateButton =
+  document.getElementById("validateButton");
+
+const importButton =
+  document.getElementById("importButton");
+
+const downloadTemplateButton =
+  document.getElementById("downloadTemplateButton");
+
+const fileInfo =
+  document.getElementById("fileInfo");
+
+const fileName =
+  document.getElementById("fileName");
+
+const fileSize =
+  document.getElementById("fileSize");
+
+const diagnosticsSection =
+  document.getElementById("diagnosticsSection");
+
+const diagnosticsStatus =
+  document.getElementById("diagnosticsStatus");
+
+const detectedColumnCount =
+  document.getElementById("detectedColumnCount");
+
+const detectedRowCount =
+  document.getElementById("detectedRowCount");
+
+const unknownColumnCount =
+  document.getElementById("unknownColumnCount");
+
+const detectedHeadersBox =
+  document.getElementById("detectedHeaders");
+
+const requiredColumnsBox =
+  document.getElementById("requiredColumnsBox");
+
+const unknownColumnsBox =
+  document.getElementById("unknownColumnsBox");
 
 const validationSection =
   document.getElementById("validationSection");
 
+const totalQuestions =
+  document.getElementById("totalQuestions");
+
+const validQuestions =
+  document.getElementById("validQuestions");
+
+const invalidQuestions =
+  document.getElementById("invalidQuestions");
+
+const validationColumnCount =
+  document.getElementById("validationColumnCount");
+
+const validationMessage =
+  document.getElementById("validationMessage");
+
+const validationErrors =
+  document.getElementById("validationErrors");
+
+const errorList =
+  document.getElementById("errorList");
+
 const previewSection =
   document.getElementById("previewSection");
 
-const importSection =
-  document.getElementById("importSection");
+const previewBody =
+  document.getElementById("previewBody");
+
+const importResult =
+  document.getElementById("importResult");
 
 const resultSection =
   document.getElementById("resultSection");
 
-
-/* ============================================================
-   AUTH
-============================================================ */
-
-async function checkExistingSession() {
-
-  try {
-
-    const {
-      data: {
-        session
-      }
-    } =
-      await supabaseClient.auth.getSession();
-
-
-    if (
-      session &&
-      session.user &&
-      session.user.email &&
-      ADMIN_EMAILS.includes(
-        session.user.email.toLowerCase()
-      )
-    ) {
-
-      showAdminApp(
-        session.user.email
-      );
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Session check error:",
-      error
-    );
-
-  }
-
-}
-
-
-function showAdminApp(email) {
-
-  loginScreen.classList.add(
-    "hidden-screen"
-  );
-
-  adminApp.classList.remove(
-    "hidden-screen"
-  );
-
-  document.getElementById(
-    "adminEmailDisplay"
-  ).textContent = email;
-
-}
-
-
-loginForm.addEventListener(
-  "submit",
-  async function(event) {
-
-    event.preventDefault();
-
-    loginMessage.textContent =
-      "Signing in...";
-
-    loginMessage.className =
-      "text-center text-sm mt-5 text-slate-500";
-
-
-    const email =
-      loginEmail.value
-        .trim()
-        .toLowerCase();
-
-    const password =
-      loginPassword.value;
-
-
-    if (
-      !ADMIN_EMAILS.includes(email)
-    ) {
-
-      loginMessage.textContent =
-        "This account is not authorized as an administrator.";
-
-      loginMessage.className =
-        "text-center text-sm mt-5 text-red-600";
-
-      return;
-
-    }
-
-
-    try {
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient.auth
-          .signInWithPassword({
-            email,
-            password
-          });
-
-
-      if (error) {
-
-        loginMessage.textContent =
-          error.message;
-
-        loginMessage.className =
-          "text-center text-sm mt-5 text-red-600";
-
-        return;
-
-      }
-
-
-      if (
-        !data.user ||
-        !data.user.email ||
-        !ADMIN_EMAILS.includes(
-          data.user.email.toLowerCase()
-        )
-      ) {
-
-        await supabaseClient.auth.signOut();
-
-        loginMessage.textContent =
-          "Administrator access denied.";
-
-        loginMessage.className =
-          "text-center text-sm mt-5 text-red-600";
-
-        return;
-
-      }
-
-
-      showAdminApp(
-        data.user.email
-      );
-
-    } catch (error) {
-
-      console.error(
-        "Login error:",
-        error
-      );
-
-      loginMessage.textContent =
-        error.message ||
-        "Unable to sign in.";
-
-      loginMessage.className =
-        "text-center text-sm mt-5 text-red-600";
-
-    }
-
-  }
-);
-
-
-document.getElementById(
-  "logoutButton"
-).addEventListener(
-  "click",
-  async function() {
-
-    try {
-
-      await supabaseClient.auth.signOut();
-
-    } finally {
-
-      window.location.reload();
-
-    }
-
-  }
-);
+const resultContent =
+  document.getElementById("resultContent");
+
+const subjectList =
+  document.getElementById("subjectList");
 
 
 /* ============================================================
-   CSV TEMPLATE
-============================================================ */
+   HELPERS
+   ============================================================ */
 
-function csvEscape(value) {
-
-  const text =
-    String(value ?? "");
-
-  return (
-    '"' +
-    text.replace(
-      /"/g,
-      '""'
-    ) +
-    '"'
-  );
-
+function normalizeHeader(value) {
+  return String(value ?? "")
+    .replace(/^\uFEFF/, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
 }
 
 
-function downloadCSV(
-  filename,
-  rows
-) {
-
-  const csv =
-    rows
-      .map(
-        row =>
-          row
-            .map(csvEscape)
-            .join(",")
-      )
-      .join("\r\n");
-
-
-  const blob =
-    new Blob(
-      [
-        "\uFEFF" + csv
-      ],
-      {
-        type:
-          "text/csv;charset=utf-8;"
-      }
-    );
-
-
-  const url =
-    URL.createObjectURL(blob);
-
-
-  const link =
-    document.createElement("a");
-
-
-  link.href = url;
-
-  link.download =
-    filename;
-
-  document.body.appendChild(link);
-
-  link.click();
-
-  document.body.removeChild(link);
-
-
-  setTimeout(
-    function() {
-
-      URL.revokeObjectURL(url);
-
-    },
-    1000
-  );
-
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-
-document.getElementById(
-  "downloadTemplateButton"
-).addEventListener(
-  "click",
-  function() {
-
-    const sample = [
-
-      CSV_HEADERS,
-
-      [
-        "Anatomy & Physiology",
-        "Genetics",
-        "Which molecule carries genetic information in most living organisms?",
-        "Protein",
-        "DNA",
-        "Lipid",
-        "Carbohydrate",
-        "B",
-        "DNA stores the genetic information used for growth, development and cellular function.",
-        "easy",
-        "PulsePrep",
-        "Nursing School",
-        "2026",
-        "pending"
-      ]
-
-    ];
-
-
-    downloadCSV(
-      "pulseprep-exam-vault-template.csv",
-      sample
-    );
-
-  }
-);
-
-
-/* ============================================================
-   FILE SELECTION
-============================================================ */
-
-csvFile.addEventListener(
-  "change",
-  function() {
-
-    const file =
-      csvFile.files[0];
-
-
-    parsedRows = [];
-    validRows = [];
-    invalidRows = [];
-
-    detectedHeaders = [];
-    rawCSVText = "";
-
-
-    diagnosticSection.classList.add(
-      "hidden"
-    );
-
-    validationSection.classList.add(
-      "hidden"
-    );
-
-    previewSection.classList.add(
-      "hidden"
-    );
-
-    importSection.classList.add(
-      "hidden"
-    );
-
-    resultSection.classList.add(
-      "hidden"
-    );
-
-
-    if (!file) {
-
-      fileInformation.textContent =
-        "No file selected.";
-
-      return;
-
-    }
-
-
-    if (
-      !file.name
-        .toLowerCase()
-        .endsWith(".csv")
-    ) {
-
-      fileInformation.textContent =
-        "Please select a CSV file.";
-
-      return;
-
-    }
-
-
-    fileInformation.innerHTML =
-      `<strong>${escapeHTML(file.name)}</strong>
-       — ${formatBytes(file.size)}`;
-
-  }
-);
-
-
-/* ============================================================
-   FILE SIZE
-============================================================ */
 
 function formatBytes(bytes) {
-
-  if (
-    !Number.isFinite(bytes) ||
-    bytes < 0
-  ) {
-
-    return "Unknown size";
-
-  }
-
-
-  if (bytes === 0) {
-
+  if (!Number.isFinite(bytes) || bytes <= 0) {
     return "0 Bytes";
-
   }
-
 
   const units = [
     "Bytes",
@@ -1365,603 +998,1093 @@ function formatBytes(bytes) {
     "GB"
   ];
 
-
-  const index =
-    Math.min(
-      Math.floor(
-        Math.log(bytes) /
-        Math.log(1024)
-      ),
-      units.length - 1
-    );
-
+  const index = Math.min(
+    Math.floor(Math.log(bytes) / Math.log(1024)),
+    units.length - 1
+  );
 
   return (
-    parseFloat(
-      (
-        bytes /
-        Math.pow(1024, index)
-      ).toFixed(2)
+    (bytes / Math.pow(1024, index)).toFixed(
+      index === 0 ? 0 : 2
     ) +
     " " +
     units[index]
   );
+}
 
+
+function csvEscape(value) {
+  const text = String(value ?? "");
+
+  if (
+    text.includes(",") ||
+    text.includes('"') ||
+    text.includes("\n") ||
+    text.includes("\r")
+  ) {
+    return '"' + text.replace(/"/g, '""') + '"';
+  }
+
+  return text;
 }
 
 
 /* ============================================================
-   CLEAN INVISIBLE CHARACTERS
-============================================================ */
+   CSV TEMPLATE
+   ============================================================ */
 
-function cleanCell(value) {
+function downloadCSV(filename, rows) {
 
-  return String(value ?? "")
-    .replace(
-      /^\uFEFF/,
-      ""
+  const csv = [
+    CSV_HEADERS.join(","),
+    ...rows.map(row =>
+      CSV_HEADERS
+        .map(header => csvEscape(row[header] ?? ""))
+        .join(",")
     )
-    .replace(
-      /[\u200B-\u200D\u2060]/g,
-      ""
-    )
-    .replace(
-      /\u00A0/g,
-      " "
-    )
-    .trim();
+  ].join("\r\n");
 
+  /*
+    UTF-8 BOM helps Excel correctly recognize UTF-8.
+  */
+
+  const blob = new Blob(
+    ["\uFEFF" + csv],
+    {
+      type: "text/csv;charset=utf-8;"
+    }
+  );
+
+  const url =
+    URL.createObjectURL(blob);
+
+  const link =
+    document.createElement("a");
+
+  link.href = url;
+  link.download = filename;
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  link.remove();
+
+  URL.revokeObjectURL(url);
 }
 
 
-/* ============================================================
-   HEADER NORMALIZATION
-============================================================ */
+function downloadTemplate() {
 
-function normalizeHeader(value) {
+  const sample = {
+    subject: "Maternal & Child Health",
+    topic: "Antenatal Care",
+    question:
+      "Which vitamin is routinely recommended during pregnancy to help prevent neural tube defects?",
+    option_a: "Vitamin A",
+    option_b: "Folic acid",
+    option_c: "Vitamin C",
+    option_d: "Vitamin K",
+    correct_answer: "B",
+    explanation:
+      "Folic acid helps prevent neural tube defects when taken before conception and during early pregnancy.",
+    difficulty: "easy",
+    source: "PulsePrep Sample",
+    school: "",
+    academic_year: "2026",
+    status: "pending"
+  };
 
-  return cleanCell(value)
-    .toLowerCase()
-    .replace(
-      /[\s\-]+/g,
-      "_"
-    )
-    .replace(
-      /[^a-z0-9_]/g,
-      ""
-    )
-    .replace(
-      /_+/g,
-      "_"
-    )
-    .replace(
-      /^_+|_+$/g,
-      ""
-    );
-
+  downloadCSV(
+    "pulseprep-exam-vault-template.csv",
+    [sample]
+  );
 }
 
 
 /* ============================================================
    ROBUST CSV PARSER
-============================================================ */
+   ============================================================ */
 
 function parseCSV(text) {
 
-  if (
-    typeof text !== "string"
-  ) {
-
+  if (typeof text !== "string") {
     throw new Error(
-      "The selected file could not be read as text."
+      "The uploaded file could not be read as text."
     );
-
   }
 
+  /*
+    Remove UTF-8 BOM if present.
+  */
 
-  text =
-    text
-      .replace(
-        /^\uFEFF/,
-        ""
-      )
-      .replace(
-        /\u0000/g,
-        ""
-      );
+  text = text.replace(/^\uFEFF/, "");
 
+  if (!text.trim()) {
+    throw new Error(
+      "The CSV file is empty."
+    );
+  }
 
   const rows = [];
 
   let row = [];
 
-  let value = "";
+  let cell = "";
 
   let insideQuotes = false;
 
-  let i = 0;
+  for (let i = 0; i < text.length; i++) {
 
+    const char = text[i];
 
-  while (
-    i < text.length
-  ) {
+    const nextChar =
+      i + 1 < text.length
+        ? text[i + 1]
+        : "";
 
-    const char =
-      text[i];
+    if (char === '"') {
 
-    const next =
-      text[i + 1];
+      if (insideQuotes && nextChar === '"') {
 
-
-    /* Escaped quote */
-
-    if (
-      char === '"' &&
-      insideQuotes &&
-      next === '"'
-    ) {
-
-      value += '"';
-
-      i += 2;
-
-      continue;
-
-    }
-
-
-    /* Quote */
-
-    if (
-      char === '"'
-    ) {
-
-      insideQuotes =
-        !insideQuotes;
-
-      i++;
-
-      continue;
-
-    }
-
-
-    /* Comma */
-
-    if (
-      char === "," &&
-      !insideQuotes
-    ) {
-
-      row.push(value);
-
-      value = "";
-
-      i++;
-
-      continue;
-
-    }
-
-
-    /* New line */
-
-    if (
-      (
-        char === "\n" ||
-        char === "\r"
-      ) &&
-      !insideQuotes
-    ) {
-
-      row.push(value);
-
-      value = "";
-
-
-      if (
-        row.some(
-          cell =>
-            cleanCell(cell) !== ""
-        )
-      ) {
-
-        rows.push(row);
-
-      }
-
-
-      row = [];
-
-
-      if (
-        char === "\r" &&
-        next === "\n"
-      ) {
-
-        i += 2;
-
-      } else {
+        cell += '"';
 
         i++;
 
+      } else {
+
+        insideQuotes = !insideQuotes;
+
       }
 
-
       continue;
-
     }
 
 
-    value += char;
+    if (char === "," && !insideQuotes) {
 
-    i++;
+      row.push(cell);
 
+      cell = "";
+
+      continue;
+    }
+
+
+    if (
+      (char === "\n" || char === "\r") &&
+      !insideQuotes
+    ) {
+
+      row.push(cell);
+
+      cell = "";
+
+      /*
+        Handle Windows CRLF.
+      */
+
+      if (
+        char === "\r" &&
+        nextChar === "\n"
+      ) {
+        i++;
+      }
+
+      /*
+        Ignore completely empty lines.
+      */
+
+      const hasContent =
+        row.some(
+          value =>
+            String(value).trim() !== ""
+        );
+
+      if (hasContent) {
+        rows.push(row);
+      }
+
+      row = [];
+
+      continue;
+    }
+
+
+    cell += char;
   }
 
 
   if (insideQuotes) {
-
     throw new Error(
-      "The CSV contains an unclosed quotation mark."
+      "The CSV contains an unclosed quoted field. Check for a missing quotation mark."
     );
-
   }
 
 
-  if (
-    value !== "" ||
-    row.length > 0
-  ) {
+  /*
+    Add final cell/row.
+  */
 
-    row.push(value);
+  row.push(cell);
 
+  const hasFinalContent =
+    row.some(
+      value =>
+        String(value).trim() !== ""
+    );
 
-    if (
-      row.some(
-        cell =>
-          cleanCell(cell) !== ""
-      )
-    ) {
-
-      rows.push(row);
-
-    }
-
+  if (hasFinalContent) {
+    rows.push(row);
   }
 
 
-  if (
-    rows.length === 0
-  ) {
-
+  if (!rows.length) {
     throw new Error(
-      "The CSV file is empty."
+      "No CSV rows were detected."
     );
-
   }
 
 
   return rows;
-
 }
 
 
 /* ============================================================
-   CSV VALIDATION BUTTON
-============================================================ */
+   LEGACY FORMAT NORMALIZATION
+   ============================================================ */
 
-document.getElementById(
-  "validateButton"
-).addEventListener(
-  "click",
-  async function() {
+function detectCSVFormat(headers) {
 
-    await validateCSV();
+  const normalized =
+    headers.map(normalizeHeader);
 
+  const headerSet =
+    new Set(normalized);
+
+
+  const hasFullFormat =
+    CSV_HEADERS.every(
+      header => headerSet.has(header)
+    );
+
+
+  const hasLegacyFormat =
+    LEGACY_HEADERS.every(
+      header => headerSet.has(header)
+    );
+
+
+  if (hasFullFormat) {
+    return "full";
   }
-);
+
+
+  if (hasLegacyFormat) {
+    return "legacy";
+  }
+
+
+  return "unknown";
+}
 
 
 /* ============================================================
-   MAIN CSV VALIDATION
-============================================================ */
+   AUTOMATIC METADATA
+   ============================================================ */
 
-async function validateCSV() {
+function getDefaultSource() {
+  return "Bulk Import";
+}
 
-  const file =
-    csvFile.files[0];
 
+function getDefaultSchool() {
+  return "";
+}
+
+
+function getDefaultAcademicYear() {
+  return String(new Date().getFullYear());
+}
+
+
+function getDefaultStatus() {
+  return "pending";
+}
+
+
+/* ============================================================
+   VALIDATE QUESTION
+   ============================================================ */
+
+function validateQuestionRow(row, rowNumber) {
+
+  const errors = [];
+
+  const subject =
+    String(row.subject || "").trim();
+
+  const topic =
+    String(row.topic || "").trim();
+
+  const question =
+    String(row.question || "").trim();
+
+  const optionA =
+    String(row.option_a || "").trim();
+
+  const optionB =
+    String(row.option_b || "").trim();
+
+  const optionC =
+    String(row.option_c || "").trim();
+
+  const optionD =
+    String(row.option_d || "").trim();
+
+  const correctAnswer =
+    String(row.correct_answer || "")
+      .trim()
+      .toUpperCase();
+
+  const explanation =
+    String(row.explanation || "").trim();
+
+  const difficulty =
+    String(row.difficulty || "")
+      .trim()
+      .toLowerCase();
+
+  const source =
+    String(row.source || "").trim();
+
+  const school =
+    String(row.school || "").trim();
+
+  const academicYear =
+    String(row.academic_year || "").trim();
+
+  const status =
+    String(row.status || "")
+      .trim()
+      .toLowerCase();
+
+
+  if (!subject) {
+    errors.push("Subject is required.");
+  } else if (!SUBJECTS.includes(subject)) {
+    errors.push(
+      `Unknown subject: "${subject}".`
+    );
+  }
+
+
+  if (!topic) {
+    errors.push("Topic is required.");
+  }
+
+
+  if (!question) {
+    errors.push("Question is required.");
+  }
+
+
+  if (!optionA) {
+    errors.push("Option A is required.");
+  }
+
+
+  if (!optionB) {
+    errors.push("Option B is required.");
+  }
+
+
+  if (!optionC) {
+    errors.push("Option C is required.");
+  }
+
+
+  if (!optionD) {
+    errors.push("Option D is required.");
+  }
+
+
+  if (
+    !["A", "B", "C", "D"].includes(
+      correctAnswer
+    )
+  ) {
+    errors.push(
+      'Correct answer must be A, B, C, or D.'
+    );
+  }
+
+
+  if (
+    !["easy", "medium", "hard"].includes(
+      difficulty
+    )
+  ) {
+    errors.push(
+      'Difficulty must be "easy", "medium", or "hard".'
+    );
+  }
+
+
+  if (
+    academicYear &&
+    !/^\d{4}$/.test(academicYear)
+  ) {
+    errors.push(
+      "Academic year must contain four digits."
+    );
+  }
+
+
+  if (
+    status &&
+    !["pending", "approved", "rejected"].includes(
+      status
+    )
+  ) {
+    errors.push(
+      'Status must be "pending", "approved", or "rejected".'
+    );
+  }
+
+
+  return {
+    valid: errors.length === 0,
+    errors,
+    rowNumber
+  };
+}
+
+
+/* ============================================================
+   PREPARE QUESTION
+   ============================================================ */
+
+function prepareQuestionRow(row) {
+
+  return {
+    subject:
+      String(row.subject || "").trim(),
+
+    topic:
+      String(row.topic || "").trim(),
+
+    question:
+      String(row.question || "").trim(),
+
+    option_a:
+      String(row.option_a || "").trim(),
+
+    option_b:
+      String(row.option_b || "").trim(),
+
+    option_c:
+      String(row.option_c || "").trim(),
+
+    option_d:
+      String(row.option_d || "").trim(),
+
+    correct_answer:
+      String(row.correct_answer || "")
+        .trim()
+        .toUpperCase(),
+
+    explanation:
+      String(row.explanation || "").trim(),
+
+    difficulty:
+      String(row.difficulty || "")
+        .trim()
+        .toLowerCase(),
+
+    source:
+      String(row.source || "")
+        .trim() ||
+      getDefaultSource(),
+
+    school:
+      String(row.school || "")
+        .trim() ||
+      getDefaultSchool(),
+
+    academic_year:
+      String(row.academic_year || "")
+        .trim() ||
+      getDefaultAcademicYear(),
+
+    /*
+      Bulk imports are deliberately placed
+      into pending status.
+    */
+
+    status: "pending"
+  };
+}
+
+
+/* ============================================================
+   MAP CSV ROW
+   ============================================================ */
+
+function mapCSVRow(headers, rawRow) {
+
+  const mapped = {};
+
+  headers.forEach(
+    (header, index) => {
+      mapped[normalizeHeader(header)] =
+        String(rawRow[index] ?? "").trim();
+    }
+  );
+
+
+  /*
+    The legacy file contains:
+
+    id
+    subject
+    topic
+    question
+    option_a
+    option_b
+    option_c
+    option_d
+    correct_answer
+    explanation
+    difficulty
+
+    The id is deliberately ignored.
+
+    Missing metadata is generated automatically.
+  */
+
+  return {
+    subject: mapped.subject || "",
+    topic: mapped.topic || "",
+    question: mapped.question || "",
+    option_a: mapped.option_a || "",
+    option_b: mapped.option_b || "",
+    option_c: mapped.option_c || "",
+    option_d: mapped.option_d || "",
+    correct_answer: mapped.correct_answer || "",
+    explanation: mapped.explanation || "",
+    difficulty: mapped.difficulty || "",
+
+    source:
+      mapped.source ||
+      getDefaultSource(),
+
+    school:
+      mapped.school ||
+      getDefaultSchool(),
+
+    academic_year:
+      mapped.academic_year ||
+      getDefaultAcademicYear(),
+
+    status:
+      mapped.status ||
+      getDefaultStatus()
+  };
+}
+
+
+/* ============================================================
+   FILE SELECTION
+   ============================================================ */
+
+function handleFile(file) {
 
   if (!file) {
-
-    showValidationError(
-      "Please select a CSV file first."
-    );
-
     return;
-
   }
+
+
+  const filename =
+    file.name.toLowerCase();
 
 
   if (
-    !file.name
-      .toLowerCase()
-      .endsWith(".csv")
+    !filename.endsWith(".csv") &&
+    file.type !== "text/csv"
   ) {
 
-    showValidationError(
-      "Please upload a CSV file."
+    showResult(
+      "Invalid File",
+      "Please select a CSV file.",
+      "error"
     );
 
     return;
-
   }
 
 
-  if (
-    file.size === 0
-  ) {
-
-    showValidationError(
-      "The selected CSV file is empty."
-    );
-
-    return;
-
-  }
+  selectedFile = file;
 
 
-  const button =
-    document.getElementById(
-      "validateButton"
-    );
+  fileName.textContent =
+    file.name;
 
+  fileSize.textContent =
+    formatBytes(file.size);
 
-  button.disabled = true;
+  fileInfo.classList.remove("hidden");
 
-  button.innerHTML =
-    `<i class="fa-solid fa-spinner fa-spin mr-2"></i>
-     Reading CSV...`;
+  validateButton.disabled = false;
 
+  /*
+    Clear previous validation state.
+  */
 
   parsedRows = [];
   validRows = [];
   invalidRows = [];
   detectedHeaders = [];
-  rawCSVText = "";
+
+  diagnosticsSection.classList.add("hidden");
+  validationSection.classList.add("hidden");
+  previewSection.classList.add("hidden");
+
+  importButton.disabled = true;
+
+  importResult.classList.add("hidden");
+
+  resultSection.classList.add("hidden");
+}
 
 
-  diagnosticSection.classList.add(
-    "hidden"
-  );
+/* ============================================================
+   VALIDATE CSV
+   ============================================================ */
 
-  validationSection.classList.add(
-    "hidden"
-  );
+async function validateCSV() {
 
-  previewSection.classList.add(
-    "hidden"
-  );
+  if (!selectedFile) {
 
-  importSection.classList.add(
-    "hidden"
-  );
+    showResult(
+      "No File Selected",
+      "Please select a CSV file first.",
+      "error"
+    );
 
-  resultSection.classList.add(
-    "hidden"
-  );
+    return;
+  }
 
+
+  validateButton.disabled = true;
+
+  validateButton.innerHTML =
+    '<span class="spinner"></span>Reading CSV...';
+
+
+  /*
+    Clear previous state.
+  */
+
+  parsedRows = [];
+  validRows = [];
+  invalidRows = [];
+  detectedHeaders = [];
 
   try {
 
-    /* ========================================================
-       READ FILE
-    ======================================================== */
+    const text =
+      await selectedFile.text();
 
-    try {
 
-      rawCSVText =
-        await file.text();
+    const rows =
+      parseCSV(text);
 
-    } catch (error) {
 
+    if (rows.length < 2) {
       throw new Error(
-        "The browser could not read this CSV file."
+        "The CSV must contain a header row and at least one question."
       );
-
     }
 
 
-    if (
-      !rawCSVText ||
-      rawCSVText.trim() === ""
-    ) {
-
-      throw new Error(
-        "The CSV contains no readable data."
-      );
-
-    }
-
-
-    /* ========================================================
-       PARSE
-    ======================================================== */
-
-    let rows;
-
-    try {
-
-      rows =
-        parseCSV(
-          rawCSVText
-        );
-
-    } catch (error) {
-
-      throw new Error(
-        "CSV parsing failed: " +
-        error.message
-      );
-
-    }
-
-
-    if (
-      rows.length < 2
-    ) {
-
-      throw new Error(
-        "The CSV needs a header row and at least one question."
-      );
-
-    }
-
-
-    /* ========================================================
-       DETECT HEADERS
-    ======================================================== */
-
-    const originalHeaders =
-      rows[0];
-
+    /*
+      First row = headers.
+    */
 
     detectedHeaders =
-      originalHeaders.map(
+      rows[0].map(
+        value => String(value ?? "").trim()
+      );
+
+
+    const normalizedHeaders =
+      detectedHeaders.map(
         normalizeHeader
       );
 
 
-    /* ========================================================
-       RENDER DIAGNOSTICS
-    ======================================================== */
+    /*
+      Detect duplicate columns.
+    */
 
-    renderDiagnostics(
-      originalHeaders,
-      detectedHeaders,
-      rows.length - 1
-    );
+    const duplicates = [];
+
+    const seenHeaders =
+      new Set();
 
 
-    /* ========================================================
-       DUPLICATE HEADERS
-    ======================================================== */
+    normalizedHeaders.forEach(header => {
 
-    const duplicateHeaders = [];
-
-    detectedHeaders.forEach(
-      function(header, index) {
-
-        if (
-          header &&
-          detectedHeaders.indexOf(header) !== index &&
-          !duplicateHeaders.includes(header)
-        ) {
-
-          duplicateHeaders.push(
-            header
-          );
-
-        }
-
+      if (!header) {
+        return;
       }
+
+      if (seenHeaders.has(header)) {
+        if (!duplicates.includes(header)) {
+          duplicates.push(header);
+        }
+      }
+
+      seenHeaders.add(header);
+    });
+
+
+    /*
+      Determine format.
+    */
+
+    const format =
+      detectCSVFormat(
+        detectedHeaders
+      );
+
+
+    /*
+      Required metadata missing from
+      legacy files is NOT an error anymore.
+
+      The only mandatory question fields are:
+      subject
+      topic
+      question
+      option_a
+      option_b
+      option_c
+      option_d
+      correct_answer
+      explanation
+      difficulty
+    */
+
+    const requiredQuestionHeaders = [
+      "subject",
+      "topic",
+      "question",
+      "option_a",
+      "option_b",
+      "option_c",
+      "option_d",
+      "correct_answer",
+      "explanation",
+      "difficulty"
+    ];
+
+
+    const missingQuestionHeaders =
+      requiredQuestionHeaders.filter(
+        header =>
+          !normalizedHeaders.includes(header)
+      );
+
+
+    /*
+      Unknown columns.
+
+      "id" is explicitly allowed and ignored.
+    */
+
+    const allowedHeaders = [
+      ...CSV_HEADERS,
+      "id"
+    ];
+
+
+    const unknownHeaders =
+      normalizedHeaders.filter(
+        header =>
+          header &&
+          !allowedHeaders.includes(header)
+      );
+
+
+    /*
+      Show diagnostics.
+    */
+
+    diagnosticsSection.classList.remove(
+      "hidden"
     );
 
 
+    detectedColumnCount.textContent =
+      normalizedHeaders.length;
+
+
+    detectedRowCount.textContent =
+      rows.length - 1;
+
+
+    unknownColumnCount.textContent =
+      unknownHeaders.length;
+
+
+    validationColumnCount.textContent =
+      normalizedHeaders.length;
+
+
+    /*
+      Diagnostics status.
+    */
+
     if (
-      duplicateHeaders.length > 0
+      format === "legacy" &&
+      missingQuestionHeaders.length === 0
     ) {
 
-      showValidationError(
-        "Duplicate CSV column(s): " +
-        duplicateHeaders.join(", ")
-      );
+      diagnosticsStatus.className =
+        "success-box rounded-xl p-4";
 
-      return;
+      diagnosticsStatus.innerHTML = `
+        <div class="flex gap-3">
+          <i class="fa-solid fa-circle-check mt-1"></i>
+          <div>
+            <strong>Legacy 11-column format detected</strong>
+            <p class="text-sm mt-1">
+              This format is supported. The <strong>id</strong> column will be ignored.
+              Source, school, academic year and status will be filled automatically.
+            </p>
+          </div>
+        </div>
+      `;
 
+    } else if (
+      format === "full"
+    ) {
+
+      diagnosticsStatus.className =
+        "success-box rounded-xl p-4";
+
+      diagnosticsStatus.innerHTML = `
+        <div class="flex gap-3">
+          <i class="fa-solid fa-circle-check mt-1"></i>
+          <div>
+            <strong>Full 14-column format detected</strong>
+            <p class="text-sm mt-1">
+              Your CSV contains the complete PulsePrep import format.
+            </p>
+          </div>
+        </div>
+      `;
+
+    } else if (
+      missingQuestionHeaders.length === 0
+    ) {
+
+      diagnosticsStatus.className =
+        "info-box rounded-xl p-4";
+
+      diagnosticsStatus.innerHTML = `
+        <div class="flex gap-3">
+          <i class="fa-solid fa-circle-info mt-1"></i>
+          <div>
+            <strong>Compatible question format detected</strong>
+            <p class="text-sm mt-1">
+              The required question columns are present.
+              Missing metadata columns will be filled automatically.
+            </p>
+          </div>
+        </div>
+      `;
+
+    } else {
+
+      diagnosticsStatus.className =
+        "error-box rounded-xl p-4";
+
+      diagnosticsStatus.innerHTML = `
+        <div class="flex gap-3">
+          <i class="fa-solid fa-circle-xmark mt-1"></i>
+          <div>
+            <strong>Structure Needs Attention</strong>
+            <p class="text-sm mt-1">
+              Required question columns are missing.
+            </p>
+          </div>
+        </div>
+      `;
     }
 
 
-    /* ========================================================
-       MISSING HEADERS
-    ======================================================== */
+    /*
+      Render detected headers.
+    */
 
-    const missingHeaders =
-      CSV_HEADERS.filter(
-        header =>
-          !detectedHeaders.includes(
-            header
-          )
-      );
+    detectedHeadersBox.innerHTML =
+      detectedHeaders.map(
+        (header, index) => {
 
+          const normalized =
+            normalizeHeader(header);
+
+          const isID =
+            normalized === "id";
+
+          return `
+            <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+              <span class="text-xs text-slate-500">
+                Column ${index + 1}
+              </span>
+
+              <span class="font-mono text-sm font-medium ${isID ? "text-amber-700" : "text-slate-800"}">
+                ${escapeHTML(header || "(empty)")}
+              </span>
+            </div>
+          `;
+        }
+      ).join("");
+
+
+    /*
+      Required columns information.
+    */
 
     if (
-      missingHeaders.length > 0
+      missingQuestionHeaders.length === 0
     ) {
 
-      showValidationError(
-        "PulsePrep could not find these required columns: " +
-        missingHeaders.join(", ") +
-        ". Check the CSV Diagnostics above."
-      );
+      requiredColumnsBox.className =
+        "success-box rounded-xl p-4";
 
-      return;
+      requiredColumnsBox.innerHTML = `
+        <div class="flex gap-3">
+          <i class="fa-solid fa-circle-check mt-1"></i>
+          <div>
+            <strong>Required question columns found</strong>
+            <p class="text-sm mt-1">
+              All columns needed to validate the questions are present.
+            </p>
 
+            <p class="text-xs mt-2">
+              Optional metadata:
+              <strong>source</strong>,
+              <strong>school</strong>,
+              <strong>academic_year</strong>,
+              <strong>status</strong>
+              will be generated when missing.
+            </p>
+          </div>
+        </div>
+      `;
+
+    } else {
+
+      requiredColumnsBox.className =
+        "error-box rounded-xl p-4";
+
+      requiredColumnsBox.innerHTML = `
+        <div class="flex gap-3">
+          <i class="fa-solid fa-circle-xmark mt-1"></i>
+          <div>
+            <strong>Missing required question columns</strong>
+            <p class="text-sm mt-1">
+              ${escapeHTML(
+                missingQuestionHeaders.join(", ")
+              )}
+            </p>
+          </div>
+        </div>
+      `;
     }
 
 
-    /* ========================================================
-       EXTRA HEADERS
-    ======================================================== */
+    /*
+      Unknown columns.
+    */
 
-    const extraHeaders =
-      detectedHeaders.filter(
-        header =>
-          header &&
-          !CSV_HEADERS.includes(
-            header
-          )
+    if (unknownHeaders.length > 0) {
+
+      unknownColumnsBox.classList.remove(
+        "hidden"
       );
 
+      unknownColumnsBox.className =
+        "warning-box rounded-xl p-4 mb-5";
 
-    if (
-      extraHeaders.length > 0
-    ) {
+      unknownColumnsBox.innerHTML = `
+        <div class="flex gap-3">
+          <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+          <div>
+            <strong>Unknown columns</strong>
 
-      showValidationError(
-        "Unknown CSV column(s): " +
-        extraHeaders.join(", ") +
-        ". The PulsePrep importer expects 14 columns."
+            <p class="text-sm mt-1">
+              ${escapeHTML(
+                unknownHeaders.join(", ")
+              )}
+            </p>
+
+            <p class="text-xs mt-2">
+              These columns will be ignored.
+            </p>
+          </div>
+        </div>
+      `;
+
+    } else {
+
+      unknownColumnsBox.classList.add(
+        "hidden"
       );
-
-      return;
-
     }
 
 
-    /* ========================================================
-       EXACT COLUMN COUNT
-    ======================================================== */
+    /*
+      Duplicate headers.
+    */
 
-    if (
-      detectedHeaders.length !==
-      CSV_HEADERS.length
-    ) {
+    if (duplicates.length > 0) {
 
-      showValidationError(
-        `PulsePrep expects ${CSV_HEADERS.length} columns, ` +
-        `but this file contains ${detectedHeaders.length}.`
+      throw new Error(
+        `Duplicate CSV column(s) detected: ${duplicates.join(", ")}`
       );
-
-      return;
-
     }
 
 
-    /* ========================================================
-       CONVERT DATA ROWS
-    ======================================================== */
+    /*
+      Stop if mandatory question headers
+      are missing.
+    */
+
+    if (
+      missingQuestionHeaders.length > 0
+    ) {
+
+      throw new Error(
+        `Missing required question columns: ${missingQuestionHeaders.join(", ")}`
+      );
+    }
+
+
+    /*
+      Parse every question row.
+    */
+
+    parsedRows = [];
+
+    validRows = [];
+
+    invalidRows = [];
+
 
     for (
       let i = 1;
@@ -1973,101 +2096,81 @@ async function validateCSV() {
         rows[i];
 
 
+      const rowNumber =
+        i + 1;
+
+
+      /*
+        Exact column count is checked against
+        the actual header count.
+
+        This prevents malformed rows from
+        silently shifting values.
+      */
+
       if (
         rawRow.length !==
         detectedHeaders.length
       ) {
 
         invalidRows.push({
-
-          row:
-            i + 1,
-
+          rowNumber,
           errors: [
             `Expected ${detectedHeaders.length} columns but found ${rawRow.length}.`
-          ]
-
+          ],
+          row: {}
         });
 
         continue;
-
       }
 
 
-      const item = {};
+      const row =
+        mapCSVRow(
+          detectedHeaders,
+          rawRow
+        );
 
 
-      detectedHeaders.forEach(
-        function(header, index) {
-
-          item[header] =
-            cleanCell(
-              rawRow[index]
-            );
-
-        }
-      );
+      parsedRows.push(row);
 
 
-      item._rowNumber =
-        i + 1;
+      const validation =
+        validateQuestionRow(
+          row,
+          rowNumber
+        );
 
 
-      parsedRows.push(
-        item
-      );
+      if (validation.valid) {
 
+        validRows.push(
+          prepareQuestionRow(row)
+        );
+
+      } else {
+
+        invalidRows.push({
+          rowNumber,
+          errors: validation.errors,
+          row
+        });
+      }
     }
 
 
-    /* ========================================================
-       QUESTION VALIDATION
-    ======================================================== */
-
-    parsedRows.forEach(
-      function(item) {
-
-        const errors =
-          validateQuestionRow(
-            item
-          );
-
-
-        if (
-          errors.length > 0
-        ) {
-
-          invalidRows.push({
-
-            row:
-              item._rowNumber,
-
-            errors
-
-          });
-
-        } else {
-
-          validRows.push(
-            prepareQuestionRow(
-              item
-            )
-          );
-
-        }
-
-      }
-    );
-
-
-    /* ========================================================
-       DISPLAY
-    ======================================================== */
+    /*
+      Render results.
+    */
 
     renderValidationResults();
 
     renderPreview();
 
+
+    /*
+      Final result.
+    */
 
     if (
       validRows.length > 0 &&
@@ -2075,23 +2178,36 @@ async function validateCSV() {
     ) {
 
       showResult(
-        true,
         "CSV Ready",
-        `${validRows.length} question(s) passed all checks and are ready to import.`
+        `${validRows.length} question(s) passed validation and are ready to import.`,
+        "success"
       );
 
+      importButton.disabled = false;
+
     } else if (
+      validRows.length > 0 &&
       invalidRows.length > 0
     ) {
 
       showResult(
-        false,
-        "CSV Needs Correction",
-        `${invalidRows.length} question(s) contain errors. Fix them and validate again.`
+        "CSV Partially Valid",
+        `${validRows.length} question(s) are valid and ${invalidRows.length} question(s) need correction. Only valid questions can be imported.`,
+        "warning"
       );
 
-    }
+      importButton.disabled = false;
 
+    } else {
+
+      showResult(
+        "CSV Validation Failed",
+        "No valid questions were found. Check the validation errors below.",
+        "error"
+      );
+
+      importButton.disabled = true;
+    }
 
   } catch (error) {
 
@@ -2101,580 +2217,66 @@ async function validateCSV() {
     );
 
 
-    showResult(
-      false,
-      "Unable to Validate CSV",
-      error.message ||
-      "The CSV could not be validated."
-    );
-
-
     validationSection.classList.remove(
       "hidden"
     );
 
 
-    document.getElementById(
-      "totalRows"
-    ).textContent = "0";
+    totalQuestions.textContent = "0";
+    validQuestions.textContent = "0";
+    invalidQuestions.textContent = "0";
 
 
-    document.getElementById(
-      "validRows"
-    ).textContent = "0";
+    validationMessage.className =
+      "error-box rounded-xl p-4";
+
+    validationMessage.innerHTML = `
+      <div class="flex gap-3">
+        <i class="fa-solid fa-circle-xmark mt-1"></i>
+
+        <div>
+          <strong>CSV Validation Failed</strong>
+
+          <p class="text-sm mt-1">
+            ${escapeHTML(
+              error.message ||
+              "The CSV could not be validated."
+            )}
+          </p>
+        </div>
+      </div>
+    `;
 
 
-    document.getElementById(
-      "invalidRows"
-    ).textContent = "0";
+    validationErrors.classList.add(
+      "hidden"
+    );
+
+
+    importButton.disabled = true;
+
+
+    showResult(
+      "CSV Validation Failed",
+      error.message ||
+      "The CSV could not be validated.",
+      "error"
+    );
 
   } finally {
 
-    button.disabled = false;
+    validateButton.disabled =
+      !selectedFile;
 
-    button.innerHTML =
-      `<i class="fa-solid fa-check-double mr-2"></i>
-       Validate CSV`;
-
+    validateButton.innerHTML =
+      '<i class="fa-solid fa-check-double mr-2"></i>Validate CSV';
   }
-
 }
 
 
 /* ============================================================
-   DIAGNOSTICS
-============================================================ */
-
-function renderDiagnostics(
-  originalHeaders,
-  normalizedHeaders,
-  dataRowCount
-) {
-
-  diagnosticSection.classList.remove(
-    "hidden"
-  );
-
-
-  const list =
-    document.getElementById(
-      "diagnosticList"
-    );
-
-
-  const overall =
-    document.getElementById(
-      "diagnosticOverall"
-    );
-
-
-  list.innerHTML = "";
-
-
-  const headerCount =
-    normalizedHeaders.length;
-
-
-  const missing =
-    CSV_HEADERS.filter(
-      h =>
-        !normalizedHeaders.includes(h)
-    );
-
-
-  const extra =
-    normalizedHeaders.filter(
-      h =>
-        h &&
-        !CSV_HEADERS.includes(h)
-    );
-
-
-  const exactCount =
-    headerCount ===
-    CSV_HEADERS.length;
-
-
-  const allRequired =
-    missing.length === 0;
-
-
-  const duplicateSet =
-    normalizedHeaders.filter(
-      (h, i, arr) =>
-        h &&
-        arr.indexOf(h) !== i
-    );
-
-
-  const duplicates =
-    [...new Set(duplicateSet)];
-
-
-  const structureOK =
-    exactCount &&
-    allRequired &&
-    extra.length === 0 &&
-    duplicates.length === 0;
-
-
-  if (structureOK) {
-
-    overall.className =
-      "px-3 py-2 rounded-lg text-sm font-bold bg-green-100 text-green-700";
-
-    overall.innerHTML =
-      `<i class="fa-solid fa-circle-check mr-1"></i>
-       Structure OK`;
-
-  } else {
-
-    overall.className =
-      "px-3 py-2 rounded-lg text-sm font-bold bg-red-100 text-red-700";
-
-    overall.innerHTML =
-      `<i class="fa-solid fa-circle-xmark mr-1"></i>
-       Structure Needs Attention`;
-
-  }
-
-
-  addDiagnostic(
-    list,
-    true,
-    "Detected columns",
-    `${headerCount} column(s)`
-  );
-
-
-  addDiagnostic(
-    list,
-    exactCount,
-    "Column count",
-    `Expected ${CSV_HEADERS.length}, detected ${headerCount}`
-  );
-
-
-  addDiagnostic(
-    list,
-    dataRowCount > 0,
-    "Question rows",
-    `${dataRowCount} data row(s) detected`
-  );
-
-
-  addDiagnostic(
-    list,
-    allRequired,
-    "Required columns",
-    missing.length === 0
-      ? "All 14 required columns found"
-      : "Missing: " + missing.join(", ")
-  );
-
-
-  addDiagnostic(
-    list,
-    extra.length === 0,
-    "Unknown columns",
-    extra.length === 0
-      ? "None"
-      : extra.join(", ")
-  );
-
-
-  addDiagnostic(
-    list,
-    duplicates.length === 0,
-    "Duplicate columns",
-    duplicates.length === 0
-      ? "None"
-      : duplicates.join(", ")
-  );
-
-
-  const headerHTML =
-    normalizedHeaders
-      .map(
-        function(header, index) {
-
-          const expected =
-            CSV_HEADERS.includes(
-              header
-            );
-
-          return `
-            <div
-              class="diagnostic-item
-                     border rounded-lg p-3
-                     ${expected
-                       ? "bg-green-50 border-green-200"
-                       : "bg-red-50 border-red-200"}"
-            >
-
-              <div class="flex items-start gap-3">
-
-                <span
-                  class="status-dot mt-1
-                    ${expected
-                      ? "bg-green-500"
-                      : "bg-red-500"}"
-                ></span>
-
-                <div class="flex-1">
-
-                  <p class="text-xs text-slate-500">
-                    Column ${index + 1}
-                  </p>
-
-                  <p class="font-semibold mono">
-                    ${escapeHTML(header || "(empty)")}
-                  </p>
-
-                </div>
-
-              </div>
-
-            </div>
-          `;
-
-        }
-      )
-      .join("");
-
-
-  list.insertAdjacentHTML(
-    "beforeend",
-    `
-      <div class="mt-4">
-
-        <p class="font-bold text-slate-700 mb-3">
-          Headers detected by browser
-        </p>
-
-        <div
-          class="grid grid-cols-1 md:grid-cols-2
-                 lg:grid-cols-3 gap-3"
-        >
-          ${headerHTML}
-        </div>
-
-      </div>
-    `
-  );
-
-}
-
-
-/* ============================================================
-   DIAGNOSTIC ITEM
-============================================================ */
-
-function addDiagnostic(
-  container,
-  good,
-  label,
-  value
-) {
-
-  const div =
-    document.createElement(
-      "div"
-    );
-
-
-  div.className =
-    good
-      ? "bg-green-50 border border-green-200 rounded-xl p-3"
-      : "bg-red-50 border border-red-200 rounded-xl p-3";
-
-
-  div.innerHTML = `
-
-    <div class="flex items-start gap-3">
-
-      <div
-        class="${good
-          ? "text-green-600"
-          : "text-red-600"} text-lg"
-      >
-
-        <i
-          class="fa-solid
-            ${good
-              ? "fa-circle-check"
-              : "fa-circle-xmark"}"
-        ></i>
-
-      </div>
-
-      <div class="flex-1">
-
-        <p class="font-semibold">
-          ${escapeHTML(label)}
-        </p>
-
-        <p class="text-sm text-slate-600 mt-1">
-          ${escapeHTML(value)}
-        </p>
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  container.appendChild(
-    div
-  );
-
-}
-
-
-/* ============================================================
-   QUESTION VALIDATION
-============================================================ */
-
-function validateQuestionRow(row) {
-
-  const errors = [];
-
-
-  /* SUBJECT */
-
-  if (!row.subject) {
-
-    errors.push(
-      "Subject is empty."
-    );
-
-  } else if (
-    !SUBJECTS.includes(
-      row.subject
-    )
-  ) {
-
-    errors.push(
-      `Unknown subject: "${row.subject}".`
-    );
-
-  }
-
-
-  /* QUESTION */
-
-  if (
-    !row.question
-  ) {
-
-    errors.push(
-      "Question is empty."
-    );
-
-  }
-
-
-  /* OPTIONS */
-
-  if (
-    !row.option_a
-  ) {
-
-    errors.push(
-      "Option A is empty."
-    );
-
-  }
-
-
-  if (
-    !row.option_b
-  ) {
-
-    errors.push(
-      "Option B is empty."
-    );
-
-  }
-
-
-  if (
-    !row.option_c
-  ) {
-
-    errors.push(
-      "Option C is empty."
-    );
-
-  }
-
-
-  if (
-    !row.option_d
-  ) {
-
-    errors.push(
-      "Option D is empty."
-    );
-
-  }
-
-
-  /* CORRECT ANSWER */
-
-  const answer =
-    String(
-      row.correct_answer || ""
-    )
-      .trim()
-      .toUpperCase();
-
-
-  if (
-    !["A", "B", "C", "D"]
-      .includes(answer)
-  ) {
-
-    errors.push(
-      "Correct answer must be A, B, C or D."
-    );
-
-  }
-
-
-  /* DIFFICULTY */
-
-  const difficulty =
-    row.difficulty
-      ? row.difficulty
-          .trim()
-          .toLowerCase()
-      : "medium";
-
-
-  if (
-    !["easy", "medium", "hard"]
-      .includes(difficulty)
-  ) {
-
-    errors.push(
-      "Difficulty must be easy, medium or hard."
-    );
-
-  }
-
-
-  /* STATUS */
-
-  if (
-    row.status &&
-    ![
-      "pending",
-      "approved",
-      "rejected"
-    ].includes(
-      row.status
-        .trim()
-        .toLowerCase()
-    )
-  ) {
-
-    errors.push(
-      "Status must be pending, approved or rejected."
-    );
-
-  }
-
-
-  /* ACADEMIC YEAR */
-
-  if (
-    row.academic_year &&
-    !/^\d{4}$/.test(
-      row.academic_year.trim()
-    )
-  ) {
-
-    errors.push(
-      "Academic year must be a four-digit year, e.g. 2026."
-    );
-
-  }
-
-
-  return errors;
-
-}
-
-
-/* ============================================================
-   PREPARE QUESTION
-============================================================ */
-
-function prepareQuestionRow(row) {
-
-  return {
-
-    subject:
-      row.subject,
-
-    topic:
-      row.topic || null,
-
-    question:
-      row.question,
-
-    option_a:
-      row.option_a,
-
-    option_b:
-      row.option_b,
-
-    option_c:
-      row.option_c,
-
-    option_d:
-      row.option_d,
-
-    correct_answer:
-      String(
-        row.correct_answer
-      )
-        .trim()
-        .toUpperCase(),
-
-    explanation:
-      row.explanation || null,
-
-    difficulty:
-      (
-        row.difficulty ||
-        "medium"
-      )
-        .trim()
-        .toLowerCase(),
-
-    source:
-      row.source || null,
-
-    school:
-      row.school || null,
-
-    academic_year:
-      row.academic_year || null,
-
-    status:
-      "pending"
-
-  };
-
-}
-
-
-/* ============================================================
-   VALIDATION DISPLAY
-============================================================ */
+   VALIDATION RESULTS
+   ============================================================ */
 
 function renderValidationResults() {
 
@@ -2683,34 +2285,20 @@ function renderValidationResults() {
   );
 
 
-  document.getElementById(
-    "totalRows"
-  ).textContent =
+  totalQuestions.textContent =
     parsedRows.length;
 
 
-  document.getElementById(
-    "validRows"
-  ).textContent =
+  validQuestions.textContent =
     validRows.length;
 
 
-  document.getElementById(
-    "invalidRows"
-  ).textContent =
+  invalidQuestions.textContent =
     invalidRows.length;
 
 
-  document.getElementById(
-    "columnCount"
-  ).textContent =
+  validationColumnCount.textContent =
     detectedHeaders.length;
-
-
-  const message =
-    document.getElementById(
-      "validationMessage"
-    );
 
 
   if (
@@ -2718,242 +2306,131 @@ function renderValidationResults() {
     validRows.length > 0
   ) {
 
-    message.textContent =
-      `All ${validRows.length} questions passed validation.`;
+    validationMessage.className =
+      "success-box rounded-xl p-4";
 
-    message.className =
-      "text-sm mb-5 text-green-700 font-semibold";
+    validationMessage.innerHTML = `
+      <div class="flex gap-3">
+        <i class="fa-solid fa-circle-check mt-1"></i>
+
+        <div>
+          <strong>CSV Validation Passed</strong>
+
+          <p class="text-sm mt-1">
+            All ${validRows.length} question(s) passed validation.
+            They are ready to import.
+          </p>
+        </div>
+      </div>
+    `;
+
+  } else if (
+    validRows.length > 0
+  ) {
+
+    validationMessage.className =
+      "warning-box rounded-xl p-4";
+
+    validationMessage.innerHTML = `
+      <div class="flex gap-3">
+        <i class="fa-solid fa-triangle-exclamation mt-1"></i>
+
+        <div>
+          <strong>Some questions need correction</strong>
+
+          <p class="text-sm mt-1">
+            ${validRows.length} question(s) are valid and
+            ${invalidRows.length} question(s) are invalid.
+          </p>
+        </div>
+      </div>
+    `;
 
   } else {
 
-    message.textContent =
-      "Some questions contain errors. Review the error list below.";
+    validationMessage.className =
+      "error-box rounded-xl p-4";
 
-    message.className =
-      "text-sm mb-5 text-red-700 font-semibold";
+    validationMessage.innerHTML = `
+      <div class="flex gap-3">
+        <i class="fa-solid fa-circle-xmark mt-1"></i>
 
+        <div>
+          <strong>No valid questions found</strong>
+
+          <p class="text-sm mt-1">
+            Please correct the problems shown below.
+          </p>
+        </div>
+      </div>
+    `;
   }
-
-
-  const errorsContainer =
-    document.getElementById(
-      "errorsContainer"
-    );
-
-
-  const errorsList =
-    document.getElementById(
-      "errorsList"
-    );
-
-
-  errorsList.innerHTML = "";
 
 
   if (
-    invalidRows.length === 0
+    invalidRows.length > 0
   ) {
 
-    errorsContainer.classList.add(
+    validationErrors.classList.remove(
       "hidden"
     );
 
-    return;
 
+    errorList.innerHTML =
+      invalidRows.map(item => {
+
+        const errorText =
+          item.errors
+            .map(
+              error =>
+                `<li>${escapeHTML(error)}</li>`
+            )
+            .join("");
+
+
+        return `
+          <div class="error-box rounded-xl p-4">
+
+            <div class="font-bold mb-1">
+              Row ${item.rowNumber}
+            </div>
+
+            <ul class="list-disc ml-5 text-sm space-y-1">
+              ${errorText}
+            </ul>
+
+          </div>
+        `;
+
+      }).join("");
+
+  } else {
+
+    validationErrors.classList.add(
+      "hidden"
+    );
+
+    errorList.innerHTML = "";
   }
-
-
-  errorsContainer.classList.remove(
-    "hidden"
-  );
-
-
-  invalidRows.forEach(
-    function(item) {
-
-      const div =
-        document.createElement(
-          "div"
-        );
-
-
-      div.className =
-        "bg-red-50 border border-red-200 " +
-        "rounded-lg p-3 text-sm text-red-800";
-
-
-      div.innerHTML =
-        `<strong>Row ${escapeHTML(item.row)}:</strong>
-         ${escapeHTML(item.errors.join(" "))}`;
-
-
-      errorsList.appendChild(
-        div
-      );
-
-    }
-  );
-
-}
-
-
-/* ============================================================
-   VALIDATION ERROR
-============================================================ */
-
-function showValidationError(
-  message
-) {
-
-  validationSection.classList.remove(
-    "hidden"
-  );
-
-  previewSection.classList.add(
-    "hidden"
-  );
-
-  importSection.classList.add(
-    "hidden"
-  );
-
-
-  document.getElementById(
-    "totalRows"
-  ).textContent =
-    "0";
-
-
-  document.getElementById(
-    "validRows"
-  ).textContent =
-    "0";
-
-
-  document.getElementById(
-    "invalidRows"
-  ).textContent =
-    "0";
-
-
-  document.getElementById(
-    "validationMessage"
-  ).textContent =
-    message;
-
-
-  document.getElementById(
-    "validationMessage"
-  ).className =
-    "text-sm mb-5 text-red-700 font-semibold";
-
-
-  document.getElementById(
-    "errorsContainer"
-  ).classList.add(
-    "hidden"
-  );
-
-
-  document.getElementById(
-    "errorsList"
-  ).innerHTML =
-    "";
-
-
-  showResult(
-    false,
-    "CSV Validation Failed",
-    message
-  );
-
 }
 
 
 /* ============================================================
    PREVIEW
-============================================================ */
+   ============================================================ */
 
 function renderPreview() {
 
-  const tbody =
-    document.getElementById(
-      "previewTableBody"
+  if (
+    validRows.length === 0
+  ) {
+
+    previewSection.classList.add(
+      "hidden"
     );
 
-
-  tbody.innerHTML = "";
-
-
-  const previewRows =
-    validRows.slice(
-      0,
-      25
-    );
-
-
-  previewRows.forEach(
-    function(row, index) {
-
-      const tr =
-        document.createElement(
-          "tr"
-        );
-
-
-      tr.innerHTML = `
-
-        <td class="border p-3">
-          ${index + 1}
-        </td>
-
-        <td class="border p-3">
-          ${escapeHTML(row.subject)}
-        </td>
-
-        <td class="border p-3">
-          ${escapeHTML(row.topic || "—")}
-        </td>
-
-        <td class="border p-3 max-w-md">
-          ${escapeHTML(row.question)}
-        </td>
-
-        <td class="border p-3 font-bold">
-          ${escapeHTML(row.correct_answer)}
-        </td>
-
-        <td class="border p-3">
-          ${escapeHTML(row.difficulty)}
-        </td>
-
-        <td class="border p-3">
-          <span
-            class="inline-flex items-center gap-1
-                   px-2 py-1 rounded-full
-                   bg-amber-100 text-amber-700
-                   text-xs font-bold"
-          >
-            <i class="fa-solid fa-clock"></i>
-            Pending
-          </span>
-        </td>
-
-      `;
-
-
-      tbody.appendChild(
-        tr
-      );
-
-    }
-  );
-
-
-  document.getElementById(
-    "previewCount"
-  ).textContent =
-    `${validRows.length} valid question(s)`;
+    return;
+  }
 
 
   previewSection.classList.remove(
@@ -2961,45 +2438,60 @@ function renderPreview() {
   );
 
 
-  if (
-    validRows.length > 0 &&
-    invalidRows.length === 0
-  ) {
+  const previewRows =
+    validRows.slice(0, 10);
 
-    importSection.classList.remove(
-      "hidden"
-    );
 
-  } else {
+  previewBody.innerHTML =
+    previewRows.map(
+      (row, index) => {
 
-    importSection.classList.add(
-      "hidden"
-    );
+        return `
+          <tr class="border-t border-slate-200">
 
-  }
+            <td class="px-4 py-3">
+              ${index + 1}
+            </td>
 
+            <td class="px-4 py-3 font-medium">
+              ${escapeHTML(row.subject)}
+            </td>
+
+            <td class="px-4 py-3">
+              ${escapeHTML(row.topic)}
+            </td>
+
+            <td
+              class="px-4 py-3 max-w-md"
+              style="white-space:normal;"
+            >
+              ${escapeHTML(row.question)}
+            </td>
+
+            <td class="px-4 py-3 font-bold">
+              ${escapeHTML(row.correct_answer)}
+            </td>
+
+            <td class="px-4 py-3">
+              ${escapeHTML(row.difficulty)}
+            </td>
+
+            <td class="px-4 py-3">
+              <span class="inline-flex rounded-full bg-amber-100 text-amber-700 px-2.5 py-1 text-xs font-semibold">
+                pending
+              </span>
+            </td>
+
+          </tr>
+        `;
+      }
+    ).join("");
 }
 
 
 /* ============================================================
-   IMPORT BUTTON
-============================================================ */
-
-document.getElementById(
-  "importButton"
-).addEventListener(
-  "click",
-  async function() {
-
-    await importQuestions();
-
-  }
-);
-
-
-/* ============================================================
    IMPORT QUESTIONS
-============================================================ */
+   ============================================================ */
 
 async function importQuestions() {
 
@@ -3007,113 +2499,176 @@ async function importQuestions() {
     validRows.length === 0
   ) {
 
-    alert(
-      "There are no valid questions to import."
+    showResult(
+      "Nothing to Import",
+      "There are no valid questions available for import.",
+      "error"
     );
 
     return;
-
   }
 
 
   const confirmed =
-    confirm(
-      `Import ${validRows.length} question(s) into the PulsePrep Exam Vault?`
+    window.confirm(
+      `Import ${validRows.length} valid question(s) into the PulsePrep Exam Vault?\n\nAll imported questions will be saved with pending status.`
     );
 
 
   if (!confirmed) {
-
     return;
-
   }
 
 
-  const button =
-    document.getElementById(
-      "importButton"
-    );
+  importButton.disabled = true;
+
+  importButton.innerHTML =
+    '<span class="spinner"></span>Importing...';
 
 
-  button.disabled = true;
+  importResult.classList.remove(
+    "hidden"
+  );
 
-  button.innerHTML =
-    `<i class="fa-solid fa-spinner fa-spin mr-2"></i>
-     Importing...`;
+  importResult.className =
+    "success-box rounded-xl p-4";
+
+  importResult.innerHTML = `
+    <div class="flex gap-3">
+      <i class="fa-solid fa-cloud-arrow-up mt-1"></i>
+
+      <div>
+        <strong>Import started</strong>
+
+        <p class="text-sm mt-1">
+          Uploading ${validRows.length} question(s)...
+        </p>
+      </div>
+    </div>
+  `;
+
+
+  let importedCount = 0;
 
 
   try {
 
-    const batchSize =
-      50;
-
-    let inserted =
-      0;
-
-
     for (
-      let i = 0;
-      i < validRows.length;
-      i += batchSize
+      let start = 0;
+      start < validRows.length;
+      start += IMPORT_BATCH_SIZE
     ) {
 
       const batch =
         validRows.slice(
-          i,
-          i + batchSize
+          start,
+          start + IMPORT_BATCH_SIZE
         );
+
+
+      /*
+        IMPORTANT:
+        We deliberately do NOT send an "id"
+        field because the legacy CSV id is ignored.
+      */
+
+      const rowsToInsert =
+        batch.map(row => ({
+          subject: row.subject,
+          topic: row.topic,
+          question: row.question,
+          option_a: row.option_a,
+          option_b: row.option_b,
+          option_c: row.option_c,
+          option_d: row.option_d,
+          correct_answer: row.correct_answer,
+          explanation: row.explanation,
+          difficulty: row.difficulty,
+          source: row.source,
+          school: row.school,
+          academic_year: row.academic_year,
+          status: "pending"
+        }));
 
 
       const {
         error
       } =
         await supabaseClient
-          .from(
-            "exam_vault_questions"
-          )
-          .insert(
-            batch
-          );
+          .from(IMPORT_TABLE)
+          .insert(rowsToInsert);
 
 
       if (error) {
-
-        throw new Error(
-          error.message ||
-          "Supabase rejected the question import."
-        );
-
+        throw error;
       }
 
 
-      inserted +=
+      importedCount +=
         batch.length;
 
+
+      importResult.innerHTML = `
+        <div class="flex gap-3">
+          <i class="fa-solid fa-spinner fa-spin mt-1"></i>
+
+          <div>
+            <strong>Importing...</strong>
+
+            <p class="text-sm mt-1">
+              ${importedCount} of ${validRows.length}
+              question(s) uploaded.
+            </p>
+          </div>
+        </div>
+      `;
     }
 
 
+    /*
+      SUCCESS
+    */
+
+    importResult.className =
+      "success-box rounded-xl p-4";
+
+    importResult.innerHTML = `
+      <div class="flex gap-3">
+        <i class="fa-solid fa-circle-check mt-1"></i>
+
+        <div>
+          <strong>Import Successful</strong>
+
+          <p class="text-sm mt-1">
+            ${importedCount} question(s) were successfully added to the Exam Vault.
+          </p>
+
+          <p class="text-xs mt-2">
+            The questions were saved with
+            <strong>pending</strong> status for review.
+          </p>
+        </div>
+      </div>
+    `;
+
+
     showResult(
-      true,
       "Import Successful",
-      `${inserted} question(s) were imported successfully as Pending.`
+      `${importedCount} question(s) have been added to the Exam Vault with pending status.`,
+      "success"
     );
 
+
+    /*
+      Clear import state.
+    */
 
     validRows = [];
-    invalidRows = [];
     parsedRows = [];
+    invalidRows = [];
 
 
-    importSection.classList.add(
-      "hidden"
-    );
-
-
-    csvFile.value = "";
-
-
-    fileInformation.textContent =
-      "Import completed. You can upload another CSV.";
+    importButton.disabled = true;
 
 
   } catch (error) {
@@ -3124,34 +2679,61 @@ async function importQuestions() {
     );
 
 
+    importResult.className =
+      "error-box rounded-xl p-4";
+
+
+    importResult.innerHTML = `
+      <div class="flex gap-3">
+        <i class="fa-solid fa-circle-xmark mt-1"></i>
+
+        <div>
+          <strong>Import Failed</strong>
+
+          <p class="text-sm mt-1">
+            ${escapeHTML(
+              error.message ||
+              "The questions could not be imported."
+            )}
+          </p>
+        </div>
+      </div>
+    `;
+
+
     showResult(
-      false,
       "Import Failed",
       error.message ||
-      "The questions could not be imported."
+      "The questions could not be imported.",
+      "error"
     );
+
+
+    /*
+      Keep the valid rows available so the
+      user can try again after fixing a
+      database/network problem.
+    */
 
   } finally {
 
-    button.disabled = false;
+    importButton.disabled =
+      validRows.length === 0;
 
-    button.innerHTML =
-      `<i class="fa-solid fa-cloud-arrow-up mr-2"></i>
-       Import Valid Questions`;
-
+    importButton.innerHTML =
+      '<i class="fa-solid fa-cloud-arrow-up mr-2"></i>Import Valid Questions';
   }
-
 }
 
 
 /* ============================================================
-   RESULT
-============================================================ */
+   RESULT MESSAGE
+   ============================================================ */
 
 function showResult(
-  success,
   title,
-  message
+  message,
+  type = "info"
 ) {
 
   resultSection.classList.remove(
@@ -3159,172 +2741,485 @@ function showResult(
   );
 
 
-  if (success) {
+  let icon =
+    "fa-circle-info";
 
-    resultSection.className =
-      "bg-green-50 border border-green-200 " +
-      "rounded-2xl p-6 mb-8";
-
-
-    document.getElementById(
-      "resultIcon"
-    ).innerHTML =
-      `<i class="fa-solid fa-circle-check text-green-600"></i>`;
+  let className =
+    "info-box";
 
 
-    document.getElementById(
-      "resultTitle"
-    ).className =
-      "text-xl font-bold text-green-800";
+  if (type === "success") {
 
+    icon =
+      "fa-circle-check";
 
-  } else {
+    className =
+      "success-box";
 
-    resultSection.className =
-      "bg-red-50 border border-red-200 " +
-      "rounded-2xl p-6 mb-8";
+  } else if (type === "error") {
 
+    icon =
+      "fa-circle-xmark";
 
-    document.getElementById(
-      "resultIcon"
-    ).innerHTML =
-      `<i class="fa-solid fa-circle-xmark text-red-600"></i>`;
+    className =
+      "error-box";
 
+  } else if (type === "warning") {
 
-    document.getElementById(
-      "resultTitle"
-    ).className =
-      "text-xl font-bold text-red-800";
+    icon =
+      "fa-triangle-exclamation";
 
+    className =
+      "warning-box";
   }
 
 
-  document.getElementById(
-    "resultTitle"
-  ).textContent =
-    title;
+  resultContent.className =
+    `${className} rounded-xl p-4`;
 
 
-  document.getElementById(
-    "resultMessage"
-  ).textContent =
-    message;
+  resultContent.innerHTML = `
+    <div class="flex gap-3">
 
+      <i class="fa-solid ${icon} mt-1"></i>
+
+      <div>
+        <strong>${escapeHTML(title)}</strong>
+
+        <p class="text-sm mt-1">
+          ${escapeHTML(message)}
+        </p>
+      </div>
+
+    </div>
+  `;
+
+
+  resultSection.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest"
+  });
 }
 
 
 /* ============================================================
-   CLEAR
-============================================================ */
+   REMOVE FILE
+   ============================================================ */
 
-document.getElementById(
-  "clearButton"
-).addEventListener(
-  "click",
-  function() {
+function clearFile() {
 
-    parsedRows = [];
+  selectedFile = null;
 
-    validRows = [];
+  csvFile.value = "";
 
-    invalidRows = [];
+  fileInfo.classList.add(
+    "hidden"
+  );
 
-    detectedHeaders = [];
+  diagnosticsSection.classList.add(
+    "hidden"
+  );
 
-    rawCSVText = "";
+  validationSection.classList.add(
+    "hidden"
+  );
+
+  previewSection.classList.add(
+    "hidden"
+  );
+
+  resultSection.classList.add(
+    "hidden"
+  );
+
+  importResult.classList.add(
+    "hidden"
+  );
+
+  parsedRows = [];
+  validRows = [];
+  invalidRows = [];
+  detectedHeaders = [];
+
+  validateButton.disabled = true;
+
+  importButton.disabled = true;
+}
 
 
-    csvFile.value =
-      "";
+/* ============================================================
+   AUTH
+   ============================================================ */
+
+async function checkExistingSession() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.getSession();
 
 
-    fileInformation.textContent =
-      "No file selected.";
+    if (error) {
+      throw error;
+    }
 
 
-    diagnosticSection.classList.add(
+    const session =
+      data?.session;
+
+
+    if (
+      session?.user
+    ) {
+
+      await verifyAdmin(
+        session.user
+      );
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Session check failed:",
+      error
+    );
+  }
+}
+
+
+async function verifyAdmin(user) {
+
+  const email =
+    String(
+      user?.email || ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const allowed =
+    ADMIN_EMAILS.some(
+      admin =>
+        admin.toLowerCase() === email
+    );
+
+
+  if (!allowed) {
+
+    await supabaseClient.auth.signOut();
+
+    showLogin();
+
+    loginError.classList.remove(
       "hidden"
     );
 
-    validationSection.classList.add(
+    loginError.textContent =
+      "This account is not authorized to access the Exam Vault importer.";
+
+    return false;
+  }
+
+
+  showAdminApp();
+
+  return true;
+}
+
+
+function showAdminApp() {
+
+  loginScreen.classList.add(
+    "hidden"
+  );
+
+  adminApp.classList.remove(
+    "hidden"
+  );
+
+  renderSubjects();
+}
+
+
+function showLogin() {
+
+  loginScreen.classList.remove(
+    "hidden"
+  );
+
+  adminApp.classList.add(
+    "hidden"
+  );
+}
+
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+
+loginForm.addEventListener(
+  "submit",
+  async event => {
+
+    event.preventDefault();
+
+
+    loginError.classList.add(
       "hidden"
     );
 
-    previewSection.classList.add(
-      "hidden"
-    );
 
-    importSection.classList.add(
-      "hidden"
-    );
+    loginButton.disabled =
+      true;
 
-    resultSection.classList.add(
-      "hidden"
-    );
+    loginButton.innerHTML =
+      '<span class="spinner"></span>Signing in...';
 
 
-    document.getElementById(
-      "previewTableBody"
-    ).innerHTML =
-      "";
+    try {
+
+      const email =
+        loginEmail.value.trim();
+
+      const password =
+        loginPassword.value;
 
 
-    document.getElementById(
-      "errorsList"
-    ).innerHTML =
-      "";
+      const {
+        data,
+        error
+      } =
+        await supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
 
 
-    document.getElementById(
-      "errorsContainer"
-    ).classList.add(
-      "hidden"
-    );
+      if (error) {
+        throw error;
+      }
 
 
-    document.getElementById(
-      "diagnosticList"
-    ).innerHTML =
-      "";
+      const isAdmin =
+        await verifyAdmin(
+          data.user
+        );
 
+
+      if (!isAdmin) {
+        return;
+      }
+
+    } catch (error) {
+
+      console.error(
+        "Login error:",
+        error
+      );
+
+
+      loginError.classList.remove(
+        "hidden"
+      );
+
+      loginError.textContent =
+        error.message ||
+        "Unable to sign in.";
+
+    } finally {
+
+      loginButton.disabled =
+        false;
+
+      loginButton.innerHTML =
+        '<i class="fa-solid fa-right-to-bracket mr-2"></i>Sign In';
+    }
   }
 );
 
 
 /* ============================================================
-   ESCAPE HTML
-============================================================ */
+   LOGOUT
+   ============================================================ */
 
-function escapeHTML(value) {
+logoutButton.addEventListener(
+  "click",
+  async () => {
 
-  return String(value ?? "")
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+    await supabaseClient.auth.signOut();
 
+    clearFile();
+
+    showLogin();
+  }
+);
+
+
+/* ============================================================
+   AUTH STATE
+   ============================================================ */
+
+supabaseClient.auth.onAuthStateChange(
+  async (event, session) => {
+
+    if (
+      session?.user
+    ) {
+
+      await verifyAdmin(
+        session.user
+      );
+
+    } else {
+
+      showLogin();
+    }
+  }
+);
+
+
+/* ============================================================
+   FILE EVENTS
+   ============================================================ */
+
+chooseFileButton.addEventListener(
+  "click",
+  event => {
+
+    event.stopPropagation();
+
+    csvFile.click();
+  }
+);
+
+
+dropZone.addEventListener(
+  "click",
+  () => {
+
+    csvFile.click();
+  }
+);
+
+
+csvFile.addEventListener(
+  "change",
+  event => {
+
+    const file =
+      event.target.files?.[0];
+
+    handleFile(file);
+  }
+);
+
+
+removeFileButton.addEventListener(
+  "click",
+  clearFile
+);
+
+
+/* ============================================================
+   DRAG AND DROP
+   ============================================================ */
+
+[
+  "dragenter",
+  "dragover"
+].forEach(eventName => {
+
+  dropZone.addEventListener(
+    eventName,
+    event => {
+
+      event.preventDefault();
+
+      dropZone.classList.add(
+        "dragging"
+      );
+    }
+  );
+});
+
+
+[
+  "dragleave",
+  "drop"
+].forEach(eventName => {
+
+  dropZone.addEventListener(
+    eventName,
+    event => {
+
+      event.preventDefault();
+
+      dropZone.classList.remove(
+        "dragging"
+      );
+    }
+  );
+});
+
+
+dropZone.addEventListener(
+  "drop",
+  event => {
+
+    const file =
+      event.dataTransfer.files?.[0];
+
+    handleFile(file);
+  }
+);
+
+
+/* ============================================================
+   BUTTON EVENTS
+   ============================================================ */
+
+downloadTemplateButton.addEventListener(
+  "click",
+  downloadTemplate
+);
+
+
+validateButton.addEventListener(
+  "click",
+  validateCSV
+);
+
+
+importButton.addEventListener(
+  "click",
+  importQuestions
+);
+
+
+/* ============================================================
+   SUBJECT DISPLAY
+   ============================================================ */
+
+function renderSubjects() {
+
+  subjectList.innerHTML =
+    SUBJECTS.map(
+      subject => `
+        <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-700 px-3 py-1.5 text-xs font-medium">
+          ${escapeHTML(subject)}
+        </span>
+      `
+    ).join("");
 }
 
 
 /* ============================================================
    START
-============================================================ */
+   ============================================================ */
 
 checkExistingSession();
 
