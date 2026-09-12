@@ -1,103 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PulsePrep — Exam Vault Bulk Import</title>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+
+  <title>PulsePrep Exam Vault Admin</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-  >
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     body {
       background: #f8fafc;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
     }
 
     .hidden {
       display: none !important;
     }
 
-    .card {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 16px;
-      box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+    .modal-backdrop {
+      background: rgba(15, 23, 42, 0.65);
     }
 
-    .stat-card {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 18px;
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: capitalize;
     }
 
-    .error-box {
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      color: #991b1b;
-    }
-
-    .success-box {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #166534;
-    }
-
-    .warning-box {
-      background: #fffbeb;
-      border: 1px solid #fde68a;
+    .status-pending {
+      background: #fef3c7;
       color: #92400e;
     }
 
-    .info-box {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1e40af;
+    .status-approved {
+      background: #dcfce7;
+      color: #166534;
     }
 
-    .table-wrap {
+    .status-rejected {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .table-scroll {
       overflow-x: auto;
     }
 
-    table {
-      min-width: 100%;
-    }
-
-    th,
-    td {
-      white-space: nowrap;
-    }
-
-    .drop-zone {
-      border: 2px dashed #cbd5e1;
-      transition: all 0.2s ease;
-    }
-
-    .drop-zone:hover {
-      border-color: #2563eb;
-      background: #eff6ff;
-    }
-
-    .drop-zone.dragging {
-      border-color: #2563eb;
-      background: #dbeafe;
+    .question-row:hover {
+      background: #f8fafc;
     }
 
     .spinner {
       width: 18px;
       height: 18px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: white;
+      border: 2px solid #cbd5e1;
+      border-top-color: #2563eb;
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 8px;
     }
 
     @keyframes spin {
@@ -105,18 +75,65 @@
         transform: rotate(360deg);
       }
     }
+
+    .toast {
+      animation: toastIn 0.25s ease-out;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    textarea {
+      min-height: 110px;
+    }
+
+    .admin-card {
+      box-shadow:
+        0 1px 3px rgba(15, 23, 42, 0.08),
+        0 10px 30px rgba(15, 23, 42, 0.04);
+    }
   </style>
 </head>
 
 <body class="min-h-screen text-slate-800">
 
-  <!-- LOGIN -->
-  <section id="loginScreen" class="min-h-screen flex items-center justify-center p-5">
-    <div class="card w-full max-w-md p-7">
+  <!-- =========================================================
+       AUTH LOADING
+  ========================================================== -->
+  <div
+    id="authLoading"
+    class="min-h-screen flex items-center justify-center bg-slate-50"
+  >
+    <div class="text-center">
+      <div class="spinner mx-auto mb-4"></div>
+      <p class="text-slate-600">Checking administrator access...</p>
+    </div>
+  </div>
 
-      <div class="text-center mb-7">
-        <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <i class="fa-solid fa-book-medical text-2xl"></i>
+
+  <!-- =========================================================
+       LOGIN
+  ========================================================== -->
+  <section
+    id="loginScreen"
+    class="hidden min-h-screen flex items-center justify-center px-4 bg-slate-100"
+  >
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
+
+      <div class="text-center mb-8">
+        <div
+          class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-600 text-white flex items-center justify-center text-2xl font-black"
+        >
+          P
         </div>
 
         <h1 class="text-2xl font-bold text-slate-900">
@@ -124,81 +141,121 @@
         </h1>
 
         <p class="text-sm text-slate-500 mt-2">
-          Administrator bulk question importer
+          Administrator login
         </p>
       </div>
 
-      <form id="loginForm" class="space-y-4">
+      <form id="loginForm" class="space-y-5">
 
         <div>
-          <label class="block text-sm font-medium mb-1">
-            Admin Email
+          <label class="block text-sm font-semibold mb-2">
+            Email
           </label>
 
           <input
             id="loginEmail"
             type="email"
-            required
             autocomplete="email"
-            class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Admin email"
-          >
+          />
         </div>
 
         <div>
-          <label class="block text-sm font-medium mb-1">
+          <label class="block text-sm font-semibold mb-2">
             Password
           </label>
 
           <input
             id="loginPassword"
             type="password"
-            required
             autocomplete="current-password"
-            class="w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+            required
+            class="w-full border border-slate-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Password"
-          >
+          />
         </div>
 
         <button
-          id="loginButton"
           type="submit"
-          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl px-4 py-3 transition"
+          id="loginButton"
+          class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl py-3 transition"
         >
-          <i class="fa-solid fa-right-to-bracket mr-2"></i>
           Sign In
         </button>
 
-        <div
+        <p
           id="loginError"
-          class="hidden error-box rounded-xl p-4 text-sm"
-        ></div>
+          class="hidden text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl p-3"
+        ></p>
 
       </form>
     </div>
   </section>
 
 
-  <!-- ADMIN APP -->
-  <section id="adminApp" class="hidden">
+  <!-- =========================================================
+       ACCESS DENIED
+  ========================================================== -->
+  <section
+    id="accessDeniedScreen"
+    class="hidden min-h-screen flex items-center justify-center px-4 bg-slate-100"
+  >
+    <div class="bg-white rounded-2xl shadow-xl max-w-lg w-full p-8 text-center">
+
+      <div
+        class="w-16 h-16 mx-auto mb-5 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-3xl"
+      >
+        !
+      </div>
+
+      <h1 class="text-2xl font-bold text-slate-900 mb-3">
+        Administrator Access Required
+      </h1>
+
+      <p
+        id="accessDeniedMessage"
+        class="text-slate-600 mb-6"
+      ></p>
+
+      <button
+        id="accessDeniedLogout"
+        class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl font-semibold"
+      >
+        Sign Out
+      </button>
+
+    </div>
+  </section>
+
+
+  <!-- =========================================================
+       ADMIN APPLICATION
+  ========================================================== -->
+  <div id="adminApp" class="hidden">
 
     <!-- HEADER -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+      <div
+        class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+      >
 
         <div>
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center">
-              <i class="fa-solid fa-book-medical"></i>
+            <div
+              class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black"
+            >
+              P
             </div>
 
             <div>
-              <h1 class="font-bold text-lg text-slate-900">
+              <h1 class="font-bold text-xl text-slate-900">
                 PulsePrep Exam Vault
               </h1>
 
               <p class="text-xs text-slate-500">
-                Bulk Question Import
+                Question Manager & Bulk Import
               </p>
             </div>
           </div>
@@ -206,20 +263,22 @@
 
         <div class="flex items-center gap-3">
 
-          <a
-            href="index.html"
-            class="hidden sm:inline-flex items-center gap-2 border border-slate-300 hover:bg-slate-50 rounded-xl px-4 py-2 text-sm font-medium"
-          >
-            <i class="fa-solid fa-arrow-left"></i>
-            Back
-          </a>
+          <div class="hidden sm:block text-right">
+            <p class="text-xs text-slate-500">
+              Administrator
+            </p>
+
+            <p
+              id="adminEmailDisplay"
+              class="font-semibold text-sm text-slate-800"
+            ></p>
+          </div>
 
           <button
             id="logoutButton"
-            class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-4 py-2 text-sm font-medium"
+            class="px-4 py-2 rounded-xl border border-slate-300 hover:bg-slate-50 font-semibold text-sm"
           >
-            <i class="fa-solid fa-right-from-bracket"></i>
-            Logout
+            Sign Out
           </button>
 
         </div>
@@ -227,526 +286,732 @@
     </header>
 
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-      <!-- INTRO -->
-      <div class="mb-7">
-        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">
-          Bulk Question Import
+      <!-- =====================================================
+           PAGE INTRO
+      ====================================================== -->
+      <div class="mb-8">
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900">
+          Exam Vault Question Manager
         </h2>
 
         <p class="text-slate-500 mt-2">
-          Upload a CSV containing nursing examination questions and validate it before importing into the Exam Vault.
+          Import, review, approve and manage PulsePrep exam questions.
         </p>
       </div>
 
 
-      <!-- COMPATIBILITY NOTICE -->
-      <div class="info-box rounded-2xl p-5 mb-7">
-        <div class="flex gap-3">
-          <i class="fa-solid fa-circle-info mt-1"></i>
+      <!-- =====================================================
+           STATS
+      ====================================================== -->
+      <div
+        class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+      >
+
+        <div class="admin-card bg-white rounded-2xl p-5 border border-slate-200">
+          <p class="text-sm text-slate-500">
+            Total Questions
+          </p>
+
+          <p
+            id="totalCount"
+            class="text-3xl font-black text-slate-900 mt-2"
+          >
+            0
+          </p>
+        </div>
+
+
+        <div class="admin-card bg-white rounded-2xl p-5 border border-amber-200">
+          <p class="text-sm text-amber-700">
+            Pending
+          </p>
+
+          <p
+            id="pendingCount"
+            class="text-3xl font-black text-amber-600 mt-2"
+          >
+            0
+          </p>
+        </div>
+
+
+        <div class="admin-card bg-white rounded-2xl p-5 border border-green-200">
+          <p class="text-sm text-green-700">
+            Approved
+          </p>
+
+          <p
+            id="approvedCount"
+            class="text-3xl font-black text-green-600 mt-2"
+          >
+            0
+          </p>
+        </div>
+
+
+        <div class="admin-card bg-white rounded-2xl p-5 border border-red-200">
+          <p class="text-sm text-red-700">
+            Rejected
+          </p>
+
+          <p
+            id="rejectedCount"
+            class="text-3xl font-black text-red-600 mt-2"
+          >
+            0
+          </p>
+        </div>
+
+      </div>
+
+
+      <!-- =====================================================
+           BULK ACTION BAR
+      ====================================================== -->
+      <div
+        class="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-8"
+      >
+
+        <div
+          class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5"
+        >
 
           <div>
-            <h3 class="font-bold">
-              CSV format compatibility
+            <h3 class="font-bold text-blue-900 text-lg">
+              Bulk Question Approval
             </h3>
 
-            <p class="text-sm mt-1 leading-6">
-              PulsePrep accepts both the original 11-column question format and the newer 14-column format.
-              If your file contains an <strong>id</strong> column, it will be ignored and the database can generate its own ID.
-              Missing optional metadata such as source, school, academic year and status will be filled automatically.
+            <p class="text-sm text-blue-700 mt-1">
+              Your imported questions are currently pending.
+              Approve them all at once instead of opening them one by one.
             </p>
           </div>
+
+          <div class="flex flex-wrap gap-3">
+
+            <button
+              id="approveAllPendingButton"
+              class="bg-green-600 hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold px-5 py-3 rounded-xl transition"
+            >
+              Approve All Pending
+              (<span id="approveAllPendingCount">0</span>)
+            </button>
+
+            <button
+              id="refreshQuestionsButton"
+              class="bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-semibold px-5 py-3 rounded-xl"
+            >
+              Refresh
+            </button>
+
+          </div>
+
         </div>
       </div>
 
 
-      <!-- STEP 1 -->
-      <section class="card p-5 sm:p-7 mb-6">
+      <!-- =====================================================
+           IMPORT CSV
+      ====================================================== -->
+      <section class="admin-card bg-white rounded-2xl border border-slate-200 p-6 mb-8">
 
-        <div class="flex items-start gap-4 mb-5">
-          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-            1
-          </div>
+        <div class="mb-6">
+          <h3 class="text-xl font-bold text-slate-900">
+            Import Questions from CSV
+          </h3>
 
-          <div>
-            <h3 class="text-lg font-bold">
-              Download CSV Template
-            </h3>
-
-            <p class="text-sm text-slate-500 mt-1">
-              Use the full template when creating new question files.
-            </p>
-          </div>
-        </div>
-
-        <button
-          id="downloadTemplateButton"
-          class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl px-5 py-3"
-        >
-          <i class="fa-solid fa-download"></i>
-          Download 14-Column Template
-        </button>
-
-      </section>
-
-
-      <!-- STEP 2 -->
-      <section class="card p-5 sm:p-7 mb-6">
-
-        <div class="flex items-start gap-4 mb-5">
-          <div class="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold">
-            2
-          </div>
-
-          <div>
-            <h3 class="text-lg font-bold">
-              Select CSV File
-            </h3>
-
-            <p class="text-sm text-slate-500 mt-1">
-              Existing 11-column files are also supported.
-            </p>
-          </div>
+          <p class="text-sm text-slate-500 mt-1">
+            Import multiple exam questions at once.
+          </p>
         </div>
 
 
         <div
-          id="dropZone"
-          class="drop-zone rounded-2xl p-8 text-center cursor-pointer"
+          class="bg-slate-50 rounded-xl border border-slate-200 p-4 mb-5"
         >
-
-          <i class="fa-solid fa-file-csv text-4xl text-blue-500 mb-4"></i>
-
-          <p class="font-semibold text-slate-800">
-            Choose your CSV file
+          <p class="font-semibold text-sm mb-2">
+            Supported CSV format
           </p>
 
-          <p class="text-sm text-slate-500 mt-1">
-            or drag and drop it here
+          <p class="text-xs text-slate-600 break-all">
+            id, subject, topic, question, option_a, option_b,
+            option_c, option_d, correct_answer, explanation, difficulty
           </p>
+
+          <p class="text-xs text-slate-500 mt-2">
+            The importer also accepts the full format containing
+            source, school and academic_year.
+          </p>
+        </div>
+
+
+        <div class="flex flex-col sm:flex-row gap-4">
 
           <input
             id="csvFile"
             type="file"
             accept=".csv,text/csv"
-            class="hidden"
-          >
+            class="block w-full text-sm text-slate-600 border border-slate-300 rounded-xl p-3"
+          />
 
           <button
-            id="chooseFileButton"
-            type="button"
-            class="mt-5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl px-5 py-3 font-medium"
+            id="importCsvButton"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl whitespace-nowrap"
           >
-            <i class="fa-solid fa-folder-open mr-2"></i>
-            Choose CSV
+            Import CSV
           </button>
 
         </div>
 
 
         <div
-          id="fileInfo"
-          class="hidden mt-4 rounded-xl bg-slate-50 border border-slate-200 p-4"
+          id="importProgress"
+          class="hidden mt-5"
         >
-          <div class="flex flex-wrap items-center justify-between gap-3">
-
-            <div>
-              <p class="font-semibold" id="fileName">
-                —
-              </p>
-
-              <p class="text-sm text-slate-500" id="fileSize">
-                —
-              </p>
-            </div>
-
-            <button
-              id="removeFileButton"
-              type="button"
-              class="text-red-600 hover:text-red-700 font-medium text-sm"
+          <div class="flex items-center gap-3">
+            <div class="spinner"></div>
+            <p
+              id="importProgressText"
+              class="text-sm text-slate-600"
             >
-              <i class="fa-solid fa-trash mr-1"></i>
-              Remove
-            </button>
-
-          </div>
-        </div>
-
-      </section>
-
-
-      <!-- STEP 3 -->
-      <section class="card p-5 sm:p-7 mb-6">
-
-        <div class="flex items-start gap-4 mb-5">
-          <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold">
-            3
-          </div>
-
-          <div>
-            <h3 class="text-lg font-bold">
-              Validate CSV
-            </h3>
-
-            <p class="text-sm text-slate-500 mt-1">
-              PulsePrep will check the columns and every question before anything is imported.
+              Importing...
             </p>
           </div>
         </div>
-
-
-        <button
-          id="validateButton"
-          disabled
-          class="w-full sm:w-auto bg-amber-500 hover:bg-amber-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl px-6 py-3"
-        >
-          <i class="fa-solid fa-check-double mr-2"></i>
-          Validate CSV
-        </button>
-
-
-        <!-- CSV DIAGNOSTICS -->
-        <div
-          id="diagnosticsSection"
-          class="hidden mt-6"
-        >
-
-          <h4 class="font-bold text-lg mb-3">
-            CSV Diagnostics
-          </h4>
-
-          <p class="text-sm text-slate-500 mb-4">
-            What PulsePrep actually detected in your file.
-          </p>
-
-
-          <div
-            id="diagnosticsStatus"
-            class="rounded-xl p-4 mb-5"
-          ></div>
-
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-
-            <div class="stat-card">
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Detected Columns
-              </p>
-
-              <p id="detectedColumnCount" class="text-2xl font-bold mt-1">
-                0
-              </p>
-            </div>
-
-
-            <div class="stat-card">
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Expected Columns
-              </p>
-
-              <p class="text-2xl font-bold mt-1">
-                14
-              </p>
-            </div>
-
-
-            <div class="stat-card">
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Question Rows
-              </p>
-
-              <p id="detectedRowCount" class="text-2xl font-bold mt-1">
-                0
-              </p>
-            </div>
-
-
-            <div class="stat-card">
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Unknown Columns
-              </p>
-
-              <p id="unknownColumnCount" class="text-2xl font-bold mt-1">
-                0
-              </p>
-            </div>
-
-          </div>
-
-
-          <!-- DETECTED HEADERS -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden mb-5">
-
-            <div class="bg-slate-50 px-4 py-3 border-b border-slate-200">
-              <h5 class="font-semibold">
-                Headers detected by browser
-              </h5>
-            </div>
-
-            <div
-              id="detectedHeaders"
-              class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2"
-            ></div>
-
-          </div>
-
-
-          <!-- REQUIRED COLUMNS -->
-          <div
-            id="requiredColumnsBox"
-            class="rounded-xl p-4 mb-5"
-          ></div>
-
-
-          <!-- UNKNOWN COLUMNS -->
-          <div
-            id="unknownColumnsBox"
-            class="hidden rounded-xl p-4 mb-5"
-          ></div>
-
-        </div>
-
-
-        <!-- VALIDATION RESULTS -->
-        <div
-          id="validationSection"
-          class="hidden mt-8"
-        >
-
-          <h4 class="font-bold text-lg mb-4">
-            Validation Results
-          </h4>
-
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-
-            <div class="stat-card">
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Total Questions
-              </p>
-
-              <p id="totalQuestions" class="text-2xl font-bold mt-1">
-                0
-              </p>
-            </div>
-
-
-            <div class="stat-card">
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Valid
-              </p>
-
-              <p id="validQuestions" class="text-2xl font-bold text-green-600 mt-1">
-                0
-              </p>
-            </div>
-
-
-            <div class="stat-card">
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Invalid
-              </p>
-
-              <p id="invalidQuestions" class="text-2xl font-bold text-red-600 mt-1">
-                0
-              </p>
-            </div>
-
-
-            <div class="stat-card">
-              <p class="text-xs uppercase tracking-wide text-slate-500">
-                Columns
-              </p>
-
-              <p id="validationColumnCount" class="text-2xl font-bold mt-1">
-                0
-              </p>
-            </div>
-
-          </div>
-
-
-          <div
-            id="validationMessage"
-            class="rounded-xl p-4 mb-5"
-          ></div>
-
-
-          <div
-            id="validationErrors"
-            class="hidden"
-          >
-            <h5 class="font-bold mb-3">
-              Problems Found
-            </h5>
-
-            <div
-              id="errorList"
-              class="space-y-2 max-h-96 overflow-y-auto"
-            ></div>
-          </div>
-
-        </div>
-
-
-        <!-- PREVIEW -->
-        <div
-          id="previewSection"
-          class="hidden mt-8"
-        >
-
-          <div class="flex items-center justify-between gap-3 mb-3">
-
-            <div>
-              <h4 class="font-bold text-lg">
-                Question Preview
-              </h4>
-
-              <p class="text-sm text-slate-500">
-                Showing the first valid questions.
-              </p>
-            </div>
-
-          </div>
-
-          <div class="table-wrap border border-slate-200 rounded-xl">
-
-            <table class="text-sm">
-              <thead class="bg-slate-50">
-                <tr>
-                  <th class="text-left px-4 py-3">#</th>
-                  <th class="text-left px-4 py-3">Subject</th>
-                  <th class="text-left px-4 py-3">Topic</th>
-                  <th class="text-left px-4 py-3">Question</th>
-                  <th class="text-left px-4 py-3">Answer</th>
-                  <th class="text-left px-4 py-3">Difficulty</th>
-                  <th class="text-left px-4 py-3">Status</th>
-                </tr>
-              </thead>
-
-              <tbody id="previewBody"></tbody>
-            </table>
-
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- STEP 4 -->
-      <section class="card p-5 sm:p-7 mb-6">
-
-        <div class="flex items-start gap-4 mb-5">
-          <div class="w-10 h-10 rounded-xl bg-green-100 text-green-700 flex items-center justify-center font-bold">
-            4
-          </div>
-
-          <div>
-            <h3 class="text-lg font-bold">
-              Import Questions
-            </h3>
-
-            <p class="text-sm text-slate-500 mt-1">
-              Only validated questions will be imported.
-            </p>
-          </div>
-        </div>
-
-
-        <div class="warning-box rounded-xl p-4 mb-5 text-sm">
-          <div class="flex gap-3">
-            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
-
-            <div>
-              <strong>Important:</strong>
-              Imported questions are saved with
-              <strong>pending</strong>
-              status so they can be reviewed before being published.
-            </div>
-          </div>
-        </div>
-
-
-        <button
-          id="importButton"
-          disabled
-          class="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl px-6 py-3"
-        >
-          <i class="fa-solid fa-cloud-arrow-up mr-2"></i>
-          Import Valid Questions
-        </button>
 
 
         <div
           id="importResult"
-          class="hidden mt-5 rounded-xl p-4"
+          class="hidden mt-5 rounded-xl p-4 text-sm"
         ></div>
 
       </section>
 
 
-      <!-- RESULT -->
-      <section
-        id="resultSection"
-        class="hidden card p-5 sm:p-7 mb-6"
-      >
-        <div id="resultContent"></div>
+      <!-- =====================================================
+           ADD / EDIT QUESTION
+      ====================================================== -->
+      <section class="admin-card bg-white rounded-2xl border border-slate-200 p-6 mb-8">
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+
+          <div>
+            <h3
+              id="formTitle"
+              class="text-xl font-bold text-slate-900"
+            >
+              Add New Question
+            </h3>
+
+            <p class="text-sm text-slate-500 mt-1">
+              Create or edit an exam question.
+            </p>
+          </div>
+
+          <button
+            id="cancelEditButton"
+            class="hidden px-4 py-2 border border-slate-300 rounded-xl font-semibold hover:bg-slate-50"
+          >
+            Cancel Edit
+          </button>
+
+        </div>
+
+
+        <form id="questionForm" class="space-y-5">
+
+          <input
+            id="editingQuestionId"
+            type="hidden"
+          />
+
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Subject *
+              </label>
+
+              <select
+                id="questionSubject"
+                required
+                class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white"
+              >
+                <option value="">Select subject</option>
+              </select>
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Topic
+              </label>
+
+              <input
+                id="questionTopic"
+                type="text"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+                placeholder="e.g. Vital Signs"
+              />
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Difficulty
+              </label>
+
+              <select
+                id="questionDifficulty"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white"
+              >
+                <option value="easy">Easy</option>
+                <option value="medium" selected>Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Source
+              </label>
+
+              <input
+                id="questionSource"
+                type="text"
+                value="PulsePrep Admin"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+                placeholder="Source"
+              />
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                School
+              </label>
+
+              <input
+                id="questionSchool"
+                type="text"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+                placeholder="School"
+              />
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Academic Year
+              </label>
+
+              <input
+                id="questionAcademicYear"
+                type="text"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+                placeholder="2026"
+              />
+            </div>
+
+          </div>
+
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              Question *
+            </label>
+
+            <textarea
+              id="questionText"
+              required
+              class="w-full border border-slate-300 rounded-xl px-4 py-3"
+              placeholder="Enter the exam question..."
+            ></textarea>
+          </div>
+
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Option A *
+              </label>
+
+              <input
+                id="optionA"
+                required
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+              />
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Option B *
+              </label>
+
+              <input
+                id="optionB"
+                required
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+              />
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Option C *
+              </label>
+
+              <input
+                id="optionC"
+                required
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+              />
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Option D *
+              </label>
+
+              <input
+                id="optionD"
+                required
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+              />
+            </div>
+
+          </div>
+
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Correct Answer *
+              </label>
+
+              <select
+                id="correctAnswer"
+                required
+                class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white"
+              >
+                <option value="">Select correct answer</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+
+
+            <div>
+              <label class="block text-sm font-semibold mb-2">
+                Status
+              </label>
+
+              <select
+                id="questionStatus"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white"
+              >
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+          </div>
+
+
+          <div>
+            <label class="block text-sm font-semibold mb-2">
+              Explanation
+            </label>
+
+            <textarea
+              id="questionExplanation"
+              class="w-full border border-slate-300 rounded-xl px-4 py-3"
+              placeholder="Explain why the correct answer is correct..."
+            ></textarea>
+          </div>
+
+
+          <button
+            id="saveQuestionButton"
+            type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-7 py-3 rounded-xl"
+          >
+            Save Question
+          </button>
+
+        </form>
       </section>
 
 
-      <!-- SUBJECTS -->
-      <section class="card p-5 sm:p-7">
+      <!-- =====================================================
+           QUESTIONS
+      ====================================================== -->
+      <section class="admin-card bg-white rounded-2xl border border-slate-200">
 
-        <h3 class="font-bold text-lg mb-4">
-          Supported PulsePrep Subjects
-        </h3>
+        <div class="p-6 border-b border-slate-200">
+
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+
+            <div>
+              <h3 class="text-xl font-bold text-slate-900">
+                Questions
+              </h3>
+
+              <p class="text-sm text-slate-500 mt-1">
+                Select questions to approve them together.
+              </p>
+            </div>
+
+
+            <div class="flex flex-wrap gap-3">
+
+              <button
+                id="approveSelectedButton"
+                disabled
+                class="bg-green-600 hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold px-4 py-2.5 rounded-xl"
+              >
+                Approve Selected
+                (<span id="selectedCount">0</span>)
+              </button>
+
+              <button
+                id="rejectSelectedButton"
+                disabled
+                class="bg-red-600 hover:bg-red-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold px-4 py-2.5 rounded-xl"
+              >
+                Reject Selected
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- FILTERS -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-2">
+                Search
+              </label>
+
+              <input
+                id="searchInput"
+                type="search"
+                placeholder="Search question, topic..."
+                class="w-full border border-slate-300 rounded-xl px-4 py-3"
+              />
+            </div>
+
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-2">
+                Subject
+              </label>
+
+              <select
+                id="filterSubject"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white"
+              >
+                <option value="">All Subjects</option>
+              </select>
+            </div>
+
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-500 mb-2">
+                Status
+              </label>
+
+              <select
+                id="filterStatus"
+                class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-white"
+              >
+                <option value="">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- TABLE -->
+        <div class="table-scroll">
+
+          <table class="w-full text-sm">
+
+            <thead class="bg-slate-50 border-b border-slate-200">
+
+              <tr>
+
+                <th class="px-4 py-4 text-left">
+                  <input
+                    id="selectAllCheckbox"
+                    type="checkbox"
+                    class="w-4 h-4"
+                    title="Select all visible questions"
+                  />
+                </th>
+
+                <th class="px-4 py-4 text-left font-bold">
+                  Question
+                </th>
+
+                <th class="px-4 py-4 text-left font-bold">
+                  Subject
+                </th>
+
+                <th class="px-4 py-4 text-left font-bold">
+                  Difficulty
+                </th>
+
+                <th class="px-4 py-4 text-left font-bold">
+                  Status
+                </th>
+
+                <th class="px-4 py-4 text-right font-bold">
+                  Actions
+                </th>
+
+              </tr>
+
+            </thead>
+
+            <tbody id="questionsTableBody">
+
+              <tr>
+                <td
+                  colspan="6"
+                  class="px-6 py-12 text-center text-slate-500"
+                >
+                  Loading questions...
+                </td>
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
 
         <div
-          id="subjectList"
-          class="flex flex-wrap gap-2"
-        ></div>
+          id="emptyQuestions"
+          class="hidden p-12 text-center"
+        >
+          <div class="text-4xl mb-4">
+            📚
+          </div>
+
+          <h4 class="font-bold text-lg">
+            No questions found
+          </h4>
+
+          <p class="text-slate-500 text-sm mt-2">
+            Try changing your filters or import a CSV file.
+          </p>
+        </div>
 
       </section>
 
     </main>
+  </div>
 
-  </section>
+
+  <!-- =========================================================
+       QUESTION DETAILS MODAL
+  ========================================================== -->
+  <div
+    id="questionModal"
+    class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4"
+  >
+
+    <div
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+    >
+
+      <div
+        class="p-5 border-b border-slate-200 flex items-center justify-between sticky top-0 bg-white"
+      >
+
+        <h3 class="font-bold text-xl">
+          Question Details
+        </h3>
+
+        <button
+          id="closeQuestionModal"
+          class="w-10 h-10 rounded-full hover:bg-slate-100 text-xl"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <div
+        id="questionModalContent"
+        class="p-6"
+      ></div>
+
+    </div>
+  </div>
+
+
+  <!-- =========================================================
+       TOAST
+  ========================================================== -->
+  <div
+    id="toastContainer"
+    class="fixed bottom-5 right-5 z-[100] space-y-3 max-w-sm"
+  ></div>
 
 
 <script>
 /* ============================================================
-   PULSEPREP EXAM VAULT BULK CSV IMPORTER
+   PULSEPREP EXAM VAULT ADMIN
    ============================================================ */
 
-const SUPABASE_URL = "https://eskwphjtiogguhvtktmh.supabase.co";
+const SUPABASE_URL =
+  "https://eskwphjtiogguhvtktmh.supabase.co";
 
 const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs";
+  "sb_publishable_o-Dr554qwhmu4SNpZL5dxQ__cP7MB9p";
 
+
+/*
+ * IMPORTANT:
+ * This is the authorized PulsePrep administrator.
+ */
 const ADMIN_EMAILS = [
   "scanzybwoy8@gmail.com"
 ];
 
-const IMPORT_TABLE = "exam_vault_questions";
 
-const IMPORT_BATCH_SIZE = 50;
-
-
-/* ============================================================
-   SUPABASE
-   ============================================================ */
-
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
-);
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
 
 
 /* ============================================================
    SUBJECTS
-   ============================================================ */
+============================================================ */
 
 const SUBJECTS = [
   "Anatomy & Physiology",
@@ -783,369 +1048,2107 @@ const SUBJECTS = [
 
 
 /* ============================================================
-   FULL CSV TEMPLATE HEADERS
-   ============================================================ */
-
-const CSV_HEADERS = [
-  "subject",
-  "topic",
-  "question",
-  "option_a",
-  "option_b",
-  "option_c",
-  "option_d",
-  "correct_answer",
-  "explanation",
-  "difficulty",
-  "source",
-  "school",
-  "academic_year",
-  "status"
-];
-
-
-/* ============================================================
-   SUPPORTED LEGACY FORMAT
-   ============================================================ */
-
-const LEGACY_HEADERS = [
-  "id",
-  "subject",
-  "topic",
-  "question",
-  "option_a",
-  "option_b",
-  "option_c",
-  "option_d",
-  "correct_answer",
-  "explanation",
-  "difficulty"
-];
-
-
-/* ============================================================
    STATE
-   ============================================================ */
+============================================================ */
 
-let selectedFile = null;
-
-let parsedRows = [];
-
-let validRows = [];
-
-let invalidRows = [];
-
-let detectedHeaders = [];
+let allQuestions = [];
+let filteredQuestions = [];
+let selectedQuestionIds = new Set();
+let currentUser = null;
+let adminInitialized = false;
 
 
 /* ============================================================
-   DOM
-   ============================================================ */
+   DOM HELPERS
+============================================================ */
 
-const loginScreen =
-  document.getElementById("loginScreen");
+function $(id) {
+  return document.getElementById(id);
+}
 
-const adminApp =
-  document.getElementById("adminApp");
 
-const loginForm =
-  document.getElementById("loginForm");
+function show(element) {
+  if (element) {
+    element.classList.remove("hidden");
+  }
+}
 
-const loginEmail =
-  document.getElementById("loginEmail");
 
-const loginPassword =
-  document.getElementById("loginPassword");
-
-const loginButton =
-  document.getElementById("loginButton");
-
-const loginError =
-  document.getElementById("loginError");
-
-const logoutButton =
-  document.getElementById("logoutButton");
-
-const csvFile =
-  document.getElementById("csvFile");
-
-const chooseFileButton =
-  document.getElementById("chooseFileButton");
-
-const removeFileButton =
-  document.getElementById("removeFileButton");
-
-const dropZone =
-  document.getElementById("dropZone");
-
-const validateButton =
-  document.getElementById("validateButton");
-
-const importButton =
-  document.getElementById("importButton");
-
-const downloadTemplateButton =
-  document.getElementById("downloadTemplateButton");
-
-const fileInfo =
-  document.getElementById("fileInfo");
-
-const fileName =
-  document.getElementById("fileName");
-
-const fileSize =
-  document.getElementById("fileSize");
-
-const diagnosticsSection =
-  document.getElementById("diagnosticsSection");
-
-const diagnosticsStatus =
-  document.getElementById("diagnosticsStatus");
-
-const detectedColumnCount =
-  document.getElementById("detectedColumnCount");
-
-const detectedRowCount =
-  document.getElementById("detectedRowCount");
-
-const unknownColumnCount =
-  document.getElementById("unknownColumnCount");
-
-const detectedHeadersBox =
-  document.getElementById("detectedHeaders");
-
-const requiredColumnsBox =
-  document.getElementById("requiredColumnsBox");
-
-const unknownColumnsBox =
-  document.getElementById("unknownColumnsBox");
-
-const validationSection =
-  document.getElementById("validationSection");
-
-const totalQuestions =
-  document.getElementById("totalQuestions");
-
-const validQuestions =
-  document.getElementById("validQuestions");
-
-const invalidQuestions =
-  document.getElementById("invalidQuestions");
-
-const validationColumnCount =
-  document.getElementById("validationColumnCount");
-
-const validationMessage =
-  document.getElementById("validationMessage");
-
-const validationErrors =
-  document.getElementById("validationErrors");
-
-const errorList =
-  document.getElementById("errorList");
-
-const previewSection =
-  document.getElementById("previewSection");
-
-const previewBody =
-  document.getElementById("previewBody");
-
-const importResult =
-  document.getElementById("importResult");
-
-const resultSection =
-  document.getElementById("resultSection");
-
-const resultContent =
-  document.getElementById("resultContent");
-
-const subjectList =
-  document.getElementById("subjectList");
+function hide(element) {
+  if (element) {
+    element.classList.add("hidden");
+  }
+}
 
 
 /* ============================================================
-   HELPERS
-   ============================================================ */
+   TOAST
+============================================================ */
 
-function normalizeHeader(value) {
-  return String(value ?? "")
-    .replace(/^\uFEFF/, "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "_");
-}
+function showToast(message, type = "success") {
 
+  const container = $("toastContainer");
 
-function escapeHTML(value) {
-  return String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
+  const toast = document.createElement("div");
 
+  let classes =
+    "toast bg-white border rounded-xl shadow-xl px-5 py-4 text-sm font-semibold";
 
-function formatBytes(bytes) {
-  if (!Number.isFinite(bytes) || bytes <= 0) {
-    return "0 Bytes";
+  if (type === "success") {
+    classes += " border-green-200 text-green-700";
+  } else if (type === "error") {
+    classes += " border-red-200 text-red-700";
+  } else {
+    classes += " border-blue-200 text-blue-700";
   }
 
-  const units = [
-    "Bytes",
-    "KB",
-    "MB",
-    "GB"
-  ];
+  toast.className = classes;
 
-  const index = Math.min(
-    Math.floor(Math.log(bytes) / Math.log(1024)),
-    units.length - 1
-  );
+  toast.textContent = message;
 
-  return (
-    (bytes / Math.pow(1024, index)).toFixed(
-      index === 0 ? 0 : 2
-    ) +
-    " " +
-    units[index]
-  );
-}
+  container.appendChild(toast);
 
-
-function csvEscape(value) {
-  const text = String(value ?? "");
-
-  if (
-    text.includes(",") ||
-    text.includes('"') ||
-    text.includes("\n") ||
-    text.includes("\r")
-  ) {
-    return '"' + text.replace(/"/g, '""') + '"';
-  }
-
-  return text;
+  setTimeout(() => {
+    toast.remove();
+  }, 5000);
 }
 
 
 /* ============================================================
-   CSV TEMPLATE
-   ============================================================ */
+   ADMIN CHECK
+============================================================ */
 
-function downloadCSV(filename, rows) {
+function isAdminEmail(email) {
 
-  const csv = [
-    CSV_HEADERS.join(","),
-    ...rows.map(row =>
-      CSV_HEADERS
-        .map(header => csvEscape(row[header] ?? ""))
-        .join(",")
-    )
-  ].join("\r\n");
+  if (!email) {
+    return false;
+  }
 
-  /*
-    UTF-8 BOM helps Excel correctly recognize UTF-8.
-  */
+  return ADMIN_EMAILS
+    .map(item => item.toLowerCase().trim())
+    .includes(email.toLowerCase().trim());
+}
 
-  const blob = new Blob(
-    ["\uFEFF" + csv],
-    {
-      type: "text/csv;charset=utf-8;"
+
+/* ============================================================
+   SUBJECT DROPDOWNS
+============================================================ */
+
+function populateSubjects() {
+
+  const formSelect = $("questionSubject");
+  const filterSelect = $("filterSubject");
+
+  if (formSelect) {
+
+    formSelect.innerHTML =
+      `<option value="">Select subject</option>`;
+
+    SUBJECTS.forEach(subject => {
+
+      const option = document.createElement("option");
+
+      option.value = subject;
+      option.textContent = subject;
+
+      formSelect.appendChild(option);
+    });
+  }
+
+
+  if (filterSelect) {
+
+    filterSelect.innerHTML =
+      `<option value="">All Subjects</option>`;
+
+    SUBJECTS.forEach(subject => {
+
+      const option = document.createElement("option");
+
+      option.value = subject;
+      option.textContent = subject;
+
+      filterSelect.appendChild(option);
+    });
+  }
+}
+
+
+/* ============================================================
+   AUTH
+============================================================ */
+
+async function checkAuth() {
+
+  try {
+
+    const {
+      data: {
+        session
+      }
+    } = await supabaseClient.auth.getSession();
+
+
+    if (!session || !session.user) {
+
+      hide($("authLoading"));
+      show($("loginScreen"));
+
+      return;
     }
-  );
 
-  const url =
-    URL.createObjectURL(blob);
 
-  const link =
-    document.createElement("a");
+    currentUser = session.user;
 
-  link.href = url;
-  link.download = filename;
 
-  document.body.appendChild(link);
+    if (!isAdminEmail(currentUser.email)) {
 
-  link.click();
+      hide($("authLoading"));
+      hide($("loginScreen"));
+      show($("accessDeniedScreen"));
 
-  link.remove();
+      $("accessDeniedMessage").textContent =
+        `This account (${currentUser.email}) is not authorized as a PulsePrep administrator.`;
 
-  URL.revokeObjectURL(url);
+      return;
+    }
+
+
+    await enterAdmin();
+
+
+  } catch (error) {
+
+    console.error("Auth error:", error);
+
+    hide($("authLoading"));
+    show($("loginScreen"));
+
+    showToast(
+      "Unable to verify your account.",
+      "error"
+    );
+  }
 }
 
 
-function downloadTemplate() {
+/* ============================================================
+   ENTER ADMIN
+============================================================ */
 
-  const sample = {
-    subject: "Maternal & Child Health",
-    topic: "Antenatal Care",
-    question:
-      "Which vitamin is routinely recommended during pregnancy to help prevent neural tube defects?",
-    option_a: "Vitamin A",
-    option_b: "Folic acid",
-    option_c: "Vitamin C",
-    option_d: "Vitamin K",
-    correct_answer: "B",
-    explanation:
-      "Folic acid helps prevent neural tube defects when taken before conception and during early pregnancy.",
-    difficulty: "easy",
-    source: "PulsePrep Sample",
-    school: "",
-    academic_year: "2026",
-    status: "pending"
+async function enterAdmin() {
+
+  hide($("authLoading"));
+  hide($("loginScreen"));
+  hide($("accessDeniedScreen"));
+
+  show($("adminApp"));
+
+
+  $("adminEmailDisplay").textContent =
+    currentUser.email;
+
+
+  if (!adminInitialized) {
+
+    adminInitialized = true;
+
+    populateSubjects();
+    attachEventListeners();
+
+  }
+
+
+  await loadQuestions();
+}
+
+
+/* ============================================================
+   LOGIN
+============================================================ */
+
+async function login() {
+
+  const email =
+    $("loginEmail").value.trim();
+
+  const password =
+    $("loginPassword").value;
+
+
+  hide($("loginError"));
+
+  const button =
+    $("loginButton");
+
+  button.disabled = true;
+  button.textContent = "Signing In...";
+
+
+  try {
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    currentUser = data.user;
+
+
+    if (!isAdminEmail(currentUser.email)) {
+
+      await supabaseClient.auth.signOut();
+
+      throw new Error(
+        `This account (${currentUser.email}) is not authorized as a PulsePrep administrator.`
+      );
+    }
+
+
+    $("loginPassword").value = "";
+
+    await enterAdmin();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    $("loginError").textContent =
+      error.message || "Login failed.";
+
+    show($("loginError"));
+
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = "Sign In";
+  }
+}
+
+
+/* ============================================================
+   LOGOUT
+============================================================ */
+
+async function logout() {
+
+  await supabaseClient.auth.signOut();
+
+  currentUser = null;
+
+  hide($("adminApp"));
+  hide($("accessDeniedScreen"));
+  show($("loginScreen"));
+
+  $("loginPassword").value = "";
+}
+
+
+/* ============================================================
+   LOAD QUESTIONS
+============================================================ */
+
+async function loadQuestions() {
+
+  const tbody =
+    $("questionsTableBody");
+
+  tbody.innerHTML = `
+    <tr>
+      <td colspan="6" class="px-6 py-12 text-center">
+        <div class="flex items-center justify-center gap-3 text-slate-500">
+          <div class="spinner"></div>
+          Loading questions...
+        </div>
+      </td>
+    </tr>
+  `;
+
+
+  try {
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("exam_vault_questions")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    allQuestions = data || [];
+
+
+    selectedQuestionIds.clear();
+
+
+    updateStats();
+
+    applyFilters();
+
+
+  } catch (error) {
+
+    console.error(
+      "Load questions error:",
+      error
+    );
+
+
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" class="px-6 py-12 text-center text-red-600">
+          Failed to load questions.
+          <br>
+          <span class="text-xs">${escapeHtml(error.message || "")}</span>
+        </td>
+      </tr>
+    `;
+
+
+    showToast(
+      "Failed to load questions: " +
+      (error.message || "Unknown error"),
+      "error"
+    );
+  }
+}
+
+
+/* ============================================================
+   STATS
+============================================================ */
+
+function updateStats() {
+
+  const total =
+    allQuestions.length;
+
+  const pending =
+    allQuestions.filter(
+      q => String(q.status || "").toLowerCase() === "pending"
+    ).length;
+
+  const approved =
+    allQuestions.filter(
+      q => String(q.status || "").toLowerCase() === "approved"
+    ).length;
+
+  const rejected =
+    allQuestions.filter(
+      q => String(q.status || "").toLowerCase() === "rejected"
+    ).length;
+
+
+  $("totalCount").textContent =
+    total;
+
+  $("pendingCount").textContent =
+    pending;
+
+  $("approvedCount").textContent =
+    approved;
+
+  $("rejectedCount").textContent =
+    rejected;
+
+  $("approveAllPendingCount").textContent =
+    pending;
+
+
+  const button =
+    $("approveAllPendingButton");
+
+  button.disabled =
+    pending === 0;
+
+
+  button.title =
+    pending === 0
+      ? "There are no pending questions."
+      : `Approve all ${pending} pending questions.`;
+}
+
+
+/* ============================================================
+   FILTERS
+============================================================ */
+
+function applyFilters() {
+
+  const search =
+    $("searchInput").value
+      .trim()
+      .toLowerCase();
+
+  const subject =
+    $("filterSubject").value;
+
+  const status =
+    $("filterStatus").value;
+
+
+  filteredQuestions =
+    allQuestions.filter(question => {
+
+      const questionText =
+        String(question.question || "").toLowerCase();
+
+      const topic =
+        String(question.topic || "").toLowerCase();
+
+      const matchesSearch =
+        !search ||
+        questionText.includes(search) ||
+        topic.includes(search);
+
+      const matchesSubject =
+        !subject ||
+        question.subject === subject;
+
+      const matchesStatus =
+        !status ||
+        String(question.status || "").toLowerCase() === status;
+
+
+      return (
+        matchesSearch &&
+        matchesSubject &&
+        matchesStatus
+      );
+    });
+
+
+  renderQuestions();
+}
+
+
+/* ============================================================
+   RENDER QUESTIONS
+============================================================ */
+
+function renderQuestions() {
+
+  const tbody =
+    $("questionsTableBody");
+
+  const empty =
+    $("emptyQuestions");
+
+
+  tbody.innerHTML = "";
+
+
+  if (filteredQuestions.length === 0) {
+
+    hide(tbody);
+    show(empty);
+
+    updateSelectionUI();
+
+    return;
+  }
+
+
+  show(tbody);
+  hide(empty);
+
+
+  filteredQuestions.forEach(question => {
+
+    const row =
+      document.createElement("tr");
+
+    row.className =
+      "question-row border-b border-slate-100";
+
+
+    const checked =
+      selectedQuestionIds.has(question.id)
+        ? "checked"
+        : "";
+
+
+    const status =
+      String(question.status || "pending").toLowerCase();
+
+
+    const statusClass =
+      status === "approved"
+        ? "status-approved"
+        : status === "rejected"
+          ? "status-rejected"
+          : "status-pending";
+
+
+    const questionText =
+      String(question.question || "");
+
+
+    const shortenedQuestion =
+      questionText.length > 100
+        ? questionText.substring(0, 100) + "..."
+        : questionText;
+
+
+    row.innerHTML = `
+
+      <td class="px-4 py-4 align-top">
+        <input
+          type="checkbox"
+          class="question-checkbox w-4 h-4"
+          data-id="${escapeAttribute(question.id)}"
+          ${checked}
+        />
+      </td>
+
+
+      <td class="px-4 py-4 align-top min-w-[280px]">
+        <div class="font-semibold text-slate-800">
+          ${escapeHtml(shortenedQuestion)}
+        </div>
+
+        ${
+          question.topic
+            ? `
+              <div class="text-xs text-slate-500 mt-1">
+                Topic: ${escapeHtml(question.topic)}
+              </div>
+            `
+            : ""
+        }
+      </td>
+
+
+      <td class="px-4 py-4 align-top whitespace-nowrap">
+        ${escapeHtml(question.subject || "-")}
+      </td>
+
+
+      <td class="px-4 py-4 align-top whitespace-nowrap">
+        ${escapeHtml(question.difficulty || "-")}
+      </td>
+
+
+      <td class="px-4 py-4 align-top whitespace-nowrap">
+        <span class="status-badge ${statusClass}">
+          ${escapeHtml(status)}
+        </span>
+      </td>
+
+
+      <td class="px-4 py-4 align-top text-right whitespace-nowrap">
+
+        <div class="flex flex-wrap justify-end gap-2">
+
+          <button
+            onclick="window.viewQuestion('${escapeAttribute(question.id)}')"
+            class="px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold"
+          >
+            View
+          </button>
+
+
+          <button
+            onclick="window.editQuestion('${escapeAttribute(question.id)}')"
+            class="px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold"
+          >
+            Edit
+          </button>
+
+
+          ${
+            status !== "approved"
+              ? `
+                <button
+                  onclick="window.changeQuestionStatus('${escapeAttribute(question.id)}', 'approved')"
+                  class="px-3 py-2 rounded-lg bg-green-50 hover:bg-green-100 text-green-700 text-xs font-bold"
+                >
+                  Approve
+                </button>
+              `
+              : ""
+          }
+
+
+          ${
+            status !== "rejected"
+              ? `
+                <button
+                  onclick="window.changeQuestionStatus('${escapeAttribute(question.id)}', 'rejected')"
+                  class="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold"
+                >
+                  Reject
+                </button>
+              `
+              : ""
+          }
+
+
+          <button
+            onclick="window.deleteQuestion('${escapeAttribute(question.id)}')"
+            class="px-3 py-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </td>
+    `;
+
+
+    tbody.appendChild(row);
+  });
+
+
+  document
+    .querySelectorAll(".question-checkbox")
+    .forEach(checkbox => {
+
+      checkbox.addEventListener(
+        "change",
+        function () {
+
+          const id =
+            this.dataset.id;
+
+          if (this.checked) {
+            selectedQuestionIds.add(id);
+          } else {
+            selectedQuestionIds.delete(id);
+          }
+
+          updateSelectionUI();
+        }
+      );
+    });
+
+
+  updateSelectionUI();
+}
+
+
+/* ============================================================
+   SELECTION
+============================================================ */
+
+function updateSelectionUI() {
+
+  const selectedCount =
+    selectedQuestionIds.size;
+
+
+  $("selectedCount").textContent =
+    selectedCount;
+
+
+  $("approveSelectedButton").disabled =
+    selectedCount === 0;
+
+
+  $("rejectSelectedButton").disabled =
+    selectedCount === 0;
+
+
+  const selectAll =
+    $("selectAllCheckbox");
+
+
+  if (!selectAll) {
+    return;
+  }
+
+
+  const visibleIds =
+    filteredQuestions.map(
+      question => String(question.id)
+    );
+
+
+  const selectedVisibleCount =
+    visibleIds.filter(
+      id => selectedQuestionIds.has(id)
+    ).length;
+
+
+  selectAll.checked =
+    visibleIds.length > 0 &&
+    selectedVisibleCount === visibleIds.length;
+
+
+  selectAll.indeterminate =
+    selectedVisibleCount > 0 &&
+    selectedVisibleCount < visibleIds.length;
+}
+
+
+/* ============================================================
+   APPROVE ALL PENDING
+============================================================ */
+
+async function approveAllPending() {
+
+  if (!currentUser || !isAdminEmail(currentUser.email)) {
+
+    showToast(
+      "Administrator authentication is required.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const pendingQuestions =
+    allQuestions.filter(
+      question =>
+        String(question.status || "").toLowerCase() === "pending"
+    );
+
+
+  if (pendingQuestions.length === 0) {
+
+    showToast(
+      "There are no pending questions to approve.",
+      "info"
+    );
+
+    return;
+  }
+
+
+  const confirmed =
+    window.confirm(
+      `Approve all ${pendingQuestions.length} pending questions?\n\n` +
+      `This will change their status from "pending" to "approved".`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  const button =
+    $("approveAllPendingButton");
+
+
+  const originalText =
+    button.innerHTML;
+
+
+  button.disabled = true;
+
+  button.innerHTML =
+    `
+      <span class="inline-flex items-center gap-2">
+        <span class="spinner"></span>
+        Approving...
+      </span>
+    `;
+
+
+  try {
+
+    /*
+     * We use the status filter so only pending questions
+     * are changed.
+     */
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("exam_vault_questions")
+      .update({
+        status: "approved"
+      })
+      .eq("status", "pending")
+      .select("id, status");
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    const approvedNumber =
+      data ? data.length : 0;
+
+
+    showToast(
+      `${approvedNumber} pending question${approvedNumber === 1 ? "" : "s"} approved successfully.`,
+      "success"
+    );
+
+
+    await loadQuestions();
+
+
+  } catch (error) {
+
+    console.error(
+      "Approve all error:",
+      error
+    );
+
+
+    showToast(
+      "Could not approve all questions: " +
+      (error.message || "Unknown error"),
+      "error"
+    );
+
+
+  } finally {
+
+    button.innerHTML =
+      originalText;
+
+    updateStats();
+  }
+}
+
+
+/* ============================================================
+   APPROVE SELECTED
+============================================================ */
+
+async function approveSelected() {
+
+  const ids =
+    Array.from(selectedQuestionIds);
+
+
+  if (ids.length === 0) {
+    return;
+  }
+
+
+  const confirmed =
+    window.confirm(
+      `Approve ${ids.length} selected question${ids.length === 1 ? "" : "s"}?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("exam_vault_questions")
+      .update({
+        status: "approved"
+      })
+      .in("id", ids)
+      .select("id, status");
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    selectedQuestionIds.clear();
+
+
+    showToast(
+      `${data ? data.length : ids.length} question${ids.length === 1 ? "" : "s"} approved.`,
+      "success"
+    );
+
+
+    await loadQuestions();
+
+
+  } catch (error) {
+
+    console.error(
+      "Approve selected error:",
+      error
+    );
+
+
+    showToast(
+      "Could not approve selected questions: " +
+      (error.message || "Unknown error"),
+      "error"
+    );
+  }
+}
+
+
+/* ============================================================
+   REJECT SELECTED
+============================================================ */
+
+async function rejectSelected() {
+
+  const ids =
+    Array.from(selectedQuestionIds);
+
+
+  if (ids.length === 0) {
+    return;
+  }
+
+
+  const confirmed =
+    window.confirm(
+      `Reject ${ids.length} selected question${ids.length === 1 ? "" : "s"}?`
+    );
+
+
+  if (!confirmed) {
+    return;
+  }
+
+
+  try {
+
+    const {
+      data,
+      error
+    } = await supabaseClient
+      .from("exam_vault_questions")
+      .update({
+        status: "rejected"
+      })
+      .in("id", ids)
+      .select("id, status");
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    selectedQuestionIds.clear();
+
+
+    showToast(
+      `${data ? data.length : ids.length} question${ids.length === 1 ? "" : "s"} rejected.`,
+      "success"
+    );
+
+
+    await loadQuestions();
+
+
+  } catch (error) {
+
+    console.error(
+      "Reject selected error:",
+      error
+    );
+
+
+    showToast(
+      "Could not reject selected questions: " +
+      (error.message || "Unknown error"),
+      "error"
+    );
+  }
+}
+
+
+/* ============================================================
+   SINGLE QUESTION STATUS
+============================================================ */
+
+window.changeQuestionStatus =
+  async function(id, newStatus) {
+
+    if (!currentUser || !isAdminEmail(currentUser.email)) {
+
+      showToast(
+        "Administrator authentication is required.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    if (
+      !["pending", "approved", "rejected"]
+        .includes(newStatus)
+    ) {
+
+      showToast(
+        "Invalid question status.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    try {
+
+      const {
+        data,
+        error
+      } = await supabaseClient
+        .from("exam_vault_questions")
+        .update({
+          status: newStatus
+        })
+        .eq("id", id)
+        .select("id, status");
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      if (!data || data.length === 0) {
+
+        throw new Error(
+          "No question was updated. Check your Supabase RLS policies."
+        );
+      }
+
+
+      showToast(
+        `Question marked as ${newStatus}.`,
+        "success"
+      );
+
+
+      await loadQuestions();
+
+
+    } catch (error) {
+
+      console.error(
+        "Status update error:",
+        error
+      );
+
+
+      showToast(
+        "Could not update question status: " +
+        (error.message || "Unknown error"),
+        "error"
+      );
+    }
   };
 
-  downloadCSV(
-    "pulseprep-exam-vault-template.csv",
-    [sample]
-  );
+
+/* ============================================================
+   DELETE QUESTION
+============================================================ */
+
+window.deleteQuestion =
+  async function(id) {
+
+    if (!currentUser || !isAdminEmail(currentUser.email)) {
+
+      showToast(
+        "Administrator authentication is required.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    const question =
+      allQuestions.find(
+        item => String(item.id) === String(id)
+      );
+
+
+    const preview =
+      question && question.question
+        ? question.question.substring(0, 80)
+        : "this question";
+
+
+    const confirmed =
+      window.confirm(
+        `Delete this question?\n\n"${preview}${question && question.question.length > 80 ? "..." : ""}"\n\nThis cannot be undone.`
+      );
+
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    try {
+
+      const {
+        error
+      } = await supabaseClient
+        .from("exam_vault_questions")
+        .delete()
+        .eq("id", id);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      selectedQuestionIds.delete(String(id));
+
+
+      showToast(
+        "Question deleted successfully.",
+        "success"
+      );
+
+
+      await loadQuestions();
+
+
+    } catch (error) {
+
+      console.error(
+        "Delete error:",
+        error
+      );
+
+
+      showToast(
+        "Could not delete question: " +
+        (error.message || "Unknown error"),
+        "error"
+      );
+    }
+  };
+
+
+/* ============================================================
+   VIEW QUESTION
+============================================================ */
+
+window.viewQuestion =
+  function(id) {
+
+    const question =
+      allQuestions.find(
+        item => String(item.id) === String(id)
+      );
+
+
+    if (!question) {
+      return;
+    }
+
+
+    const status =
+      String(question.status || "pending").toLowerCase();
+
+
+    $("questionModalContent").innerHTML = `
+
+      <div class="space-y-6">
+
+        <div class="flex flex-wrap gap-2">
+
+          <span class="status-badge ${
+            status === "approved"
+              ? "status-approved"
+              : status === "rejected"
+                ? "status-rejected"
+                : "status-pending"
+          }">
+            ${escapeHtml(status)}
+          </span>
+
+          <span class="px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">
+            ${escapeHtml(question.difficulty || "medium")}
+          </span>
+
+        </div>
+
+
+        <div>
+          <p class="text-xs font-bold text-slate-500 uppercase mb-2">
+            Subject
+          </p>
+
+          <p class="font-semibold">
+            ${escapeHtml(question.subject || "-")}
+          </p>
+        </div>
+
+
+        <div>
+          <p class="text-xs font-bold text-slate-500 uppercase mb-2">
+            Topic
+          </p>
+
+          <p>
+            ${escapeHtml(question.topic || "-")}
+          </p>
+        </div>
+
+
+        <div>
+          <p class="text-xs font-bold text-slate-500 uppercase mb-2">
+            Question
+          </p>
+
+          <p class="text-lg font-semibold leading-relaxed">
+            ${escapeHtml(question.question || "")}
+          </p>
+        </div>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+
+          ${renderOption("A", question.option_a, question.correct_answer)}
+
+          ${renderOption("B", question.option_b, question.correct_answer)}
+
+          ${renderOption("C", question.option_c, question.correct_answer)}
+
+          ${renderOption("D", question.option_d, question.correct_answer)}
+
+        </div>
+
+
+        <div>
+          <p class="text-xs font-bold text-slate-500 uppercase mb-2">
+            Explanation
+          </p>
+
+          <div class="bg-slate-50 rounded-xl p-4 leading-relaxed">
+            ${escapeHtml(question.explanation || "No explanation provided.")}
+          </div>
+        </div>
+
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+
+          <div>
+            <p class="text-slate-500">
+              Source
+            </p>
+
+            <p class="font-semibold">
+              ${escapeHtml(question.source || "-")}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-slate-500">
+              School
+            </p>
+
+            <p class="font-semibold">
+              ${escapeHtml(question.school || "-")}
+            </p>
+          </div>
+
+          <div>
+            <p class="text-slate-500">
+              Academic Year
+            </p>
+
+            <p class="font-semibold">
+              ${escapeHtml(question.academic_year || "-")}
+            </p>
+          </div>
+
+        </div>
+
+
+        <div class="flex flex-wrap gap-3 pt-3 border-t border-slate-200">
+
+          ${
+            status !== "approved"
+              ? `
+                <button
+                  onclick="window.changeQuestionStatus('${escapeAttribute(question.id)}', 'approved'); window.closeQuestionModal();"
+                  class="bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl font-bold"
+                >
+                  Approve
+                </button>
+              `
+              : ""
+          }
+
+
+          ${
+            status !== "rejected"
+              ? `
+                <button
+                  onclick="window.changeQuestionStatus('${escapeAttribute(question.id)}', 'rejected'); window.closeQuestionModal();"
+                  class="bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl font-bold"
+                >
+                  Reject
+                </button>
+              `
+              : ""
+          }
+
+        </div>
+
+      </div>
+    `;
+
+
+    show($("questionModal"));
+  };
+
+
+function renderOption(letter, value, correctAnswer) {
+
+  const isCorrect =
+    String(correctAnswer || "")
+      .trim()
+      .toUpperCase() === letter;
+
+
+  return `
+    <div
+      class="border rounded-xl p-4 ${
+        isCorrect
+          ? "border-green-300 bg-green-50"
+          : "border-slate-200"
+      }"
+    >
+
+      <div class="flex gap-3">
+
+        <div
+          class="font-black ${
+            isCorrect
+              ? "text-green-700"
+              : "text-slate-500"
+          }"
+        >
+          ${letter}.
+        </div>
+
+        <div class="flex-1">
+          ${escapeHtml(value || "")}
+        </div>
+
+      </div>
+
+      ${
+        isCorrect
+          ? `
+            <div class="text-xs text-green-700 font-bold mt-2">
+              ✓ Correct Answer
+            </div>
+          `
+          : ""
+      }
+
+    </div>
+  `;
 }
 
 
 /* ============================================================
-   ROBUST CSV PARSER
-   ============================================================ */
+   CLOSE MODAL
+============================================================ */
 
-function parseCSV(text) {
+window.closeQuestionModal =
+  function() {
 
-  if (typeof text !== "string") {
-    throw new Error(
-      "The uploaded file could not be read as text."
+    hide($("questionModal"));
+  };
+
+
+/* ============================================================
+   EDIT QUESTION
+============================================================ */
+
+window.editQuestion =
+  function(id) {
+
+    const question =
+      allQuestions.find(
+        item => String(item.id) === String(id)
+      );
+
+
+    if (!question) {
+      return;
+    }
+
+
+    $("editingQuestionId").value =
+      question.id;
+
+
+    $("questionSubject").value =
+      question.subject || "";
+
+
+    $("questionTopic").value =
+      question.topic || "";
+
+
+    $("questionDifficulty").value =
+      question.difficulty || "medium";
+
+
+    $("questionSource").value =
+      question.source || "";
+
+
+    $("questionSchool").value =
+      question.school || "";
+
+
+    $("questionAcademicYear").value =
+      question.academic_year || "";
+
+
+    $("questionText").value =
+      question.question || "";
+
+
+    $("optionA").value =
+      question.option_a || "";
+
+
+    $("optionB").value =
+      question.option_b || "";
+
+
+    $("optionC").value =
+      question.option_c || "";
+
+
+    $("optionD").value =
+      question.option_d || "";
+
+
+    $("correctAnswer").value =
+      normalizeCorrectAnswer(
+        question.correct_answer
+      );
+
+
+    $("questionExplanation").value =
+      question.explanation || "";
+
+
+    $("questionStatus").value =
+      question.status || "pending";
+
+
+    $("formTitle").textContent =
+      "Edit Question";
+
+
+    $("saveQuestionButton").textContent =
+      "Update Question";
+
+
+    show($("cancelEditButton"));
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  };
+
+
+/* ============================================================
+   CANCEL EDIT
+============================================================ */
+
+function cancelEdit() {
+
+  resetQuestionForm();
+
+  $("formTitle").textContent =
+    "Add New Question";
+
+  $("saveQuestionButton").textContent =
+    "Save Question";
+
+  hide($("cancelEditButton"));
+}
+
+
+/* ============================================================
+   RESET FORM
+============================================================ */
+
+function resetQuestionForm() {
+
+  $("questionForm").reset();
+
+  $("editingQuestionId").value = "";
+
+  $("questionSource").value =
+    "PulsePrep Admin";
+
+  $("questionAcademicYear").value =
+    String(new Date().getFullYear());
+
+  $("questionDifficulty").value =
+    "medium";
+
+  $("questionStatus").value =
+    "pending";
+}
+
+
+/* ============================================================
+   SAVE QUESTION
+============================================================ */
+
+async function saveQuestion(event) {
+
+  event.preventDefault();
+
+
+  if (!currentUser || !isAdminEmail(currentUser.email)) {
+
+    showToast(
+      "Administrator authentication is required.",
+      "error"
     );
+
+    return;
   }
+
+
+  const editingId =
+    $("editingQuestionId").value.trim();
+
+
+  const questionData = {
+
+    subject:
+      $("questionSubject").value.trim(),
+
+    topic:
+      $("questionTopic").value.trim(),
+
+    question:
+      $("questionText").value.trim(),
+
+    option_a:
+      $("optionA").value.trim(),
+
+    option_b:
+      $("optionB").value.trim(),
+
+    option_c:
+      $("optionC").value.trim(),
+
+    option_d:
+      $("optionD").value.trim(),
+
+    correct_answer:
+      $("correctAnswer").value.trim().toUpperCase(),
+
+    explanation:
+      $("questionExplanation").value.trim(),
+
+    difficulty:
+      $("questionDifficulty").value.trim(),
+
+    source:
+      $("questionSource").value.trim(),
+
+    school:
+      $("questionSchool").value.trim(),
+
+    academic_year:
+      $("questionAcademicYear").value.trim(),
+
+    status:
+      $("questionStatus").value
+  };
+
+
+  const button =
+    $("saveQuestionButton");
+
+
+  button.disabled = true;
+
+  const originalText =
+    button.textContent;
+
+  button.textContent =
+    editingId
+      ? "Updating..."
+      : "Saving...";
+
+
+  try {
+
+    if (editingId) {
+
+      const {
+        error
+      } = await supabaseClient
+        .from("exam_vault_questions")
+        .update(questionData)
+        .eq("id", editingId);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      showToast(
+        "Question updated successfully.",
+        "success"
+      );
+
+
+    } else {
+
+      const {
+        error
+      } = await supabaseClient
+        .from("exam_vault_questions")
+        .insert(questionData);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      showToast(
+        "Question created successfully.",
+        "success"
+      );
+    }
+
+
+    cancelEdit();
+
+    await loadQuestions();
+
+
+  } catch (error) {
+
+    console.error(
+      "Save question error:",
+      error
+    );
+
+
+    showToast(
+      "Could not save question: " +
+      (error.message || "Unknown error"),
+      "error"
+    );
+
+
+  } finally {
+
+    button.disabled = false;
+
+    button.textContent =
+      editingId
+        ? "Update Question"
+        : "Save Question";
+  }
+}
+
+
+/* ============================================================
+   CSV IMPORT
+============================================================ */
+
+async function importCsv() {
+
+  const file =
+    $("csvFile").files[0];
+
+
+  if (!file) {
+
+    showToast(
+      "Please choose a CSV file first.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const progress =
+    $("importProgress");
+
+  const progressText =
+    $("importProgressText");
+
+  const result =
+    $("importResult");
+
+  const button =
+    $("importCsvButton");
+
+
+  hide(result);
+  show(progress);
+
+
+  button.disabled = true;
+
+
+  try {
+
+    progressText.textContent =
+      "Reading CSV file...";
+
+
+    const text =
+      await file.text();
+
+
+    const rows =
+      parseCSV(text);
+
+
+    if (!rows.length) {
+      throw new Error(
+        "The CSV file is empty."
+      );
+    }
+
+
+    const headers =
+      rows[0].map(
+        header =>
+          String(header || "")
+            .trim()
+            .toLowerCase()
+      );
+
+
+    const dataRows =
+      rows.slice(1).filter(row =>
+        row.some(
+          cell =>
+            String(cell || "").trim() !== ""
+        )
+      );
+
+
+    if (!dataRows.length) {
+      throw new Error(
+        "No question rows were found."
+      );
+    }
+
+
+    progressText.textContent =
+      `Preparing ${dataRows.length} questions...`;
+
+
+    const questions =
+      dataRows.map(
+        (row, index) =>
+          csvRowToQuestion(
+            headers,
+            row,
+            index
+          )
+      );
+
+
+    const invalidRows =
+      questions.filter(
+        question => question.__invalid
+      );
+
+
+    if (invalidRows.length) {
+
+      throw new Error(
+        `The CSV contains ${invalidRows.length} invalid row(s). ` +
+        `Make sure question, subject, options and correct_answer are filled in.`
+      );
+    }
+
+
+    /*
+     * Remove the internal validation property
+     * before sending to Supabase.
+     */
+    questions.forEach(
+      question => delete question.__invalid
+    );
+
+
+    progressText.textContent =
+      `Importing ${questions.length} questions...`;
+
+
+    /*
+     * Insert in batches so large files are safer.
+     */
+    const batchSize = 100;
+
+    let imported = 0;
+
+
+    for (
+      let i = 0;
+      i < questions.length;
+      i += batchSize
+    ) {
+
+      const batch =
+        questions.slice(
+          i,
+          i + batchSize
+        );
+
+
+      const {
+        error
+      } = await supabaseClient
+        .from("exam_vault_questions")
+        .insert(batch);
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      imported += batch.length;
+
+
+      progressText.textContent =
+        `Imported ${imported} of ${questions.length} questions...`;
+    }
+
+
+    show(result);
+
+    result.className =
+      "mt-5 rounded-xl p-4 text-sm bg-green-50 border border-green-200 text-green-700";
+
+    result.textContent =
+      `Successfully imported ${imported} question${imported === 1 ? "" : "s"}. ` +
+      `They were added as pending questions. Use "Approve All Pending" to approve them together.`;
+
+
+    $("csvFile").value = "";
+
+
+    await loadQuestions();
+
+
+  } catch (error) {
+
+    console.error(
+      "CSV import error:",
+      error
+    );
+
+
+    show(result);
+
+    result.className =
+      "mt-5 rounded-xl p-4 text-sm bg-red-50 border border-red-200 text-red-700";
+
+    result.textContent =
+      "Import failed: " +
+      (error.message || "Unknown error");
+
+
+  } finally {
+
+    hide(progress);
+
+    button.disabled = false;
+  }
+}
+
+
+/* ============================================================
+   CSV ROW -> QUESTION
+============================================================ */
+
+function csvRowToQuestion(headers, row, index) {
+
+  const get =
+    name => {
+
+      const position =
+        headers.indexOf(name);
+
+      if (position === -1) {
+        return "";
+      }
+
+      return String(
+        row[position] ?? ""
+      ).trim();
+    };
+
+
+  const questionText =
+    get("question");
+
+  const subject =
+    get("subject");
+
+  const optionA =
+    get("option_a");
+
+  const optionB =
+    get("option_b");
+
+  const optionC =
+    get("option_c");
+
+  const optionD =
+    get("option_d");
+
+
+  const correctAnswer =
+    normalizeCorrectAnswer(
+      get("correct_answer")
+    );
+
+
+  const currentYear =
+    String(
+      new Date().getFullYear()
+    );
+
+
+  const question = {
+
+    subject:
+      subject,
+
+    topic:
+      get("topic"),
+
+    question:
+      questionText,
+
+    option_a:
+      optionA,
+
+    option_b:
+      optionB,
+
+    option_c:
+      optionC,
+
+    option_d:
+      optionD,
+
+    correct_answer:
+      correctAnswer,
+
+    explanation:
+      get("explanation"),
+
+    difficulty:
+      get("difficulty") || "medium",
+
+    source:
+      get("source") || "Bulk Import",
+
+    school:
+      get("school") || "",
+
+    academic_year:
+      get("academic_year") || currentYear,
+
+    status:
+      get("status") || "pending"
+  };
+
 
   /*
-    Remove UTF-8 BOM if present.
-  */
+   * The old 11-column CSV contains an id column.
+   * We intentionally do NOT import that id.
+   * Supabase generates the table id.
+   */
 
-  text = text.replace(/^\uFEFF/, "");
 
-  if (!text.trim()) {
-    throw new Error(
-      "The CSV file is empty."
+  question.__invalid =
+    !subject ||
+    !questionText ||
+    !optionA ||
+    !optionB ||
+    !optionC ||
+    !optionD ||
+    !["A", "B", "C", "D"].includes(
+      correctAnswer
     );
-  }
+
+
+  return question;
+}
+
+
+/* ============================================================
+   CSV PARSER
+============================================================ */
+
+function parseCSV(text) {
 
   const rows = [];
 
   let row = [];
-
   let cell = "";
-
   let insideQuotes = false;
 
-  for (let i = 0; i < text.length; i++) {
 
-    const char = text[i];
+  for (
+    let i = 0;
+    i < text.length;
+    i++
+  ) {
 
-    const nextChar =
-      i + 1 < text.length
-        ? text[i + 1]
-        : "";
+    const char =
+      text[i];
+
+    const next =
+      text[i + 1];
+
 
     if (char === '"') {
 
-      if (insideQuotes && nextChar === '"') {
+      if (insideQuotes && next === '"') {
 
         cell += '"';
 
@@ -1153,8 +3156,8 @@ function parseCSV(text) {
 
       } else {
 
-        insideQuotes = !insideQuotes;
-
+        insideQuotes =
+          !insideQuotes;
       }
 
       continue;
@@ -1176,34 +3179,28 @@ function parseCSV(text) {
       !insideQuotes
     ) {
 
-      row.push(cell);
-
-      cell = "";
-
-      /*
-        Handle Windows CRLF.
-      */
-
       if (
         char === "\r" &&
-        nextChar === "\n"
+        next === "\n"
       ) {
         i++;
       }
 
-      /*
-        Ignore completely empty lines.
-      */
 
-      const hasContent =
+      row.push(cell);
+
+      cell = "";
+
+
+      if (
         row.some(
           value =>
             String(value).trim() !== ""
-        );
-
-      if (hasContent) {
+        )
+      ) {
         rows.push(row);
       }
+
 
       row = [];
 
@@ -1215,34 +3212,18 @@ function parseCSV(text) {
   }
 
 
-  if (insideQuotes) {
-    throw new Error(
-      "The CSV contains an unclosed quoted field. Check for a missing quotation mark."
-    );
-  }
+  if (cell !== "" || row.length) {
 
+    row.push(cell);
 
-  /*
-    Add final cell/row.
-  */
-
-  row.push(cell);
-
-  const hasFinalContent =
-    row.some(
-      value =>
-        String(value).trim() !== ""
-    );
-
-  if (hasFinalContent) {
-    rows.push(row);
-  }
-
-
-  if (!rows.length) {
-    throw new Error(
-      "No CSV rows were detected."
-    );
+    if (
+      row.some(
+        value =>
+          String(value).trim() !== ""
+      )
+    ) {
+      rows.push(row);
+    }
   }
 
 
@@ -1251,1977 +3232,316 @@ function parseCSV(text) {
 
 
 /* ============================================================
-   LEGACY FORMAT NORMALIZATION
-   ============================================================ */
+   NORMALIZE CORRECT ANSWER
+============================================================ */
 
-function detectCSVFormat(headers) {
+function normalizeCorrectAnswer(value) {
 
-  const normalized =
-    headers.map(normalizeHeader);
-
-  const headerSet =
-    new Set(normalized);
-
-
-  const hasFullFormat =
-    CSV_HEADERS.every(
-      header => headerSet.has(header)
-    );
-
-
-  const hasLegacyFormat =
-    LEGACY_HEADERS.every(
-      header => headerSet.has(header)
-    );
-
-
-  if (hasFullFormat) {
-    return "full";
-  }
-
-
-  if (hasLegacyFormat) {
-    return "legacy";
-  }
-
-
-  return "unknown";
-}
-
-
-/* ============================================================
-   AUTOMATIC METADATA
-   ============================================================ */
-
-function getDefaultSource() {
-  return "Bulk Import";
-}
-
-
-function getDefaultSchool() {
-  return "";
-}
-
-
-function getDefaultAcademicYear() {
-  return String(new Date().getFullYear());
-}
-
-
-function getDefaultStatus() {
-  return "pending";
-}
-
-
-/* ============================================================
-   VALIDATE QUESTION
-   ============================================================ */
-
-function validateQuestionRow(row, rowNumber) {
-
-  const errors = [];
-
-  const subject =
-    String(row.subject || "").trim();
-
-  const topic =
-    String(row.topic || "").trim();
-
-  const question =
-    String(row.question || "").trim();
-
-  const optionA =
-    String(row.option_a || "").trim();
-
-  const optionB =
-    String(row.option_b || "").trim();
-
-  const optionC =
-    String(row.option_c || "").trim();
-
-  const optionD =
-    String(row.option_d || "").trim();
-
-  const correctAnswer =
-    String(row.correct_answer || "")
+  const answer =
+    String(value || "")
       .trim()
       .toUpperCase();
 
-  const explanation =
-    String(row.explanation || "").trim();
-
-  const difficulty =
-    String(row.difficulty || "")
-      .trim()
-      .toLowerCase();
-
-  const source =
-    String(row.source || "").trim();
-
-  const school =
-    String(row.school || "").trim();
-
-  const academicYear =
-    String(row.academic_year || "").trim();
-
-  const status =
-    String(row.status || "")
-      .trim()
-      .toLowerCase();
-
-
-  if (!subject) {
-    errors.push("Subject is required.");
-  } else if (!SUBJECTS.includes(subject)) {
-    errors.push(
-      `Unknown subject: "${subject}".`
-    );
-  }
-
-
-  if (!topic) {
-    errors.push("Topic is required.");
-  }
-
-
-  if (!question) {
-    errors.push("Question is required.");
-  }
-
-
-  if (!optionA) {
-    errors.push("Option A is required.");
-  }
-
-
-  if (!optionB) {
-    errors.push("Option B is required.");
-  }
-
-
-  if (!optionC) {
-    errors.push("Option C is required.");
-  }
-
-
-  if (!optionD) {
-    errors.push("Option D is required.");
-  }
-
 
   if (
-    !["A", "B", "C", "D"].includes(
-      correctAnswer
-    )
+    ["A", "B", "C", "D"]
+      .includes(answer)
   ) {
-    errors.push(
-      'Correct answer must be A, B, C, or D.'
-    );
+    return answer;
   }
-
-
-  if (
-    !["easy", "medium", "hard"].includes(
-      difficulty
-    )
-  ) {
-    errors.push(
-      'Difficulty must be "easy", "medium", or "hard".'
-    );
-  }
-
-
-  if (
-    academicYear &&
-    !/^\d{4}$/.test(academicYear)
-  ) {
-    errors.push(
-      "Academic year must contain four digits."
-    );
-  }
-
-
-  if (
-    status &&
-    !["pending", "approved", "rejected"].includes(
-      status
-    )
-  ) {
-    errors.push(
-      'Status must be "pending", "approved", or "rejected".'
-    );
-  }
-
-
-  return {
-    valid: errors.length === 0,
-    errors,
-    rowNumber
-  };
-}
-
-
-/* ============================================================
-   PREPARE QUESTION
-   ============================================================ */
-
-function prepareQuestionRow(row) {
-
-  return {
-    subject:
-      String(row.subject || "").trim(),
-
-    topic:
-      String(row.topic || "").trim(),
-
-    question:
-      String(row.question || "").trim(),
-
-    option_a:
-      String(row.option_a || "").trim(),
-
-    option_b:
-      String(row.option_b || "").trim(),
-
-    option_c:
-      String(row.option_c || "").trim(),
-
-    option_d:
-      String(row.option_d || "").trim(),
-
-    correct_answer:
-      String(row.correct_answer || "")
-        .trim()
-        .toUpperCase(),
-
-    explanation:
-      String(row.explanation || "").trim(),
-
-    difficulty:
-      String(row.difficulty || "")
-        .trim()
-        .toLowerCase(),
-
-    source:
-      String(row.source || "")
-        .trim() ||
-      getDefaultSource(),
-
-    school:
-      String(row.school || "")
-        .trim() ||
-      getDefaultSchool(),
-
-    academic_year:
-      String(row.academic_year || "")
-        .trim() ||
-      getDefaultAcademicYear(),
-
-    /*
-      Bulk imports are deliberately placed
-      into pending status.
-    */
-
-    status: "pending"
-  };
-}
-
-
-/* ============================================================
-   MAP CSV ROW
-   ============================================================ */
-
-function mapCSVRow(headers, rawRow) {
-
-  const mapped = {};
-
-  headers.forEach(
-    (header, index) => {
-      mapped[normalizeHeader(header)] =
-        String(rawRow[index] ?? "").trim();
-    }
-  );
 
 
   /*
-    The legacy file contains:
+   * Also support common CSV formats such as:
+   * option_a
+   * option_a.
+   * A.
+   * 1 / 2 / 3 / 4
+   */
 
-    id
-    subject
-    topic
-    question
-    option_a
-    option_b
-    option_c
-    option_d
-    correct_answer
-    explanation
-    difficulty
-
-    The id is deliberately ignored.
-
-    Missing metadata is generated automatically.
-  */
-
-  return {
-    subject: mapped.subject || "",
-    topic: mapped.topic || "",
-    question: mapped.question || "",
-    option_a: mapped.option_a || "",
-    option_b: mapped.option_b || "",
-    option_c: mapped.option_c || "",
-    option_d: mapped.option_d || "",
-    correct_answer: mapped.correct_answer || "",
-    explanation: mapped.explanation || "",
-    difficulty: mapped.difficulty || "",
-
-    source:
-      mapped.source ||
-      getDefaultSource(),
-
-    school:
-      mapped.school ||
-      getDefaultSchool(),
-
-    academic_year:
-      mapped.academic_year ||
-      getDefaultAcademicYear(),
-
-    status:
-      mapped.status ||
-      getDefaultStatus()
-  };
-}
-
-
-/* ============================================================
-   FILE SELECTION
-   ============================================================ */
-
-function handleFile(file) {
-
-  if (!file) {
-    return;
+  if (
+    answer === "1" ||
+    answer === "OPTION_A" ||
+    answer === "OPTION A" ||
+    answer === "A."
+  ) {
+    return "A";
   }
-
-
-  const filename =
-    file.name.toLowerCase();
 
 
   if (
-    !filename.endsWith(".csv") &&
-    file.type !== "text/csv"
+    answer === "2" ||
+    answer === "OPTION_B" ||
+    answer === "OPTION B" ||
+    answer === "B."
   ) {
-
-    showResult(
-      "Invalid File",
-      "Please select a CSV file.",
-      "error"
-    );
-
-    return;
+    return "B";
   }
 
 
-  selectedFile = file;
+  if (
+    answer === "3" ||
+    answer === "OPTION_C" ||
+    answer === "OPTION C" ||
+    answer === "C."
+  ) {
+    return "C";
+  }
 
 
-  fileName.textContent =
-    file.name;
+  if (
+    answer === "4" ||
+    answer === "OPTION_D" ||
+    answer === "OPTION D" ||
+    answer === "D."
+  ) {
+    return "D";
+  }
 
-  fileSize.textContent =
-    formatBytes(file.size);
 
-  fileInfo.classList.remove("hidden");
-
-  validateButton.disabled = false;
-
-  /*
-    Clear previous validation state.
-  */
-
-  parsedRows = [];
-  validRows = [];
-  invalidRows = [];
-  detectedHeaders = [];
-
-  diagnosticsSection.classList.add("hidden");
-  validationSection.classList.add("hidden");
-  previewSection.classList.add("hidden");
-
-  importButton.disabled = true;
-
-  importResult.classList.add("hidden");
-
-  resultSection.classList.add("hidden");
+  return answer;
 }
 
 
 /* ============================================================
-   VALIDATE CSV
-   ============================================================ */
+   EVENT LISTENERS
+============================================================ */
 
-async function validateCSV() {
+function attachEventListeners() {
 
-  if (!selectedFile) {
-
-    showResult(
-      "No File Selected",
-      "Please select a CSV file first.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  validateButton.disabled = true;
-
-  validateButton.innerHTML =
-    '<span class="spinner"></span>Reading CSV...';
-
-
-  /*
-    Clear previous state.
-  */
-
-  parsedRows = [];
-  validRows = [];
-  invalidRows = [];
-  detectedHeaders = [];
-
-  try {
-
-    const text =
-      await selectedFile.text();
-
-
-    const rows =
-      parseCSV(text);
-
-
-    if (rows.length < 2) {
-      throw new Error(
-        "The CSV must contain a header row and at least one question."
-      );
-    }
-
-
-    /*
-      First row = headers.
-    */
-
-    detectedHeaders =
-      rows[0].map(
-        value => String(value ?? "").trim()
-      );
-
-
-    const normalizedHeaders =
-      detectedHeaders.map(
-        normalizeHeader
-      );
-
-
-    /*
-      Detect duplicate columns.
-    */
-
-    const duplicates = [];
-
-    const seenHeaders =
-      new Set();
-
-
-    normalizedHeaders.forEach(header => {
-
-      if (!header) {
-        return;
+  $("loginForm")
+    .addEventListener(
+      "submit",
+      event => {
+        event.preventDefault();
+        login();
       }
+    );
 
-      if (seenHeaders.has(header)) {
-        if (!duplicates.includes(header)) {
-          duplicates.push(header);
+
+  $("logoutButton")
+    .addEventListener(
+      "click",
+      logout
+    );
+
+
+  $("accessDeniedLogout")
+    .addEventListener(
+      "click",
+      logout
+    );
+
+
+  $("approveAllPendingButton")
+    .addEventListener(
+      "click",
+      approveAllPending
+    );
+
+
+  $("approveSelectedButton")
+    .addEventListener(
+      "click",
+      approveSelected
+    );
+
+
+  $("rejectSelectedButton")
+    .addEventListener(
+      "click",
+      rejectSelected
+    );
+
+
+  $("refreshQuestionsButton")
+    .addEventListener(
+      "click",
+      loadQuestions
+    );
+
+
+  $("searchInput")
+    .addEventListener(
+      "input",
+      applyFilters
+    );
+
+
+  $("filterSubject")
+    .addEventListener(
+      "change",
+      applyFilters
+    );
+
+
+  $("filterStatus")
+    .addEventListener(
+      "change",
+      applyFilters
+    );
+
+
+  $("questionForm")
+    .addEventListener(
+      "submit",
+      saveQuestion
+    );
+
+
+  $("cancelEditButton")
+    .addEventListener(
+      "click",
+      cancelEdit
+    );
+
+
+  $("importCsvButton")
+    .addEventListener(
+      "click",
+      importCsv
+    );
+
+
+  $("selectAllCheckbox")
+    .addEventListener(
+      "change",
+      function() {
+
+        filteredQuestions.forEach(
+          question => {
+
+            const id =
+              String(question.id);
+
+            if (this.checked) {
+
+              selectedQuestionIds.add(id);
+
+            } else {
+
+              selectedQuestionIds.delete(id);
+            }
+          }
+        );
+
+
+        renderQuestions();
+      }
+    );
+
+
+  $("closeQuestionModal")
+    .addEventListener(
+      "click",
+      window.closeQuestionModal
+    );
+
+
+  $("questionModal")
+    .addEventListener(
+      "click",
+      function(event) {
+
+        if (
+          event.target === this
+        ) {
+          window.closeQuestionModal();
         }
       }
-
-      seenHeaders.add(header);
-    });
-
-
-    /*
-      Determine format.
-    */
-
-    const format =
-      detectCSVFormat(
-        detectedHeaders
-      );
-
-
-    /*
-      Required metadata missing from
-      legacy files is NOT an error anymore.
-
-      The only mandatory question fields are:
-      subject
-      topic
-      question
-      option_a
-      option_b
-      option_c
-      option_d
-      correct_answer
-      explanation
-      difficulty
-    */
-
-    const requiredQuestionHeaders = [
-      "subject",
-      "topic",
-      "question",
-      "option_a",
-      "option_b",
-      "option_c",
-      "option_d",
-      "correct_answer",
-      "explanation",
-      "difficulty"
-    ];
-
-
-    const missingQuestionHeaders =
-      requiredQuestionHeaders.filter(
-        header =>
-          !normalizedHeaders.includes(header)
-      );
-
-
-    /*
-      Unknown columns.
-
-      "id" is explicitly allowed and ignored.
-    */
-
-    const allowedHeaders = [
-      ...CSV_HEADERS,
-      "id"
-    ];
-
-
-    const unknownHeaders =
-      normalizedHeaders.filter(
-        header =>
-          header &&
-          !allowedHeaders.includes(header)
-      );
-
-
-    /*
-      Show diagnostics.
-    */
-
-    diagnosticsSection.classList.remove(
-      "hidden"
     );
-
-
-    detectedColumnCount.textContent =
-      normalizedHeaders.length;
-
-
-    detectedRowCount.textContent =
-      rows.length - 1;
-
-
-    unknownColumnCount.textContent =
-      unknownHeaders.length;
-
-
-    validationColumnCount.textContent =
-      normalizedHeaders.length;
-
-
-    /*
-      Diagnostics status.
-    */
-
-    if (
-      format === "legacy" &&
-      missingQuestionHeaders.length === 0
-    ) {
-
-      diagnosticsStatus.className =
-        "success-box rounded-xl p-4";
-
-      diagnosticsStatus.innerHTML = `
-        <div class="flex gap-3">
-          <i class="fa-solid fa-circle-check mt-1"></i>
-          <div>
-            <strong>Legacy 11-column format detected</strong>
-            <p class="text-sm mt-1">
-              This format is supported. The <strong>id</strong> column will be ignored.
-              Source, school, academic year and status will be filled automatically.
-            </p>
-          </div>
-        </div>
-      `;
-
-    } else if (
-      format === "full"
-    ) {
-
-      diagnosticsStatus.className =
-        "success-box rounded-xl p-4";
-
-      diagnosticsStatus.innerHTML = `
-        <div class="flex gap-3">
-          <i class="fa-solid fa-circle-check mt-1"></i>
-          <div>
-            <strong>Full 14-column format detected</strong>
-            <p class="text-sm mt-1">
-              Your CSV contains the complete PulsePrep import format.
-            </p>
-          </div>
-        </div>
-      `;
-
-    } else if (
-      missingQuestionHeaders.length === 0
-    ) {
-
-      diagnosticsStatus.className =
-        "info-box rounded-xl p-4";
-
-      diagnosticsStatus.innerHTML = `
-        <div class="flex gap-3">
-          <i class="fa-solid fa-circle-info mt-1"></i>
-          <div>
-            <strong>Compatible question format detected</strong>
-            <p class="text-sm mt-1">
-              The required question columns are present.
-              Missing metadata columns will be filled automatically.
-            </p>
-          </div>
-        </div>
-      `;
-
-    } else {
-
-      diagnosticsStatus.className =
-        "error-box rounded-xl p-4";
-
-      diagnosticsStatus.innerHTML = `
-        <div class="flex gap-3">
-          <i class="fa-solid fa-circle-xmark mt-1"></i>
-          <div>
-            <strong>Structure Needs Attention</strong>
-            <p class="text-sm mt-1">
-              Required question columns are missing.
-            </p>
-          </div>
-        </div>
-      `;
-    }
-
-
-    /*
-      Render detected headers.
-    */
-
-    detectedHeadersBox.innerHTML =
-      detectedHeaders.map(
-        (header, index) => {
-
-          const normalized =
-            normalizeHeader(header);
-
-          const isID =
-            normalized === "id";
-
-          return `
-            <div class="flex items-center justify-between gap-3 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-              <span class="text-xs text-slate-500">
-                Column ${index + 1}
-              </span>
-
-              <span class="font-mono text-sm font-medium ${isID ? "text-amber-700" : "text-slate-800"}">
-                ${escapeHTML(header || "(empty)")}
-              </span>
-            </div>
-          `;
-        }
-      ).join("");
-
-
-    /*
-      Required columns information.
-    */
-
-    if (
-      missingQuestionHeaders.length === 0
-    ) {
-
-      requiredColumnsBox.className =
-        "success-box rounded-xl p-4";
-
-      requiredColumnsBox.innerHTML = `
-        <div class="flex gap-3">
-          <i class="fa-solid fa-circle-check mt-1"></i>
-          <div>
-            <strong>Required question columns found</strong>
-            <p class="text-sm mt-1">
-              All columns needed to validate the questions are present.
-            </p>
-
-            <p class="text-xs mt-2">
-              Optional metadata:
-              <strong>source</strong>,
-              <strong>school</strong>,
-              <strong>academic_year</strong>,
-              <strong>status</strong>
-              will be generated when missing.
-            </p>
-          </div>
-        </div>
-      `;
-
-    } else {
-
-      requiredColumnsBox.className =
-        "error-box rounded-xl p-4";
-
-      requiredColumnsBox.innerHTML = `
-        <div class="flex gap-3">
-          <i class="fa-solid fa-circle-xmark mt-1"></i>
-          <div>
-            <strong>Missing required question columns</strong>
-            <p class="text-sm mt-1">
-              ${escapeHTML(
-                missingQuestionHeaders.join(", ")
-              )}
-            </p>
-          </div>
-        </div>
-      `;
-    }
-
-
-    /*
-      Unknown columns.
-    */
-
-    if (unknownHeaders.length > 0) {
-
-      unknownColumnsBox.classList.remove(
-        "hidden"
-      );
-
-      unknownColumnsBox.className =
-        "warning-box rounded-xl p-4 mb-5";
-
-      unknownColumnsBox.innerHTML = `
-        <div class="flex gap-3">
-          <i class="fa-solid fa-triangle-exclamation mt-1"></i>
-          <div>
-            <strong>Unknown columns</strong>
-
-            <p class="text-sm mt-1">
-              ${escapeHTML(
-                unknownHeaders.join(", ")
-              )}
-            </p>
-
-            <p class="text-xs mt-2">
-              These columns will be ignored.
-            </p>
-          </div>
-        </div>
-      `;
-
-    } else {
-
-      unknownColumnsBox.classList.add(
-        "hidden"
-      );
-    }
-
-
-    /*
-      Duplicate headers.
-    */
-
-    if (duplicates.length > 0) {
-
-      throw new Error(
-        `Duplicate CSV column(s) detected: ${duplicates.join(", ")}`
-      );
-    }
-
-
-    /*
-      Stop if mandatory question headers
-      are missing.
-    */
-
-    if (
-      missingQuestionHeaders.length > 0
-    ) {
-
-      throw new Error(
-        `Missing required question columns: ${missingQuestionHeaders.join(", ")}`
-      );
-    }
-
-
-    /*
-      Parse every question row.
-    */
-
-    parsedRows = [];
-
-    validRows = [];
-
-    invalidRows = [];
-
-
-    for (
-      let i = 1;
-      i < rows.length;
-      i++
-    ) {
-
-      const rawRow =
-        rows[i];
-
-
-      const rowNumber =
-        i + 1;
-
-
-      /*
-        Exact column count is checked against
-        the actual header count.
-
-        This prevents malformed rows from
-        silently shifting values.
-      */
-
-      if (
-        rawRow.length !==
-        detectedHeaders.length
-      ) {
-
-        invalidRows.push({
-          rowNumber,
-          errors: [
-            `Expected ${detectedHeaders.length} columns but found ${rawRow.length}.`
-          ],
-          row: {}
-        });
-
-        continue;
-      }
-
-
-      const row =
-        mapCSVRow(
-          detectedHeaders,
-          rawRow
-        );
-
-
-      parsedRows.push(row);
-
-
-      const validation =
-        validateQuestionRow(
-          row,
-          rowNumber
-        );
-
-
-      if (validation.valid) {
-
-        validRows.push(
-          prepareQuestionRow(row)
-        );
-
-      } else {
-
-        invalidRows.push({
-          rowNumber,
-          errors: validation.errors,
-          row
-        });
-      }
-    }
-
-
-    /*
-      Render results.
-    */
-
-    renderValidationResults();
-
-    renderPreview();
-
-
-    /*
-      Final result.
-    */
-
-    if (
-      validRows.length > 0 &&
-      invalidRows.length === 0
-    ) {
-
-      showResult(
-        "CSV Ready",
-        `${validRows.length} question(s) passed validation and are ready to import.`,
-        "success"
-      );
-
-      importButton.disabled = false;
-
-    } else if (
-      validRows.length > 0 &&
-      invalidRows.length > 0
-    ) {
-
-      showResult(
-        "CSV Partially Valid",
-        `${validRows.length} question(s) are valid and ${invalidRows.length} question(s) need correction. Only valid questions can be imported.`,
-        "warning"
-      );
-
-      importButton.disabled = false;
-
-    } else {
-
-      showResult(
-        "CSV Validation Failed",
-        "No valid questions were found. Check the validation errors below.",
-        "error"
-      );
-
-      importButton.disabled = true;
-    }
-
-  } catch (error) {
-
-    console.error(
-      "CSV validation error:",
-      error
-    );
-
-
-    validationSection.classList.remove(
-      "hidden"
-    );
-
-
-    totalQuestions.textContent = "0";
-    validQuestions.textContent = "0";
-    invalidQuestions.textContent = "0";
-
-
-    validationMessage.className =
-      "error-box rounded-xl p-4";
-
-    validationMessage.innerHTML = `
-      <div class="flex gap-3">
-        <i class="fa-solid fa-circle-xmark mt-1"></i>
-
-        <div>
-          <strong>CSV Validation Failed</strong>
-
-          <p class="text-sm mt-1">
-            ${escapeHTML(
-              error.message ||
-              "The CSV could not be validated."
-            )}
-          </p>
-        </div>
-      </div>
-    `;
-
-
-    validationErrors.classList.add(
-      "hidden"
-    );
-
-
-    importButton.disabled = true;
-
-
-    showResult(
-      "CSV Validation Failed",
-      error.message ||
-      "The CSV could not be validated.",
-      "error"
-    );
-
-  } finally {
-
-    validateButton.disabled =
-      !selectedFile;
-
-    validateButton.innerHTML =
-      '<i class="fa-solid fa-check-double mr-2"></i>Validate CSV';
-  }
 }
 
 
 /* ============================================================
-   VALIDATION RESULTS
-   ============================================================ */
+   HTML ESCAPING
+============================================================ */
 
-function renderValidationResults() {
+function escapeHtml(value) {
 
-  validationSection.classList.remove(
-    "hidden"
-  );
-
-
-  totalQuestions.textContent =
-    parsedRows.length;
-
-
-  validQuestions.textContent =
-    validRows.length;
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 
 
-  invalidQuestions.textContent =
-    invalidRows.length;
-
-
-  validationColumnCount.textContent =
-    detectedHeaders.length;
-
-
-  if (
-    invalidRows.length === 0 &&
-    validRows.length > 0
-  ) {
-
-    validationMessage.className =
-      "success-box rounded-xl p-4";
-
-    validationMessage.innerHTML = `
-      <div class="flex gap-3">
-        <i class="fa-solid fa-circle-check mt-1"></i>
-
-        <div>
-          <strong>CSV Validation Passed</strong>
-
-          <p class="text-sm mt-1">
-            All ${validRows.length} question(s) passed validation.
-            They are ready to import.
-          </p>
-        </div>
-      </div>
-    `;
-
-  } else if (
-    validRows.length > 0
-  ) {
-
-    validationMessage.className =
-      "warning-box rounded-xl p-4";
-
-    validationMessage.innerHTML = `
-      <div class="flex gap-3">
-        <i class="fa-solid fa-triangle-exclamation mt-1"></i>
-
-        <div>
-          <strong>Some questions need correction</strong>
-
-          <p class="text-sm mt-1">
-            ${validRows.length} question(s) are valid and
-            ${invalidRows.length} question(s) are invalid.
-          </p>
-        </div>
-      </div>
-    `;
-
-  } else {
-
-    validationMessage.className =
-      "error-box rounded-xl p-4";
-
-    validationMessage.innerHTML = `
-      <div class="flex gap-3">
-        <i class="fa-solid fa-circle-xmark mt-1"></i>
-
-        <div>
-          <strong>No valid questions found</strong>
-
-          <p class="text-sm mt-1">
-            Please correct the problems shown below.
-          </p>
-        </div>
-      </div>
-    `;
-  }
-
-
-  if (
-    invalidRows.length > 0
-  ) {
-
-    validationErrors.classList.remove(
-      "hidden"
-    );
-
-
-    errorList.innerHTML =
-      invalidRows.map(item => {
-
-        const errorText =
-          item.errors
-            .map(
-              error =>
-                `<li>${escapeHTML(error)}</li>`
-            )
-            .join("");
-
-
-        return `
-          <div class="error-box rounded-xl p-4">
-
-            <div class="font-bold mb-1">
-              Row ${item.rowNumber}
-            </div>
-
-            <ul class="list-disc ml-5 text-sm space-y-1">
-              ${errorText}
-            </ul>
-
-          </div>
-        `;
-
-      }).join("");
-
-  } else {
-
-    validationErrors.classList.add(
-      "hidden"
-    );
-
-    errorList.innerHTML = "";
-  }
+function escapeAttribute(value) {
+  return escapeHtml(value);
 }
 
 
 /* ============================================================
-   PREVIEW
-   ============================================================ */
-
-function renderPreview() {
-
-  if (
-    validRows.length === 0
-  ) {
-
-    previewSection.classList.add(
-      "hidden"
-    );
-
-    return;
-  }
-
-
-  previewSection.classList.remove(
-    "hidden"
-  );
-
-
-  const previewRows =
-    validRows.slice(0, 10);
-
-
-  previewBody.innerHTML =
-    previewRows.map(
-      (row, index) => {
-
-        return `
-          <tr class="border-t border-slate-200">
-
-            <td class="px-4 py-3">
-              ${index + 1}
-            </td>
-
-            <td class="px-4 py-3 font-medium">
-              ${escapeHTML(row.subject)}
-            </td>
-
-            <td class="px-4 py-3">
-              ${escapeHTML(row.topic)}
-            </td>
-
-            <td
-              class="px-4 py-3 max-w-md"
-              style="white-space:normal;"
-            >
-              ${escapeHTML(row.question)}
-            </td>
-
-            <td class="px-4 py-3 font-bold">
-              ${escapeHTML(row.correct_answer)}
-            </td>
-
-            <td class="px-4 py-3">
-              ${escapeHTML(row.difficulty)}
-            </td>
-
-            <td class="px-4 py-3">
-              <span class="inline-flex rounded-full bg-amber-100 text-amber-700 px-2.5 py-1 text-xs font-semibold">
-                pending
-              </span>
-            </td>
-
-          </tr>
-        `;
-      }
-    ).join("");
-}
-
-
-/* ============================================================
-   IMPORT QUESTIONS
-   ============================================================ */
-
-async function importQuestions() {
-
-  if (
-    validRows.length === 0
-  ) {
-
-    showResult(
-      "Nothing to Import",
-      "There are no valid questions available for import.",
-      "error"
-    );
-
-    return;
-  }
-
-
-  const confirmed =
-    window.confirm(
-      `Import ${validRows.length} valid question(s) into the PulsePrep Exam Vault?\n\nAll imported questions will be saved with pending status.`
-    );
-
-
-  if (!confirmed) {
-    return;
-  }
-
-
-  importButton.disabled = true;
-
-  importButton.innerHTML =
-    '<span class="spinner"></span>Importing...';
-
-
-  importResult.classList.remove(
-    "hidden"
-  );
-
-  importResult.className =
-    "success-box rounded-xl p-4";
-
-  importResult.innerHTML = `
-    <div class="flex gap-3">
-      <i class="fa-solid fa-cloud-arrow-up mt-1"></i>
-
-      <div>
-        <strong>Import started</strong>
-
-        <p class="text-sm mt-1">
-          Uploading ${validRows.length} question(s)...
-        </p>
-      </div>
-    </div>
-  `;
-
-
-  let importedCount = 0;
-
-
-  try {
-
-    for (
-      let start = 0;
-      start < validRows.length;
-      start += IMPORT_BATCH_SIZE
-    ) {
-
-      const batch =
-        validRows.slice(
-          start,
-          start + IMPORT_BATCH_SIZE
-        );
-
-
-      /*
-        IMPORTANT:
-        We deliberately do NOT send an "id"
-        field because the legacy CSV id is ignored.
-      */
-
-      const rowsToInsert =
-        batch.map(row => ({
-          subject: row.subject,
-          topic: row.topic,
-          question: row.question,
-          option_a: row.option_a,
-          option_b: row.option_b,
-          option_c: row.option_c,
-          option_d: row.option_d,
-          correct_answer: row.correct_answer,
-          explanation: row.explanation,
-          difficulty: row.difficulty,
-          source: row.source,
-          school: row.school,
-          academic_year: row.academic_year,
-          status: "pending"
-        }));
-
-
-      const {
-        error
-      } =
-        await supabaseClient
-          .from(IMPORT_TABLE)
-          .insert(rowsToInsert);
-
-
-      if (error) {
-        throw error;
-      }
-
-
-      importedCount +=
-        batch.length;
-
-
-      importResult.innerHTML = `
-        <div class="flex gap-3">
-          <i class="fa-solid fa-spinner fa-spin mt-1"></i>
-
-          <div>
-            <strong>Importing...</strong>
-
-            <p class="text-sm mt-1">
-              ${importedCount} of ${validRows.length}
-              question(s) uploaded.
-            </p>
-          </div>
-        </div>
-      `;
-    }
-
-
-    /*
-      SUCCESS
-    */
-
-    importResult.className =
-      "success-box rounded-xl p-4";
-
-    importResult.innerHTML = `
-      <div class="flex gap-3">
-        <i class="fa-solid fa-circle-check mt-1"></i>
-
-        <div>
-          <strong>Import Successful</strong>
-
-          <p class="text-sm mt-1">
-            ${importedCount} question(s) were successfully added to the Exam Vault.
-          </p>
-
-          <p class="text-xs mt-2">
-            The questions were saved with
-            <strong>pending</strong> status for review.
-          </p>
-        </div>
-      </div>
-    `;
-
-
-    showResult(
-      "Import Successful",
-      `${importedCount} question(s) have been added to the Exam Vault with pending status.`,
-      "success"
-    );
-
-
-    /*
-      Clear import state.
-    */
-
-    validRows = [];
-    parsedRows = [];
-    invalidRows = [];
-
-
-    importButton.disabled = true;
-
-
-  } catch (error) {
-
-    console.error(
-      "Import error:",
-      error
-    );
-
-
-    importResult.className =
-      "error-box rounded-xl p-4";
-
-
-    importResult.innerHTML = `
-      <div class="flex gap-3">
-        <i class="fa-solid fa-circle-xmark mt-1"></i>
-
-        <div>
-          <strong>Import Failed</strong>
-
-          <p class="text-sm mt-1">
-            ${escapeHTML(
-              error.message ||
-              "The questions could not be imported."
-            )}
-          </p>
-        </div>
-      </div>
-    `;
-
-
-    showResult(
-      "Import Failed",
-      error.message ||
-      "The questions could not be imported.",
-      "error"
-    );
-
-
-    /*
-      Keep the valid rows available so the
-      user can try again after fixing a
-      database/network problem.
-    */
-
-  } finally {
-
-    importButton.disabled =
-      validRows.length === 0;
-
-    importButton.innerHTML =
-      '<i class="fa-solid fa-cloud-arrow-up mr-2"></i>Import Valid Questions';
-  }
-}
-
-
-/* ============================================================
-   RESULT MESSAGE
-   ============================================================ */
-
-function showResult(
-  title,
-  message,
-  type = "info"
-) {
-
-  resultSection.classList.remove(
-    "hidden"
-  );
-
-
-  let icon =
-    "fa-circle-info";
-
-  let className =
-    "info-box";
-
-
-  if (type === "success") {
-
-    icon =
-      "fa-circle-check";
-
-    className =
-      "success-box";
-
-  } else if (type === "error") {
-
-    icon =
-      "fa-circle-xmark";
-
-    className =
-      "error-box";
-
-  } else if (type === "warning") {
-
-    icon =
-      "fa-triangle-exclamation";
-
-    className =
-      "warning-box";
-  }
-
-
-  resultContent.className =
-    `${className} rounded-xl p-4`;
-
-
-  resultContent.innerHTML = `
-    <div class="flex gap-3">
-
-      <i class="fa-solid ${icon} mt-1"></i>
-
-      <div>
-        <strong>${escapeHTML(title)}</strong>
-
-        <p class="text-sm mt-1">
-          ${escapeHTML(message)}
-        </p>
-      </div>
-
-    </div>
-  `;
-
-
-  resultSection.scrollIntoView({
-    behavior: "smooth",
-    block: "nearest"
-  });
-}
-
-
-/* ============================================================
-   REMOVE FILE
-   ============================================================ */
-
-function clearFile() {
-
-  selectedFile = null;
-
-  csvFile.value = "";
-
-  fileInfo.classList.add(
-    "hidden"
-  );
-
-  diagnosticsSection.classList.add(
-    "hidden"
-  );
-
-  validationSection.classList.add(
-    "hidden"
-  );
-
-  previewSection.classList.add(
-    "hidden"
-  );
-
-  resultSection.classList.add(
-    "hidden"
-  );
-
-  importResult.classList.add(
-    "hidden"
-  );
-
-  parsedRows = [];
-  validRows = [];
-  invalidRows = [];
-  detectedHeaders = [];
-
-  validateButton.disabled = true;
-
-  importButton.disabled = true;
-}
-
-
-/* ============================================================
-   AUTH
-   ============================================================ */
-
-async function checkExistingSession() {
-
-  try {
-
-    const {
-      data,
-      error
-    } =
-      await supabaseClient.auth.getSession();
-
-
-    if (error) {
-      throw error;
-    }
-
-
-    const session =
-      data?.session;
-
-
-    if (
-      session?.user
-    ) {
-
-      await verifyAdmin(
-        session.user
-      );
-
-    }
-
-  } catch (error) {
-
-    console.error(
-      "Session check failed:",
-      error
-    );
-  }
-}
-
-
-async function verifyAdmin(user) {
-
-  const email =
-    String(
-      user?.email || ""
-    )
-      .trim()
-      .toLowerCase();
-
-
-  const allowed =
-    ADMIN_EMAILS.some(
-      admin =>
-        admin.toLowerCase() === email
-    );
-
-
-  if (!allowed) {
-
-    await supabaseClient.auth.signOut();
-
-    showLogin();
-
-    loginError.classList.remove(
-      "hidden"
-    );
-
-    loginError.textContent =
-      "This account is not authorized to access the Exam Vault importer.";
-
-    return false;
-  }
-
-
-  showAdminApp();
-
-  return true;
-}
-
-
-function showAdminApp() {
-
-  loginScreen.classList.add(
-    "hidden"
-  );
-
-  adminApp.classList.remove(
-    "hidden"
-  );
-
-  renderSubjects();
-}
-
-
-function showLogin() {
-
-  loginScreen.classList.remove(
-    "hidden"
-  );
-
-  adminApp.classList.add(
-    "hidden"
-  );
-}
-
-
-/* ============================================================
-   LOGIN
-   ============================================================ */
-
-loginForm.addEventListener(
-  "submit",
-  async event => {
-
-    event.preventDefault();
-
-
-    loginError.classList.add(
-      "hidden"
-    );
-
-
-    loginButton.disabled =
-      true;
-
-    loginButton.innerHTML =
-      '<span class="spinner"></span>Signing in...';
-
-
-    try {
-
-      const email =
-        loginEmail.value.trim();
-
-      const password =
-        loginPassword.value;
-
-
-      const {
-        data,
-        error
-      } =
-        await supabaseClient.auth.signInWithPassword({
-          email,
-          password
-        });
-
-
-      if (error) {
-        throw error;
-      }
-
-
-      const isAdmin =
-        await verifyAdmin(
-          data.user
-        );
-
-
-      if (!isAdmin) {
-        return;
-      }
-
-    } catch (error) {
-
-      console.error(
-        "Login error:",
-        error
-      );
-
-
-      loginError.classList.remove(
-        "hidden"
-      );
-
-      loginError.textContent =
-        error.message ||
-        "Unable to sign in.";
-
-    } finally {
-
-      loginButton.disabled =
-        false;
-
-      loginButton.innerHTML =
-        '<i class="fa-solid fa-right-to-bracket mr-2"></i>Sign In';
-    }
-  }
-);
-
-
-/* ============================================================
-   LOGOUT
-   ============================================================ */
-
-logoutButton.addEventListener(
-  "click",
-  async () => {
-
-    await supabaseClient.auth.signOut();
-
-    clearFile();
-
-    showLogin();
-  }
-);
-
-
-/* ============================================================
-   AUTH STATE
-   ============================================================ */
+   SUPABASE AUTH STATE
+============================================================ */
 
 supabaseClient.auth.onAuthStateChange(
   async (event, session) => {
 
     if (
-      session?.user
+      event === "SIGNED_OUT"
     ) {
 
-      await verifyAdmin(
-        session.user
-      );
+      currentUser = null;
 
-    } else {
+      hide($("adminApp"));
+      hide($("accessDeniedScreen"));
 
-      showLogin();
+      show($("loginScreen"));
+
+      return;
+    }
+
+
+    if (
+      session &&
+      session.user
+    ) {
+
+      currentUser =
+        session.user;
+
+
+      if (
+        isAdminEmail(
+          currentUser.email
+        )
+      ) {
+
+        await enterAdmin();
+
+      } else {
+
+        hide($("authLoading"));
+        hide($("loginScreen"));
+        show($("accessDeniedScreen"));
+
+        $("accessDeniedMessage").textContent =
+          `This account (${currentUser.email}) is not authorized as a PulsePrep administrator.`;
+      }
     }
   }
 );
 
 
 /* ============================================================
-   FILE EVENTS
-   ============================================================ */
+   INITIAL START
+============================================================ */
 
-chooseFileButton.addEventListener(
-  "click",
-  event => {
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
 
-    event.stopPropagation();
-
-    csvFile.click();
-  }
-);
-
-
-dropZone.addEventListener(
-  "click",
-  () => {
-
-    csvFile.click();
-  }
-);
-
-
-csvFile.addEventListener(
-  "change",
-  event => {
-
-    const file =
-      event.target.files?.[0];
-
-    handleFile(file);
-  }
-);
-
-
-removeFileButton.addEventListener(
-  "click",
-  clearFile
-);
-
-
-/* ============================================================
-   DRAG AND DROP
-   ============================================================ */
-
-[
-  "dragenter",
-  "dragover"
-].forEach(eventName => {
-
-  dropZone.addEventListener(
-    eventName,
-    event => {
-
-      event.preventDefault();
-
-      dropZone.classList.add(
-        "dragging"
+    $("questionAcademicYear").value =
+      String(
+        new Date().getFullYear()
       );
-    }
-  );
-});
 
-
-[
-  "dragleave",
-  "drop"
-].forEach(eventName => {
-
-  dropZone.addEventListener(
-    eventName,
-    event => {
-
-      event.preventDefault();
-
-      dropZone.classList.remove(
-        "dragging"
-      );
-    }
-  );
-});
-
-
-dropZone.addEventListener(
-  "drop",
-  event => {
-
-    const file =
-      event.dataTransfer.files?.[0];
-
-    handleFile(file);
+    await checkAuth();
   }
 );
-
-
-/* ============================================================
-   BUTTON EVENTS
-   ============================================================ */
-
-downloadTemplateButton.addEventListener(
-  "click",
-  downloadTemplate
-);
-
-
-validateButton.addEventListener(
-  "click",
-  validateCSV
-);
-
-
-importButton.addEventListener(
-  "click",
-  importQuestions
-);
-
-
-/* ============================================================
-   SUBJECT DISPLAY
-   ============================================================ */
-
-function renderSubjects() {
-
-  subjectList.innerHTML =
-    SUBJECTS.map(
-      subject => `
-        <span class="inline-flex items-center rounded-full bg-slate-100 text-slate-700 px-3 py-1.5 text-xs font-medium">
-          ${escapeHTML(subject)}
-        </span>
-      `
-    ).join("");
-}
-
-
-/* ============================================================
-   START
-   ============================================================ */
-
-checkExistingSession();
 
 </script>
 
