@@ -372,6 +372,7 @@ async function loadApprovedPastPapers() {
       !window.pulseprepSupabase &&
       attempts < 50
     ) {
+
       await new Promise(resolve =>
         setTimeout(resolve, 100)
       );
@@ -380,9 +381,22 @@ async function loadApprovedPastPapers() {
     }
 
     if (!window.pulseprepSupabase) {
-      console.warn(
-        "PulsePrep: Supabase client not ready."
-      );
+
+      container.innerHTML = `
+        <div class="text-center py-10">
+
+          <div class="text-4xl mb-3">⏳</div>
+
+          <h3 class="text-xl font-extrabold text-slate-900">
+            PulsePrep is still loading
+          </h3>
+
+          <p class="text-slate-500 mt-2">
+            Please wait a moment and try again.
+          </p>
+
+        </div>
+      `;
 
       return;
     }
@@ -398,10 +412,27 @@ async function loadApprovedPastPapers() {
       await window.pulseprepSupabase.auth.getSession();
 
     if (sessionError) {
+
       console.error(
         "PulsePrep session error:",
         sessionError
       );
+
+      container.innerHTML = `
+        <div class="text-center py-10">
+
+          <div class="text-4xl mb-3">⚠️</div>
+
+          <h3 class="text-xl font-extrabold text-slate-900">
+            Unable to check your login
+          </h3>
+
+          <p class="text-slate-500 mt-2">
+            Please refresh the page and try again.
+          </p>
+
+        </div>
+      `;
 
       return;
     }
@@ -409,22 +440,92 @@ async function loadApprovedPastPapers() {
     const session =
       sessionData?.session;
 
+    // --------------------------------------------------------
+    // LOGIN REQUIRED
+    // --------------------------------------------------------
+
     if (!session) {
+
       console.warn(
         "PulsePrep: No active session."
       );
+
+      container.innerHTML = `
+        <div class="max-w-xl mx-auto py-10">
+
+          <div class="bg-white
+                      rounded-2xl
+                      border
+                      border-slate-200
+                      shadow-sm
+                      p-8
+                      text-center">
+
+            <div class="w-16 h-16
+                        mx-auto
+                        rounded-2xl
+                        bg-blue-50
+                        text-blue-600
+                        flex
+                        items-center
+                        justify-center
+                        text-3xl">
+
+              🔐
+
+            </div>
+
+            <h3 class="text-2xl
+                       font-extrabold
+                       text-slate-900
+                       mt-5">
+
+              Login Required
+
+            </h3>
+
+            <p class="text-slate-500
+                      mt-2
+                      leading-6">
+
+              Please log in with your email and password
+              to access the PulsePrep Question Bank.
+
+            </p>
+
+            <button
+              type="button"
+              onclick="showTab('account')"
+              class="mt-6
+                     inline-flex
+                     items-center
+                     justify-center
+                     gap-2
+                     px-6
+                     py-3
+                     rounded-xl
+                     bg-blue-600
+                     text-white
+                     font-bold
+                     hover:bg-blue-700
+                     transition">
+
+              <i class="fa-solid fa-right-to-bracket"></i>
+
+              Login to PulsePrep
+
+            </button>
+
+          </div>
+
+        </div>
+      `;
 
       return;
     }
 
     // --------------------------------------------------------
     // LOAD ALL APPROVED EXAM VAULT QUESTIONS
-    // --------------------------------------------------------
-    //
-    // The API now supports pagination.
-    //
-    // We request 100 at a time and continue until
-    // every approved question has been retrieved.
     // --------------------------------------------------------
 
     let allQuestions = [];
@@ -454,13 +555,32 @@ async function loadApprovedPastPapers() {
       let result = {};
 
       try {
+
         result = await response.json();
+
       } catch (error) {
 
         console.error(
           "PulsePrep: Invalid Exam Vault response.",
           error
         );
+
+        container.innerHTML = `
+          <div class="text-center py-10">
+
+            <div class="text-4xl mb-3">⚠️</div>
+
+            <h3 class="text-xl font-extrabold text-slate-900">
+              Unable to load Question Bank
+            </h3>
+
+            <p class="text-slate-500 mt-2">
+              The server returned an invalid response.
+              Please try again.
+            </p>
+
+          </div>
+        `;
 
         return;
       }
@@ -472,7 +592,10 @@ async function loadApprovedPastPapers() {
           result
         );
 
-        // Premium access error
+        // ----------------------------------------------------
+        // PREMIUM REQUIRED
+        // ----------------------------------------------------
+
         if (
           response.status === 403 &&
           result.premiumRequired
@@ -482,8 +605,172 @@ async function loadApprovedPastPapers() {
             "PulsePrep: Premium subscription required."
           );
 
+          container.innerHTML = `
+            <div class="max-w-xl mx-auto py-10">
+
+              <div class="bg-white
+                          rounded-2xl
+                          border
+                          border-amber-200
+                          shadow-sm
+                          p-8
+                          text-center">
+
+                <div class="w-16 h-16
+                            mx-auto
+                            rounded-2xl
+                            bg-amber-50
+                            text-amber-600
+                            flex
+                            items-center
+                            justify-center
+                            text-3xl">
+
+                  👑
+
+                </div>
+
+                <h3 class="text-2xl
+                           font-extrabold
+                           text-slate-900
+                           mt-5">
+
+                  Premium Access Required
+
+                </h3>
+
+                <p class="text-slate-500
+                          mt-2
+                          leading-6">
+
+                  The PulsePrep Question Bank is available
+                  to Premium students. Upgrade your account
+                  to access all approved exam questions.
+
+                </p>
+
+                <button
+                  type="button"
+                  onclick="showTab('payment')"
+                  class="mt-6
+                         inline-flex
+                         items-center
+                         justify-center
+                         gap-2
+                         px-6
+                         py-3
+                         rounded-xl
+                         bg-amber-500
+                         text-white
+                         font-bold
+                         hover:bg-amber-600
+                         transition">
+
+                  <i class="fa-solid fa-crown"></i>
+
+                  Upgrade to Premium
+
+                </button>
+
+              </div>
+
+            </div>
+          `;
+
           return;
         }
+
+        // ----------------------------------------------------
+        // EXPIRED / INVALID SESSION
+        // ----------------------------------------------------
+
+        if (response.status === 401) {
+
+          container.innerHTML = `
+            <div class="max-w-xl mx-auto py-10">
+
+              <div class="bg-white
+                          rounded-2xl
+                          border
+                          border-red-200
+                          shadow-sm
+                          p-8
+                          text-center">
+
+                <div class="text-4xl mb-3">
+                  🔐
+                </div>
+
+                <h3 class="text-2xl
+                           font-extrabold
+                           text-slate-900">
+
+                  Session Expired
+
+                </h3>
+
+                <p class="text-slate-500 mt-2">
+
+                  Please log in again to continue
+                  using the Question Bank.
+
+                </p>
+
+                <button
+                  type="button"
+                  onclick="showTab('account')"
+                  class="mt-6
+                         inline-flex
+                         items-center
+                         justify-center
+                         gap-2
+                         px-6
+                         py-3
+                         rounded-xl
+                         bg-blue-600
+                         text-white
+                         font-bold
+                         hover:bg-blue-700
+                         transition">
+
+                  <i class="fa-solid fa-right-to-bracket"></i>
+
+                  Log In Again
+
+                </button>
+
+              </div>
+
+            </div>
+          `;
+
+          return;
+        }
+
+        // ----------------------------------------------------
+        // OTHER SERVER ERROR
+        // ----------------------------------------------------
+
+        container.innerHTML = `
+          <div class="text-center py-10">
+
+            <div class="text-4xl mb-3">⚠️</div>
+
+            <h3 class="text-xl font-extrabold text-slate-900">
+              Question Bank Unavailable
+            </h3>
+
+            <p class="text-slate-500 mt-2">
+              ${
+                escapeHtml(
+                  result.error ||
+                  "Unable to load the approved questions right now."
+                )
+              }
+            </p>
+
+          </div>
+        `;
 
         return;
       }
@@ -507,9 +794,11 @@ async function loadApprovedPastPapers() {
 
       // Safety protection
       if (page > 1000) {
+
         console.error(
           "PulsePrep: Pagination safety limit reached."
         );
+
         break;
       }
 
@@ -571,7 +860,6 @@ async function loadApprovedPastPapers() {
       container.appendChild(section);
     }
 
-    // Clear old content
     section.innerHTML = "";
 
     // --------------------------------------------------------
@@ -581,8 +869,10 @@ async function loadApprovedPastPapers() {
     if (papers.length === 0) {
 
       section.innerHTML = `
-        <div class="bg-white rounded-2xl
-                    border border-slate-200
+        <div class="bg-white
+                    rounded-2xl
+                    border
+                    border-slate-200
                     p-6">
 
           <div class="flex items-center gap-3">
@@ -630,8 +920,7 @@ async function loadApprovedPastPapers() {
     // GROUP QUESTIONS BY SUBJECT
     // --------------------------------------------------------
 
-    const grouped =
-      {};
+    const grouped = {};
 
     papers.forEach(question => {
 
@@ -969,6 +1258,23 @@ async function loadApprovedPastPapers() {
       "PulsePrep Exam Vault loading error:",
       error
     );
+
+    container.innerHTML = `
+      <div class="text-center py-10">
+
+        <div class="text-4xl mb-3">⚠️</div>
+
+        <h3 class="text-xl font-extrabold text-slate-900">
+          Something went wrong
+        </h3>
+
+        <p class="text-slate-500 mt-2">
+          We could not load the Question Bank.
+          Please try again.
+        </p>
+
+      </div>
+    `;
 
   } finally {
 
