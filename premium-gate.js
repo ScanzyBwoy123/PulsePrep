@@ -349,410 +349,632 @@ window.PulsePrepOpenPremiumPlans = function () {
       .replace(/"/g, "&quot;")
       .replace(/'/g, "&#039;");
   }
+async function loadApprovedPastPapers() {
 
-  async function loadApprovedPastPapers() {
+  if (loadingPastPapers) return;
 
-    if (loadingPastPapers) return;
+  const container =
+    document.getElementById("questionBankContent");
 
-    const container =
-      document.getElementById("questionBankContent");
+  if (!container) return;
 
-    if (!container) return;
+  loadingPastPapers = true;
 
-    loadingPastPapers = true;
+  try {
 
-    try {
+    // --------------------------------------------------------
+    // WAIT FOR SUPABASE
+    // --------------------------------------------------------
 
-      // Wait for Supabase
-      let attempts = 0;
+    let attempts = 0;
 
-      while (
-        !window.pulseprepSupabase &&
-        attempts < 50
-      ) {
-        await new Promise(resolve =>
-          setTimeout(resolve, 100)
-        );
+    while (
+      !window.pulseprepSupabase &&
+      attempts < 50
+    ) {
+      await new Promise(resolve =>
+        setTimeout(resolve, 100)
+      );
 
-        attempts++;
-      }
+      attempts++;
+    }
 
-      if (!window.pulseprepSupabase) {
-        console.warn(
-          "PulsePrep: Supabase client not ready."
-        );
-        return;
-      }
+    if (!window.pulseprepSupabase) {
+      console.warn(
+        "PulsePrep: Supabase client not ready."
+      );
 
-      const {
-        data: sessionData,
-        error: sessionError
-      } =
-        await window.pulseprepSupabase.auth.getSession();
+      return;
+    }
 
-      if (sessionError) {
-        console.error(
-          "PulsePrep session error:",
-          sessionError
-        );
-        return;
-      }
+    // --------------------------------------------------------
+    // GET CURRENT SESSION
+    // --------------------------------------------------------
 
-      const session =
-        sessionData?.session;
+    const {
+      data: sessionData,
+      error: sessionError
+    } =
+      await window.pulseprepSupabase.auth.getSession();
 
-      if (!session) {
-        return;
-      }
+    if (sessionError) {
+      console.error(
+        "PulsePrep session error:",
+        sessionError
+      );
 
-      const response = await fetch(
-        "/.netlify/functions/get-past-questions",
-        {
+      return;
+    }
+
+    const session =
+      sessionData?.session;
+
+    if (!session) {
+      console.warn(
+        "PulsePrep: No active session."
+      );
+
+      return;
+    }
+
+    // --------------------------------------------------------
+    // LOAD ALL APPROVED EXAM VAULT QUESTIONS
+    // --------------------------------------------------------
+    //
+    // The API now supports pagination.
+    //
+    // We request 100 at a time and continue until
+    // every approved question has been retrieved.
+    // --------------------------------------------------------
+
+    let allQuestions = [];
+    let page = 1;
+    const limit = 100;
+    let totalPages = 1;
+
+    do {
+
+      const url =
+        `/.netlify/functions/get-exam-vault-questions?page=${page}&limit=${limit}`;
+
+      console.log(
+        `PulsePrep: Loading Exam Vault page ${page}...`
+      );
+
+      const response =
+        await fetch(url, {
           method: "GET",
 
           headers: {
             "Authorization":
               `Bearer ${session.access_token}`
           }
-        }
-      );
+        });
 
       let result = {};
 
       try {
         result = await response.json();
       } catch (error) {
+
         console.error(
-          "PulsePrep: invalid past-paper response.",
+          "PulsePrep: Invalid Exam Vault response.",
           error
         );
+
         return;
       }
 
       if (!response.ok) {
 
         console.error(
-          "PulsePrep past-paper request failed:",
+          "PulsePrep Exam Vault request failed:",
           result
         );
+
+        // Premium access error
+        if (
+          response.status === 403 &&
+          result.premiumRequired
+        ) {
+
+          console.warn(
+            "PulsePrep: Premium subscription required."
+          );
+
+          return;
+        }
 
         return;
       }
 
-      const papers =
+      const questions =
         Array.isArray(result.questions)
           ? result.questions
           : [];
 
-      let section =
-        document.getElementById(
-          "pulsePrepPastPapers"
+      allQuestions =
+        allQuestions.concat(questions);
+
+      totalPages =
+        Number(result.totalPages || 1);
+
+      console.log(
+        `PulsePrep: Exam Vault page ${page}/${totalPages} loaded.`
+      );
+
+      page++;
+
+      // Safety protection
+      if (page > 1000) {
+        console.error(
+          "PulsePrep: Pagination safety limit reached."
         );
-
-      if (!section) {
-
-        section =
-          document.createElement("div");
-
-        section.id =
-          "pulsePrepPastPapers";
-
-        section.className =
-          "mt-10";
-
-        container.appendChild(section);
+        break;
       }
 
-      // Remove previous content before rebuilding.
-      section.innerHTML = "";
+    } while (page <= totalPages);
 
-      // No approved papers
-      if (papers.length === 0) {
+    // --------------------------------------------------------
+    // REMOVE DUPLICATES
+    // --------------------------------------------------------
 
-        section.innerHTML = `
-          <div class="bg-white rounded-2xl
-                      border border-slate-200
-                      p-6">
+    const uniqueQuestions = [];
+    const seenIds = new Set();
 
-            <div class="flex items-center gap-3">
+    allQuestions.forEach(question => {
 
-              <div class="w-12 h-12 rounded-xl
-                          bg-slate-100
-                          flex items-center
-                          justify-center">
+      const id = question?.id;
 
-                <i class="fa-solid fa-file-pdf
-                          text-slate-500
-                          text-xl"></i>
+      if (
+        id !== undefined &&
+        id !== null
+      ) {
 
-              </div>
+        if (seenIds.has(id)) {
+          return;
+        }
 
-              <div>
-
-                <h3 class="text-xl font-extrabold
-                           text-slate-800">
-
-                  Past Examination Papers
-
-                </h3>
-
-                <p class="text-sm text-slate-500 mt-1">
-
-                  No approved past examination
-                  papers are available yet.
-
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-        `;
-
-        pastPapersLoaded = true;
-        return;
+        seenIds.add(id);
       }
 
-      // Render approved papers
+      uniqueQuestions.push(question);
+    });
+
+    const papers =
+      uniqueQuestions;
+
+    console.log(
+      `PulsePrep: ${papers.length} approved Exam Vault questions loaded.`
+    );
+
+    // --------------------------------------------------------
+    // CREATE / FIND DISPLAY SECTION
+    // --------------------------------------------------------
+
+    let section =
+      document.getElementById(
+        "pulsePrepPastPapers"
+      );
+
+    if (!section) {
+
+      section =
+        document.createElement("div");
+
+      section.id =
+        "pulsePrepPastPapers";
+
+      section.className =
+        "mt-10";
+
+      container.appendChild(section);
+    }
+
+    // Clear old content
+    section.innerHTML = "";
+
+    // --------------------------------------------------------
+    // NO APPROVED QUESTIONS
+    // --------------------------------------------------------
+
+    if (papers.length === 0) {
+
       section.innerHTML = `
+        <div class="bg-white rounded-2xl
+                    border border-slate-200
+                    p-6">
 
-        <div class="mb-5">
+          <div class="flex items-center gap-3">
 
-          <div class="inline-flex items-center
-                      gap-2 px-3 py-1
-                      rounded-full
-                      bg-emerald-50
-                      text-emerald-700
-                      text-xs font-extrabold
-                      uppercase">
+            <div class="w-12 h-12 rounded-xl
+                        bg-slate-100
+                        flex items-center
+                        justify-center">
 
-            <i class="fa-solid fa-file-pdf"></i>
-
-            Past Examination Papers
-
-          </div>
-
-          <h3 class="text-2xl font-extrabold
-                     text-slate-900 mt-3">
-
-            Approved Past Papers
-
-          </h3>
-
-          <p class="text-slate-500 mt-1">
-
-            Practice with approved past
-            examination papers.
-
-          </p>
-
-        </div>
-
-        <div class="grid grid-cols-1
-                    md:grid-cols-2
-                    gap-5">
-
-          ${papers.map((paper) => `
-
-            <div
-              class="bg-white rounded-2xl
-                     border border-slate-200
-                     shadow-sm
-                     p-5"
-            >
-
-              <div class="flex items-start gap-3">
-
-                <div
-                  class="w-12 h-12 rounded-xl
-                         bg-red-50
-                         text-red-600
-                         flex items-center
-                         justify-center
-                         flex-shrink-0"
-                >
-
-                  <i class="fa-solid
-                            fa-file-pdf
-                            text-xl"></i>
-
-                </div>
-
-                <div class="min-w-0">
-
-                  <h4
-                    class="font-extrabold
-                           text-slate-800
-                           break-words"
-                  >
-                    ${escapeHtml(
-                      paper.file_name ||
-                      "Past Examination Paper"
-                    )}
-                  </h4>
-
-                  <p
-                    class="text-sm
-                           text-slate-500
-                           mt-1"
-                  >
-                    ${escapeHtml(
-                      paper.school ||
-                      "Nursing School"
-                    )}
-                  </p>
-
-                </div>
-
-              </div>
-
-              <div class="flex flex-wrap gap-2 mt-4">
-
-                ${
-                  paper.subject
-                    ? `
-                      <span
-                        class="px-2.5 py-1
-                               rounded-lg
-                               bg-blue-50
-                               text-blue-700
-                               text-xs
-                               font-semibold"
-                      >
-                        ${escapeHtml(
-                          paper.subject
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
-
-                ${
-                  paper.level
-                    ? `
-                      <span
-                        class="px-2.5 py-1
-                               rounded-lg
-                               bg-purple-50
-                               text-purple-700
-                               text-xs
-                               font-semibold"
-                      >
-                        ${escapeHtml(
-                          paper.level
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
-
-                ${
-                  paper.exam_type
-                    ? `
-                      <span
-                        class="px-2.5 py-1
-                               rounded-lg
-                               bg-amber-50
-                               text-amber-700
-                               text-xs
-                               font-semibold"
-                      >
-                        ${escapeHtml(
-                          paper.exam_type
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
-
-                ${
-                  paper.academic_year
-                    ? `
-                      <span
-                        class="px-2.5 py-1
-                               rounded-lg
-                               bg-slate-100
-                               text-slate-700
-                               text-xs
-                               font-semibold"
-                      >
-                        ${escapeHtml(
-                          paper.academic_year
-                        )}
-                      </span>
-                    `
-                    : ""
-                }
-
-              </div>
-
-              ${
-                paper.programme
-                  ? `
-                    <p
-                      class="text-sm
-                             text-slate-500
-                             mt-4"
-                    >
-                      <strong>Programme:</strong>
-                      ${escapeHtml(
-                        paper.programme
-                      )}
-                    </p>
-                  `
-                  : ""
-              }
-
-              <button
-                type="button"
-                class="w-full mt-5
-                       bg-teal-600
-                       hover:bg-teal-700
-                       text-white
-                       py-3
-                       rounded-xl
-                       font-bold
-                       transition"
-                onclick="openPulsePrepPastPaper('${escapeHtml(
-                  paper.id
-                )}')"
-              >
-
-                <i class="fa-solid
-                          fa-folder-open
-                          mr-2"></i>
-
-                Open Past Paper
-
-              </button>
+              <i class="fa-solid fa-circle-question
+                        text-slate-500
+                        text-xl"></i>
 
             </div>
 
-          `).join("")}
+            <div>
+
+              <h3 class="text-xl font-extrabold
+                         text-slate-800">
+
+                Exam Vault
+
+              </h3>
+
+              <p class="text-sm text-slate-500 mt-1">
+
+                No approved Exam Vault questions
+                are available yet.
+
+              </p>
+
+            </div>
+
+          </div>
 
         </div>
       `;
 
       pastPapersLoaded = true;
 
-      console.log(
-        "PulsePrep: approved past papers loaded:",
-        papers.length
-      );
-
-    } catch (error) {
-
-      console.error(
-        "PulsePrep past-paper loading error:",
-        error
-      );
-
-    } finally {
-
-      loadingPastPapers = false;
+      return;
     }
+
+    // --------------------------------------------------------
+    // GROUP QUESTIONS BY SUBJECT
+    // --------------------------------------------------------
+
+    const grouped =
+      {};
+
+    papers.forEach(question => {
+
+      const subject =
+        question.subject ||
+        "Other";
+
+      if (!grouped[subject]) {
+        grouped[subject] = [];
+      }
+
+      grouped[subject].push(question);
+    });
+
+    // --------------------------------------------------------
+    // RENDER EXAM VAULT
+    // --------------------------------------------------------
+
+    section.innerHTML = `
+
+      <div class="mb-6">
+
+        <div class="inline-flex items-center
+                    gap-2 px-3 py-1
+                    rounded-full
+                    bg-emerald-50
+                    text-emerald-700
+                    text-xs
+                    font-extrabold
+                    uppercase">
+
+          <i class="fa-solid fa-shield-check"></i>
+
+          Exam Vault
+
+        </div>
+
+        <h3 class="text-2xl
+                   font-extrabold
+                   text-slate-900
+                   mt-3">
+
+          Approved Exam Questions
+
+        </h3>
+
+        <p class="text-slate-500 mt-1">
+
+          ${papers.length} approved questions
+          available for Premium students.
+
+        </p>
+
+      </div>
+
+      <div class="space-y-6">
+
+        ${Object.entries(grouped)
+          .map(([subject, questions]) => `
+
+            <div class="bg-white
+                        rounded-2xl
+                        border
+                        border-slate-200
+                        shadow-sm
+                        overflow-hidden">
+
+              <div class="px-5 py-4
+                          bg-slate-50
+                          border-b
+                          border-slate-200">
+
+                <div class="flex
+                            items-center
+                            justify-between
+                            gap-3">
+
+                  <h4 class="font-extrabold
+                             text-slate-800">
+
+                    ${escapeHtml(subject)}
+
+                  </h4>
+
+                  <span class="px-3 py-1
+                               rounded-full
+                               bg-teal-50
+                               text-teal-700
+                               text-xs
+                               font-bold">
+
+                    ${questions.length}
+                    questions
+
+                  </span>
+
+                </div>
+
+              </div>
+
+              <div class="divide-y
+                          divide-slate-100">
+
+                ${questions
+                  .map((question, index) => `
+
+                    <div class="p-5">
+
+                      <div class="flex
+                                  items-start
+                                  gap-3">
+
+                        <div class="w-8 h-8
+                                    rounded-lg
+                                    bg-teal-50
+                                    text-teal-700
+                                    flex
+                                    items-center
+                                    justify-center
+                                    font-bold
+                                    text-sm
+                                    flex-shrink-0">
+
+                          ${index + 1}
+
+                        </div>
+
+                        <div class="min-w-0
+                                    flex-1">
+
+                          <p class="font-bold
+                                    text-slate-800
+                                    leading-7">
+
+                            ${escapeHtml(
+                              question.question ||
+                              ""
+                            )}
+
+                          </p>
+
+                          <div class="grid
+                                      grid-cols-1
+                                      sm:grid-cols-2
+                                      gap-2
+                                      mt-4">
+
+                            <div class="p-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        border
+                                        border-slate-100">
+
+                              <strong>A.</strong>
+                              ${escapeHtml(
+                                question.option_a ||
+                                ""
+                              )}
+
+                            </div>
+
+                            <div class="p-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        border
+                                        border-slate-100">
+
+                              <strong>B.</strong>
+                              ${escapeHtml(
+                                question.option_b ||
+                                ""
+                              )}
+
+                            </div>
+
+                            <div class="p-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        border
+                                        border-slate-100">
+
+                              <strong>C.</strong>
+                              ${escapeHtml(
+                                question.option_c ||
+                                ""
+                              )}
+
+                            </div>
+
+                            <div class="p-3
+                                        rounded-xl
+                                        bg-slate-50
+                                        border
+                                        border-slate-100">
+
+                              <strong>D.</strong>
+                              ${escapeHtml(
+                                question.option_d ||
+                                ""
+                              )}
+
+                            </div>
+
+                          </div>
+
+                          <div class="flex
+                                      flex-wrap
+                                      gap-2
+                                      mt-4">
+
+                            ${
+                              question.topic
+                                ? `
+                                  <span
+                                    class="px-2.5
+                                           py-1
+                                           rounded-lg
+                                           bg-blue-50
+                                           text-blue-700
+                                           text-xs
+                                           font-semibold">
+
+                                    ${escapeHtml(
+                                      question.topic
+                                    )}
+
+                                  </span>
+                                `
+                                : ""
+                            }
+
+                            ${
+                              question.difficulty
+                                ? `
+                                  <span
+                                    class="px-2.5
+                                           py-1
+                                           rounded-lg
+                                           bg-purple-50
+                                           text-purple-700
+                                           text-xs
+                                           font-semibold">
+
+                                    ${escapeHtml(
+                                      question.difficulty
+                                    )}
+
+                                  </span>
+                                `
+                                : ""
+                            }
+
+                            ${
+                              question.academic_year
+                                ? `
+                                  <span
+                                    class="px-2.5
+                                           py-1
+                                           rounded-lg
+                                           bg-amber-50
+                                           text-amber-700
+                                           text-xs
+                                           font-semibold">
+
+                                    ${escapeHtml(
+                                      question.academic_year
+                                    )}
+
+                                  </span>
+                                `
+                                : ""
+                            }
+
+                          </div>
+
+                          ${
+                            question.explanation
+                              ? `
+                                <div
+                                  class="mt-4
+                                         p-4
+                                         rounded-xl
+                                         bg-emerald-50
+                                         border
+                                         border-emerald-100">
+
+                                  <p class="text-sm
+                                            font-bold
+                                            text-emerald-800
+                                            mb-1">
+
+                                    Explanation
+
+                                  </p>
+
+                                  <p class="text-sm
+                                            text-emerald-900
+                                            leading-6">
+
+                                    ${escapeHtml(
+                                      question.explanation
+                                    )}
+
+                                  </p>
+
+                                </div>
+                              `
+                              : ""
+                          }
+
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  `)
+                  .join("")}
+
+              </div>
+
+            </div>
+
+          `)
+          .join("")}
+
+      </div>
+    `;
+
+    pastPapersLoaded = true;
+
+  } catch (error) {
+
+    console.error(
+      "PulsePrep Exam Vault loading error:",
+      error
+    );
+
+  } finally {
+
+    loadingPastPapers = false;
   }
+}
 
 
   // ==========================================================
