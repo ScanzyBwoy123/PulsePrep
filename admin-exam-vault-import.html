@@ -1117,16 +1117,33 @@ function showToast(message, type = "success") {
 /* ============================================================
    ADMIN CHECK
 ============================================================ */
-
 function isAdminEmail(email) {
 
-  if (!email) {
-    return false;
-  }
+  const normalizedEmail =
+    String(email || "")
+      .trim()
+      .toLowerCase();
 
-  return ADMIN_EMAILS
-    .map(item => item.toLowerCase().trim())
-    .includes(email.toLowerCase().trim());
+  const ADMIN_EMAILS = [
+    "scanzybwoy8@gmail.com"
+  ];
+
+  console.log(
+    "Admin email check:",
+    normalizedEmail
+  );
+
+  console.log(
+    "Allowed admin emails:",
+    ADMIN_EMAILS
+  );
+
+  return ADMIN_EMAILS.some(
+    adminEmail =>
+      normalizedEmail ===
+      adminEmail.trim().toLowerCase()
+  );
+
 }
 
 
