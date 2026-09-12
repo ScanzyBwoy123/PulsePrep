@@ -1456,16 +1456,27 @@ async function login() {
 
     currentUser = data.user;
 
+// Use the email entered during a successful Supabase login.
+// Supabase has already verified the email + password.
+const authenticatedEmail =
+  String(email || "")
+    .trim()
+    .toLowerCase();
 
-    if (!isAdminEmail(currentUser.email)) {
+console.log("PulsePrep authenticated email:", authenticatedEmail);
+console.log("Supabase user email:", currentUser.email);
+console.log(
+  "PulsePrep admin check:",
+  isAdminEmail(authenticatedEmail)
+);
 
-      await supabaseClient.auth.signOut();
+if (!isAdminEmail(authenticatedEmail)) {
+  await supabaseClient.auth.signOut();
 
-      throw new Error(
-        `This account (${currentUser.email}) is not authorized as a PulsePrep administrator.`
-      );
-    }
-
+  throw new Error(
+    `This account (${authenticatedEmail}) is not authorized as a PulsePrep administrator.`
+  );
+}
 
     $("loginPassword").value = "";
 
