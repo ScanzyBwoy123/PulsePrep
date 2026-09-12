@@ -1185,11 +1185,41 @@ async function checkAuth() {
     const {
       data: {
         session
-      }
+      },
+      error
     } = await supabaseClient.auth.getSession();
 
 
+    // ---------------------------------------------------------
+    // CHECK FOR SESSION ERROR
+    // ---------------------------------------------------------
+
+    if (error) {
+
+      console.error(
+        "Supabase session error:",
+        error
+      );
+
+      hide($("authLoading"));
+      show($("loginScreen"));
+
+      $("loginMessage").textContent =
+        "Unable to check your PulsePrep login session.";
+
+      return;
+    }
+
+
+    // ---------------------------------------------------------
+    // NO LOGIN SESSION
+    // ---------------------------------------------------------
+
     if (!session || !session.user) {
+
+      console.log(
+        "No active Supabase session."
+      );
 
       hide($("authLoading"));
       show($("loginScreen"));
@@ -1198,39 +1228,145 @@ async function checkAuth() {
     }
 
 
+    // ---------------------------------------------------------
+    // SAVE CURRENT USER
+    // ---------------------------------------------------------
+
     currentUser = session.user;
 
 
-    if (!isAdminEmail(currentUser.email)) {
+    const supabaseEmail =
+      (currentUser.email || "")
+        .trim()
+        .toLowerCase();
+
+
+    console.log(
+      "================================="
+    );
+
+    console.log(
+      "PULSEPREP ADMIN AUTH DIAGNOSTIC"
+    );
+
+    console.log(
+      "Supabase User ID:",
+      currentUser.id
+    );
+
+    console.log(
+      "Supabase Email:",
+      supabaseEmail
+    );
+
+    console.log(
+      "Expected Admin Email:",
+      "scanzybwoy8@gmail.com"
+    );
+
+    console.log(
+      "isAdminEmail result:",
+      isAdminEmail(supabaseEmail)
+    );
+
+    console.log(
+      "================================="
+    );
+
+
+    // ---------------------------------------------------------
+    // ADMIN CHECK
+    // ---------------------------------------------------------
+
+    if (!isAdminEmail(supabaseEmail)) {
 
       hide($("authLoading"));
       hide($("loginScreen"));
       show($("accessDeniedScreen"));
 
-      $("accessDeniedMessage").textContent =
-        `This account (${currentUser.email}) is not authorized as a PulsePrep administrator.`;
+
+      // Show the ACTUAL email Supabase returned.
+      const accessDeniedMessage =
+        $("accessDeniedMessage");
+
+
+      if (accessDeniedMessage) {
+
+        accessDeniedMessage.innerHTML = `
+          This account is not authorized as a PulsePrep administrator.
+          <br><br>
+          <span class="text-xs text-slate-500">
+            Supabase logged you in as:
+            <strong>${supabaseEmail || "NO EMAIL RETURNED"}</strong>
+          </span>
+        `;
+
+      }
+
 
       return;
     }
 
 
-    await enterAdmin();
+    // ---------------------------------------------------------
+    // ADMIN VERIFIED
+    // ---------------------------------------------------------
+
+    console.log(
+      "PulsePrep administrator verified:",
+      supabaseEmail
+    );
+
+
+    hide($("authLoading"));
+    hide($("loginScreen"));
+    hide($("accessDeniedScreen"));
+    show($("adminApp"));
+
+
+    // Update displayed admin email if the element exists.
+    const adminEmailDisplay =
+      $("adminEmailDisplay");
+
+
+    if (adminEmailDisplay) {
+
+      adminEmailDisplay.textContent =
+        supabaseEmail;
+
+    }
+
+
+    // Load the Exam Vault data.
+    await loadQuestions();
 
 
   } catch (error) {
 
-    console.error("Auth error:", error);
+    console.error(
+      "Unexpected authentication error:",
+      error
+    );
+
 
     hide($("authLoading"));
     show($("loginScreen"));
 
-    showToast(
-      "Unable to verify your account.",
-      "error"
-    );
-  }
-}
 
+    const loginMessage =
+      $("loginMessage");
+
+
+    if (loginMessage) {
+
+      loginMessage.textContent =
+        "An unexpected authentication error occurred.";
+
+    }
+
+  }
+
+}
 
 /* ============================================================
    ENTER ADMIN
