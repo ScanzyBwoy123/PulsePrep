@@ -2,43 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
-
   <title>PulsePrep Exam Vault Admin</title>
-
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <!-- Font Awesome -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   >
-
   <style>
     body {
       background: #f1f5f9;
     }
-
     .hidden-screen {
       display: none !important;
     }
-
     .modal-backdrop {
       background: rgba(15, 23, 42, 0.65);
     }
-
     textarea {
       resize: vertical;
     }
-
     .loading-spinner {
       width: 18px;
       height: 18px;
@@ -49,7 +36,6 @@
       display: inline-block;
       vertical-align: middle;
     }
-
     @keyframes spin {
       to {
         transform: rotate(360deg);
@@ -57,20 +43,15 @@
     }
   </style>
 </head>
-
 <body class="min-h-screen text-slate-800">
-
   <!-- =========================================================
-       AUTHENTICATION LOADING SCREEN
+       AUTH LOADING
   ========================================================== -->
-
   <div
     id="authLoadingScreen"
     class="min-h-screen flex items-center justify-center px-4"
   >
-
     <div class="text-center">
-
       <div
         class="w-16 h-16 mx-auto mb-5 rounded-2xl
                bg-blue-600 text-white flex items-center
@@ -78,35 +59,25 @@
       >
         <i class="fa-solid fa-shield-halved"></i>
       </div>
-
       <h1 class="text-xl font-bold text-slate-900">
         Checking administrator access...
       </h1>
-
       <p class="text-sm text-slate-500 mt-2">
         Please wait.
       </p>
-
     </div>
-
   </div>
-
-
   <!-- =========================================================
-       LOGIN SCREEN
+       LOGIN
   ========================================================== -->
-
   <div
     id="loginScreen"
     class="hidden-screen min-h-screen flex items-center justify-center px-4"
   >
-
     <div
       class="bg-white w-full max-w-md rounded-2xl shadow-xl p-8"
     >
-
       <div class="text-center mb-8">
-
         <div
           class="w-16 h-16 mx-auto mb-4 rounded-2xl
                  bg-blue-600 text-white flex items-center
@@ -114,29 +85,21 @@
         >
           <i class="fa-solid fa-lock"></i>
         </div>
-
         <h1 class="text-2xl font-bold text-slate-900">
           PulsePrep Exam Vault
         </h1>
-
         <p class="text-slate-500 mt-2">
           Administrator access only
         </p>
-
       </div>
-
-
       <form id="loginForm" class="space-y-5">
-
         <div>
-
           <label
             for="loginEmail"
             class="block text-sm font-semibold mb-2"
           >
             Admin Email
           </label>
-
           <input
             id="loginEmail"
             type="email"
@@ -148,19 +111,14 @@
                    focus:ring-2 focus:ring-blue-500"
             placeholder="Enter admin email"
           >
-
         </div>
-
-
         <div>
-
           <label
             for="loginPassword"
             class="block text-sm font-semibold mb-2"
           >
             Password
           </label>
-
           <input
             id="loginPassword"
             type="password"
@@ -172,10 +130,7 @@
                    focus:ring-2 focus:ring-blue-500"
             placeholder="Enter password"
           >
-
         </div>
-
-
         <button
           id="loginButton"
           type="submit"
@@ -186,33 +141,23 @@
           <i class="fa-solid fa-right-to-bracket mr-2"></i>
           Sign In
         </button>
-
       </form>
-
-
       <p
         id="loginMessage"
         class="text-center text-sm mt-5 min-h-[20px]"
       ></p>
-
     </div>
-
   </div>
-
-
   <!-- =========================================================
-       ACCESS DENIED SCREEN
+       ACCESS DENIED
   ========================================================== -->
-
   <div
     id="accessDeniedScreen"
     class="hidden-screen min-h-screen flex items-center justify-center px-4"
   >
-
     <div
       class="bg-white w-full max-w-md rounded-2xl shadow-xl p-8 text-center"
     >
-
       <div
         class="w-16 h-16 mx-auto mb-5 rounded-full
                bg-red-100 text-red-600
@@ -220,16 +165,13 @@
       >
         <i class="fa-solid fa-ban"></i>
       </div>
-
       <h1 class="text-2xl font-bold text-slate-900">
         Access Denied
       </h1>
-
       <p class="text-slate-500 mt-3">
         This account is not authorized to access
         the PulsePrep Exam Vault administrator area.
       </p>
-
       <button
         id="deniedLogoutButton"
         class="mt-6 bg-slate-900 hover:bg-slate-800
@@ -238,64 +180,43 @@
       >
         Sign Out
       </button>
-
     </div>
-
   </div>
-
-
   <!-- =========================================================
-       ADMIN APPLICATION
-       IMPORTANT:
-       This remains hidden until authentication succeeds.
+       ADMIN APP
   ========================================================== -->
-
   <div
     id="adminApp"
     class="hidden-screen"
   >
-
     <!-- HEADER -->
-
     <header class="bg-slate-900 text-white shadow-lg">
-
       <div
         class="max-w-7xl mx-auto px-4 py-4
                flex flex-col md:flex-row
                md:items-center md:justify-between gap-4"
       >
-
         <div class="flex items-center gap-3">
-
           <div
             class="w-11 h-11 rounded-xl bg-blue-600
                    flex items-center justify-center"
           >
             <i class="fa-solid fa-vault"></i>
           </div>
-
           <div>
-
             <h1 class="text-xl font-bold">
               PulsePrep Exam Vault
             </h1>
-
             <p class="text-xs text-slate-300">
               Premium question management
             </p>
-
           </div>
-
         </div>
-
-
         <div class="flex items-center gap-3">
-
           <span
             id="adminEmailDisplay"
             class="text-sm text-slate-300 hidden md:block"
           ></span>
-
           <button
             id="logoutButton"
             type="button"
@@ -306,139 +227,94 @@
             <i class="fa-solid fa-right-from-bracket mr-1"></i>
             Logout
           </button>
-
         </div>
-
       </div>
-
     </header>
-
-
     <!-- MAIN -->
-
     <main class="max-w-7xl mx-auto px-4 py-8">
-
       <!-- INTRO -->
-
       <div class="mb-8">
-
         <h2 class="text-3xl font-bold text-slate-900">
           Exam Vault Question Manager
         </h2>
-
         <p class="text-slate-500 mt-2">
-          Add, review, approve and manage the individual
-          questions that appear in the premium PulsePrep Exam Vault.
+          Add, review, approve and manage the questions
+          that appear in the premium PulsePrep Exam Vault.
         </p>
-
       </div>
-
-
-      <!-- STATS -->
-
+      <!-- =====================================================
+           STATISTICS
+      ====================================================== -->
       <div
         class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
       >
-
         <div class="bg-white rounded-2xl shadow-sm p-5">
-
           <p class="text-sm text-slate-500">
             Total Questions
           </p>
-
           <p
             id="totalCount"
             class="text-3xl font-bold mt-2"
           >
             0
           </p>
-
         </div>
-
-
         <div class="bg-white rounded-2xl shadow-sm p-5">
-
           <p class="text-sm text-slate-500">
             Pending
           </p>
-
           <p
             id="pendingCount"
             class="text-3xl font-bold text-amber-600 mt-2"
           >
             0
           </p>
-
         </div>
-
-
         <div class="bg-white rounded-2xl shadow-sm p-5">
-
           <p class="text-sm text-slate-500">
             Approved
           </p>
-
           <p
             id="approvedCount"
             class="text-3xl font-bold text-green-600 mt-2"
           >
             0
           </p>
-
         </div>
-
-
         <div class="bg-white rounded-2xl shadow-sm p-5">
-
           <p class="text-sm text-slate-500">
             Rejected
           </p>
-
           <p
             id="rejectedCount"
             class="text-3xl font-bold text-red-600 mt-2"
           >
             0
           </p>
-
         </div>
-
       </div>
-
-
       <!-- =====================================================
            QUESTION FORM
       ====================================================== -->
-
       <section
         class="bg-white rounded-2xl shadow-sm mb-8 overflow-hidden"
       >
-
         <div
           class="bg-blue-600 text-white px-6 py-5
                  flex flex-col md:flex-row
                  md:items-center md:justify-between gap-3"
         >
-
           <div>
-
             <h3 class="text-xl font-bold">
-
               <i class="fa-solid fa-circle-plus mr-2"></i>
-
               <span id="formTitle">
                 Add Exam Vault Question
               </span>
-
             </h3>
-
             <p class="text-blue-100 text-sm mt-1">
               Create one structured MCQ at a time.
             </p>
-
           </div>
-
-
           <button
             id="cancelEditButton"
             type="button"
@@ -447,36 +323,25 @@
           >
             Cancel Edit
           </button>
-
         </div>
-
-
         <form
           id="questionForm"
           class="p-6"
         >
-
           <input
             type="hidden"
             id="editingQuestionId"
           >
-
-
-          <!-- SUBJECT + TOPIC -->
-
           <div
             class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5"
           >
-
             <div>
-
               <label
                 for="subject"
                 class="block text-sm font-semibold mb-2"
               >
                 Subject *
               </label>
-
               <select
                 id="subject"
                 required
@@ -485,25 +350,18 @@
                        bg-white focus:outline-none
                        focus:ring-2 focus:ring-blue-500"
               >
-
                 <option value="">
                   Select subject
                 </option>
-
               </select>
-
             </div>
-
-
             <div>
-
               <label
                 for="topic"
                 class="block text-sm font-semibold mb-2"
               >
                 Topic
               </label>
-
               <input
                 id="topic"
                 type="text"
@@ -513,23 +371,15 @@
                        focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. Antenatal Care"
               >
-
             </div>
-
           </div>
-
-
-          <!-- QUESTION -->
-
           <div class="mb-5">
-
             <label
               for="question"
               class="block text-sm font-semibold mb-2"
             >
               Question *
             </label>
-
             <textarea
               id="question"
               required
@@ -540,25 +390,17 @@
                      focus:ring-2 focus:ring-blue-500"
               placeholder="Enter the examination question..."
             ></textarea>
-
           </div>
-
-
-          <!-- OPTIONS -->
-
           <div
             class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5"
           >
-
             <div>
-
               <label
                 for="optionA"
                 class="block text-sm font-semibold mb-2"
               >
                 Option A *
               </label>
-
               <input
                 id="optionA"
                 type="text"
@@ -569,19 +411,14 @@
                        focus:ring-2 focus:ring-blue-500"
                 placeholder="Option A"
               >
-
             </div>
-
-
             <div>
-
               <label
                 for="optionB"
                 class="block text-sm font-semibold mb-2"
               >
                 Option B *
               </label>
-
               <input
                 id="optionB"
                 type="text"
@@ -592,19 +429,14 @@
                        focus:ring-2 focus:ring-blue-500"
                 placeholder="Option B"
               >
-
             </div>
-
-
             <div>
-
               <label
                 for="optionC"
                 class="block text-sm font-semibold mb-2"
               >
                 Option C *
               </label>
-
               <input
                 id="optionC"
                 type="text"
@@ -615,19 +447,14 @@
                        focus:ring-2 focus:ring-blue-500"
                 placeholder="Option C"
               >
-
             </div>
-
-
             <div>
-
               <label
                 for="optionD"
                 class="block text-sm font-semibold mb-2"
               >
                 Option D *
               </label>
-
               <input
                 id="optionD"
                 type="text"
@@ -638,27 +465,18 @@
                        focus:ring-2 focus:ring-blue-500"
                 placeholder="Option D"
               >
-
             </div>
-
           </div>
-
-
-          <!-- ANSWER / DIFFICULTY / STATUS -->
-
           <div
             class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5"
           >
-
             <div>
-
               <label
                 for="correctAnswer"
                 class="block text-sm font-semibold mb-2"
               >
                 Correct Answer *
               </label>
-
               <select
                 id="correctAnswer"
                 required
@@ -667,30 +485,22 @@
                        bg-white focus:outline-none
                        focus:ring-2 focus:ring-blue-500"
               >
-
                 <option value="">
                   Select answer
                 </option>
-
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
                 <option value="D">D</option>
-
               </select>
-
             </div>
-
-
             <div>
-
               <label
                 for="difficulty"
                 class="block text-sm font-semibold mb-2"
               >
                 Difficulty
               </label>
-
               <select
                 id="difficulty"
                 class="w-full border border-slate-300
@@ -698,33 +508,24 @@
                        bg-white focus:outline-none
                        focus:ring-2 focus:ring-blue-500"
               >
-
                 <option value="easy">
                   Easy
                 </option>
-
                 <option value="medium" selected>
                   Medium
                 </option>
-
                 <option value="hard">
                   Hard
                 </option>
-
               </select>
-
             </div>
-
-
             <div>
-
               <label
                 for="status"
                 class="block text-sm font-semibold mb-2"
               >
                 Status
               </label>
-
               <select
                 id="status"
                 class="w-full border border-slate-300
@@ -732,37 +533,25 @@
                        bg-white focus:outline-none
                        focus:ring-2 focus:ring-blue-500"
               >
-
                 <option value="pending">
                   Pending
                 </option>
-
                 <option value="approved">
                   Approved
                 </option>
-
                 <option value="rejected">
                   Rejected
                 </option>
-
               </select>
-
             </div>
-
           </div>
-
-
-          <!-- EXPLANATION -->
-
           <div class="mb-5">
-
             <label
               for="explanation"
               class="block text-sm font-semibold mb-2"
             >
               Explanation
             </label>
-
             <textarea
               id="explanation"
               rows="4"
@@ -772,25 +561,17 @@
                      focus:ring-2 focus:ring-blue-500"
               placeholder="Explain why the correct answer is correct..."
             ></textarea>
-
           </div>
-
-
-          <!-- SOURCE -->
-
           <div
             class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6"
           >
-
             <div>
-
               <label
                 for="source"
                 class="block text-sm font-semibold mb-2"
               >
                 Source
               </label>
-
               <input
                 id="source"
                 type="text"
@@ -800,19 +581,14 @@
                        focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. PulsePrep"
               >
-
             </div>
-
-
             <div>
-
               <label
                 for="school"
                 class="block text-sm font-semibold mb-2"
               >
                 School
               </label>
-
               <input
                 id="school"
                 type="text"
@@ -822,19 +598,14 @@
                        focus:ring-2 focus:ring-blue-500"
                 placeholder="Optional"
               >
-
             </div>
-
-
             <div>
-
               <label
                 for="academicYear"
                 class="block text-sm font-semibold mb-2"
               >
                 Academic Year
               </label>
-
               <input
                 id="academicYear"
                 type="text"
@@ -844,24 +615,13 @@
                        focus:ring-2 focus:ring-blue-500"
                 placeholder="e.g. 2025/2026"
               >
-
             </div>
-
           </div>
-
-
-          <!-- FORM MESSAGE -->
-
           <div
             id="formMessage"
             class="hidden mb-5 rounded-xl px-4 py-3 text-sm"
           ></div>
-
-
-          <!-- FORM BUTTONS -->
-
           <div class="flex flex-wrap gap-3">
-
             <button
               id="saveQuestionButton"
               type="submit"
@@ -872,8 +632,6 @@
               <i class="fa-solid fa-floppy-disk mr-2"></i>
               Save Question
             </button>
-
-
             <button
               id="resetFormButton"
               type="button"
@@ -884,46 +642,31 @@
               <i class="fa-solid fa-rotate-left mr-2"></i>
               Clear
             </button>
-
           </div>
-
         </form>
-
       </section>
-
-
       <!-- =====================================================
            FILTERS
       ====================================================== -->
-
       <section
         class="bg-white rounded-2xl shadow-sm mb-8 p-6"
       >
-
         <div class="flex items-center gap-2 mb-5">
-
           <i class="fa-solid fa-filter text-blue-600"></i>
-
           <h3 class="font-bold text-lg">
             Search & Filter
           </h3>
-
         </div>
-
-
         <div
           class="grid grid-cols-1 md:grid-cols-3 gap-4"
         >
-
           <div>
-
             <label
               for="searchInput"
               class="block text-sm font-semibold mb-2"
             >
               Search
             </label>
-
             <input
               id="searchInput"
               type="search"
@@ -933,19 +676,14 @@
                      focus:ring-2 focus:ring-blue-500"
               placeholder="Search questions..."
             >
-
           </div>
-
-
           <div>
-
             <label
               for="filterSubject"
               class="block text-sm font-semibold mb-2"
             >
               Subject
             </label>
-
             <select
               id="filterSubject"
               class="w-full border border-slate-300
@@ -953,25 +691,18 @@
                      bg-white focus:outline-none
                      focus:ring-2 focus:ring-blue-500"
             >
-
               <option value="">
                 All Subjects
               </option>
-
             </select>
-
           </div>
-
-
           <div>
-
             <label
               for="filterStatus"
               class="block text-sm font-semibold mb-2"
             >
               Status
             </label>
-
             <select
               id="filterStatus"
               class="w-full border border-slate-300
@@ -979,84 +710,125 @@
                      bg-white focus:outline-none
                      focus:ring-2 focus:ring-blue-500"
             >
-
               <option value="">
                 All Statuses
               </option>
-
               <option value="pending">
                 Pending
               </option>
-
               <option value="approved">
                 Approved
               </option>
-
               <option value="rejected">
                 Rejected
               </option>
-
             </select>
-
           </div>
-
         </div>
-
       </section>
-
-
       <!-- =====================================================
-           QUESTIONS TABLE
+           QUESTION MANAGER
       ====================================================== -->
-
       <section
         class="bg-white rounded-2xl shadow-sm overflow-hidden"
       >
-
         <div
           class="px-6 py-5 border-b border-slate-200
-                 flex flex-col md:flex-row
-                 md:items-center md:justify-between gap-3"
+                 flex flex-col lg:flex-row
+                 lg:items-center lg:justify-between gap-4"
         >
-
           <div>
-
             <h3 class="text-xl font-bold">
               Exam Vault Questions
             </h3>
-
             <p
               id="resultCount"
               class="text-sm text-slate-500 mt-1"
             >
               Loading...
             </p>
-
           </div>
-
-
-          <button
-            id="refreshButton"
-            type="button"
-            class="bg-slate-900 hover:bg-slate-800
-                   text-white px-5 py-2.5
-                   rounded-xl text-sm font-semibold"
-          >
-            <i class="fa-solid fa-arrows-rotate mr-2"></i>
-            Refresh
-          </button>
-
+          <!-- BULK ACTIONS -->
+          <div class="flex flex-wrap gap-2">
+            <button
+              id="approveAllPendingButton"
+              type="button"
+              class="bg-green-600 hover:bg-green-700
+                     text-white px-4 py-2.5
+                     rounded-xl text-sm font-semibold"
+            >
+              <i class="fa-solid fa-check-double mr-2"></i>
+              Approve All Pending
+            </button>
+            <button
+              id="approveSelectedButton"
+              type="button"
+              class="bg-blue-600 hover:bg-blue-700
+                     text-white px-4 py-2.5
+                     rounded-xl text-sm font-semibold"
+            >
+              <i class="fa-solid fa-check mr-2"></i>
+              Approve Selected
+            </button>
+            <button
+              id="rejectSelectedButton"
+              type="button"
+              class="bg-red-600 hover:bg-red-700
+                     text-white px-4 py-2.5
+                     rounded-xl text-sm font-semibold"
+            >
+              <i class="fa-solid fa-xmark mr-2"></i>
+              Reject Selected
+            </button>
+            <button
+              id="refreshButton"
+              type="button"
+              class="bg-slate-900 hover:bg-slate-800
+                     text-white px-4 py-2.5
+                     rounded-xl text-sm font-semibold"
+            >
+              <i class="fa-solid fa-arrows-rotate mr-2"></i>
+              Refresh
+            </button>
+          </div>
         </div>
-
-
+        <!-- BULK STATUS BAR -->
+        <div
+          id="bulkActionBar"
+          class="hidden px-6 py-3 bg-blue-50
+                 border-b border-blue-100
+                 flex items-center justify-between gap-3"
+        >
+          <div class="text-sm text-blue-800">
+            <i class="fa-solid fa-circle-info mr-1"></i>
+            <span id="selectedCountText">
+              0 questions selected
+            </span>
+          </div>
+          <button
+            id="clearSelectionButton"
+            type="button"
+            class="text-sm font-semibold
+                   text-blue-700 hover:text-blue-900"
+          >
+            Clear Selection
+          </button>
+        </div>
         <div class="overflow-x-auto">
-
-          <table class="w-full min-w-[1000px]">
-
+          <table class="w-full min-w-[1100px]">
             <thead class="bg-slate-50">
-
               <tr>
-
+                <th
+                  class="text-center px-4 py-4
+                         w-12"
+                >
+                  <input
+                    id="selectAllCheckbox"
+                    type="checkbox"
+                    class="w-4 h-4 accent-blue-600"
+                    title="Select all visible questions"
+                  >
+                </th>
                 <th
                   class="text-left px-5 py-4
                          text-xs font-bold uppercase
@@ -1064,7 +836,6 @@
                 >
                   Question
                 </th>
-
                 <th
                   class="text-left px-5 py-4
                          text-xs font-bold uppercase
@@ -1072,7 +843,6 @@
                 >
                   Subject
                 </th>
-
                 <th
                   class="text-left px-5 py-4
                          text-xs font-bold uppercase
@@ -1080,7 +850,6 @@
                 >
                   Topic
                 </th>
-
                 <th
                   class="text-left px-5 py-4
                          text-xs font-bold uppercase
@@ -1088,7 +857,6 @@
                 >
                   Difficulty
                 </th>
-
                 <th
                   class="text-left px-5 py-4
                          text-xs font-bold uppercase
@@ -1096,7 +864,6 @@
                 >
                   Status
                 </th>
-
                 <th
                   class="text-right px-5 py-4
                          text-xs font-bold uppercase
@@ -1104,65 +871,45 @@
                 >
                   Actions
                 </th>
-
               </tr>
-
             </thead>
-
-
             <tbody id="questionsTableBody">
-
               <tr>
-
                 <td
-                  colspan="6"
+                  colspan="7"
                   class="px-5 py-10 text-center
                          text-slate-500"
                 >
                   Loading questions...
                 </td>
-
               </tr>
-
             </tbody>
-
           </table>
-
         </div>
-
       </section>
-
     </main>
-
   </div>
-
-
   <!-- =========================================================
        QUESTION DETAILS MODAL
   ========================================================== -->
-
   <div
     id="questionModal"
     class="hidden fixed inset-0 z-50
            modal-backdrop flex items-center
            justify-center p-4"
   >
-
     <div
       class="bg-white w-full max-w-3xl
              max-h-[90vh] overflow-y-auto
              rounded-2xl shadow-2xl"
     >
-
       <div
         class="px-6 py-5 border-b
                flex items-center justify-between"
       >
-
         <h3 class="text-xl font-bold">
           Question Details
         </h3>
-
         <button
           id="closeModalButton"
           type="button"
@@ -1171,52 +918,36 @@
         >
           <i class="fa-solid fa-xmark"></i>
         </button>
-
       </div>
-
-
       <div
         id="modalContent"
         class="p-6"
       ></div>
-
     </div>
-
   </div>
-
-
   <!-- =========================================================
        JAVASCRIPT
   ========================================================== -->
-
   <script>
-
     /* ==========================================================
-       SUPABASE CONFIGURATION
+       SUPABASE
     ========================================================== */
-
     const SUPABASE_URL =
       "https://eskwphjtiogguhvtktmh.supabase.co";
-
     const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_o-Dr554qwhmu4SNpZL5dxQ__cP7MB9p";
-
+      "sb_publishable_o-Dr554qwhmu4SNpZL5dxQ__cP7MB9p";
     const ADMIN_EMAILS = [
-      "scanzybwoy8@gmail.com"
+      "scanzybwoy123@gmail.com",
+      "scanzybwoy@gmail.com"
     ];
-
-
     const supabaseClient =
       window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_PUBLISHABLE_KEY
       );
-
-
     /* ==========================================================
-       SUBJECT LIST
+       SUBJECTS
     ========================================================== */
-
     const SUBJECTS = [
       "Anatomy & Physiology",
       "Microbiology",
@@ -1249,267 +980,165 @@
       "Biostatistics",
       "Statistics"
     ];
-
-
     /* ==========================================================
-       APPLICATION STATE
+       STATE
     ========================================================== */
-
     let currentUser = null;
     let questions = [];
     let editingQuestionId = null;
-
-
+    let selectedQuestionIds = new Set();
     /* ==========================================================
-       DOM HELPERS
+       DOM
     ========================================================== */
-
-    const $ = (id) =>
+    const $ = id =>
       document.getElementById(id);
-
-
     /* ==========================================================
-       AUTH SCREEN HELPERS
+       AUTH HELPERS
     ========================================================== */
-
     function showOnly(screenId) {
-
       const screens = [
         "authLoadingScreen",
         "loginScreen",
         "accessDeniedScreen",
         "adminApp"
       ];
-
       screens.forEach(id => {
-
         const element = $(id);
-
-        if (!element) return;
-
-        element.classList.add("hidden-screen");
-
+        if (element) {
+          element.classList.add("hidden-screen");
+        }
       });
-
       $(screenId).classList.remove("hidden-screen");
     }
-
-
     function normalizeEmail(email) {
-
       return String(email || "")
         .trim()
         .toLowerCase();
-
     }
-
-
     function isAdminEmail(email) {
-
-      const normalized =
-        normalizeEmail(email);
-
       return ADMIN_EMAILS
         .map(normalizeEmail)
-        .includes(normalized);
-
+        .includes(
+          normalizeEmail(email)
+        );
     }
-
-
+    function setLoginMessage(message, type) {
+      const element =
+        $("loginMessage");
+      element.textContent =
+        message;
+      element.className =
+        "text-center text-sm mt-5 min-h-[20px]";
+      if (type === "error") {
+        element.classList.add("text-red-600");
+      }
+      if (type === "success") {
+        element.classList.add("text-green-600");
+      }
+    }
     /* ==========================================================
-       INITIAL AUTH CHECK
-       IMPORTANT:
-       The admin application is NOT shown by default.
+       INITIAL AUTHENTICATION
     ========================================================== */
-
     async function initializeAuthentication() {
-
       showOnly("authLoadingScreen");
-
       try {
-
         const {
           data: { session },
           error
-        } = await supabaseClient.auth.getSession();
-
+        } =
+          await supabaseClient.auth.getSession();
         if (error) {
-
-          console.error(
-            "Session check error:",
-            error
-          );
-
-          await supabaseClient.auth.signOut();
-
-          showOnly("loginScreen");
-
-          setLoginMessage(
-            "Unable to verify your session. Please sign in again.",
-            "error"
-          );
-
-          return;
+          throw error;
         }
-
-
         if (!session || !session.user) {
-
           showOnly("loginScreen");
-
           return;
         }
-
-
-        const user =
-          session.user;
-
         const email =
-          normalizeEmail(user.email);
-
-
+          normalizeEmail(
+            session.user.email
+          );
         if (!isAdminEmail(email)) {
-
           currentUser = null;
-
           showOnly("accessDeniedScreen");
-
           return;
         }
-
-
-        currentUser = user;
-
+        currentUser =
+          session.user;
         showOnly("adminApp");
-
         $("adminEmailDisplay").textContent =
           email;
-
         await initializeAdminApplication();
-
       } catch (error) {
-
         console.error(
           "Authentication initialization error:",
           error
         );
-
         await supabaseClient.auth.signOut();
-
         showOnly("loginScreen");
-
         setLoginMessage(
-          "An authentication error occurred. Please sign in again.",
+          error.message ||
+          "Unable to verify your session.",
           "error"
         );
-
       }
-
     }
-
-
     /* ==========================================================
-       AUTH STATE LISTENER
+       AUTH STATE
     ========================================================== */
-
     supabaseClient.auth.onAuthStateChange(
       async (event, session) => {
-
-        console.log(
-          "Auth state changed:",
-          event
-        );
-
-
         if (
           event === "SIGNED_OUT" ||
           !session ||
           !session.user
         ) {
-
           currentUser = null;
-
           showOnly("loginScreen");
-
           return;
         }
-
-
         const email =
-          normalizeEmail(session.user.email);
-
-
+          normalizeEmail(
+            session.user.email
+          );
         if (!isAdminEmail(email)) {
-
           currentUser = null;
-
           showOnly("accessDeniedScreen");
-
           return;
         }
-
-
         currentUser =
           session.user;
-
         showOnly("adminApp");
-
         $("adminEmailDisplay").textContent =
           email;
-
       }
     );
-
-
     /* ==========================================================
        LOGIN
     ========================================================== */
-
     $("loginForm").addEventListener(
       "submit",
-      async function(event) {
-
+      async event => {
         event.preventDefault();
-
-
         const email =
           normalizeEmail(
             $("loginEmail").value
           );
-
         const password =
           $("loginPassword").value;
-
-
         if (!isAdminEmail(email)) {
-
           setLoginMessage(
             "This account is not authorized as a PulsePrep administrator.",
             "error"
           );
-
           return;
         }
-
-
         const button =
           $("loginButton");
-
-
         button.disabled = true;
-
         button.innerHTML =
           '<span class="loading-spinner mr-2"></span> Signing in...';
-
-
-        setLoginMessage(
-          "",
-          ""
-        );
-
-
         try {
-
           const {
             data,
             error
@@ -1518,238 +1147,125 @@
               email,
               password
             });
-
-
           if (error) {
-
-            console.error(
-              "Login error:",
-              error
-            );
-
-            setLoginMessage(
-              error.message ||
-              "Login failed. Check your email and password.",
-              "error"
-            );
-
-            return;
+            throw error;
           }
-
-
-          if (!data || !data.user) {
-
-            setLoginMessage(
-              "Login failed. No authenticated user was returned.",
-              "error"
+          if (!data?.user) {
+            throw new Error(
+              "No authenticated user was returned."
             );
-
-            return;
           }
-
-
           if (
-            !isAdminEmail(data.user.email)
+            !isAdminEmail(
+              data.user.email
+            )
           ) {
-
             await supabaseClient.auth.signOut();
-
-            setLoginMessage(
-              "Access denied. This account is not an administrator.",
-              "error"
+            throw new Error(
+              "Access denied. This account is not an administrator."
             );
-
-            return;
           }
-
-
           currentUser =
             data.user;
-
           showOnly("adminApp");
-
           $("adminEmailDisplay").textContent =
-            normalizeEmail(data.user.email);
-
+            normalizeEmail(
+              data.user.email
+            );
           await initializeAdminApplication();
-
         } catch (error) {
-
           console.error(
-            "Unexpected login error:",
+            "Login error:",
             error
           );
-
           setLoginMessage(
-            "An unexpected login error occurred.",
+            error.message ||
+            "Login failed.",
             "error"
           );
-
         } finally {
-
           button.disabled = false;
-
           button.innerHTML =
             '<i class="fa-solid fa-right-to-bracket mr-2"></i> Sign In';
-
         }
-
       }
     );
-
-
-    /* ==========================================================
-       LOGIN MESSAGE
-    ========================================================== */
-
-    function setLoginMessage(
-      message,
-      type
-    ) {
-
-      const element =
-        $("loginMessage");
-
-      element.textContent =
-        message;
-
-
-      element.className =
-        "text-center text-sm mt-5 min-h-[20px]";
-
-
-      if (type === "error") {
-
-        element.classList.add(
-          "text-red-600"
-        );
-
-      }
-
-      if (type === "success") {
-
-        element.classList.add(
-          "text-green-600"
-        );
-
-      }
-
-    }
-
-
     /* ==========================================================
        LOGOUT
     ========================================================== */
-
     async function logoutAdmin() {
-
       try {
-
         await supabaseClient.auth.signOut();
-
       } catch (error) {
-
         console.error(
           "Logout error:",
           error
         );
-
       } finally {
-
         currentUser = null;
-
+        selectedQuestionIds.clear();
         $("loginEmail").value = "";
         $("loginPassword").value = "";
-
         showOnly("loginScreen");
-
       }
-
     }
-
-
     $("logoutButton").addEventListener(
       "click",
       logoutAdmin
     );
-
-
     $("deniedLogoutButton").addEventListener(
       "click",
       logoutAdmin
     );
-
-
     /* ==========================================================
-       LOAD SUBJECT DROPDOWNS
+       SUBJECT DROPDOWNS
     ========================================================== */
-
     function loadSubjectDropdowns() {
-
       const subjectSelect =
         $("subject");
-
       const filterSubject =
         $("filterSubject");
-
-
+      if (
+        subjectSelect.options.length > 1
+      ) {
+        return;
+      }
       SUBJECTS.forEach(subject => {
-
         const option =
           document.createElement("option");
-
         option.value =
           subject;
-
         option.textContent =
           subject;
-
         subjectSelect.appendChild(
           option
         );
-
-
         const filterOption =
           document.createElement("option");
-
         filterOption.value =
           subject;
-
         filterOption.textContent =
           subject;
-
         filterSubject.appendChild(
           filterOption
         );
-
       });
-
     }
-
-
     /* ==========================================================
-       INITIALIZE ADMIN APPLICATION
+       INITIALIZE ADMIN
     ========================================================== */
-
     async function initializeAdminApplication() {
-
       loadSubjectDropdowns();
-
       await loadQuestions();
-
     }
-
-
     /* ==========================================================
        LOAD QUESTIONS
     ========================================================== */
-
     async function loadQuestions() {
-
       $("questionsTableBody").innerHTML = `
         <tr>
           <td
-            colspan="6"
+            colspan="7"
             class="px-5 py-10 text-center text-slate-500"
           >
             <i class="fa-solid fa-spinner fa-spin mr-2"></i>
@@ -1757,191 +1273,162 @@
           </td>
         </tr>
       `;
-
-
       try {
-
         const {
           data,
           error
-        } = await supabaseClient
-          .from("exam_vault_questions")
-          .select("*")
-          .order(
-            "created_at",
-            {
-              ascending: false
-            }
-          );
-
-
+        } =
+          await supabaseClient
+            .from("exam_vault_questions")
+            .select("*")
+            .order(
+              "created_at",
+              {
+                ascending: false
+              }
+            );
         if (error) {
-
-          console.error(
-            "Question loading error:",
-            error
-          );
-
           throw error;
         }
-
-
         questions =
           data || [];
-
-
+        const existingIds =
+          new Set(
+            questions.map(
+              question => question.id
+            )
+          );
+        selectedQuestionIds =
+          new Set(
+            [...selectedQuestionIds]
+              .filter(
+                id => existingIds.has(id)
+              )
+          );
         updateStatistics();
-
         renderQuestions();
-
       } catch (error) {
-
         console.error(
           "Unable to load questions:",
           error
         );
-
-
         $("questionsTableBody").innerHTML = `
           <tr>
             <td
-              colspan="6"
+              colspan="7"
               class="px-5 py-10 text-center text-red-600"
             >
               <i class="fa-solid fa-triangle-exclamation mr-2"></i>
               Unable to load questions.
               <br>
               <span class="text-sm text-slate-500">
-                ${escapeHtml(error.message || "Unknown error")}
+                ${escapeHtml(
+                  error.message ||
+                  "Unknown error"
+                )}
               </span>
             </td>
           </tr>
         `;
-
       }
-
     }
-
-
     /* ==========================================================
        STATISTICS
     ========================================================== */
-
     function updateStatistics() {
-
       const total =
         questions.length;
-
       const pending =
         questions.filter(
-          q => q.status === "pending"
+          q =>
+            String(q.status)
+              .toLowerCase() === "pending"
         ).length;
-
       const approved =
         questions.filter(
-          q => q.status === "approved"
+          q =>
+            String(q.status)
+              .toLowerCase() === "approved"
         ).length;
-
       const rejected =
         questions.filter(
-          q => q.status === "rejected"
+          q =>
+            String(q.status)
+              .toLowerCase() === "rejected"
         ).length;
-
-
       $("totalCount").textContent =
         total;
-
       $("pendingCount").textContent =
         pending;
-
       $("approvedCount").textContent =
         approved;
-
       $("rejectedCount").textContent =
         rejected;
-
     }
-
-
     /* ==========================================================
-       FILTER QUESTIONS
+       FILTER
     ========================================================== */
-
     function getFilteredQuestions() {
-
       const search =
         $("searchInput")
           .value
           .trim()
           .toLowerCase();
-
       const subject =
         $("filterSubject")
           .value;
-
       const status =
         $("filterStatus")
           .value;
-
-
       return questions.filter(question => {
-
         const matchesSearch =
           !search ||
-          String(question.question || "")
+          String(
+            question.question || ""
+          )
             .toLowerCase()
             .includes(search) ||
-          String(question.topic || "")
+          String(
+            question.topic || ""
+          )
             .toLowerCase()
             .includes(search) ||
-          String(question.subject || "")
+          String(
+            question.subject || ""
+          )
             .toLowerCase()
             .includes(search);
-
-
         const matchesSubject =
           !subject ||
           question.subject === subject;
-
-
         const matchesStatus =
           !status ||
           question.status === status;
-
-
         return (
           matchesSearch &&
           matchesSubject &&
           matchesStatus
         );
-
       });
-
     }
-
-
     /* ==========================================================
        RENDER QUESTIONS
     ========================================================== */
-
     function renderQuestions() {
-
       const filtered =
         getFilteredQuestions();
-
-
       $("resultCount").textContent =
         `${filtered.length} question${
-          filtered.length === 1 ? "" : "s"
+          filtered.length === 1
+            ? ""
+            : "s"
         } shown`;
-
-
+      updateBulkUI();
       if (!filtered.length) {
-
         $("questionsTableBody").innerHTML = `
           <tr>
             <td
-              colspan="6"
+              colspan="7"
               class="px-5 py-10 text-center text-slate-500"
             >
               <i class="fa-solid fa-inbox text-2xl mb-3 block"></i>
@@ -1949,28 +1436,43 @@
             </td>
           </tr>
         `;
-
+        $("selectAllCheckbox").checked =
+          false;
+        $("selectAllCheckbox").indeterminate =
+          false;
         return;
       }
-
-
       $("questionsTableBody").innerHTML =
         filtered.map(question => {
-
           const statusClass =
-            getStatusClass(question.status);
-
+            getStatusClass(
+              question.status
+            );
           const difficultyClass =
             getDifficultyClass(
               question.difficulty
             );
-
-
+          const isSelected =
+            selectedQuestionIds.has(
+              question.id
+            );
           return `
-            <tr class="border-t border-slate-100 hover:bg-slate-50">
-
+            <tr
+              class="border-t border-slate-100
+                     hover:bg-slate-50"
+            >
+              <td class="px-4 py-4 text-center">
+                <input
+                  type="checkbox"
+                  class="question-checkbox w-4 h-4
+                         accent-blue-600"
+                  data-question-id="${escapeHtml(
+                    question.id
+                  )}"
+                  ${isSelected ? "checked" : ""}
+                >
+              </td>
               <td class="px-5 py-4">
-
                 <div
                   class="font-semibold text-slate-800
                          max-w-[380px]"
@@ -1979,75 +1481,62 @@
                     question.question || ""
                   )}
                 </div>
-
               </td>
-
-
               <td class="px-5 py-4">
-
                 <span class="text-sm">
                   ${escapeHtml(
                     question.subject || ""
                   )}
                 </span>
-
               </td>
-
-
               <td class="px-5 py-4">
-
-                <span class="text-sm text-slate-500">
+                <span
+                  class="text-sm text-slate-500"
+                >
                   ${escapeHtml(
                     question.topic || "—"
                   )}
                 </span>
-
               </td>
-
-
               <td class="px-5 py-4">
-
                 <span
                   class="inline-flex px-2.5 py-1
                          rounded-full text-xs
-                         font-semibold ${difficultyClass}"
+                         font-semibold
+                         ${difficultyClass}"
                 >
                   ${escapeHtml(
                     capitalize(
-                      question.difficulty || "medium"
+                      question.difficulty ||
+                      "medium"
                     )
                   )}
                 </span>
-
               </td>
-
-
               <td class="px-5 py-4">
-
                 <span
                   class="inline-flex px-2.5 py-1
                          rounded-full text-xs
-                         font-semibold ${statusClass}"
+                         font-semibold
+                         ${statusClass}"
                 >
                   ${escapeHtml(
                     capitalize(
-                      question.status || "pending"
+                      question.status ||
+                      "pending"
                     )
                   )}
                 </span>
-
               </td>
-
-
               <td class="px-5 py-4">
-
                 <div
                   class="flex justify-end gap-2"
                 >
-
                   <button
                     type="button"
-                    onclick="viewQuestion('${question.id}')"
+                    onclick="viewQuestion('${escapeJs(
+                      question.id
+                    )}')"
                     class="w-9 h-9 rounded-lg
                            bg-slate-100
                            hover:bg-slate-200
@@ -2056,11 +1545,11 @@
                   >
                     <i class="fa-solid fa-eye"></i>
                   </button>
-
-
                   <button
                     type="button"
-                    onclick="editQuestion('${question.id}')"
+                    onclick="editQuestion('${escapeJs(
+                      question.id
+                    )}')"
                     class="w-9 h-9 rounded-lg
                            bg-blue-100
                            hover:bg-blue-200
@@ -2069,49 +1558,53 @@
                   >
                     <i class="fa-solid fa-pen"></i>
                   </button>
-
-
                   ${
-                    question.status !== "approved"
-                    ? `
-                      <button
-                        type="button"
-                        onclick="changeQuestionStatus('${question.id}', 'approved')"
-                        class="w-9 h-9 rounded-lg
-                               bg-green-100
-                               hover:bg-green-200
-                               text-green-700"
-                        title="Approve"
-                      >
-                        <i class="fa-solid fa-check"></i>
-                      </button>
-                    `
-                    : ""
+                    question.status !==
+                    "approved"
+                      ? `
+                        <button
+                          type="button"
+                          onclick="changeQuestionStatus(
+                            '${escapeJs(question.id)}',
+                            'approved'
+                          )"
+                          class="w-9 h-9 rounded-lg
+                                 bg-green-100
+                                 hover:bg-green-200
+                                 text-green-700"
+                          title="Approve"
+                        >
+                          <i class="fa-solid fa-check"></i>
+                        </button>
+                      `
+                      : ""
                   }
-
-
                   ${
-                    question.status !== "rejected"
-                    ? `
-                      <button
-                        type="button"
-                        onclick="changeQuestionStatus('${question.id}', 'rejected')"
-                        class="w-9 h-9 rounded-lg
-                               bg-red-100
-                               hover:bg-red-200
-                               text-red-700"
-                        title="Reject"
-                      >
-                        <i class="fa-solid fa-xmark"></i>
-                      </button>
-                    `
-                    : ""
+                    question.status !==
+                    "rejected"
+                      ? `
+                        <button
+                          type="button"
+                          onclick="changeQuestionStatus(
+                            '${escapeJs(question.id)}',
+                            'rejected'
+                          )"
+                          class="w-9 h-9 rounded-lg
+                                 bg-red-100
+                                 hover:bg-red-200
+                                 text-red-700"
+                          title="Reject"
+                        >
+                          <i class="fa-solid fa-xmark"></i>
+                        </button>
+                      `
+                      : ""
                   }
-
-
                   <button
                     type="button"
-                    onclick="deleteQuestion('${question.id}')"
+                    onclick="deleteQuestion('${escapeJs(
+                      question.id
+                    )}')"
                     class="w-9 h-9 rounded-lg
                            bg-red-100
                            hover:bg-red-200
@@ -2120,830 +1613,816 @@
                   >
                     <i class="fa-solid fa-trash"></i>
                   </button>
-
                 </div>
-
               </td>
-
             </tr>
           `;
-
         }).join("");
-
+      attachQuestionCheckboxListeners();
+      updateSelectAllState();
     }
-
-
     /* ==========================================================
        STATUS STYLING
     ========================================================== */
-
     function getStatusClass(status) {
-
       if (status === "approved") {
-
         return "bg-green-100 text-green-700";
-
       }
-
       if (status === "rejected") {
-
         return "bg-red-100 text-red-700";
-
       }
-
       return "bg-amber-100 text-amber-700";
-
     }
-
-
     function getDifficultyClass(difficulty) {
-
       if (difficulty === "easy") {
-
         return "bg-green-100 text-green-700";
-
       }
-
       if (difficulty === "hard") {
-
         return "bg-red-100 text-red-700";
-
       }
-
       return "bg-blue-100 text-blue-700";
-
     }
-
-
+    /* ==========================================================
+       QUESTION CHECKBOXES
+    ========================================================== */
+    function attachQuestionCheckboxListeners() {
+      document
+        .querySelectorAll(
+          ".question-checkbox"
+        )
+        .forEach(checkbox => {
+          checkbox.addEventListener(
+            "change",
+            function() {
+              const id =
+                this.dataset.questionId;
+              if (this.checked) {
+                selectedQuestionIds.add(id);
+              } else {
+                selectedQuestionIds.delete(id);
+              }
+              updateBulkUI();
+              updateSelectAllState();
+            }
+          );
+        });
+    }
+    /* ==========================================================
+       SELECT ALL
+    ========================================================== */
+    $("selectAllCheckbox")
+      .addEventListener(
+        "change",
+        function() {
+          const filtered =
+            getFilteredQuestions();
+          filtered.forEach(question => {
+            if (this.checked) {
+              selectedQuestionIds.add(
+                question.id
+              );
+            } else {
+              selectedQuestionIds.delete(
+                question.id
+              );
+            }
+          });
+          renderQuestions();
+        }
+      );
+    function updateSelectAllState() {
+      const filtered =
+        getFilteredQuestions();
+      if (!filtered.length) {
+        $("selectAllCheckbox").checked =
+          false;
+        $("selectAllCheckbox").indeterminate =
+          false;
+        return;
+      }
+      const selectedVisible =
+        filtered.filter(
+          question =>
+            selectedQuestionIds.has(
+              question.id
+            )
+        ).length;
+      $("selectAllCheckbox").checked =
+        selectedVisible ===
+        filtered.length;
+      $("selectAllCheckbox").indeterminate =
+        selectedVisible > 0 &&
+        selectedVisible <
+          filtered.length;
+    }
+    function updateBulkUI() {
+      const count =
+        selectedQuestionIds.size;
+      $("selectedCountText").textContent =
+        `${count} question${
+          count === 1 ? "" : "s"
+        } selected`;
+      if (count > 0) {
+        $("bulkActionBar")
+          .classList.remove("hidden");
+      } else {
+        $("bulkActionBar")
+          .classList.add("hidden");
+      }
+    }
+    $("clearSelectionButton")
+      .addEventListener(
+        "click",
+        function() {
+          selectedQuestionIds.clear();
+          renderQuestions();
+        }
+      );
+    /* ==========================================================
+       APPROVE ALL PENDING
+    ========================================================== */
+    $("approveAllPendingButton")
+      .addEventListener(
+        "click",
+        approveAllPendingQuestions
+      );
+    async function approveAllPendingQuestions() {
+      if (!await verifyAdminSession()) {
+        return;
+      }
+      const pendingQuestions =
+        questions.filter(
+          question =>
+            String(question.status)
+              .toLowerCase() ===
+            "pending"
+        );
+      if (!pendingQuestions.length) {
+        alert(
+          "There are no pending questions to approve."
+        );
+        return;
+      }
+      const confirmed =
+        confirm(
+          `You are about to approve ${pendingQuestions.length} pending question${
+            pendingQuestions.length === 1
+              ? ""
+              : "s"
+          }.\n\n` +
+          "This will make them available as approved Exam Vault questions.\n\n" +
+          "Continue?"
+        );
+      if (!confirmed) {
+        return;
+      }
+      const button =
+        $("approveAllPendingButton");
+      const originalText =
+        button.innerHTML;
+      button.disabled = true;
+      button.innerHTML =
+        '<span class="loading-spinner mr-2"></span> Approving...';
+      try {
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from("exam_vault_questions")
+            .update({
+              status: "approved"
+            })
+            .eq("status", "pending")
+            .select("id, status");
+        if (error) {
+          throw error;
+        }
+        const updatedCount =
+          data?.length || 0;
+        selectedQuestionIds.clear();
+        await loadQuestions();
+        alert(
+          `${updatedCount} question${
+            updatedCount === 1
+              ? ""
+              : "s"
+          } approved successfully.`
+        );
+      } catch (error) {
+        console.error(
+          "Approve all pending error:",
+          error
+        );
+        alert(
+          error.message ||
+          "Unable to approve all pending questions."
+        );
+      } finally {
+        button.disabled = false;
+        button.innerHTML =
+          originalText;
+      }
+    }
+    /* ==========================================================
+       APPROVE SELECTED
+    ========================================================== */
+    $("approveSelectedButton")
+      .addEventListener(
+        "click",
+        function() {
+          bulkChangeSelectedStatus(
+            "approved"
+          );
+        }
+      );
+    /* ==========================================================
+       REJECT SELECTED
+    ========================================================== */
+    $("rejectSelectedButton")
+      .addEventListener(
+        "click",
+        function() {
+          bulkChangeSelectedStatus(
+            "rejected"
+          );
+        }
+      );
+    /* ==========================================================
+       BULK STATUS CHANGE
+    ========================================================== */
+    async function bulkChangeSelectedStatus(
+      newStatus
+    ) {
+      if (!await verifyAdminSession()) {
+        return;
+      }
+      const ids =
+        [...selectedQuestionIds];
+      if (!ids.length) {
+        alert(
+          "Please select at least one question first."
+        );
+        return;
+      }
+      const actionText =
+        newStatus === "approved"
+          ? "approve"
+          : "reject";
+      const confirmed =
+        confirm(
+          `Are you sure you want to ${actionText} ${ids.length} selected question${
+            ids.length === 1
+              ? ""
+              : "s"
+          }?`
+        );
+      if (!confirmed) {
+        return;
+      }
+      const button =
+        newStatus === "approved"
+          ? $("approveSelectedButton")
+          : $("rejectSelectedButton");
+      const originalText =
+        button.innerHTML;
+      button.disabled = true;
+      button.innerHTML =
+        '<span class="loading-spinner mr-2"></span> Updating...';
+      try {
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from("exam_vault_questions")
+            .update({
+              status: newStatus
+            })
+            .in("id", ids)
+            .select("id, status");
+        if (error) {
+          throw error;
+        }
+        const updatedCount =
+          data?.length || 0;
+        selectedQuestionIds.clear();
+        await loadQuestions();
+        alert(
+          `${updatedCount} question${
+            updatedCount === 1
+              ? ""
+              : "s"
+          } ${actionText}ed successfully.`
+        );
+      } catch (error) {
+        console.error(
+          "Bulk status update error:",
+          error
+        );
+        alert(
+          error.message ||
+          "Unable to update the selected questions."
+        );
+      } finally {
+        button.disabled = false;
+        button.innerHTML =
+          originalText;
+      }
+    }
+    /* ==========================================================
+       VERIFY ADMIN SESSION
+    ========================================================== */
+    async function verifyAdminSession() {
+      if (
+        !currentUser ||
+        !isAdminEmail(
+          currentUser.email
+        )
+      ) {
+        alert(
+          "Administrator authentication required."
+        );
+        await logoutAdmin();
+        return false;
+      }
+      try {
+        const {
+          data,
+          error
+        } =
+          await supabaseClient.auth.getUser();
+        if (error) {
+          throw error;
+        }
+        const user =
+          data?.user;
+        if (
+          !user ||
+          !isAdminEmail(
+            user.email
+          )
+        ) {
+          alert(
+            "The current Supabase session is not authorized as an administrator."
+          );
+          await logoutAdmin();
+          return false;
+        }
+        return true;
+      } catch (error) {
+        console.error(
+          "Admin verification error:",
+          error
+        );
+        alert(
+          "Unable to verify your administrator session."
+        );
+        return false;
+      }
+    }
     /* ==========================================================
        SAVE QUESTION
     ========================================================== */
-
-    $("questionForm").addEventListener(
-      "submit",
-      async function(event) {
-
-        event.preventDefault();
-
-
-        if (!currentUser ||
-            !isAdminEmail(currentUser.email)) {
-
-          alert(
-            "Your administrator session is no longer valid."
-          );
-
-          await logoutAdmin();
-
-          return;
-        }
-
-
-        const subject =
-          $("subject").value.trim();
-
-        const topic =
-          $("topic").value.trim();
-
-        const question =
-          $("question").value.trim();
-
-        const optionA =
-          $("optionA").value.trim();
-
-        const optionB =
-          $("optionB").value.trim();
-
-        const optionC =
-          $("optionC").value.trim();
-
-        const optionD =
-          $("optionD").value.trim();
-
-        const correctAnswer =
-          $("correctAnswer").value;
-
-        const difficulty =
-          $("difficulty").value;
-
-        const status =
-          $("status").value;
-
-        const explanation =
-          $("explanation").value.trim();
-
-        const source =
-          $("source").value.trim();
-
-        const school =
-          $("school").value.trim();
-
-        const academicYear =
-          $("academicYear").value.trim();
-
-
-        if (
-          !subject ||
-          !question ||
-          !optionA ||
-          !optionB ||
-          !optionC ||
-          !optionD ||
-          !correctAnswer
-        ) {
-
-          showFormMessage(
-            "Please complete all required fields.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        const payload = {
-
-          subject,
-
-          topic:
-            topic || null,
-
-          question,
-
-          option_a:
-            optionA,
-
-          option_b:
-            optionB,
-
-          option_c:
-            optionC,
-
-          option_d:
-            optionD,
-
-          correct_answer:
-            correctAnswer,
-
-          explanation:
-            explanation || null,
-
-          difficulty,
-
-          source:
-            source || null,
-
-          school:
-            school || null,
-
-          academic_year:
-            academicYear || null,
-
-          status
-
-        };
-
-
-        const button =
-          $("saveQuestionButton");
-
-        button.disabled = true;
-
-        button.innerHTML =
-          '<span class="loading-spinner mr-2"></span> Saving...';
-
-
-        try {
-
-          let result;
-
-
-          if (editingQuestionId) {
-
-            result =
-              await supabaseClient
-                .from("exam_vault_questions")
-                .update(payload)
-                .eq(
-                  "id",
-                  editingQuestionId
-                );
-
-          } else {
-
-            result =
-              await supabaseClient
-                .from("exam_vault_questions")
-                .insert(payload);
-
+    $("questionForm")
+      .addEventListener(
+        "submit",
+        async event => {
+          event.preventDefault();
+          if (!await verifyAdminSession()) {
+            return;
           }
-
-
-          if (result.error) {
-
-            throw result.error;
-
+          const subject =
+            $("subject").value.trim();
+          const topic =
+            $("topic").value.trim();
+          const question =
+            $("question").value.trim();
+          const optionA =
+            $("optionA").value.trim();
+          const optionB =
+            $("optionB").value.trim();
+          const optionC =
+            $("optionC").value.trim();
+          const optionD =
+            $("optionD").value.trim();
+          const correctAnswer =
+            $("correctAnswer").value;
+          const difficulty =
+            $("difficulty").value;
+          const status =
+            $("status").value;
+          const explanation =
+            $("explanation").value.trim();
+          const source =
+            $("source").value.trim();
+          const school =
+            $("school").value.trim();
+          const academicYear =
+            $("academicYear").value.trim();
+          if (
+            !subject ||
+            !question ||
+            !optionA ||
+            !optionB ||
+            !optionC ||
+            !optionD ||
+            !correctAnswer
+          ) {
+            showFormMessage(
+              "Please complete all required fields.",
+              "error"
+            );
+            return;
           }
-
-
-          showFormMessage(
-            editingQuestionId
-              ? "Question updated successfully."
-              : "Question added successfully.",
-            "success"
-          );
-
-
-          resetQuestionForm();
-
-          await loadQuestions();
-
-        } catch (error) {
-
-          console.error(
-            "Save question error:",
-            error
-          );
-
-
-          showFormMessage(
-            error.message ||
-            "Unable to save question.",
-            "error"
-          );
-
-        } finally {
-
-          button.disabled = false;
-
+          const payload = {
+            subject,
+            topic:
+              topic || null,
+            question,
+            option_a:
+              optionA,
+            option_b:
+              optionB,
+            option_c:
+              optionC,
+            option_d:
+              optionD,
+            correct_answer:
+              correctAnswer,
+            explanation:
+              explanation || null,
+            difficulty,
+            source:
+              source || null,
+            school:
+              school || null,
+            academic_year:
+              academicYear || null,
+            status
+          };
+          const button =
+            $("saveQuestionButton");
+          button.disabled = true;
           button.innerHTML =
-            '<i class="fa-solid fa-floppy-disk mr-2"></i> Save Question';
-
+            '<span class="loading-spinner mr-2"></span> Saving...';
+          try {
+            let result;
+            if (editingQuestionId) {
+              result =
+                await supabaseClient
+                  .from(
+                    "exam_vault_questions"
+                  )
+                  .update(payload)
+                  .eq(
+                    "id",
+                    editingQuestionId
+                  );
+            } else {
+              result =
+                await supabaseClient
+                  .from(
+                    "exam_vault_questions"
+                  )
+                  .insert(payload);
+            }
+            if (result.error) {
+              throw result.error;
+            }
+            showFormMessage(
+              editingQuestionId
+                ? "Question updated successfully."
+                : "Question added successfully.",
+              "success"
+            );
+            resetQuestionForm();
+            await loadQuestions();
+          } catch (error) {
+            console.error(
+              "Save question error:",
+              error
+            );
+            showFormMessage(
+              error.message ||
+              "Unable to save question.",
+              "error"
+            );
+          } finally {
+            button.disabled = false;
+            button.innerHTML =
+              '<i class="fa-solid fa-floppy-disk mr-2"></i> Save Question';
+          }
         }
-
-      }
-    );
-
-
+      );
     /* ==========================================================
        EDIT QUESTION
     ========================================================== */
-
-    window.deleteQuestion =
-  async function(id) {
-
-    if (
-      !currentUser ||
-      !isAdminEmail(currentUser.email)
-    ) {
-
-      alert(
-        "Administrator authentication required."
-      );
-
-      await logoutAdmin();
-
-      return;
-    }
-
-
-    const question =
-      questions.find(
-        item => item.id === id
-      );
-
-
-    if (!question) {
-
-      alert(
-        "Question could not be found."
-      );
-
-      return;
-    }
-
-
-    if (
-      !confirm(
-        "Delete this question permanently?"
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    try {
-
-      const {
-        error
-      } =
-        await supabaseClient
-          .from("exam_vault_questions")
-          .delete()
-          .eq("id", id);
-
-
-      if (error) {
-
-        console.error(
-          "Delete error:",
-          error
-        );
-
-        throw error;
-      }
-
-
-      await loadQuestions();
-
-
-      alert(
-        "Question deleted successfully."
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Delete error:",
-        error
-      );
-
-
-      alert(
-        error.message ||
-        "Unable to delete question."
-      );
-
-    }
-
-  };
-
-    /* ==========================================================
-       CANCEL EDIT
-    ========================================================== */
-
-    $("cancelEditButton").addEventListener(
-      "click",
-      resetQuestionForm
-    );
-
-
-    /* ==========================================================
-       RESET FORM
-    ========================================================== */
-
-    $("resetFormButton").addEventListener(
-      "click",
-      resetQuestionForm
-    );
-
-
-    function resetQuestionForm() {
-
-      editingQuestionId =
-        null;
-
-      $("editingQuestionId").value =
-        "";
-
-      $("questionForm").reset();
-
-      $("difficulty").value =
-        "medium";
-
-      $("status").value =
-        "pending";
-
-      $("formTitle").textContent =
-        "Add Exam Vault Question";
-
-      $("cancelEditButton")
-        .classList.add("hidden");
-
-      hideFormMessage();
-
-    }
-
-
-    /* ==========================================================
-       CHANGE STATUS
-    ========================================================== */
-
-    window.changeQuestionStatus =
-  async function(id, newStatus) {
-
-    if (
-      !currentUser ||
-      !isAdminEmail(currentUser.email)
-    ) {
-
-      alert(
-        "Administrator authentication required."
-      );
-
-      await logoutAdmin();
-
-      return;
-    }
-
-
-    /* ----------------------------------------------------------
-       VERIFY THE REAL SUPABASE AUTHENTICATED USER
-    ---------------------------------------------------------- */
-
-    const {
-      data: userData,
-      error: userError
-    } = await supabaseClient.auth.getUser();
-
-    if (userError) {
-
-      console.error(
-        "Authenticated user check failed:",
-        userError
-      );
-
-      alert(
-        "Unable to verify your administrator session."
-      );
-
-      return;
-    }
-
-    const authenticatedUser =
-      userData?.user;
-
-    const authenticatedEmail =
-      normalizeEmail(
-        authenticatedUser?.email
-      );
-
-    console.log(
-      "PulsePrep Exam Vault authenticated user:",
-      authenticatedEmail
-    );
-
-    if (
-      !authenticatedUser ||
-      !isAdminEmail(authenticatedEmail)
-    ) {
-
-      alert(
-        "The current Supabase session is not authorized as an administrator."
-      );
-
-      await logoutAdmin();
-
-      return;
-    }
-
-
-    const question =
-      questions.find(
-        item => item.id === id
-      );
-
-
-    if (!question) {
-
-      alert(
-        "Question could not be found."
-      );
-
-      return;
-    }
-
-
-    const actionText =
-      newStatus === "approved"
-        ? "approve"
-        : "reject";
-
-
-    if (
-      !confirm(
-        `Are you sure you want to ${actionText} this question?`
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    try {
-
-      console.log(
-        "Attempting Exam Vault status update:",
-        {
-          questionId: id,
-          newStatus,
-          authenticatedEmail
-        }
-      );
-
-
-      const {
-        data: updatedRows,
-        error
-      } =
-        await supabaseClient
-          .from("exam_vault_questions")
-          .update({
-            status: newStatus
-          })
-          .eq("id", id)
-          .select("id, status");
-
-
-      if (error) {
-
-        console.error(
-          "Supabase status update error:",
-          {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-          }
-        );
-
-        throw error;
-      }
-
-
-      if (
-        !updatedRows ||
-        updatedRows.length === 0
-      ) {
-
-        console.error(
-          "Exam Vault status update affected 0 rows:",
-          {
-            questionId: id,
-            newStatus,
-            authenticatedEmail
-          }
-        );
-
-        throw new Error(
-          "Supabase matched 0 rows. " +
-          "The question was not updated."
-        );
-      }
-
-
-      console.log(
-        "Exam Vault status update successful:",
-        updatedRows
-      );
-
-
-      await loadQuestions();
-
-
-      alert(
-        newStatus === "approved"
-          ? "Question approved successfully."
-          : "Question rejected successfully."
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Status update error:",
-        error
-      );
-
-
-      alert(
-        error.message ||
-        "Unable to update question status."
-      );
-
-    }
-
-  };
-
-    /* ==========================================================
-       DELETE QUESTION
-    ========================================================== */
-
-    window.deleteQuestion =
-      async function(id) {
-
-        if (!currentUser ||
-            !isAdminEmail(currentUser.email)) {
-
-          alert(
-            "Administrator authentication required."
-          );
-
-          await logoutAdmin();
-
-          return;
-        }
-
-
+    window.editQuestion =
+      function(id) {
         const question =
           questions.find(
             item => item.id === id
           );
-
-
-        if (!question) return;
-
-
+        if (!question) {
+          alert(
+            "Question could not be found."
+          );
+          return;
+        }
+        editingQuestionId =
+          id;
+        $("editingQuestionId").value =
+          id;
+        $("subject").value =
+          question.subject || "";
+        $("topic").value =
+          question.topic || "";
+        $("question").value =
+          question.question || "";
+        $("optionA").value =
+          question.option_a || "";
+        $("optionB").value =
+          question.option_b || "";
+        $("optionC").value =
+          question.option_c || "";
+        $("optionD").value =
+          question.option_d || "";
+        $("correctAnswer").value =
+          question.correct_answer || "";
+        $("difficulty").value =
+          question.difficulty ||
+          "medium";
+        $("status").value =
+          question.status ||
+          "pending";
+        $("explanation").value =
+          question.explanation || "";
+        $("source").value =
+          question.source || "";
+        $("school").value =
+          question.school || "";
+        $("academicYear").value =
+          question.academic_year || "";
+        $("formTitle").textContent =
+          "Edit Exam Vault Question";
+        $("cancelEditButton")
+          .classList.remove("hidden");
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      };
+    /* ==========================================================
+       CANCEL / RESET
+    ========================================================== */
+    $("cancelEditButton")
+      .addEventListener(
+        "click",
+        resetQuestionForm
+      );
+    $("resetFormButton")
+      .addEventListener(
+        "click",
+        resetQuestionForm
+      );
+    function resetQuestionForm() {
+      editingQuestionId =
+        null;
+      $("editingQuestionId").value =
+        "";
+      $("questionForm").reset();
+      $("difficulty").value =
+        "medium";
+      $("status").value =
+        "pending";
+      $("formTitle").textContent =
+        "Add Exam Vault Question";
+      $("cancelEditButton")
+        .classList.add("hidden");
+      hideFormMessage();
+    }
+    /* ==========================================================
+       INDIVIDUAL STATUS CHANGE
+    ========================================================== */
+    window.changeQuestionStatus =
+      async function(id, newStatus) {
+        if (!await verifyAdminSession()) {
+          return;
+        }
+        const question =
+          questions.find(
+            item => item.id === id
+          );
+        if (!question) {
+          alert(
+            "Question could not be found."
+          );
+          return;
+        }
+        const actionText =
+          newStatus === "approved"
+            ? "approve"
+            : "reject";
+        if (
+          !confirm(
+            `Are you sure you want to ${actionText} this question?`
+          )
+        ) {
+          return;
+        }
+        try {
+          const {
+            data,
+            error
+          } =
+            await supabaseClient
+              .from(
+                "exam_vault_questions"
+              )
+              .update({
+                status: newStatus
+              })
+              .eq(
+                "id",
+                id
+              )
+              .select(
+                "id, status"
+              );
+          if (error) {
+            throw error;
+          }
+          if (
+            !data ||
+            data.length === 0
+          ) {
+            throw new Error(
+              "Supabase matched 0 rows. " +
+              "The question was not updated."
+            );
+          }
+          await loadQuestions();
+          alert(
+            newStatus === "approved"
+              ? "Question approved successfully."
+              : "Question rejected successfully."
+          );
+        } catch (error) {
+          console.error(
+            "Status update error:",
+            error
+          );
+          alert(
+            error.message ||
+            "Unable to update question status."
+          );
+        }
+      };
+    /* ==========================================================
+       DELETE QUESTION
+    ========================================================== */
+    window.deleteQuestion =
+      async function(id) {
+        if (!await verifyAdminSession()) {
+          return;
+        }
+        const question =
+          questions.find(
+            item => item.id === id
+          );
+        if (!question) {
+          alert(
+            "Question could not be found."
+          );
+          return;
+        }
         if (
           !confirm(
             "Delete this question permanently?"
           )
         ) {
-
           return;
-
         }
-
-
         try {
-
           const {
-  data: updatedRows,
-  error
-} = await supabaseClient
-  .from("exam_vault_questions")
-  .update({
-    status: newStatus
-  })
-  .eq("id", id)
-  .select("id, status");
-
-if (error) {
-  console.error("Supabase status update error:", {
-    message: error.message,
-    details: error.details,
-    hint: error.hint,
-    code: error.code
-  });
-
-  throw error;
-}
-
-/*
-  IMPORTANT:
-  If Supabase returns zero rows, the update did not
-  actually affect the question.
-*/
-if (!updatedRows || updatedRows.length === 0) {
-
-  console.error(
-    "Status update affected 0 rows.",
-    {
-      id,
-      newStatus,
-      currentUser: currentUser?.email
-    }
-  );
-
-  throw new Error(
-    "The question was not updated. Supabase matched 0 rows. " +
-    "Your admin session or RLS policy is preventing this update."
-  );
-}
-
-console.log(
-  "Exam Vault status updated successfully:",
-  updatedRows
-);
-
-await loadQuestions();
-
+            error
+          } =
+            await supabaseClient
+              .from(
+                "exam_vault_questions"
+              )
+              .delete()
+              .eq(
+                "id",
+                id
+              );
+          if (error) {
+            throw error;
+          }
+          selectedQuestionIds.delete(id);
+          await loadQuestions();
+          alert(
+            "Question deleted successfully."
+          );
         } catch (error) {
-
           console.error(
             "Delete error:",
             error
           );
-
-
           alert(
             error.message ||
             "Unable to delete question."
           );
-
         }
-
       };
-
-
     /* ==========================================================
        VIEW QUESTION
     ========================================================== */
-
     window.viewQuestion =
       function(id) {
-
         const question =
           questions.find(
             item => item.id === id
           );
-
-
-        if (!question) return;
-
-
+        if (!question) {
+          return;
+        }
         $("modalContent").innerHTML = `
-
           <div class="space-y-6">
-
             <div>
-
-              <p class="text-xs font-bold uppercase
-                        text-slate-500 mb-2">
+              <p
+                class="text-xs font-bold uppercase
+                       text-slate-500 mb-2"
+              >
                 Subject
               </p>
-
               <p class="font-semibold">
                 ${escapeHtml(
-                  question.subject || "—"
+                  question.subject ||
+                  "—"
                 )}
               </p>
-
             </div>
-
-
             <div>
-
-              <p class="text-xs font-bold uppercase
-                        text-slate-500 mb-2">
+              <p
+                class="text-xs font-bold uppercase
+                       text-slate-500 mb-2"
+              >
                 Topic
               </p>
-
               <p>
                 ${escapeHtml(
-                  question.topic || "—"
+                  question.topic ||
+                  "—"
                 )}
               </p>
-
             </div>
-
-
             <div>
-
-              <p class="text-xs font-bold uppercase
-                        text-slate-500 mb-2">
+              <p
+                class="text-xs font-bold uppercase
+                       text-slate-500 mb-2"
+              >
                 Question
               </p>
-
               <p class="font-semibold leading-7">
                 ${escapeHtml(
-                  question.question || ""
+                  question.question ||
+                  ""
                 )}
               </p>
-
             </div>
-
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-
+            <div
+              class="grid grid-cols-1 md:grid-cols-2 gap-3"
+            >
               ${renderOption(
                 "A",
                 question.option_a,
                 question.correct_answer
               )}
-
               ${renderOption(
                 "B",
                 question.option_b,
                 question.correct_answer
               )}
-
               ${renderOption(
                 "C",
                 question.option_c,
                 question.correct_answer
               )}
-
               ${renderOption(
                 "D",
                 question.option_d,
                 question.correct_answer
               )}
-
             </div>
-
-
             <div>
-
-              <p class="text-xs font-bold uppercase
-                        text-slate-500 mb-2">
+              <p
+                class="text-xs font-bold uppercase
+                       text-slate-500 mb-2"
+              >
                 Explanation
               </p>
-
               <div
                 class="bg-slate-50 rounded-xl p-4
                        leading-7"
@@ -2953,100 +2432,81 @@ await loadQuestions();
                   "No explanation provided."
                 )}
               </div>
-
             </div>
-
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-
-              <div class="bg-slate-50 rounded-xl p-3">
-
+            <div
+              class="grid grid-cols-2
+                     md:grid-cols-4 gap-3"
+            >
+              <div
+                class="bg-slate-50 rounded-xl p-3"
+              >
                 <p class="text-xs text-slate-500">
                   Difficulty
                 </p>
-
                 <p class="font-semibold mt-1">
                   ${escapeHtml(
                     capitalize(
-                      question.difficulty || "medium"
+                      question.difficulty ||
+                      "medium"
                     )
                   )}
                 </p>
-
               </div>
-
-
-              <div class="bg-slate-50 rounded-xl p-3">
-
+              <div
+                class="bg-slate-50 rounded-xl p-3"
+              >
                 <p class="text-xs text-slate-500">
                   Status
                 </p>
-
                 <p class="font-semibold mt-1">
                   ${escapeHtml(
                     capitalize(
-                      question.status || "pending"
+                      question.status ||
+                      "pending"
                     )
                   )}
                 </p>
-
               </div>
-
-
-              <div class="bg-slate-50 rounded-xl p-3">
-
+              <div
+                class="bg-slate-50 rounded-xl p-3"
+              >
                 <p class="text-xs text-slate-500">
                   School
                 </p>
-
                 <p class="font-semibold mt-1">
                   ${escapeHtml(
-                    question.school || "—"
+                    question.school ||
+                    "—"
                   )}
                 </p>
-
               </div>
-
-
-              <div class="bg-slate-50 rounded-xl p-3">
-
+              <div
+                class="bg-slate-50 rounded-xl p-3"
+              >
                 <p class="text-xs text-slate-500">
                   Academic Year
                 </p>
-
                 <p class="font-semibold mt-1">
                   ${escapeHtml(
-                    question.academic_year || "—"
+                    question.academic_year ||
+                    "—"
                   )}
                 </p>
-
               </div>
-
             </div>
-
           </div>
-
         `;
-
-
         $("questionModal")
           .classList.remove("hidden");
-
       };
-
-
     function renderOption(
       letter,
       text,
       correctAnswer
     ) {
-
       const isCorrect =
         letter === correctAnswer;
-
-
       return `
-
         <div
           class="rounded-xl border p-4
                  ${
@@ -3055,9 +2515,9 @@ await loadQuestions();
                      : "border-slate-200 bg-white"
                  }"
         >
-
-          <div class="flex items-start gap-3">
-
+          <div
+            class="flex items-start gap-3"
+          >
             <span
               class="font-bold
                      ${
@@ -3068,13 +2528,12 @@ await loadQuestions();
             >
               ${letter}.
             </span>
-
             <span>
-              ${escapeHtml(text || "")}
+              ${escapeHtml(
+                text || ""
+              )}
             </span>
-
           </div>
-
           ${
             isCorrect
               ? `
@@ -3082,106 +2541,80 @@ await loadQuestions();
                   class="text-xs font-bold
                          text-green-700 mt-2"
                 >
-                  <i class="fa-solid fa-check mr-1"></i>
+                  <i
+                    class="fa-solid fa-check mr-1"
+                  ></i>
                   Correct answer
                 </div>
               `
               : ""
           }
-
         </div>
-
       `;
-
     }
-
-
     /* ==========================================================
-       MODAL CLOSE
+       MODAL
     ========================================================== */
-
-    $("closeModalButton").addEventListener(
-      "click",
-      function() {
-
-        $("questionModal")
-          .classList.add("hidden");
-
-      }
-    );
-
-
-    $("questionModal").addEventListener(
-      "click",
-      function(event) {
-
-        if (
-          event.target ===
-          $("questionModal")
-        ) {
-
+    $("closeModalButton")
+      .addEventListener(
+        "click",
+        () => {
           $("questionModal")
             .classList.add("hidden");
-
         }
-
-      }
-    );
-
-
+      );
+    $("questionModal")
+      .addEventListener(
+        "click",
+        event => {
+          if (
+            event.target ===
+            $("questionModal")
+          ) {
+            $("questionModal")
+              .classList.add("hidden");
+          }
+        }
+      );
     /* ==========================================================
-       SEARCH / FILTER EVENTS
+       SEARCH / FILTER
     ========================================================== */
-
-    $("searchInput").addEventListener(
-      "input",
-      renderQuestions
-    );
-
-
-    $("filterSubject").addEventListener(
-      "change",
-      renderQuestions
-    );
-
-
-    $("filterStatus").addEventListener(
-      "change",
-      renderQuestions
-    );
-
-
+    $("searchInput")
+      .addEventListener(
+        "input",
+        renderQuestions
+      );
+    $("filterSubject")
+      .addEventListener(
+        "change",
+        renderQuestions
+      );
+    $("filterStatus")
+      .addEventListener(
+        "change",
+        renderQuestions
+      );
     /* ==========================================================
        REFRESH
     ========================================================== */
-
-    $("refreshButton").addEventListener(
-      "click",
-      async function() {
-
-        await loadQuestions();
-
-      }
-    );
-
-
+    $("refreshButton")
+      .addEventListener(
+        "click",
+        async () => {
+          await loadQuestions();
+        }
+      );
     /* ==========================================================
-       FORM MESSAGE
+       FORM MESSAGES
     ========================================================== */
-
     function showFormMessage(
       message,
       type
     ) {
-
       const element =
         $("formMessage");
-
-
       element.textContent =
         message;
-
-
       element.classList.remove(
         "hidden",
         "bg-red-100",
@@ -3189,71 +2622,55 @@ await loadQuestions();
         "bg-green-100",
         "text-green-700"
       );
-
-
       if (type === "success") {
-
         element.classList.add(
           "bg-green-100",
           "text-green-700"
         );
-
       } else {
-
         element.classList.add(
           "bg-red-100",
           "text-red-700"
         );
-
       }
-
     }
-
-
     function hideFormMessage() {
-
       $("formMessage")
         .classList.add("hidden");
-
       $("formMessage").textContent =
         "";
-
     }
-
-
     /* ==========================================================
        UTILITIES
     ========================================================== */
-
     function capitalize(value) {
-
-      if (!value) return "";
-
-      return value.charAt(0).toUpperCase() +
-        value.slice(1);
-
+      if (!value) {
+        return "";
+      }
+      return (
+        value.charAt(0).toUpperCase() +
+        value.slice(1)
+      );
     }
-
-
     function escapeHtml(value) {
-
       return String(value ?? "")
         .replaceAll("&", "&amp;")
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
-
     }
-
-
+    function escapeJs(value) {
+      return String(value ?? "")
+        .replaceAll("\\", "\\\\")
+        .replaceAll("'", "\\'")
+        .replaceAll("\n", "\\n")
+        .replaceAll("\r", "\\r");
+    }
     /* ==========================================================
-       START AUTHENTICATION
+       START
     ========================================================== */
-
     initializeAuthentication();
-
   </script>
-
 </body>
 </html>
