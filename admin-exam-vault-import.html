@@ -1340,7 +1340,8 @@ async function checkAuth() {
     hide($("accessDeniedScreen"));
     show($("adminApp"));
 
-
+populateSubjects();
+attachEventListeners();
     // Update displayed admin email if the element exists.
     const adminEmailDisplay =
       $("adminEmailDisplay");
