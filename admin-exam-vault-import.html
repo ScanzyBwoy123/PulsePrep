@@ -3148,54 +3148,34 @@ async function saveQuestion(event) {
 
 async function importCsv() {
 
-  const file =
-    $("csvFile").files[0];
-
+  const file = $("csvFile").files[0];
 
   if (!file) {
-
     showToast(
       "Please choose a CSV file first.",
       "error"
     );
-
     return;
   }
 
-
-  const progress =
-    $("importProgress");
-
-  const progressText =
-    $("importProgressText");
-
-  const result =
-    $("importResult");
-
-  const button =
-    $("importCsvButton");
-
+  const progress = $("importProgress");
+  const progressText = $("importProgressText");
+  const result = $("importResult");
+  const button = $("importCsvButton");
 
   hide(result);
   show(progress);
 
-
   button.disabled = true;
-
 
   try {
 
     progressText.textContent =
       "Reading CSV file...";
 
+    const text = await file.text();
 
-    const text =
-      await file.text();
-
-
-    const rows =
-      parseCSV(text);
-
+    const rows = parseCSV(text);
 
     if (!rows.length) {
       throw new Error(
@@ -3203,24 +3183,23 @@ async function importCsv() {
       );
     }
 
+    /*
+     * First row is the CSV header.
+     */
+    const headers = rows[0].map(header =>
+      String(header || "")
+        .trim()
+        .toLowerCase()
+    );
 
-    const headers =
-      rows[0].map(
-        header =>
-          String(header || "")
-            .trim()
-            .toLowerCase()
-      );
-
-
-    const dataRows =
-      rows.slice(1).filter(row =>
+    const dataRows = rows
+      .slice(1)
+      .filter(row =>
         row.some(
           cell =>
             String(cell || "").trim() !== ""
         )
       );
-
 
     if (!dataRows.length) {
       throw new Error(
@@ -3228,49 +3207,68 @@ async function importCsv() {
       );
     }
 
-
     progressText.textContent =
       `Preparing ${dataRows.length} questions...`;
 
+    /*
+     * Normalize every CSV row.
+     */
+    const processedRows = dataRows.map(
+      (row, index) =>
+        csvRowToQuestion(
+          headers,
+          row,
+          index
+        )
+    );
 
-    const questions =
-      dataRows.map(
-        (row, index) =>
-          csvRowToQuestion(
-            headers,
-            row,
-            index
-          )
-      );
+    /*
+     * Find invalid rows.
+     */
+    const invalidRows = processedRows.filter(
+      item => !item.valid
+    );
 
-
-    const invalidRows =
-      questions.filter(
-        question => question.__invalid
-      );
-
-
+    /*
+     * Give detailed errors instead of the old
+     * generic "125 invalid rows" message.
+     */
     if (invalidRows.length) {
 
+      const errorLines = invalidRows
+        .slice(0, 20)
+        .map(item =>
+          `Row ${item.row}: ${item.errors.join(", ")}`
+        );
+
+      let message =
+        `The CSV contains ${invalidRows.length} invalid row(s).\n\n` +
+        errorLines.join("\n");
+
+      if (invalidRows.length > 20) {
+        message +=
+          `\n\n...and ${invalidRows.length - 20} more invalid row(s).`;
+      }
+
+      throw new Error(message);
+    }
+
+    /*
+     * Extract only the actual question data.
+     * Do NOT send the validation wrapper to Supabase.
+     */
+    const questions = processedRows.map(
+      item => item.data
+    );
+
+    if (!questions.length) {
       throw new Error(
-        `The CSV contains ${invalidRows.length} invalid row(s). ` +
-        `Make sure question, subject, options and correct_answer are filled in.`
+        "No valid questions were found in the CSV."
       );
     }
 
-
-    /*
-     * Remove the internal validation property
-     * before sending to Supabase.
-     */
-    questions.forEach(
-      question => delete question.__invalid
-    );
-
-
     progressText.textContent =
       `Importing ${questions.length} questions...`;
-
 
     /*
      * Insert in batches so large files are safer.
@@ -3279,19 +3277,16 @@ async function importCsv() {
 
     let imported = 0;
 
-
     for (
       let i = 0;
       i < questions.length;
       i += batchSize
     ) {
 
-      const batch =
-        questions.slice(
-          i,
-          i + batchSize
-        );
-
+      const batch = questions.slice(
+        i,
+        i + batchSize
+      );
 
       const {
         error
@@ -3299,19 +3294,15 @@ async function importCsv() {
         .from("exam_vault_questions")
         .insert(batch);
 
-
       if (error) {
         throw error;
       }
 
-
       imported += batch.length;
-
 
       progressText.textContent =
         `Imported ${imported} of ${questions.length} questions...`;
     }
-
 
     show(result);
 
@@ -3322,12 +3313,9 @@ async function importCsv() {
       `Successfully imported ${imported} question${imported === 1 ? "" : "s"}. ` +
       `They were added as pending questions. Use "Approve All Pending" to approve them together.`;
 
-
     $("csvFile").value = "";
 
-
     await loadQuestions();
-
 
   } catch (error) {
 
@@ -3336,16 +3324,19 @@ async function importCsv() {
       error
     );
 
-
     show(result);
 
     result.className =
       "mt-5 rounded-xl p-4 text-sm bg-red-50 border border-red-200 text-red-700";
 
+    /*
+     * Preserve line breaks in detailed validation errors.
+     */
+    result.style.whiteSpace = "pre-line";
+
     result.textContent =
       "Import failed: " +
       (error.message || "Unknown error");
-
 
   } finally {
 
