@@ -32,13 +32,21 @@ async function initPulsePrepAuth() {
 
   const { data } = await window.pulseprepSupabase.auth.getSession();
 
-  updateAuthUI(data?.session || null);
+updateAuthUI(data?.session || null);
 
-  window.pulseprepSupabase.auth.onAuthStateChange(
-    (_event, session) => {
-      updateAuthUI(session);
+if (typeof window.refreshPulsePrepAccountUI === "function") {
+  window.refreshPulsePrepAccountUI(data?.session || null);
+}
+
+window.pulseprepSupabase.auth.onAuthStateChange(
+  (_event, session) => {
+    updateAuthUI(session);
+
+    if (typeof window.refreshPulsePrepAccountUI === "function") {
+      window.refreshPulsePrepAccountUI(session);
     }
-  );
+  }
+);
 }
 
 
@@ -94,7 +102,11 @@ async function pulsePrepLogin(email, password) {
 
   updateAuthUI(data.session);
 
-  return data;
+if (typeof window.refreshPulsePrepAccountUI === "function") {
+  window.refreshPulsePrepAccountUI(data.session);
+}
+
+return data;
 }
 
 
