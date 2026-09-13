@@ -3361,120 +3361,281 @@ async function importCsv() {
 ============================================================ */
 
 function csvRowToQuestion(headers, row, index) {
-
-  const get =
-    name => {
-
-      const position =
-        headers.indexOf(name);
-
-      if (position === -1) {
-        return "";
-      }
-
-      return String(
-        row[position] ?? ""
-      ).trim();
-    };
-
-
-  const questionText =
-    get("question");
-
-  const subject =
-    get("subject");
-
-  const optionA =
-    get("option_a");
-
-  const optionB =
-    get("option_b");
-
-  const optionC =
-    get("option_c");
-
-  const optionD =
-    get("option_d");
-
-
-  const correctAnswer =
-    normalizeCorrectAnswer(
-      get("correct_answer")
-    );
-
-
-  const currentYear =
-    String(
-      new Date().getFullYear()
-    );
-
-
-  const question = {
-
-    subject:
-      subject,
-
-    topic:
-      get("topic"),
-
-    question:
-      questionText,
-
-    option_a:
-      optionA,
-
-    option_b:
-      optionB,
-
-    option_c:
-      optionC,
-
-    option_d:
-      optionD,
-
-    correct_answer:
-      correctAnswer,
-
-    explanation:
-      get("explanation"),
-
-    difficulty:
-      get("difficulty") || "medium",
-
-    source:
-      get("source") || "Bulk Import",
-
-    school:
-      get("school") || "",
-
-    academic_year:
-      get("academic_year") || currentYear,
-
-    status:
-      get("status") || "pending"
-  };
-
-
   /*
-   * The old 11-column CSV contains an id column.
-   * We intentionally do NOT import that id.
-   * Supabase generates the table id.
+   * PulsePrep flexible CSV row normalizer
+   *
+   * Accepts:
+   * - question or question_text
+   * - option_a / optionA / A
+   * - option_b / optionB / B
+   * - option_c / optionC / C
+   * - option_d / optionD / D
+   * - correct_answer / correctAnswer / answer
+   * - easy / Easy / EASY
+   * - A / a / A) / Option A
+   *
+   * Also supports optional:
+   * - id
+   * - topic
+   * - source
+   * - school
+   * - academic_year
+   * - status
+   * - explanation
    */
 
+  const cleanHeader = value =>
+    String(value || "")
+      .trim()
+      .toLowerCase()
+      .replace(/^\uFEFF/, "")
+      .replace(/[\s-]+/g, "_");
 
-  question.__invalid =
-    !subject ||
-    !questionText ||
-    !optionA ||
-    !optionB ||
-    !optionC ||
-    !optionD ||
-    !["A", "B", "C", "D"].includes(
-      correctAnswer
-    );
+  const cleanValue = value =>
+    String(value ?? "")
+      .replace(/^\uFEFF/, "")
+      .trim();
 
+  const normalizedHeaders = headers.map(cleanHeader);
 
-  return question;
+  const get = (...names) => {
+    for (const name of names) {
+      const key = cleanHeader(name);
+      const position = normalizedHeaders.indexOf(key);
+
+      if (position !== -1 && row[position] !== undefined) {
+        return cleanValue(row[position]);
+      }
+    }
+
+    return "";
+  };
+
+  const id = get("id");
+
+  const subject = get(
+    "subject",
+    "subject_name"
+  );
+
+  const topic = get(
+    "topic",
+    "topic_name"
+  );
+
+  const difficultyRaw = get(
+    "difficulty",
+    "level"
+  );
+
+  const source = get(
+    "source",
+    "question_source"
+  );
+
+  const school = get(
+    "school",
+    "school_name",
+    "institution"
+  );
+
+  const academicYear = get(
+    "academic_year",
+    "academicyear",
+    "year"
+  );
+
+  const questionText = get(
+    "question_text",
+    "question",
+    "question_text_",
+    "question_body"
+  );
+
+  const optionA = get(
+    "option_a",
+    "optiona",
+    "a",
+    "choice_a",
+    "answer_a"
+  );
+
+  const optionB = get(
+    "option_b",
+    "optionb",
+    "b",
+    "choice_b",
+    "answer_b"
+  );
+
+  const optionC = get(
+    "option_c",
+    "optionc",
+    "c",
+    "choice_c",
+    "answer_c"
+  );
+
+  const optionD = get(
+    "option_d",
+    "optiond",
+    "d",
+    "choice_d",
+    "answer_d"
+  );
+
+  const correctAnswerRaw = get(
+    "correct_answer",
+    "correctanswer",
+    "correct",
+    "answer",
+    "correct_option"
+  );
+
+  const statusRaw = get(
+    "status",
+    "question_status"
+  );
+
+  const explanation = get(
+    "explanation",
+    "answer_explanation",
+    "rationale"
+  );
+
+  // Normalize difficulty to the exact database values.
+  let difficulty = difficultyRaw.toLowerCase();
+
+  if (difficulty === "easy" || difficulty === "e") {
+    difficulty = "easy";
+  } else if (
+    difficulty === "medium" ||
+    difficulty === "med" ||
+    difficulty === "moderate" ||
+    difficulty === "m"
+  ) {
+    difficulty = "medium";
+  } else if (
+    difficulty === "hard" ||
+    difficulty === "difficult" ||
+    difficulty === "h"
+  ) {
+    difficulty = "hard";
+  } else {
+    difficulty = "medium";
+  }
+
+  // Normalize correct answer to A/B/C/D.
+  let correctAnswer = correctAnswerRaw
+    .trim()
+    .toUpperCase()
+    .replace(/[.)]/g, "")
+    .trim();
+
+  if (correctAnswer.includes("OPTION A")) {
+    correctAnswer = "A";
+  } else if (correctAnswer.includes("OPTION B")) {
+    correctAnswer = "B";
+  } else if (correctAnswer.includes("OPTION C")) {
+    correctAnswer = "C";
+  } else if (correctAnswer.includes("OPTION D")) {
+    correctAnswer = "D";
+  } else if (
+    correctAnswer === "A" ||
+    correctAnswer === "B" ||
+    correctAnswer === "C" ||
+    correctAnswer === "D"
+  ) {
+    // Already valid.
+  } else {
+    // Try the existing PulsePrep normalizer if available.
+    if (typeof normalizeCorrectAnswer === "function") {
+      const normalized = normalizeCorrectAnswer(correctAnswerRaw);
+
+      if (normalized) {
+        correctAnswer = String(normalized)
+          .trim()
+          .toUpperCase()
+          .replace(/[.)]/g, "");
+      }
+    }
+  }
+
+  // Normalize status.
+  let status = statusRaw.toLowerCase();
+
+  if (
+    status !== "pending" &&
+    status !== "approved" &&
+    status !== "rejected"
+  ) {
+    status = "pending";
+  }
+
+  /*
+   * Required-field validation.
+   * We intentionally keep this strict for the fields that are
+   * absolutely necessary to create a usable question.
+   */
+  const missing = [];
+
+  if (!subject) missing.push("subject");
+  if (!questionText) missing.push("question");
+  if (!optionA) missing.push("option_a");
+  if (!optionB) missing.push("option_b");
+  if (!optionC) missing.push("option_c");
+  if (!optionD) missing.push("option_d");
+
+  if (!["A", "B", "C", "D"].includes(correctAnswer)) {
+    missing.push("correct_answer");
+  }
+
+  if (missing.length > 0) {
+    return {
+      valid: false,
+      row: index + 2,
+      errors: missing,
+      data: {
+        id,
+        subject,
+        topic,
+        difficulty,
+        source,
+        school,
+        academic_year: academicYear,
+        question_text: questionText,
+        option_a: optionA,
+        option_b: optionB,
+        option_c: optionC,
+        option_d: optionD,
+        correct_answer: correctAnswer,
+        status,
+        explanation
+      }
+    };
+  }
+
+  return {
+    valid: true,
+    row: index + 2,
+    data: {
+      ...(id ? { id } : {}),
+      subject,
+      topic,
+      difficulty,
+      source,
+      school,
+      academic_year: academicYear,
+      question_text: questionText,
+      option_a: optionA,
+      option_b: optionB,
+      option_c: optionC,
+      option_d: optionD,
+      correct_answer: correctAnswer,
+      status,
+      explanation
+    }
+  };
 }
 
 
