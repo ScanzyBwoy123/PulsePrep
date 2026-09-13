@@ -992,230 +992,337 @@
     const $ = id =>
       document.getElementById(id);
     /* ==========================================================
-       AUTH HELPERS
-    ========================================================== */
-    function showOnly(screenId) {
-      const screens = [
-        "authLoadingScreen",
-        "loginScreen",
-        "accessDeniedScreen",
-        "adminApp"
-      ];
-      screens.forEach(id => {
-        const element = $(id);
-        if (element) {
-          element.classList.add("hidden-screen");
-        }
-      });
-      $(screenId).classList.remove("hidden-screen");
+   AUTH HELPERS
+========================================================== */
+
+function showOnly(screenId) {
+  const screens = [
+    "authLoadingScreen",
+    "loginScreen",
+    "accessDeniedScreen",
+    "adminApp"
+  ];
+
+  screens.forEach(id => {
+    const element = $(id);
+    if (element) {
+      element.classList.add("hidden-screen");
     }
-    function normalizeEmail(email) {
-      return String(email || "")
-        .trim()
-        .toLowerCase();
+  });
+
+  const target = $(screenId);
+  if (target) {
+    target.classList.remove("hidden-screen");
+  }
+}
+
+function normalizeEmail(email) {
+  return String(email || "")
+    .trim()
+    .toLowerCase();
+}
+
+function isAdminEmail(email) {
+  return ADMIN_EMAILS
+    .map(normalizeEmail)
+    .includes(normalizeEmail(email));
+}
+
+function setLoginMessage(message, type) {
+  const element = $("loginMessage");
+
+  element.textContent = message;
+
+  element.className =
+    "text-center text-sm mt-5 min-h-[20px]";
+
+  if (type === "error") {
+    element.classList.add("text-red-600");
+  }
+
+  if (type === "success") {
+    element.classList.add("text-green-600");
+  }
+}
+
+/* ==========================================================
+   SHOW AUTHORIZED ADMIN
+========================================================== */
+
+async function showAuthorizedAdmin(user) {
+  if (!user || !user.email) {
+    currentUser = null;
+    showOnly("loginScreen");
+    return false;
+  }
+
+  const email = normalizeEmail(user.email);
+
+  if (!isAdminEmail(email)) {
+    currentUser = null;
+    showOnly("accessDeniedScreen");
+    return false;
+  }
+
+  currentUser = user;
+
+  $("adminEmailDisplay").textContent = email;
+
+  showOnly("adminApp");
+
+  /*
+   * Initialize the existing admin application.
+   * This does NOT change the question system.
+   */
+  await initializeAdminApplication();
+
+  return true;
+}
+
+/* ==========================================================
+   INITIAL AUTHENTICATION
+========================================================== */
+
+async function initializeAuthentication() {
+  showOnly("authLoadingScreen");
+
+  try {
+    const {
+      data: { session },
+      error
+    } = await supabaseClient.auth.getSession();
+
+    if (error) {
+      throw error;
     }
-    function isAdminEmail(email) {
-      return ADMIN_EMAILS
-        .map(normalizeEmail)
-        .includes(
-          normalizeEmail(email)
-        );
+
+    if (!session || !session.user) {
+      currentUser = null;
+      showOnly("loginScreen");
+      return;
     }
-    function setLoginMessage(message, type) {
-      const element =
-        $("loginMessage");
-      element.textContent =
-        message;
-      element.className =
-        "text-center text-sm mt-5 min-h-[20px]";
-      if (type === "error") {
-        element.classList.add("text-red-600");
-      }
-      if (type === "success") {
-        element.classList.add("text-green-600");
-      }
+
+    await showAuthorizedAdmin(session.user);
+
+  } catch (error) {
+    console.error(
+      "Authentication initialization error:",
+      error
+    );
+
+    currentUser = null;
+
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (signOutError) {
+      console.error(
+        "Session cleanup error:",
+        signOutError
+      );
     }
-    /* ==========================================================
-       INITIAL AUTHENTICATION
-    ========================================================== */
-    async function initializeAuthentication() {
-      showOnly("authLoadingScreen");
+
+    showOnly("loginScreen");
+
+    setLoginMessage(
+      error.message ||
+      "Unable to verify your session.",
+      "error"
+    );
+  }
+}
+
+/* ==========================================================
+   AUTH STATE
+========================================================== */
+
+supabaseClient.auth.onAuthStateChange(
+  async (event, session) => {
+
+    console.log(
+      "PulsePrep auth event:",
+      event
+    );
+
+    /*
+     * INITIAL_SESSION is already handled by
+     * initializeAuthentication().
+     *
+     * We deliberately do not initialize the
+     * admin application here to prevent duplicate
+     * loading and race conditions.
+     */
+    if (event === "INITIAL_SESSION") {
+      return;
+    }
+
+    if (
+      event === "SIGNED_OUT" ||
+      !session ||
+      !session.user
+    ) {
+      currentUser = null;
+      selectedQuestionIds.clear();
+      showOnly("loginScreen");
+      return;
+    }
+
+    if (
+      event === "SIGNED_IN" ||
+      event === "TOKEN_REFRESHED" ||
+      event === "USER_UPDATED"
+    ) {
       try {
-        const {
-          data: { session },
-          error
-        } =
-          await supabaseClient.auth.getSession();
-        if (error) {
-          throw error;
-        }
-        if (!session || !session.user) {
-          showOnly("loginScreen");
-          return;
-        }
-        const email =
-          normalizeEmail(
-            session.user.email
-          );
-        if (!isAdminEmail(email)) {
-          currentUser = null;
-          showOnly("accessDeniedScreen");
-          return;
-        }
-        currentUser =
-          session.user;
-        showOnly("adminApp");
-        $("adminEmailDisplay").textContent =
-          email;
-        await initializeAdminApplication();
+        await showAuthorizedAdmin(session.user);
       } catch (error) {
         console.error(
-          "Authentication initialization error:",
+          "Admin authentication state error:",
           error
         );
-        await supabaseClient.auth.signOut();
+
+        currentUser = null;
         showOnly("loginScreen");
+
         setLoginMessage(
           error.message ||
-          "Unable to verify your session.",
+          "Unable to initialize administrator access.",
           "error"
         );
       }
     }
-    /* ==========================================================
-       AUTH STATE
-    ========================================================== */
-    supabaseClient.auth.onAuthStateChange(
-      async (event, session) => {
-        if (
-          event === "SIGNED_OUT" ||
-          !session ||
-          !session.user
-        ) {
-          currentUser = null;
-          showOnly("loginScreen");
-          return;
-        }
-        const email =
-          normalizeEmail(
-            session.user.email
-          );
-        if (!isAdminEmail(email)) {
-          currentUser = null;
-          showOnly("accessDeniedScreen");
-          return;
-        }
-        currentUser =
-          session.user;
-        showOnly("adminApp");
-        $("adminEmailDisplay").textContent =
-          email;
-      }
+  }
+);
+
+/* ==========================================================
+   LOGIN
+========================================================== */
+
+$("loginForm").addEventListener(
+  "submit",
+  async event => {
+    event.preventDefault();
+
+    const email = normalizeEmail(
+      $("loginEmail").value
     );
-    /* ==========================================================
-       LOGIN
-    ========================================================== */
-    $("loginForm").addEventListener(
-      "submit",
-      async event => {
-        event.preventDefault();
-        const email =
-          normalizeEmail(
-            $("loginEmail").value
-          );
-        const password =
-          $("loginPassword").value;
-        if (!isAdminEmail(email)) {
-          setLoginMessage(
-            "This account is not authorized as a PulsePrep administrator.",
-            "error"
-          );
-          return;
-        }
-        const button =
-          $("loginButton");
-        button.disabled = true;
-        button.innerHTML =
-          '<span class="loading-spinner mr-2"></span> Signing in...';
-        try {
-          const {
-            data,
-            error
-          } =
-            await supabaseClient.auth.signInWithPassword({
-              email,
-              password
-            });
-          if (error) {
-            throw error;
-          }
-          if (!data?.user) {
-            throw new Error(
-              "No authenticated user was returned."
-            );
-          }
-          if (
-            !isAdminEmail(
-              data.user.email
-            )
-          ) {
-            await supabaseClient.auth.signOut();
-            throw new Error(
-              "Access denied. This account is not an administrator."
-            );
-          }
-          currentUser =
-            data.user;
-          showOnly("adminApp");
-          $("adminEmailDisplay").textContent =
-            normalizeEmail(
-              data.user.email
-            );
-          await initializeAdminApplication();
-        } catch (error) {
-          console.error(
-            "Login error:",
-            error
-          );
-          setLoginMessage(
-            error.message ||
-            "Login failed.",
-            "error"
-          );
-        } finally {
-          button.disabled = false;
-          button.innerHTML =
-            '<i class="fa-solid fa-right-to-bracket mr-2"></i> Sign In';
-        }
-      }
-    );
-    /* ==========================================================
-       LOGOUT
-    ========================================================== */
-    async function logoutAdmin() {
-      try {
-        await supabaseClient.auth.signOut();
-      } catch (error) {
-        console.error(
-          "Logout error:",
-          error
-        );
-      } finally {
-        currentUser = null;
-        selectedQuestionIds.clear();
-        $("loginEmail").value = "";
-        $("loginPassword").value = "";
-        showOnly("loginScreen");
-      }
+
+    const password =
+      $("loginPassword").value;
+
+    if (!isAdminEmail(email)) {
+      setLoginMessage(
+        "This account is not authorized as a PulsePrep administrator.",
+        "error"
+      );
+      return;
     }
-    $("logoutButton").addEventListener(
-      "click",
-      logoutAdmin
+
+    const button = $("loginButton");
+
+    button.disabled = true;
+
+    button.innerHTML =
+      '<span class="loading-spinner mr-2"></span> Signing in...';
+
+    setLoginMessage("", "");
+
+    try {
+      const {
+        data,
+        error
+      } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (!data?.user) {
+        throw new Error(
+          "No authenticated user was returned."
+        );
+      }
+
+      if (!isAdminEmail(data.user.email)) {
+        await supabaseClient.auth.signOut();
+
+        throw new Error(
+          "Access denied. This account is not an administrator."
+        );
+      }
+
+      /*
+       * Initialize immediately after successful login.
+       * The auth-state listener will also receive SIGNED_IN,
+       * but initializeAdminApplication() is safe because
+       * the existing application initialization is retained.
+       */
+      await showAuthorizedAdmin(data.user);
+
+      setLoginMessage(
+        "Administrator login successful.",
+        "success"
+      );
+
+    } catch (error) {
+      console.error(
+        "Login error:",
+        error
+      );
+
+      currentUser = null;
+
+      showOnly("loginScreen");
+
+      setLoginMessage(
+        error.message ||
+        "Login failed.",
+        "error"
+      );
+
+    } finally {
+      button.disabled = false;
+
+      button.innerHTML =
+        '<i class="fa-solid fa-right-to-bracket mr-2"></i> Sign In';
+    }
+  }
+);
+
+/* ==========================================================
+   LOGOUT
+========================================================== */
+
+async function logoutAdmin() {
+  try {
+    await supabaseClient.auth.signOut();
+  } catch (error) {
+    console.error(
+      "Logout error:",
+      error
     );
-    $("deniedLogoutButton").addEventListener(
-      "click",
-      logoutAdmin
-    );
+  } finally {
+    currentUser = null;
+
+    selectedQuestionIds.clear();
+
+    $("loginEmail").value = "";
+    $("loginPassword").value = "";
+
+    showOnly("loginScreen");
+  }
+}
+
+$("logoutButton").addEventListener(
+  "click",
+  logoutAdmin
+);
+
+$("deniedLogoutButton").addEventListener(
+  "click",
+  logoutAdmin
+);
     /* ==========================================================
        SUBJECT DROPDOWNS
     ========================================================== */
