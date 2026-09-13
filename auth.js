@@ -14,7 +14,12 @@ supabaseScript.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
 supabaseScript.onload = () => {
   window.pulseprepSupabase = window.supabase.createClient(
   SUPABASE_URL,
-  SUPABASE_PUBLISHABLE_KEY
+  SUPABASE_PUBLISHABLE_KEY,
+  {
+    auth: {
+      persistSession: false
+    }
+  }
 );
 
   initPulsePrepAuth();
