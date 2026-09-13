@@ -378,16 +378,49 @@ function setupQuestionBankAuthGuard() {
 
         if (event === "SIGNED_IN" && session) {
 
-          questionBankUnlocked = true;
+  questionBankUnlocked = true;
 
-          // Allow the Question Bank to load again.
-          pastPapersLoaded = false;
+  // Allow the Question Bank to load again.
+  pastPapersLoaded = false;
 
-          console.log(
-            "PulsePrep Question Bank unlocked after fresh login."
-          );
+  const container =
+    document.getElementById("questionBankContent");
 
-        }
+  if (container) {
+
+    const loginHeading =
+      Array.from(
+        container.querySelectorAll("h3")
+      ).find(
+        heading =>
+          heading.textContent.trim() ===
+          "Login Required"
+      );
+
+    if (loginHeading) {
+
+      const loginCard =
+        loginHeading.closest(".max-w-xl");
+
+      if (loginCard) {
+        loginCard.remove();
+      }
+
+    }
+
+  }
+
+  console.log(
+    "PulsePrep Question Bank unlocked after fresh login."
+  );
+
+  // Load the approved questions again.
+  setTimeout(
+    loadApprovedPastPapers,
+    100
+  );
+
+}
 
         if (event === "SIGNED_OUT") {
 
