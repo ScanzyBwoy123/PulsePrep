@@ -841,26 +841,30 @@ async function loadApprovedPastPapers() {
     // CREATE / FIND DISPLAY SECTION
     // --------------------------------------------------------
 
-    let section =
-      document.getElementById(
-        "pulsePrepPastPapers"
-      );
+    // Remove the old "Loading Question Bank..." placeholder
+// once the approved questions are ready to be displayed.
+const loadingPlaceholder = container.querySelector("h3");
 
-    if (!section) {
+if (
+  loadingPlaceholder &&
+  loadingPlaceholder.textContent.includes("Loading Question Bank")
+) {
+  const placeholderWrapper = loadingPlaceholder.closest(".text-center");
+  if (placeholderWrapper) {
+    placeholderWrapper.remove();
+  }
+}
 
-      section =
-        document.createElement("div");
+let section = document.getElementById("pulsePrepPastPapers");
 
-      section.id =
-        "pulsePrepPastPapers";
+if (!section) {
+  section = document.createElement("div");
+  section.id = "pulsePrepPastPapers";
+  section.className = "mt-10";
+  container.appendChild(section);
+}
 
-      section.className =
-        "mt-10";
-
-      container.appendChild(section);
-    }
-
-    section.innerHTML = "";
+section.innerHTML = "";
 
     // --------------------------------------------------------
     // NO APPROVED QUESTIONS
