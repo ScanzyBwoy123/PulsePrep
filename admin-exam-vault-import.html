@@ -1055,7 +1055,10 @@ let allQuestions = [];
 let filteredQuestions = [];
 let selectedQuestionIds = new Set();
 let currentUser = null;
+
 let adminInitialized = false;
+let adminInitializationPromise = null;
+let eventListenersAttached = false;
 
 
 /* ============================================================
@@ -1114,38 +1117,6 @@ function showToast(message, type = "success") {
 }
 
 
-/* ============================================================
-   ADMIN CHECK
-============================================================ */
-function isAdminEmail(email) {
-
-  const normalizedEmail =
-    String(email || "")
-      .trim()
-      .toLowerCase();
-
-  const ADMIN_EMAILS = [
-    "scanzybwoy8@gmail.com"
-  ];
-
-  console.log(
-    "Admin email check:",
-    normalizedEmail
-  );
-
-  console.log(
-    "Allowed admin emails:",
-    ADMIN_EMAILS
-  );
-
-  return ADMIN_EMAILS.some(
-    adminEmail =>
-      normalizedEmail ===
-      adminEmail.trim().toLowerCase()
-  );
-
-}
-
 
 /* ============================================================
    SUBJECT DROPDOWNS
@@ -1195,6 +1166,158 @@ function populateSubjects() {
    AUTH
 ============================================================ */
 
+function normalizeEmail(email) {
+  return String(email || "")
+    .trim()
+    .toLowerCase();
+}
+
+
+function isAdminEmail(email) {
+
+  const normalizedEmail =
+    normalizeEmail(email);
+
+  console.log(
+    "Admin email check:",
+    normalizedEmail
+  );
+
+  console.log(
+    "Allowed admin emails:",
+    ADMIN_EMAILS
+  );
+
+  return ADMIN_EMAILS.some(
+    adminEmail =>
+      normalizedEmail === normalizeEmail(adminEmail)
+  );
+}
+
+
+function showLoginError(message) {
+
+  const loginError = $("loginError");
+
+  if (!loginError) {
+    return;
+  }
+
+  loginError.textContent =
+    message || "";
+
+  if (message) {
+    show(loginError);
+  } else {
+    hide(loginError);
+  }
+}
+
+
+/* ============================================================
+   INITIALIZE ADMIN APPLICATION
+============================================================ */
+
+async function initializeAdminApplication() {
+
+  /*
+   * Prevent login() and Supabase SIGNED_IN from
+   * initializing the application twice.
+   */
+  if (adminInitializationPromise) {
+    return adminInitializationPromise;
+  }
+
+
+  adminInitializationPromise =
+    (async () => {
+
+      console.log(
+        "Initializing PulsePrep Exam Vault admin..."
+      );
+
+
+      /*
+       * Populate subjects only once.
+       */
+      populateSubjects();
+
+
+      /*
+       * Event listeners must only be attached once.
+       * This prevents duplicate CSV imports,
+       * duplicate approval actions and duplicate
+       * button clicks after login/session events.
+       */
+      if (!eventListenersAttached) {
+
+        attachEventListeners();
+
+        eventListenersAttached = true;
+
+        console.log(
+          "Admin event listeners attached."
+        );
+      }
+
+
+      /*
+       * Load questions after authentication
+       * has been confirmed.
+       */
+      await loadQuestions();
+
+
+      adminInitialized = true;
+
+
+      console.log(
+        "PulsePrep Exam Vault admin initialized successfully."
+      );
+
+    })();
+
+
+  try {
+
+    await adminInitializationPromise;
+
+  } catch (error) {
+
+    console.error(
+      "Admin initialization error:",
+      error
+    );
+
+    adminInitialized = false;
+    adminInitializationPromise = null;
+
+    throw error;
+  }
+
+
+  return adminInitializationPromise;
+}
+
+
+/* ============================================================
+   RESET ADMIN INITIALIZATION
+============================================================ */
+
+function resetAdminInitialization() {
+
+  adminInitialized = false;
+  adminInitializationPromise = null;
+
+  selectedQuestionIds.clear();
+
+}
+
+
+/* ============================================================
+   CHECK AUTHENTICATION
+============================================================ */
+
 async function checkAuth() {
 
   try {
@@ -1207,10 +1330,6 @@ async function checkAuth() {
     } = await supabaseClient.auth.getSession();
 
 
-    // ---------------------------------------------------------
-    // CHECK FOR SESSION ERROR
-    // ---------------------------------------------------------
-
     if (error) {
 
       console.error(
@@ -1221,41 +1340,45 @@ async function checkAuth() {
       hide($("authLoading"));
       show($("loginScreen"));
 
-      $("loginMessage").textContent =
-        "Unable to check your PulsePrep login session.";
+      showLoginError(
+        "Unable to check your PulsePrep login session."
+      );
 
       return;
     }
 
 
-    // ---------------------------------------------------------
-    // NO LOGIN SESSION
-    // ---------------------------------------------------------
-
+    /*
+     * No active session.
+     */
     if (!session || !session.user) {
 
       console.log(
         "No active Supabase session."
       );
 
+      currentUser = null;
+
+      resetAdminInitialization();
+
       hide($("authLoading"));
+      hide($("adminApp"));
+      hide($("accessDeniedScreen"));
+
       show($("loginScreen"));
 
       return;
     }
 
 
-    // ---------------------------------------------------------
-    // SAVE CURRENT USER
-    // ---------------------------------------------------------
-
+    /*
+     * Use the actual Supabase user.
+     */
     currentUser = session.user;
 
 
     const supabaseEmail =
-      (currentUser.email || "")
-        .trim()
-        .toLowerCase();
+      normalizeEmail(currentUser.email);
 
 
     console.log(
@@ -1263,7 +1386,7 @@ async function checkAuth() {
     );
 
     console.log(
-      "PULSEPREP ADMIN AUTH DIAGNOSTIC"
+      "PULSEPREP ADMIN AUTH"
     );
 
     console.log(
@@ -1277,12 +1400,7 @@ async function checkAuth() {
     );
 
     console.log(
-      "Expected Admin Email:",
-      "scanzybwoy8@gmail.com"
-    );
-
-    console.log(
-      "isAdminEmail result:",
+      "Admin Authorized:",
       isAdminEmail(supabaseEmail)
     );
 
@@ -1291,18 +1409,20 @@ async function checkAuth() {
     );
 
 
-    // ---------------------------------------------------------
-    // ADMIN CHECK
-    // ---------------------------------------------------------
-
+    /*
+     * Check administrator permission.
+     */
     if (!isAdminEmail(supabaseEmail)) {
+
+      resetAdminInitialization();
 
       hide($("authLoading"));
       hide($("loginScreen"));
+      hide($("adminApp"));
+
       show($("accessDeniedScreen"));
 
 
-      // Show the ACTUAL email Supabase returned.
       const accessDeniedMessage =
         $("accessDeniedMessage");
 
@@ -1314,10 +1434,11 @@ async function checkAuth() {
           <br><br>
           <span class="text-xs text-slate-500">
             Supabase logged you in as:
-            <strong>${supabaseEmail || "NO EMAIL RETURNED"}</strong>
+            <strong>${escapeHtml(
+              supabaseEmail || "NO EMAIL RETURNED"
+            )}</strong>
           </span>
         `;
-
       }
 
 
@@ -1325,38 +1446,10 @@ async function checkAuth() {
     }
 
 
-    // ---------------------------------------------------------
-    // ADMIN VERIFIED
-    // ---------------------------------------------------------
-
-    console.log(
-      "PulsePrep administrator verified:",
-      supabaseEmail
-    );
-
-
-    hide($("authLoading"));
-    hide($("loginScreen"));
-    hide($("accessDeniedScreen"));
-    show($("adminApp"));
-
-populateSubjects();
-attachEventListeners();
-    // Update displayed admin email if the element exists.
-    const adminEmailDisplay =
-      $("adminEmailDisplay");
-
-
-    if (adminEmailDisplay) {
-
-      adminEmailDisplay.textContent =
-        supabaseEmail;
-
-    }
-
-
-    // Load the Exam Vault data.
-    await loadQuestions();
+    /*
+     * Administrator verified.
+     */
+    await enterAdmin();
 
 
   } catch (error) {
@@ -1366,25 +1459,20 @@ attachEventListeners();
       error
     );
 
-
     hide($("authLoading"));
+    hide($("adminApp"));
+    hide($("accessDeniedScreen"));
+
     show($("loginScreen"));
 
-
-    const loginMessage =
-      $("loginMessage");
-
-
-    if (loginMessage) {
-
-      loginMessage.textContent =
-        "An unexpected authentication error occurred.";
-
-    }
-
+    showLoginError(
+      "An unexpected authentication error occurred: " +
+      (error.message || "Unknown error")
+    );
   }
 
 }
+
 
 /* ============================================================
    ENTER ADMIN
@@ -1392,35 +1480,75 @@ attachEventListeners();
 
 async function enterAdmin() {
 
+  if (!currentUser) {
+    return;
+  }
+
+
+  const authenticatedEmail =
+    normalizeEmail(currentUser.email);
+
+
+  /*
+   * Never allow a non-admin user into the application.
+   */
+  if (!isAdminEmail(authenticatedEmail)) {
+
+    hide($("authLoading"));
+    hide($("adminApp"));
+
+    show($("accessDeniedScreen"));
+
+    const accessDeniedMessage =
+      $("accessDeniedMessage");
+
+    if (accessDeniedMessage) {
+
+      accessDeniedMessage.innerHTML = `
+        This account is not authorized as a PulsePrep administrator.
+        <br><br>
+        <span class="text-xs text-slate-500">
+          Supabase logged you in as:
+          <strong>${escapeHtml(
+            authenticatedEmail || "NO EMAIL RETURNED"
+          )}</strong>
+        </span>
+      `;
+    }
+
+    return;
+  }
+
+
+  /*
+   * Show the admin application.
+   */
   hide($("authLoading"));
   hide($("loginScreen"));
   hide($("accessDeniedScreen"));
 
   show($("adminApp"));
 
-populateSubjects();
-attachEventListeners();
-if (!adminInitialized) {
-  adminInitialized = true;
-  populateSubjects();
-  attachEventListeners();
-}
 
-  $("adminEmailDisplay").textContent =
-    currentUser.email;
+  /*
+   * Display the actual authenticated Supabase email.
+   */
+  const adminEmailDisplay =
+    $("adminEmailDisplay");
 
+  if (adminEmailDisplay) {
 
-  if (!adminInitialized) {
-
-    adminInitialized = true;
-
-    populateSubjects();
-    attachEventListeners();
-
+    adminEmailDisplay.textContent =
+      authenticatedEmail;
   }
 
 
-  await loadQuestions();
+  /*
+   * Initialize only once.
+   * If another authentication event calls this
+   * at the same time, the same Promise is reused.
+   */
+  await initializeAdminApplication();
 }
 
 
@@ -1431,16 +1559,20 @@ if (!adminInitialized) {
 async function login() {
 
   const email =
-    $("loginEmail").value.trim();
+    normalizeEmail(
+      $("loginEmail").value
+    );
 
   const password =
     $("loginPassword").value;
 
 
-  hide($("loginError"));
+  showLoginError("");
+
 
   const button =
     $("loginButton");
+
 
   button.disabled = true;
   button.textContent = "Signing In...";
@@ -1462,43 +1594,77 @@ async function login() {
     }
 
 
-    currentUser = data.user;
-alert("Supabase email: " + (data.user.email || "NO EMAIL"));
-// Use the email entered during a successful Supabase login.
-// Supabase has already verified the email + password.
-const authenticatedEmail =
-  String(email || "")
-    .trim()
-    .toLowerCase();
+    /*
+     * IMPORTANT:
+     * Always use the email returned by Supabase.
+     * Do not trust only the email typed into the form.
+     */
+    currentUser =
+      data && data.user
+        ? data.user
+        : null;
 
-console.log("PulsePrep authenticated email:", authenticatedEmail);
-console.log("Supabase user email:", currentUser.email);
-console.log(
-  "PulsePrep admin check:",
-  isAdminEmail(authenticatedEmail)
-);
 
-if (!isAdminEmail(authenticatedEmail)) {
-  await supabaseClient.auth.signOut();
+    if (!currentUser) {
 
-  throw new Error(
-    `This account (${authenticatedEmail}) is not authorized as a PulsePrep administrator.`
-  );
-}
+      throw new Error(
+        "Supabase login succeeded but no authenticated user was returned."
+      );
+    }
 
+
+    const authenticatedEmail =
+      normalizeEmail(currentUser.email);
+
+
+    console.log(
+      "PulsePrep authenticated email:",
+      authenticatedEmail
+    );
+
+
+    /*
+     * Verify the actual Supabase account.
+     */
+    if (!isAdminEmail(authenticatedEmail)) {
+
+      await supabaseClient.auth.signOut();
+
+      currentUser = null;
+
+      resetAdminInitialization();
+
+      throw new Error(
+        `This account (${authenticatedEmail || "unknown"}) is not authorized as a PulsePrep administrator.`
+      );
+    }
+
+
+    /*
+     * Clear password after successful login.
+     */
     $("loginPassword").value = "";
 
+
+    /*
+     * Enter the admin application.
+     * The initialization guard prevents duplicate setup
+     * if Supabase also fires SIGNED_IN.
+     */
     await enterAdmin();
 
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "PulsePrep login error:",
+      error
+    );
 
-    $("loginError").textContent =
-      error.message || "Login failed.";
 
-    show($("loginError"));
+    showLoginError(
+      error.message || "Login failed."
+    );
 
 
   } finally {
@@ -1515,18 +1681,34 @@ if (!isAdminEmail(authenticatedEmail)) {
 
 async function logout() {
 
-  await supabaseClient.auth.signOut();
+  try {
 
-  currentUser = null;
+    await supabaseClient.auth.signOut();
 
-  hide($("adminApp"));
-  hide($("accessDeniedScreen"));
-  show($("loginScreen"));
+  } catch (error) {
 
-  $("loginPassword").value = "";
+    console.error(
+      "Logout error:",
+      error
+    );
+
+  } finally {
+
+    currentUser = null;
+
+    resetAdminInitialization();
+
+    hide($("authLoading"));
+    hide($("adminApp"));
+    hide($("accessDeniedScreen"));
+
+    show($("loginScreen"));
+
+    $("loginPassword").value = "";
+
+    showLoginError("");
+  }
 }
-
-
 /* ============================================================
    LOAD QUESTIONS
 ============================================================ */
@@ -3652,30 +3834,92 @@ supabaseClient.auth.onAuthStateChange(
       event
     );
 
-    // Do not independently authorize or reject
-    // the user here.
-    //
-    // checkAuth() and the login handler are the
-    // single places responsible for administrator
-    // authorization.
 
-    if (!session || !session.user) {
+    /*
+     * INITIAL_SESSION is handled by checkAuth().
+     * Do not initialize the application a second time here.
+     */
+    if (event === "INITIAL_SESSION") {
+      return;
+    }
+
+
+    /*
+     * User signed out.
+     */
+    if (
+      event === "SIGNED_OUT" ||
+      !session ||
+      !session.user
+    ) {
 
       currentUser = null;
 
+      resetAdminInitialization();
+
+      hide($("authLoading"));
       hide($("adminApp"));
       hide($("accessDeniedScreen"));
+
       show($("loginScreen"));
+
+      showLoginError("");
 
       return;
     }
 
-    currentUser = session.user;
 
-    console.log(
-      "Authenticated Supabase user:",
-      currentUser.email
-    );
+    /*
+     * SIGNED_IN can happen immediately after login().
+     *
+     * enterAdmin() is safe to call here because
+     * initializeAdminApplication() uses a Promise guard.
+     */
+    if (event === "SIGNED_IN") {
+
+      currentUser =
+        session.user;
+
+
+      const authenticatedEmail =
+        normalizeEmail(
+          currentUser.email
+        );
+
+
+      if (!isAdminEmail(authenticatedEmail)) {
+
+        console.warn(
+          "SIGNED_IN user is not an authorized administrator."
+        );
+
+        return;
+      }
+
+
+      try {
+
+        await enterAdmin();
+
+      } catch (error) {
+
+        console.error(
+          "SIGNED_IN admin initialization error:",
+          error
+        );
+      }
+
+
+      return;
+    }
+
+
+    /*
+     * TOKEN_REFRESHED and other session events should
+     * not rebuild the entire application.
+     */
+    currentUser =
+      session.user;
 
   }
 );
