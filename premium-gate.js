@@ -339,8 +339,79 @@ window.PulsePrepOpenPremiumPlans = function () {
   "use strict";
 
   let pastPapersLoaded = false;
-  let loadingPastPapers = false;
+let loadingPastPapers = false;
 
+// Question Bank requires a fresh login after each page load.
+let questionBankUnlocked = false;
+let questionBankAuthWatcherStarted = false;
+function setupQuestionBankAuthGuard() {
+
+  if (questionBankAuthWatcherStarted) return;
+
+  questionBankAuthWatcherStarted = true;
+
+  let attempts = 0;
+
+  const timer = setInterval(() => {
+
+    attempts++;
+
+    if (!window.pulseprepSupabase) {
+
+      if (attempts > 100) {
+        clearInterval(timer);
+        questionBankAuthWatcherStarted = false;
+      }
+
+      return;
+    }
+
+    clearInterval(timer);
+
+    window.pulseprepSupabase.auth.onAuthStateChange(
+      (event, session) => {
+
+        console.log(
+          "PulsePrep Question Bank auth event:",
+          event
+        );
+
+        if (event === "SIGNED_IN" && session) {
+
+          questionBankUnlocked = true;
+
+          // Allow the Question Bank to load again.
+          pastPapersLoaded = false;
+
+          console.log(
+            "PulsePrep Question Bank unlocked after fresh login."
+          );
+
+        }
+
+        if (event === "SIGNED_OUT") {
+
+          questionBankUnlocked = false;
+          pastPapersLoaded = false;
+
+          const container =
+            document.getElementById("questionBankContent");
+
+          if (container) {
+            container.innerHTML = "";
+          }
+
+          console.log(
+            "PulsePrep Question Bank locked after logout."
+          );
+        }
+
+      }
+    );
+
+  }, 100);
+
+}
   function escapeHtml(value) {
     return String(value ?? "")
       .replace(/&/g, "&amp;")
@@ -443,7 +514,85 @@ async function loadApprovedPastPapers() {
     // --------------------------------------------------------
     // LOGIN REQUIRED
     // --------------------------------------------------------
+// --------------------------------------------------------
+// QUESTION BANK FRESH LOGIN REQUIRED
+// --------------------------------------------------------
 
+if (!questionBankUnlocked) {
+
+  container.innerHTML = `
+    <div class="max-w-xl mx-auto py-10">
+
+      <div class="bg-white
+                  rounded-2xl
+                  border
+                  border-slate-200
+                  shadow-sm
+                  p-8
+                  text-center">
+
+        <div class="w-16 h-16
+                    mx-auto
+                    rounded-2xl
+                    bg-blue-50
+                    text-blue-600
+                    flex
+                    items-center
+                    justify-center
+                    text-3xl">
+
+          🔐
+
+        </div>
+
+        <h3 class="text-2xl
+                   font-extrabold
+                   text-slate-900
+                   mt-5">
+
+          Login Required
+
+        </h3>
+
+        <p class="text-slate-500
+                  mt-2
+                  leading-6">
+
+          Please log in again to access the PulsePrep
+          Question Bank.
+
+        </p>
+
+        <button
+          type="button"
+          onclick="showTab('account')"
+          class="mt-6
+                 inline-flex
+                 items-center
+                 justify-center
+                 gap-2
+                 px-6
+                 py-3
+                 rounded-xl
+                 bg-blue-600
+                 text-white
+                 font-bold
+                 hover:bg-blue-700
+                 transition">
+
+          <i class="fa-solid fa-right-to-bracket"></i>
+
+          Login to PulsePrep
+
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  return;
+}
     if (!session) {
 
       console.warn(
@@ -1547,19 +1696,20 @@ window.openPulsePrepPastPaper =
           new MutationObserver(() => {
 
             if (
-              document.getElementById(
-                "questionBankContent"
-              ) &&
-              !document.getElementById(
-                "pulsePrepPastPapers"
-              )
-            ) {
+  questionBankUnlocked &&
+  document.getElementById(
+    "questionBankContent"
+  ) &&
+  !document.getElementById(
+    "pulsePrepPastPapers"
+  )
+) {
 
-              if (!loadingPastPapers) {
-                loadApprovedPastPapers();
-              }
+  if (!loadingPastPapers) {
+    loadApprovedPastPapers();
+  }
 
-            }
+}
 
           });
 
@@ -1575,7 +1725,8 @@ window.openPulsePrepPastPaper =
   }
 
 
-  setupQuestionBankWatcher();
+  setupQuestionBankAuthGuard();
+setupQuestionBankWatcher();
 
 
   // ==========================================================
