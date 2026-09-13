@@ -1096,7 +1096,694 @@ section.innerHTML = "";
 
         </div>
       `;
+// ==========================================================
+// QUESTION BANK SEARCH + FILTERS
+// ==========================================================
 
+(function setupPulsePrepQuestionBankFilters() {
+
+  // Remove an old filter bar if the renderer is being refreshed
+  const existingFilters =
+    document.getElementById("pulsePrepQuestionBankFilters");
+
+  if (existingFilters) {
+    existingFilters.remove();
+  }
+
+  // ----------------------------------------------------------
+  // FILTER DATA
+  // ----------------------------------------------------------
+
+  const subjects = new Set();
+  const topics = new Set();
+  const difficulties = new Set();
+
+  papers.forEach(question => {
+
+    const subject =
+      String(question?.subject || "Other").trim();
+
+    const topic =
+      String(question?.topic || "").trim();
+
+    const difficulty =
+      String(question?.difficulty || "").trim();
+
+    if (subject) {
+      subjects.add(subject);
+    }
+
+    if (topic) {
+      topics.add(topic);
+    }
+
+    if (difficulty) {
+      difficulties.add(difficulty);
+    }
+
+  });
+
+  // ----------------------------------------------------------
+  // CREATE FILTER BAR
+  // ----------------------------------------------------------
+
+  const filterBar =
+    document.createElement("div");
+
+  filterBar.id =
+    "pulsePrepQuestionBankFilters";
+
+  filterBar.className =
+    "mb-6 bg-white rounded-2xl border border-slate-200 shadow-sm p-5";
+
+  filterBar.innerHTML = `
+    <div class="flex flex-col gap-4">
+
+      <div>
+        <h4 class="text-lg font-extrabold text-slate-900">
+          Find Questions
+        </h4>
+
+        <p class="text-sm text-slate-500 mt-1">
+          Search or filter the approved Question Bank.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+
+        <!-- SEARCH -->
+
+        <div>
+
+          <label
+            for="pulsePrepQuestionSearch"
+            class="block text-xs font-bold text-slate-600 mb-1">
+            Search
+          </label>
+
+          <div class="relative">
+
+            <i
+              class="fa-solid fa-magnifying-glass
+                     absolute left-3 top-1/2
+                     -translate-y-1/2
+                     text-slate-400">
+            </i>
+
+            <input
+              id="pulsePrepQuestionSearch"
+              type="search"
+              placeholder="Search questions..."
+              autocomplete="off"
+              class="w-full rounded-xl
+                     border border-slate-300
+                     pl-10 pr-4 py-3
+                     text-sm
+                     outline-none
+                     focus:ring-2
+                     focus:ring-teal-500
+                     focus:border-teal-500"
+            />
+
+          </div>
+
+        </div>
+
+        <!-- SUBJECT -->
+
+        <div>
+
+          <label
+            for="pulsePrepQuestionSubjectFilter"
+            class="block text-xs font-bold text-slate-600 mb-1">
+            Subject
+          </label>
+
+          <select
+            id="pulsePrepQuestionSubjectFilter"
+            class="w-full rounded-xl
+                   border border-slate-300
+                   bg-white
+                   px-4 py-3
+                   text-sm
+                   outline-none
+                   focus:ring-2
+                   focus:ring-teal-500">
+
+            <option value="">
+              All Subjects
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- TOPIC -->
+
+        <div>
+
+          <label
+            for="pulsePrepQuestionTopicFilter"
+            class="block text-xs font-bold text-slate-600 mb-1">
+            Topic
+          </label>
+
+          <select
+            id="pulsePrepQuestionTopicFilter"
+            class="w-full rounded-xl
+                   border border-slate-300
+                   bg-white
+                   px-4 py-3
+                   text-sm
+                   outline-none
+                   focus:ring-2
+                   focus:ring-teal-500">
+
+            <option value="">
+              All Topics
+            </option>
+
+          </select>
+
+        </div>
+
+        <!-- DIFFICULTY -->
+
+        <div>
+
+          <label
+            for="pulsePrepQuestionDifficultyFilter"
+            class="block text-xs font-bold text-slate-600 mb-1">
+            Difficulty
+          </label>
+
+          <select
+            id="pulsePrepQuestionDifficultyFilter"
+            class="w-full rounded-xl
+                   border border-slate-300
+                   bg-white
+                   px-4 py-3
+                   text-sm
+                   outline-none
+                   focus:ring-2
+                   focus:ring-teal-500">
+
+            <option value="">
+              All Difficulties
+            </option>
+
+          </select>
+
+        </div>
+
+      </div>
+
+      <!-- RESULTS + CLEAR -->
+
+      <div class="flex flex-col sm:flex-row
+                  sm:items-center
+                  sm:justify-between
+                  gap-3">
+
+        <div
+          id="pulsePrepQuestionBankFilterCount"
+          class="text-sm font-bold text-slate-600">
+        </div>
+
+        <button
+          type="button"
+          id="pulsePrepClearQuestionFilters"
+          class="inline-flex
+                 items-center
+                 justify-center
+                 gap-2
+                 px-4
+                 py-2.5
+                 rounded-xl
+                 border
+                 border-slate-300
+                 text-slate-700
+                 font-bold
+                 hover:bg-slate-50
+                 transition">
+
+          <i class="fa-solid fa-rotate-left"></i>
+
+          Clear Filters
+
+        </button>
+
+      </div>
+
+    </div>
+  `;
+
+  // ----------------------------------------------------------
+  // INSERT FILTER BAR
+  // ----------------------------------------------------------
+
+  const questionBankSection =
+    document.getElementById("pulsePrepPastPapers");
+
+  if (!questionBankSection) {
+    console.warn(
+      "PulsePrep: Question Bank section not found for filters."
+    );
+    return;
+  }
+
+  const sectionHeader =
+    questionBankSection.firstElementChild;
+
+  if (sectionHeader) {
+
+    sectionHeader.insertAdjacentElement(
+      "afterend",
+      filterBar
+    );
+
+  } else {
+
+    questionBankSection.prepend(
+      filterBar
+    );
+
+  }
+
+  // ----------------------------------------------------------
+  // GET FILTER ELEMENTS
+  // ----------------------------------------------------------
+
+  const searchInput =
+    document.getElementById(
+      "pulsePrepQuestionSearch"
+    );
+
+  const subjectFilter =
+    document.getElementById(
+      "pulsePrepQuestionSubjectFilter"
+    );
+
+  const topicFilter =
+    document.getElementById(
+      "pulsePrepQuestionTopicFilter"
+    );
+
+  const difficultyFilter =
+    document.getElementById(
+      "pulsePrepQuestionDifficultyFilter"
+    );
+
+  const countDisplay =
+    document.getElementById(
+      "pulsePrepQuestionBankFilterCount"
+    );
+
+  const clearButton =
+    document.getElementById(
+      "pulsePrepClearQuestionFilters"
+    );
+
+  if (
+    !searchInput ||
+    !subjectFilter ||
+    !topicFilter ||
+    !difficultyFilter ||
+    !countDisplay ||
+    !clearButton
+  ) {
+
+    console.warn(
+      "PulsePrep: Question Bank filter elements were not created correctly."
+    );
+
+    return;
+  }
+
+  // ----------------------------------------------------------
+  // ADD SUBJECT OPTIONS
+  // ----------------------------------------------------------
+
+  Array.from(subjects)
+    .sort((a, b) =>
+      a.localeCompare(b)
+    )
+    .forEach(subject => {
+
+      const option =
+        document.createElement("option");
+
+      option.value =
+        subject.toLowerCase();
+
+      option.textContent =
+        subject;
+
+      subjectFilter.appendChild(
+        option
+      );
+
+    });
+
+  // ----------------------------------------------------------
+  // ADD TOPIC OPTIONS
+  // ----------------------------------------------------------
+
+  Array.from(topics)
+    .sort((a, b) =>
+      a.localeCompare(b)
+    )
+    .forEach(topic => {
+
+      const option =
+        document.createElement("option");
+
+      option.value =
+        topic.toLowerCase();
+
+      option.textContent =
+        topic;
+
+      topicFilter.appendChild(
+        option
+      );
+
+    });
+
+  // ----------------------------------------------------------
+  // ADD DIFFICULTY OPTIONS
+  // ----------------------------------------------------------
+
+  Array.from(difficulties)
+    .sort((a, b) =>
+      a.localeCompare(b)
+    )
+    .forEach(difficulty => {
+
+      const option =
+        document.createElement("option");
+
+      option.value =
+        difficulty.toLowerCase();
+
+      option.textContent =
+        difficulty;
+
+      difficultyFilter.appendChild(
+        option
+      );
+
+    });
+
+  // ----------------------------------------------------------
+  // FIND RENDERED QUESTION CARDS
+  // ----------------------------------------------------------
+
+  const questionCards = [];
+
+  const renderedGroups =
+    Array.from(
+      questionBankSection.querySelectorAll(
+        ".divide-y"
+      )
+    );
+
+  renderedGroups.forEach(group => {
+
+    const subjectContainer =
+      group.closest(".bg-white");
+
+    const subjectHeading =
+      subjectContainer?.querySelector("h4");
+
+    const subject =
+      String(
+        subjectHeading?.textContent || "Other"
+      )
+      .trim();
+
+    const cards =
+      Array.from(
+        group.children
+      );
+
+    cards.forEach(card => {
+
+      if (!card || !card.querySelector) {
+        return;
+      }
+
+      const text =
+        String(
+          card.textContent || ""
+        ).trim();
+
+      if (!text) {
+        return;
+      }
+
+      const topic =
+        Array.from(
+          card.querySelectorAll("span")
+        )
+        .find(span =>
+          span.className.includes("bg-blue-50")
+        )
+        ?.textContent
+        ?.trim() || "";
+
+      const difficulty =
+        Array.from(
+          card.querySelectorAll("span")
+        )
+        .find(span =>
+          span.className.includes("bg-purple-50")
+        )
+        ?.textContent
+        ?.trim() || "";
+
+      questionCards.push({
+        card,
+        group,
+        subject: subject.toLowerCase(),
+        topic: topic.toLowerCase(),
+        difficulty: difficulty.toLowerCase(),
+        searchText: (
+          text +
+          " " +
+          subject +
+          " " +
+          topic +
+          " " +
+          difficulty
+        ).toLowerCase()
+      });
+
+    });
+
+  });
+
+  const totalQuestions =
+    questionCards.length;
+
+  // ----------------------------------------------------------
+  // NO RESULTS MESSAGE
+  // ----------------------------------------------------------
+
+  const noResults =
+    document.createElement("div");
+
+  noResults.id =
+    "pulsePrepQuestionBankNoResults";
+
+  noResults.className =
+    "hidden bg-white rounded-2xl border border-slate-200 p-8 text-center";
+
+  noResults.innerHTML = `
+    <div class="text-4xl mb-3">
+      🔎
+    </div>
+
+    <h3 class="text-xl font-extrabold text-slate-900">
+      No Questions Found
+    </h3>
+
+    <p class="text-slate-500 mt-2">
+      Try another search or clear your filters.
+    </p>
+  `;
+
+  questionBankSection.appendChild(
+    noResults
+  );
+
+  // ----------------------------------------------------------
+  // APPLY FILTERS
+  // ----------------------------------------------------------
+
+  function applyQuestionBankFilters() {
+
+    const search =
+      String(
+        searchInput.value || ""
+      )
+      .trim()
+      .toLowerCase();
+
+    const selectedSubject =
+      String(
+        subjectFilter.value || ""
+      )
+      .toLowerCase();
+
+    const selectedTopic =
+      String(
+        topicFilter.value || ""
+      )
+      .toLowerCase();
+
+    const selectedDifficulty =
+      String(
+        difficultyFilter.value || ""
+      )
+      .toLowerCase();
+
+    let visibleCount = 0;
+
+    const visibleGroups =
+      new Set();
+
+    questionCards.forEach(item => {
+
+      const matchesSearch =
+        !search ||
+        item.searchText.includes(
+          search
+        );
+
+      const matchesSubject =
+        !selectedSubject ||
+        item.subject ===
+          selectedSubject;
+
+      const matchesTopic =
+        !selectedTopic ||
+        item.topic ===
+          selectedTopic;
+
+      const matchesDifficulty =
+        !selectedDifficulty ||
+        item.difficulty ===
+          selectedDifficulty;
+
+      const visible =
+        matchesSearch &&
+        matchesSubject &&
+        matchesTopic &&
+        matchesDifficulty;
+
+      item.card.style.display =
+        visible ? "" : "none";
+
+      if (visible) {
+
+        visibleCount++;
+
+        visibleGroups.add(
+          item.group
+        );
+
+      }
+
+    });
+
+    // Hide subjects that have no matching questions
+    renderedGroups.forEach(group => {
+
+      group.style.display =
+        visibleGroups.has(group)
+          ? ""
+          : "none";
+
+    });
+
+    // Update result count
+    countDisplay.textContent =
+      `Showing ${visibleCount} of ${totalQuestions} questions`;
+
+    // Show/hide no-results message
+    noResults.classList.toggle(
+      "hidden",
+      visibleCount !== 0
+    );
+
+  }
+
+  // ----------------------------------------------------------
+  // LIVE SEARCH
+  // ----------------------------------------------------------
+
+  searchInput.addEventListener(
+    "input",
+    applyQuestionBankFilters
+  );
+
+  // ----------------------------------------------------------
+  // SUBJECT FILTER
+  // ----------------------------------------------------------
+
+  subjectFilter.addEventListener(
+    "change",
+    applyQuestionBankFilters
+  );
+
+  // ----------------------------------------------------------
+  // TOPIC FILTER
+  // ----------------------------------------------------------
+
+  topicFilter.addEventListener(
+    "change",
+    applyQuestionBankFilters
+  );
+
+  // ----------------------------------------------------------
+  // DIFFICULTY FILTER
+  // ----------------------------------------------------------
+
+  difficultyFilter.addEventListener(
+    "change",
+    applyQuestionBankFilters
+  );
+
+  // ----------------------------------------------------------
+  // CLEAR FILTERS
+  // ----------------------------------------------------------
+
+  clearButton.addEventListener(
+    "click",
+    function () {
+
+      searchInput.value = "";
+      subjectFilter.value = "";
+      topicFilter.value = "";
+      difficultyFilter.value = "";
+
+      applyQuestionBankFilters();
+
+    }
+  );
+
+  // ----------------------------------------------------------
+  // INITIAL COUNT
+  // ----------------------------------------------------------
+
+  applyQuestionBankFilters();
+
+  console.log(
+    `PulsePrep: Question Bank Search + Filters enabled for ${totalQuestions} questions.`
+  );
+
+})();
       pastPapersLoaded = true;
     // ========================================================
     // QUESTION BANK SEARCH + FILTERS
