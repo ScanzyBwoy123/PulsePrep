@@ -2511,246 +2511,48 @@ function updateBodyCounter() {
    ============================================================ */
 
 async function initializePage() {
-
   populateSubjects();
-
   setupEventListeners();
-
   /*
    * ---------------------------------------------------------
    * STEP 1: Connect to the existing PulsePrep Supabase client
    * ---------------------------------------------------------
    */
   let connected = initializeSupabase();
-
   let attempts = 0;
-
   while (!connected && attempts < 50) {
-
     await new Promise(resolve =>
       setTimeout(resolve, 100)
     );
-
     connected = initializeSupabase();
-
     attempts++;
   }
-
   if (!connected) {
-
     document
       .getElementById("loadingState")
       ?.classList.add("hidden");
-
     showStatus(
       "PulsePrep authentication could not be loaded. Please refresh the page.",
       "error"
     );
-
     return;
   }
-
   /*
    * ---------------------------------------------------------
    * STEP 2: Load the currently logged-in PulsePrep student
+   *
+   * Class Discussions are FREE.
+   * No Premium verification is required.
    * ---------------------------------------------------------
    */
   await loadCurrentUser();
-
   /*
    * ---------------------------------------------------------
-   * STEP 3: Check Premium access
-   * ---------------------------------------------------------
-   */
-  let premiumStatus = null;
-
-  try {
-
-    if (
-      typeof window.checkPulsePrepPremium !== "function"
-    ) {
-      throw new Error(
-        "PulsePrep Premium verification system is not loaded."
-      );
-    }
-
-    premiumStatus =
-      await window.checkPulsePrepPremium();
-
-  } catch (error) {
-
-    console.error(
-      "Class Discussions Premium verification error:",
-      error
-    );
-
-    document
-      .getElementById("loadingState")
-      ?.classList.add("hidden");
-
-    showStatus(
-      "Unable to verify Premium access. Please refresh the page and try again.",
-      "error"
-    );
-
-    return;
-  }
-
-  /*
-   * ---------------------------------------------------------
-   * STEP 4: Student must be logged in
-   * ---------------------------------------------------------
-   */
-  if (!premiumStatus?.authenticated) {
-
-    showPremiumDiscussionLock("login");
-
-    return;
-  }
-
-  /*
-   * ---------------------------------------------------------
-   * STEP 5: Student must have Premium
-   * ---------------------------------------------------------
-   */
-  if (premiumStatus.premium !== true) {
-
-    showPremiumDiscussionLock("premium");
-
-    return;
-  }
-
-  /*
-   * ---------------------------------------------------------
-   * STEP 6: Premium student can load discussions
+   * STEP 3: Load all Class Discussion posts
    * ---------------------------------------------------------
    */
   await loadPosts();
-
 }
-/* ============================================================
-   AUTH LISTENER
-   ============================================================ */
-
-function setupAuthListener() {
-
-  if (!supabaseClient) return;
-
-
-  supabaseClient.auth.onAuthStateChange(
-    async (_event, session) => {
-
-      currentUser =
-        session?.user || null;
-
-
-      updateUserStatus();
-
-
-      /*
-       * Re-render so "Delete" and "My Posts" update
-       * immediately after login/logout.
-       */
-
-      renderPosts();
-
-    }
-  );
-}
-
-
-/* ============================================================
-   CUSTOM CSS
-   ============================================================ */
-
-const customStyle =
-document.createElement("style");
-
-
-customStyle.textContent = `
-
-  .category-btn {
-    background: white;
-    border: 1px solid #d1d5db;
-    color: #374151;
-    padding: 10px 12px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s ease;
-  }
-
-  .category-btn:hover {
-    background: #eff6ff;
-    border-color: #93c5fd;
-  }
-
-  .active-category {
-    background: #1d4ed8 !important;
-    border-color: #1d4ed8 !important;
-    color: white !important;
-  }
-
-  .view-btn {
-    background: white;
-    border: 1px solid #d1d5db;
-    color: #374151;
-    padding: 9px 14px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-
-  .active-view {
-    background: #172554 !important;
-    color: white !important;
-    border-color: #172554 !important;
-  }
-
-  .action-btn {
-    background: #f8fafc;
-    border: 1px solid #e5e7eb;
-    color: #374151;
-    padding: 7px 11px;
-    border-radius: 9px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .2s ease;
-  }
-
-  .action-btn:hover {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-  }
-
-  .report-btn:hover {
-    background: #fff7ed;
-    border-color: #fed7aa;
-    color: #c2410c;
-  }
-
-`;
-
-
-document.head.appendChild(customStyle);
-
-
-/* ============================================================
-   START
-   ============================================================ */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  async () => {
-
-    await initializePage();
-
-    setupAuthListener();
-
-  }
 );
 
 </script>
