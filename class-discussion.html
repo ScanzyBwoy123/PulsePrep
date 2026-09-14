@@ -7,7 +7,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
+<script src="auth.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -580,20 +580,12 @@
    SUPABASE
    ============================================================ */
 
-const SUPABASE_URL =
-  "https://eskwphjtiogguhvtktmh.supabase.co";
-
 /*
- * Keep your existing publishable/anon key here if your current
- * PulsePrep project does not already expose it globally.
+ * PulsePrep authentication is provided by auth.js.
+ * This page uses the same Supabase client as index.html.
  *
- * The page first tries the existing PulsePrep Supabase client.
+ * Do NOT add another Supabase URL or API key here.
  */
-
-const SUPABASE_PUBLISHABLE_KEY =
-  "YOUR_EXISTING_PULSEPREP_PUBLISHABLE_KEY";
-
-
 /* ============================================================
    SUBJECT LIST
    ============================================================ */
@@ -652,47 +644,18 @@ let reportPostId = null;
 function initializeSupabase() {
 
   /*
-   * Reuse the existing PulsePrep client if available.
+   * Use the SAME Supabase client created by
+   * PulsePrep's existing auth.js.
+   *
+   * Do not create another client here.
    */
-
   if (window.pulseprepSupabase) {
     supabaseClient = window.pulseprepSupabase;
     return true;
   }
 
-  /*
-   * Reuse window.supabaseClient if another PulsePrep file
-   * already created it.
-   */
-
-  if (window.supabaseClient) {
-    supabaseClient = window.supabaseClient;
-    return true;
-  }
-
-  /*
-   * Create a client only when a publishable key is available.
-   */
-
-  if (
-    window.supabase &&
-    typeof window.supabase.createClient === "function" &&
-    SUPABASE_PUBLISHABLE_KEY
-  ) {
-    supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_PUBLISHABLE_KEY
-      );
-
-    window.pulseprepSupabase = supabaseClient;
-
-    return true;
-  }
-
   return false;
 }
-
 
 /* ============================================================
    LOGIN
@@ -2204,10 +2167,24 @@ async function initializePage() {
 
   setupEventListeners();
 
+  /*
+   * auth.js loads the Supabase client asynchronously.
+   * Wait for PulsePrep's existing client to become available.
+   */
+  let connected = initializeSupabase();
 
-  const connected =
-    initializeSupabase();
+  let attempts = 0;
 
+  while (!connected && attempts < 50) {
+
+    await new Promise(resolve =>
+      setTimeout(resolve, 100)
+    );
+
+    connected = initializeSupabase();
+
+    attempts++;
+  }
 
   if (!connected) {
 
@@ -2215,24 +2192,19 @@ async function initializePage() {
       .getElementById("loadingState")
       ?.classList.add("hidden");
 
-
     showStatus(
-      "PulsePrep Supabase authentication is not available on this page yet. Make sure the existing Supabase publishable key is loaded.",
+      "PulsePrep Supabase authentication is not available on this page yet. Make sure the existing PulsePrep authentication system is loaded.",
       "error"
     );
 
-
     return;
   }
-
 
   await loadCurrentUser();
 
   await loadPosts();
 
 }
-
-
 /* ============================================================
    AUTH LISTENER
    ============================================================ */
