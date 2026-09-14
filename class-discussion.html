@@ -2534,15 +2534,17 @@ async function initializePage() {
    * No Premium verification is required.
    * ---------------------------------------------------------
    */
-  await loadCurrentUser();
-  /*
-   * ---------------------------------------------------------
-   * STEP 3: Load all Class Discussion posts
-   * ---------------------------------------------------------
-   */
-  await loadPosts();
-}
-);
+  console.log("CLASS DISCUSSION: loadCurrentUser starting");
+
+await loadCurrentUser();
+
+console.log("CLASS DISCUSSION: loadCurrentUser finished");
+
+console.log("CLASS DISCUSSION: loadPosts starting");
+
+await loadPosts();
+
+console.log("CLASS DISCUSSION: loadPosts finished");
 
 </script>
 
