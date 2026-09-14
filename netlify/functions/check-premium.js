@@ -2,6 +2,10 @@ const { createClient } = require("@supabase/supabase-js");
 
 exports.handler = async (event) => {
   try {
+
+    /*
+     * Only GET requests are allowed.
+     */
     if (event.httpMethod !== "GET") {
       return {
         statusCode: 405,
@@ -14,11 +18,19 @@ exports.handler = async (event) => {
       };
     }
 
+    /*
+     * ---------------------------------------------------------
+     * GET ACCESS TOKEN
+     * ---------------------------------------------------------
+     */
     const authHeader =
-      event.headers.authorization ||
-      event.headers.Authorization;
+      event.headers?.authorization ||
+      event.headers?.Authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (
+      !authHeader ||
+      !authHeader.startsWith("Bearer ")
+    ) {
       return {
         statusCode: 401,
         headers: {
@@ -30,14 +42,44 @@ exports.handler = async (event) => {
       };
     }
 
-    const accessToken = authHeader.substring(7);
+    const accessToken =
+      authHeader.substring(7).trim();
 
-    const supabaseUrl = process.env.SUPABASE_URL;
+    if (!accessToken) {
+      return {
+        statusCode: 401,
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          error: "Missing access token"
+        })
+      };
+    }
+
+    /*
+     * ---------------------------------------------------------
+     * SUPABASE CONFIGURATION
+     * ---------------------------------------------------------
+     *
+     * Use the existing PulsePrep Supabase project.
+     *
+     * SUPABASE_URL is supported if it exists.
+     * The fallback keeps this function tied to the
+     * existing PulsePrep project.
+     */
+    const supabaseUrl =
+      process.env.SUPABASE_URL ||
+      "https://eskwphjtiogguhvtktmh.supabase.co";
+
     const serviceRoleKey =
       process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!supabaseUrl || !serviceRoleKey) {
-      console.error("Missing Supabase environment variables");
+    if (!serviceRoleKey) {
+
+      console.error(
+        "CHECK PREMIUM: SUPABASE_SERVICE_ROLE_KEY is missing."
+      );
 
       return {
         statusCode: 500,
@@ -45,11 +87,17 @@ exports.handler = async (event) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY"
+          error:
+            "Premium verification is not configured correctly."
         })
       };
     }
 
+    /*
+     * ---------------------------------------------------------
+     * ADMIN SUPABASE CLIENT
+     * ---------------------------------------------------------
+     */
     const supabaseAdmin = createClient(
       supabaseUrl,
       serviceRoleKey,
@@ -61,13 +109,25 @@ exports.handler = async (event) => {
       }
     );
 
+    /*
+     * ---------------------------------------------------------
+     * VERIFY LOGGED-IN USER
+     * ---------------------------------------------------------
+     */
     const {
-      data: { user },
+      data: userData,
       error: userError
-    } = await supabaseAdmin.auth.getUser(accessToken);
+    } =
+      await supabaseAdmin.auth.getUser(
+        accessToken
+      );
 
-    if (userError || !user) {
-      console.error("USER VERIFICATION ERROR:", userError);
+    if (userError || !userData?.user) {
+
+      console.error(
+        "CHECK PREMIUM USER ERROR:",
+        userError
+      );
 
       return {
         statusCode: 401,
@@ -75,45 +135,62 @@ exports.handler = async (event) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: "Invalid or expired session",
-          details: userError?.message || "No user returned"
+          error:
+            "Invalid or expired login session."
         })
       };
     }
 
-    const email = user.email?.trim().toLowerCase();
+    const user =
+      userData.user;
+
+    const email =
+      user.email
+        ?.trim()
+        .toLowerCase();
 
     if (!email) {
+
       return {
         statusCode: 403,
         headers: {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: "Account email not available"
+          error:
+            "Your account does not have an email address."
         })
       };
     }
 
+    /*
+     * ---------------------------------------------------------
+     * CHECK PREMIUM SUBSCRIPTION
+     * ---------------------------------------------------------
+     *
+     * A successful subscription for the logged-in
+     * student's email gives Premium access.
+     */
     const {
-      data: subscription,
+      data: subscriptions,
       error: subscriptionError
-    } = await supabaseAdmin
-      .from("subscriptions")
-      .select(
-        "email, reference, amount, status, plan, paid_at"
-      )
-      .eq("email", email)
-      .eq("status", "success")
-      .order("paid_at", {
-        ascending: false
-      })
-      .limit(1)
-      .maybeSingle();
+    } =
+      await supabaseAdmin
+        .from("subscriptions")
+        .select(
+          "email, reference, amount, status, plan, paid_at"
+        )
+        .eq("email", email)
+        .eq("status", "success")
+        .order("paid_at", {
+          ascending: false
+        })
+        .limit(1);
 
     if (subscriptionError) {
+
       console.error(
-        "SUBSCRIPTION ERROR:",
+        "CHECK PREMIUM SUBSCRIPTION ERROR:",
         subscriptionError
       );
 
@@ -123,14 +200,25 @@ exports.handler = async (event) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          error: "Subscription lookup failed",
-          details: subscriptionError.message
+          error:
+            "Unable to check your Premium subscription.",
+          details:
+            subscriptionError.message
         })
       };
     }
 
-    const premium = !!subscription;
+    const subscription =
+      subscriptions?.[0] || null;
 
+    const premium =
+      subscription !== null;
+
+    /*
+     * ---------------------------------------------------------
+     * RETURN PREMIUM STATUS
+     * ---------------------------------------------------------
+     */
     return {
       statusCode: 200,
       headers: {
@@ -139,15 +227,21 @@ exports.handler = async (event) => {
       },
       body: JSON.stringify({
         authenticated: true,
-        premium,
-        email,
-        plan: subscription?.plan || null,
-        paidAt: subscription?.paid_at || null
+        premium: premium,
+        email: email,
+        plan:
+          subscription?.plan || null,
+        paidAt:
+          subscription?.paid_at || null
       })
     };
 
   } catch (error) {
-    console.error("CHECK PREMIUM CRASH:", error);
+
+    console.error(
+      "CHECK PREMIUM CRASH:",
+      error
+    );
 
     return {
       statusCode: 500,
@@ -155,8 +249,10 @@ exports.handler = async (event) => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        error: "Internal server error",
-        details: error.message
+        error:
+          "Internal Premium verification error.",
+        details:
+          error?.message || "Unknown error"
       })
     };
   }
