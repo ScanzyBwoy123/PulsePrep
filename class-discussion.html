@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Discussions | PulsePrep</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f7fb;
+      color: #172033;
+      min-height: 100vh;
+    }
+    /* =========================
+       HEADER
+    ========================= */
+    .topbar {
+      background: linear-gradient(135deg, #0b63ce, #084b9b);
+      color: white;
+      padding: 18px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+    }
+    .topbar-inner {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: white;
+      color: #0b63ce;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .brand-text h1 {
+      font-size: 21px;
+    }
+    .brand-text p {
+      font-size: 12px;
+      opacity: 0.85;
+      margin-top: 2px;
+    }
+    .back-btn {
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.12);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .back-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    /* =========================
+       PAGE
+    ========================= */
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: 25px 18px 60px;
+    }
+    .hero {
+      background: white;
+      border-radius: 18px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 18px rgba(20, 50, 90, 0.07);
+    }
+    .hero h2 {
+      color: #0b63ce;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .hero p {
+      color: #64748b;
+      line-height: 1.6;
+    }
+    /* =========================
+       ACTIONS
+    ========================= */
+    .actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .primary-btn,
+    .secondary-btn {
+      border: none;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .primary-btn {
+      background: #0b63ce;
+      color: white;
+    }
+    .primary-btn:hover {
+      background: #084b9b;
+    }
+    .secondary-btn {
+      background: #eaf2ff;
+      color: #0b63ce;
+    }
+    /* =========================
+       SEARCH
+    ========================= */
+    .search-section {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 18px rgba(20, 50, 90, 0.06);
+    }
+    .search-box {
+      display: flex;
+      gap: 10px;
+    }
+    .search-box input {
+      flex: 1;
+      padding: 13px 15px;
+      border: 1px solid #d7dfeb;
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+    }
+    .search-box input:focus {
+      border-color: #0b63ce;
+      box-shadow: 0 0 0 3px rgba(11, 99, 206, 0.08);
+    }
+    /* =========================
+       FILTERS
+    ========================= */
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .filters select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d7dfeb;
+      border-radius: 10px;
+      background: white;
+      outline: none;
+    }
+    /* =========================
+       DISCUSSIONS
+    ========================= */
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 10px;
+    }
+    .section-title h3 {
+      font-size: 20px;
+    }
+    .discussion-count {
+      font-size: 13px;
+      color: #64748b;
+    }
+    .discussion-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 18px rgba(20, 50, 90, 0.06);
+      border: 1px solid #edf1f7;
+    }
+    .discussion-card:hover {
+      border-color: #cfe0f8;
+    }
+    .discussion-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #dcecff;
+      color: #0b63ce;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    .author-info strong {
+      display: block;
+      font-size: 14px;
+    }
+    .author-info span {
+      font-size: 12px;
+      color: #8994a5;
+    }
+    .badge {
+      display: inline-block;
+      background: #eaf2ff;
+      color: #0b63ce;
+      padding: 5px 9px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .discussion-card h4 {
+      font-size: 18px;
+      margin-bottom: 9px;
+      color: #172033;
+    }
+    .discussion-card p {
+      color: #5f6b7a;
+      line-height: 1.65;
+      font-size: 14px;
+    }
+    .discussion-footer {
+      border-top: 1px solid #edf1f7;
+      margin-top: 17px;
+      padding-top: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .discussion-actions {
+      display: flex;
+      gap: 8px;
+    }
+    .small-btn {
+      background: #f5f7fa;
+      border: 1px solid #e4e9f0;
+      padding: 8px 11px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: #465467;
+      font-size: 12px;
+    }
+    .small-btn:hover {
+      background: #eaf2ff;
+      color: #0b63ce;
+    }
+    .replies {
+      color: #64748b;
+      font-size: 12px;
+    }
+    /* =========================
+       EMPTY STATE
+    ========================= */
+    .empty {
+      text-align: center;
+      padding: 45px 20px;
+      background: white;
+      border-radius: 15px;
+      color: #64748b;
+    }
+    .empty-icon {
+      font-size: 45px;
+      margin-bottom: 10px;
+    }
+    /* =========================
+       MODAL
+    ========================= */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 25, 45, 0.58);
+      z-index: 500;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .modal.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      background: white;
+      width: 100%;
+      max-width: 600px;
+      border-radius: 18px;
+      padding: 25px;
+      position: relative;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-header h3 {
+      font-size: 21px;
+      color: #0b63ce;
+    }
+    .close-btn {
+      border: none;
+      background: #f1f4f8;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 700;
+      font-size: 13px;
+      margin-bottom: 7px;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      border: 1px solid #d7dfeb;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      outline: none;
+      font-family: inherit;
+    }
+    .form-group textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      border-color: #0b63ce;
+      box-shadow: 0 0 0 3px rgba(11,99,206,0.08);
+    }
+    .form-note {
+      font-size: 12px;
+      color: #7a8697;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    /* =========================
+       TOAST
+    ========================= */
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: #172033;
+      color: white;
+      padding: 13px 17px;
+      border-radius: 10px;
+      display: none;
+      z-index: 1000;
+      font-size: 13px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+    .toast.show {
+      display: block;
+    }
+    /* =========================
+       MOBILE
+    ========================= */
+    @media (max-width: 650px) {
+      .topbar-inner {
+        align-items: flex-start;
+      }
+      .back-btn {
+        padding: 8px 10px;
+        font-size: 12px;
+      }
+      .hero {
+        padding: 20px;
+      }
+      .hero h2 {
+        font-size: 23px;
+      }
+      .filters {
+        grid-template-columns: 1fr;
+      }
+      .search-box {
+        flex-direction: column;
+      }
+      .discussion-card {
+        padding: 16px;
+      }
+      .discussion-footer {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- =========================
+       HEADER
+  ========================= -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-icon">P</div>
+        <div class="brand-text">
+          <h1>PulsePrep</h1>
+          <p>Student Learning Community</p>
+        </div>
+      </div>
+      <button class="back-btn" onclick="goBack()">
+        ← Back
+      </button>
+    </div>
+  </header>
+  <!-- =========================
+       MAIN CONTENT
+  ========================= -->
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <h2>💬 Class Discussions</h2>
+      <p>
+        Ask questions from class, discuss difficult topics,
+        share explanations and learn together with other students.
+      </p>
+      <div class="actions">
+        <button class="primary-btn" onclick="openQuestionModal()">
+          + Ask a Question
+        </button>
+        <button class="secondary-btn" onclick="showMyQuestions()">
+          My Questions
+        </button>
+      </div>
+    </section>
+    <!-- SEARCH -->
+    <section class="search-section">
+      <div class="search-box">
+        <input
+          type="search"
+          id="searchInput"
+          placeholder="Search discussions, topics or questions..."
+          oninput="filterDiscussions()"
+        >
+        <button
+          class="primary-btn"
+          onclick="filterDiscussions()"
+        >
+          Search
+        </button>
+      </div>
+      <div class="filters">
+        <select id="subjectFilter" onchange="filterDiscussions()">
+          <option value="">All Subjects</option>
+          <option value="Anatomy & Physiology">
+            Anatomy & Physiology
+          </option>
+          <option value="Pharmacology">
+            Pharmacology
+          </option>
+          <option value="Medical-Surgical Nursing">
+            Medical-Surgical Nursing
+          </option>
+          <option value="Fundamentals of Nursing">
+            Fundamentals of Nursing
+          </option>
+          <option value="Microbiology">
+            Microbiology
+          </option>
+          <option value="Maternal & Child Health">
+            Maternal & Child Health
+          </option>
+          <option value="Mental Health Nursing">
+            Mental Health Nursing
+          </option>
+          <option value="Community Health Nursing">
+            Community Health Nursing
+          </option>
+        </select>
+        <select id="sortFilter" onchange="sortDiscussions()">
+          <option value="latest">Latest</option>
+          <option value="popular">Most Popular</option>
+          <option value="replies">Most Discussed</option>
+        </select>
+      </div>
+    </section>
+    <!-- DISCUSSIONS -->
+    <section>
+      <div class="section-title">
+        <h3>Recent Discussions</h3>
+        <span
+          class="discussion-count"
+          id="discussionCount"
+        >
+          3 discussions
+        </span>
+      </div>
+      <div id="discussionList">
+        <!-- DISCUSSION 1 -->
+        <article
+          class="discussion-card"
+          data-subject="Pharmacology"
+          data-title="What is the difference between absorption and distribution?"
+          data-popularity="25"
+          data-replies="8"
+        >
+          <div class="discussion-meta">
+            <div class="avatar">
+              A
+            </div>
+            <div class="author-info">
+              <strong>Student</strong>
+              <span>Today • 9:15 AM</span>
+            </div>
+            <span class="badge">
+              Pharmacology
+            </span>
+          </div>
+          <h4>
+            What is the difference between absorption and distribution?
+          </h4>
+          <p>
+            I'm finding it difficult to understand the difference
+            between drug absorption and distribution. Can someone
+            explain it in simple terms?
+          </p>
+          <div class="discussion-footer">
+            <div class="discussion-actions">
+              <button
+                class="small-btn"
+                onclick="likeDiscussion(this)"
+              >
+                👍 <span>25</span>
+              </button>
+              <button
+                class="small-btn"
+                onclick="openDiscussion(this)"
+              >
+                💬 Discuss
+              </button>
+              <button
+                class="small-btn"
+                onclick="reportDiscussion()"
+              >
+                🚩 Report
+              </button>
+            </div>
+            <span class="replies">
+              8 replies
+            </span>
+          </div>
+        </article>
+        <!-- DISCUSSION 2 -->
+        <article
+          class="discussion-card"
+          data-subject="Anatomy & Physiology"
+          data-title="Can someone explain the cardiac cycle?"
+          data-popularity="18"
+          data-replies="5"
+        >
+          <div class="discussion-meta">
+            <div class="avatar">
+              M
+            </div>
+            <div class="author-info">
+              <strong>Student</strong>
+              <span>Yesterday • 6:40 PM</span>
+            </div>
+            <span class="badge">
+              Anatomy & Physiology
+            </span>
+          </div>
+          <h4>
+            Can someone explain the cardiac cycle?
+          </h4>
+          <p>
+            I understand systole and diastole separately,
+            but I'm confused about how they work together
+            during the complete cardiac cycle.
+          </p>
+          <div class="discussion-footer">
+            <div class="discussion-actions">
+              <button
+                class="small-btn"
+                onclick="likeDiscussion(this)"
+              >
+                👍 <span>18</span>
+              </button>
+              <button
+                class="small-btn"
+                onclick="openDiscussion(this)"
+              >
+                💬 Discuss
+              </button>
+              <button
+                class="small-btn"
+                onclick="reportDiscussion()"
+              >
+                🚩 Report
+              </button>
+            </div>
+            <span class="replies">
+              5 replies
+            </span>
+          </div>
+        </article>
+        <!-- DISCUSSION 3 -->
+        <article
+          class="discussion-card"
+          data-subject="Fundamentals of Nursing"
+          data-title="What are the principles of therapeutic communication?"
+          data-popularity="31"
+          data-replies="12"
+        >
+          <div class="discussion-meta">
+            <div class="avatar">
+              K
+            </div>
+            <div class="author-info">
+              <strong>Student</strong>
+              <span>2 days ago • 2:20 PM</span>
+            </div>
+            <span class="badge">
+              Fundamentals of Nursing
+            </span>
+          </div>
+          <h4>
+            What are the principles of therapeutic communication?
+          </h4>
+          <p>
+            Please can someone explain therapeutic communication
+            and give some examples that can help us remember it
+            for examinations?
+          </p>
+          <div class="discussion-footer">
+            <div class="discussion-actions">
+              <button
+                class="small-btn"
+                onclick="likeDiscussion(this)"
+              >
+                👍 <span>31</span>
+              </button>
+              <button
+                class="small-btn"
+                onclick="openDiscussion(this)"
+              >
+                💬 Discuss
+              </button>
+              <button
+                class="small-btn"
+                onclick="reportDiscussion()"
+              >
+                🚩 Report
+              </button>
+            </div>
+            <span class="replies">
+              12 replies
+            </span>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <!-- =========================
+       ASK QUESTION MODAL
+  ========================= -->
+  <div
+    class="modal"
+    id="questionModal"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Ask a Class Question</h3>
+        <button
+          class="close-btn"
+          onclick="closeQuestionModal()"
+        >
+          ×
+        </button>
+      </div>
+      <p class="form-note">
+        Ask something you learned in class or something
+        you need help understanding. Be respectful and
+        provide enough information for other students to help.
+      </p>
+      <form onsubmit="submitQuestion(event)">
+        <div class="form-group">
+          <label for="questionSubject">
+            Subject
+          </label>
+          <select id="questionSubject" required>
+            <option value="">
+              Select subject
+            </option>
+            <option>
+              Anatomy & Physiology
+            </option>
+            <option>
+              Pharmacology
+            </option>
+            <option>
+              Medical-Surgical Nursing
+            </option>
+            <option>
+              Fundamentals of Nursing
+            </option>
+            <option>
+              Microbiology
+            </option>
+            <option>
+              Maternal & Child Health
+            </option>
+            <option>
+              Mental Health Nursing
+            </option>
+            <option>
+              Community Health Nursing
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="questionTopic">
+            Topic
+          </label>
+          <input
+            type="text"
+            id="questionTopic"
+            placeholder="Example: Therapeutic Communication"
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="questionTitle">
+            Question Title
+          </label>
+          <input
+            type="text"
+            id="questionTitle"
+            placeholder="What do you want to understand?"
+            maxlength="150"
+            required
+          >
+        </div>
+        <div class="form-group">
+          <label for="questionBody">
+            Explain your question
+          </label>
+          <textarea
+            id="questionBody"
+            placeholder="Write your question here..."
+            required
+          ></textarea>
+        </div>
+        <button
+          type="submit"
+          class="primary-btn"
+          style="width:100%;"
+        >
+          Post Question
+        </button>
+      </form>
+    </div>
+  </div>
+  <!-- TOAST -->
+  <div
+    class="toast"
+    id="toast"
+  ></div>
+  <!-- =========================
+       JAVASCRIPT
+  ========================= -->
+  <script>
+    /*
+      ==============================================
+      PULSEPREP CLASS DISCUSSION
+      FRONTEND VERSION
+      Supabase will be connected in the next step.
+      ==============================================
+    */
+    function goBack() {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "index.html";
+      }
+    }
+    function openQuestionModal() {
+      document
+        .getElementById("questionModal")
+        .classList.add("show");
+    }
+    function closeQuestionModal() {
+      document
+        .getElementById("questionModal")
+        .classList.remove("show");
+    }
+    function showToast(message) {
+      const toast =
+        document.getElementById("toast");
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(function() {
+        toast.classList.remove("show");
+      }, 2500);
+    }
+    function submitQuestion(event) {
+      event.preventDefault();
+      const subject =
+        document.getElementById("questionSubject").value;
+      const topic =
+        document.getElementById("questionTopic").value.trim();
+      const title =
+        document.getElementById("questionTitle").value.trim();
+      const body =
+        document.getElementById("questionBody").value.trim();
+      if (!subject || !topic || !title || !body) {
+        showToast("Please complete all fields.");
+        return;
+      }
+      /*
+        TEMPORARY:
+        We are not saving to Supabase yet.
+        This prevents this new page from affecting
+        your existing database.
+      */
+      showToast(
+        "Question ready! Database connection will be added next."
+      );
+      document
+        .getElementById("questionSubject")
+        .value = "";
+      document
+        .getElementById("questionTopic")
+        .value = "";
+      document
+        .getElementById("questionTitle")
+        .value = "";
+      document
+        .getElementById("questionBody")
+        .value = "";
+      setTimeout(function() {
+        closeQuestionModal();
+      }, 700);
+    }
+    function likeDiscussion(button) {
+      const span =
+        button.querySelector("span");
+      let current =
+        parseInt(span.textContent) || 0;
+      current++;
+      span.textContent = current;
+      button.disabled = true;
+      button.style.opacity = "0.7";
+      showToast("Thanks for supporting this discussion.");
+    }
+    function openDiscussion(button) {
+      const card =
+        button.closest(".discussion-card");
+      const title =
+        card.querySelector("h4").textContent.trim();
+      showToast(
+        "Discussion page for: " + title
+      );
+      /*
+        Later this will open:
+        discussion.html?id=DISCUSSION_ID
+      */
+    }
+    function reportDiscussion() {
+      const confirmed =
+        confirm(
+          "Do you want to report this discussion for review?"
+        );
+      if (confirmed) {
+        showToast(
+          "Report received. An administrator can review it."
+        );
+      }
+    }
+    function filterDiscussions() {
+      const search =
+        document
+          .getElementById("searchInput")
+          .value
+          .toLowerCase()
+          .trim();
+      const subject =
+        document
+          .getElementById("subjectFilter")
+          .value;
+      const cards =
+        document.querySelectorAll(
+          ".discussion-card"
+        );
+      let visible = 0;
+      cards.forEach(function(card) {
+        const title =
+          card
+            .dataset
+            .title
+            .toLowerCase();
+        const cardSubject =
+          card.dataset.subject;
+        const content =
+          card.textContent.toLowerCase();
+        const matchesSearch =
+          !search ||
+          title.includes(search) ||
+          content.includes(search);
+        const matchesSubject =
+          !subject ||
+          cardSubject === subject;
+        if (
+          matchesSearch &&
+          matchesSubject
+        ) {
+          card.style.display = "block";
+          visible++;
+        } else {
+          card.style.display = "none";
+        }
+      });
+      document
+        .getElementById("discussionCount")
+        .textContent =
+        visible +
+        (visible === 1
+          ? " discussion"
+          : " discussions");
+    }
+    function sortDiscussions() {
+      const sort =
+        document
+          .getElementById("sortFilter")
+          .value;
+      const list =
+        document.getElementById("discussionList");
+      const cards =
+        Array.from(
+          list.querySelectorAll(".discussion-card")
+        );
+      cards.sort(function(a, b) {
+        if (sort === "popular") {
+          return (
+            parseInt(b.dataset.popularity) -
+            parseInt(a.dataset.popularity)
+          );
+        }
+        if (sort === "replies") {
+          return (
+            parseInt(b.dataset.replies) -
+            parseInt(a.dataset.replies)
+          );
+        }
+        return 0;
+      });
+      cards.forEach(function(card) {
+        list.appendChild(card);
+      });
+      filterDiscussions();
+    }
+    function showMyQuestions() {
+      showToast(
+        "Your personal questions will appear here after login is connected."
+      );
+    }
+    /*
+      Close modal when clicking outside it.
+    */
+    document
+      .getElementById("questionModal")
+      .addEventListener(
+        "click",
+        function(event) {
+          if (
+            event.target === this
+          ) {
+            closeQuestionModal();
+          }
+        }
+      );
+  </script>
+</body>
+</html>
