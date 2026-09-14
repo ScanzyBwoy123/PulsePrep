@@ -2488,8 +2488,9 @@ async function initializePage() {
   setupEventListeners();
 
   /*
-   * auth.js loads the Supabase client asynchronously.
-   * Wait for PulsePrep's existing client to become available.
+   * ---------------------------------------------------------
+   * STEP 1: Connect to the existing PulsePrep Supabase client
+   * ---------------------------------------------------------
    */
   let connected = initializeSupabase();
 
@@ -2513,22 +2514,35 @@ async function initializePage() {
       ?.classList.add("hidden");
 
     showStatus(
-      "PulsePrep Supabase authentication is not available on this page yet. Make sure the existing PulsePrep authentication system is loaded.",
+      "PulsePrep authentication could not be loaded. Please refresh the page.",
       "error"
     );
 
     return;
   }
+
   /*
-   * PREMIUM ACCESS CHECK
-   * Uses the same Premium system as Question Bank.
+   * ---------------------------------------------------------
+   * STEP 2: Load the currently logged-in PulsePrep student
+   * ---------------------------------------------------------
    */
-  let premiumStatus;
+  await loadCurrentUser();
+
+  /*
+   * ---------------------------------------------------------
+   * STEP 3: Check Premium access
+   * ---------------------------------------------------------
+   */
+  let premiumStatus = null;
 
   try {
 
-    if (typeof window.checkPulsePrepPremium !== "function") {
-      throw new Error("Premium verification system is not loaded.");
+    if (
+      typeof window.checkPulsePrepPremium !== "function"
+    ) {
+      throw new Error(
+        "PulsePrep Premium verification system is not loaded."
+      );
     }
 
     premiumStatus =
@@ -2541,43 +2555,47 @@ async function initializePage() {
       error
     );
 
-    showStatus(
-      "Unable to verify your Premium access. Please refresh the page and try again.",
-      "error"
-    );
-
     document
       .getElementById("loadingState")
       ?.classList.add("hidden");
 
+    showStatus(
+      "Unable to verify Premium access. Please refresh the page and try again.",
+      "error"
+    );
+
     return;
   }
 
   /*
-   * Student must be logged in.
+   * ---------------------------------------------------------
+   * STEP 4: Student must be logged in
+   * ---------------------------------------------------------
    */
   if (!premiumStatus?.authenticated) {
 
-    showPremiumDiscussionLock(
-      "login"
-    );
+    showPremiumDiscussionLock("login");
 
     return;
   }
 
   /*
-   * Student must have active Premium access.
+   * ---------------------------------------------------------
+   * STEP 5: Student must have Premium
+   * ---------------------------------------------------------
    */
   if (premiumStatus.premium !== true) {
 
-    showPremiumDiscussionLock(
-      "premium"
-    );
+    showPremiumDiscussionLock("premium");
 
     return;
   }
-  await loadCurrentUser();
 
+  /*
+   * ---------------------------------------------------------
+   * STEP 6: Premium student can load discussions
+   * ---------------------------------------------------------
+   */
   await loadPosts();
 
 }
