@@ -214,13 +214,33 @@ async function checkPulsePrepPremium() {
   );
 
   if (!response.ok) {
-    throw new Error(
-      "Unable to verify Premium status."
+
+  let errorMessage =
+    "Unable to verify Premium status.";
+
+  try {
+
+    const errorData =
+      await response.json();
+
+    errorMessage =
+      errorData?.details ||
+      errorData?.error ||
+      errorMessage;
+
+  } catch (parseError) {
+
+    console.error(
+      "Premium error response could not be read:",
+      parseError
     );
+
   }
 
-  return await response.json();
+  throw new Error(errorMessage);
 }
+
+return await response.json();
 
 
 // Make it available to PulsePrep
