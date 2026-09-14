@@ -4,1606 +4,2361 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Class Discussions | PulsePrep</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
     }
+
     body {
+      margin: 0;
       font-family: Arial, Helvetica, sans-serif;
       background: #f4f7fb;
       color: #172033;
-      min-height: 100vh;
     }
+
     button,
     input,
-    select,
-    textarea {
-      font-family: inherit;
+    textarea,
+    select {
+      font: inherit;
     }
-    button {
-      cursor: pointer;
-    }
-    /* =========================
-       HEADER
-    ========================= */
-    .topbar {
-      background: linear-gradient(135deg, #0b63ce, #084b9b);
-      color: white;
-      padding: 17px 20px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 3px 12px rgba(0,0,0,.12);
-    }
-    .topbar-inner {
-      max-width: 1100px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-    }
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .brand-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 12px;
-      background: white;
-      color: #0b63ce;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: 800;
-    }
-    .brand-text h1 {
-      font-size: 21px;
-    }
-    .brand-text p {
-      font-size: 12px;
-      opacity: .85;
-      margin-top: 2px;
-    }
-    .back-btn {
-      border: 1px solid rgba(255,255,255,.35);
-      background: rgba(255,255,255,.12);
-      color: white;
-      padding: 10px 15px;
-      border-radius: 9px;
-      font-weight: 600;
-    }
-    .back-btn:hover {
-      background: rgba(255,255,255,.2);
-    }
-    /* =========================
-       MAIN
-    ========================= */
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 25px 18px 60px;
-    }
-    .hero {
-      background: white;
-      border-radius: 18px;
-      padding: 25px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 18px rgba(20,50,90,.07);
-    }
-    .hero h2 {
-      color: #0b63ce;
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-    .hero p {
-      color: #64748b;
-      line-height: 1.6;
-    }
-    .user-status {
-      margin-top: 12px;
-      font-size: 13px;
-      color: #64748b;
-    }
-    .user-status strong {
-      color: #0b63ce;
-    }
-    /* =========================
-       BUTTONS
-    ========================= */
-    .actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 20px;
-    }
-    .primary-btn,
-    .secondary-btn {
-      border: none;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-weight: 700;
-      font-size: 14px;
-    }
-    .primary-btn {
-      background: #0b63ce;
-      color: white;
-    }
-    .primary-btn:hover {
-      background: #084b9b;
-    }
-    .primary-btn:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-    .secondary-btn {
-      background: #eaf2ff;
-      color: #0b63ce;
-    }
-    /* =========================
-       SEARCH
-    ========================= */
-    .search-section {
-      background: white;
-      padding: 18px;
-      border-radius: 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 18px rgba(20,50,90,.06);
-    }
-    .search-box {
-      display: flex;
-      gap: 10px;
-    }
-    .search-box input {
-      flex: 1;
-      padding: 13px 15px;
-      border: 1px solid #d7dfeb;
-      border-radius: 10px;
-      outline: none;
-      font-size: 14px;
-    }
-    .search-box input:focus,
-    .filters select:focus,
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: #0b63ce;
-      box-shadow: 0 0 0 3px rgba(11,99,206,.08);
-    }
-    .filters {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 12px;
-    }
-    .filters select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #d7dfeb;
-      border-radius: 10px;
-      background: white;
-      outline: none;
-    }
-    /* =========================
-       SECTION
-    ========================= */
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-      gap: 10px;
-    }
-    .section-title h3 {
-      font-size: 20px;
-    }
-    .discussion-count {
-      font-size: 13px;
-      color: #64748b;
-    }
-    /* =========================
-       DISCUSSION CARD
-    ========================= */
-    .discussion-card {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 15px;
-      box-shadow: 0 4px 18px rgba(20,50,90,.06);
-      border: 1px solid #edf1f7;
-    }
-    .discussion-card:hover {
-      border-color: #cfe0f8;
-    }
-    .discussion-meta {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-    }
-    .avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: #dcecff;
-      color: #0b63ce;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      flex-shrink: 0;
-    }
-    .author-info strong {
-      display: block;
-      font-size: 14px;
-    }
-    .author-info span {
-      font-size: 12px;
-      color: #8994a5;
-    }
-    .badge {
-      display: inline-block;
-      background: #eaf2ff;
-      color: #0b63ce;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .topic-badge {
-      background: #f1f5f9;
-      color: #64748b;
-    }
-    .discussion-card h4 {
-      font-size: 18px;
-      margin-bottom: 9px;
-      color: #172033;
-    }
-    .discussion-card p {
-      color: #5f6b7a;
-      line-height: 1.65;
-      font-size: 14px;
+
+    .post-body {
       white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.75;
     }
-    .discussion-footer {
-      border-top: 1px solid #edf1f7;
-      margin-top: 17px;
-      padding-top: 13px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
+
+    .hidden {
+      display: none !important;
     }
-    .discussion-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
+
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
-    .small-btn {
-      background: #f5f7fa;
-      border: 1px solid #e4e9f0;
-      padding: 8px 11px;
-      border-radius: 8px;
-      color: #465467;
-      font-size: 12px;
-    }
-    .small-btn:hover {
-      background: #eaf2ff;
-      color: #0b63ce;
-    }
-    .small-btn.liked {
-      background: #dcecff;
-      color: #0b63ce;
-    }
-    .replies {
-      color: #64748b;
-      font-size: 12px;
-    }
-    /* =========================
-       LOADING / EMPTY
-    ========================= */
-    .loading,
-    .empty {
-      text-align: center;
-      padding: 45px 20px;
-      background: white;
-      border-radius: 15px;
-      color: #64748b;
-    }
-    .loading {
-      display: none;
-    }
-    .loading.show {
-      display: block;
-    }
-    .empty-icon {
-      font-size: 42px;
-      margin-bottom: 10px;
-    }
-    /* =========================
-       MODAL
-    ========================= */
-    .modal {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(10,25,45,.58);
-      z-index: 500;
-      padding: 20px;
+
+    .modal-scroll {
+      max-height: calc(100vh - 120px);
       overflow-y: auto;
     }
-    .modal.show {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-content {
-      background: white;
-      width: 100%;
-      max-width: 600px;
-      border-radius: 18px;
-      padding: 25px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.2);
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      gap: 15px;
-    }
-    .modal-header h3 {
-      font-size: 21px;
-      color: #0b63ce;
-    }
-    .close-btn {
-      border: none;
-      background: #f1f4f8;
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      font-size: 18px;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    .form-group label {
-      display: block;
-      font-weight: 700;
-      font-size: 13px;
-      margin-bottom: 7px;
-    }
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-      width: 100%;
-      border: 1px solid #d7dfeb;
-      border-radius: 10px;
-      padding: 12px;
-      font-size: 14px;
-      outline: none;
-    }
-    .form-group textarea {
-      min-height: 150px;
-      resize: vertical;
-    }
-    .form-note {
-      font-size: 12px;
-      color: #7a8697;
-      line-height: 1.5;
-      margin-bottom: 15px;
-    }
-    .login-warning {
-      display: none;
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
-      color: #9a3412;
-      padding: 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      margin-bottom: 15px;
-    }
-    /* =========================
-       TOAST
-    ========================= */
-    .toast {
-      position: fixed;
-      right: 20px;
-      bottom: 20px;
-      background: #172033;
-      color: white;
-      padding: 13px 17px;
-      border-radius: 10px;
-      display: none;
-      z-index: 1000;
-      font-size: 13px;
-      box-shadow: 0 8px 25px rgba(0,0,0,.2);
-      max-width: 340px;
-    }
-    .toast.show {
-      display: block;
-    }
-    /* =========================
-       MOBILE
-    ========================= */
-    @media (max-width: 650px) {
-      .topbar-inner {
-        align-items: flex-start;
-      }
-      .back-btn {
-        padding: 8px 10px;
-        font-size: 12px;
-      }
-      .hero {
-        padding: 20px;
-      }
-      .hero h2 {
-        font-size: 23px;
-      }
-      .filters {
-        grid-template-columns: 1fr;
-      }
-      .search-box {
-        flex-direction: column;
-      }
-      .discussion-card {
-        padding: 16px;
-      }
-      .discussion-footer {
-        align-items: flex-start;
-        flex-direction: column;
+
+    @media (max-width: 640px) {
+      .mobile-full {
+        width: 100%;
       }
     }
   </style>
 </head>
+
 <body>
-  <!-- ========================================================
+
+  <!-- =========================================================
        HEADER
-  ========================================================= -->
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-icon">
-          P
+  ========================================================== -->
+  <header class="bg-blue-700 text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-3">
+      <div class="flex items-center justify-between gap-3">
+
+        <div class="flex items-center gap-3">
+          <a
+            href="index.html"
+            class="bg-white/15 hover:bg-white/25 rounded-lg px-3 py-2 transition"
+          >
+            ←
+          </a>
+
+          <div>
+            <h1 class="font-bold text-lg sm:text-xl">
+              PulsePrep Class Discussions
+            </h1>
+            <p class="text-xs text-blue-100">
+              Learn together. Ask questions. Share knowledge.
+            </p>
+          </div>
         </div>
-        <div class="brand-text">
-          <h1>PulsePrep</h1>
-          <p>Student Learning Community</p>
+
+        <div class="flex items-center gap-2">
+          <span
+            id="userStatus"
+            class="hidden sm:inline text-xs bg-white/15 px-3 py-2 rounded-lg"
+          >
+            Checking login...
+          </span>
+
+          <button
+            id="loginButton"
+            onclick="handleLoginButton()"
+            class="hidden bg-white text-blue-700 font-semibold px-3 py-2 rounded-lg text-sm"
+          >
+            Login
+          </button>
         </div>
+
       </div>
-      <button
-        class="back-btn"
-        onclick="goBack()"
-      >
-        ← Back
-      </button>
     </div>
   </header>
-  <!-- ========================================================
+
+
+  <!-- =========================================================
        MAIN
-  ========================================================= -->
-  <main class="container">
-    <section class="hero">
-      <h2>💬 Class Discussions</h2>
-      <p>
-        Ask questions from class, discuss difficult topics,
-        share explanations and learn together with other
-        PulsePrep students.
+  ========================================================== -->
+  <main class="max-w-7xl mx-auto px-4 py-5">
+
+    <!-- INTRO -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 mb-5">
+
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-2xl">🎓</span>
+            <h2 class="text-xl font-bold">
+              Student Learning Community
+            </h2>
+          </div>
+
+          <p class="text-gray-600 text-sm leading-6">
+            Ask questions, share class notes, discuss difficult topics,
+            exchange study tips and help other nursing students.
+          </p>
+        </div>
+
+        <button
+          id="createPostButton"
+          onclick="openPostModal()"
+          class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-5 py-3 rounded-xl transition"
+        >
+          ＋ Create Post
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         CATEGORIES
+    ======================================================== -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-5">
+
+      <button class="category-btn active-category" data-category="all">
+        📚 All
+      </button>
+
+      <button class="category-btn" data-category="Class Notes">
+        📝 Notes
+      </button>
+
+      <button class="category-btn" data-category="Questions">
+        ❓ Questions
+      </button>
+
+      <button class="category-btn" data-category="Discussions">
+        💬 Discussions
+      </button>
+
+      <button class="category-btn" data-category="Study Tips">
+        💡 Study Tips
+      </button>
+
+      <button class="category-btn" data-category="Clinical Tips">
+        🩺 Clinical Tips
+      </button>
+
+      <button class="category-btn" data-category="Exam Help">
+        🔥 Exam Help
+      </button>
+
+    </section>
+
+
+    <!-- =======================================================
+         SEARCH / FILTER
+    ======================================================== -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-5">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+        <div class="md:col-span-1">
+          <label class="block text-xs font-semibold text-gray-500 mb-1">
+            Search
+          </label>
+
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search discussions..."
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 mb-1">
+            Subject
+          </label>
+
+          <select
+            id="subjectFilter"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Subjects</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 mb-1">
+            Sort
+          </label>
+
+          <select
+            id="sortFilter"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="popular">Most Liked</option>
+          </select>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =======================================================
+         USER TABS
+    ======================================================== -->
+    <section class="flex flex-wrap gap-2 mb-5">
+
+      <button
+        id="allPostsTab"
+        onclick="setView('all')"
+        class="view-btn active-view"
+      >
+        📚 All Posts
+      </button>
+
+      <button
+        id="myPostsTab"
+        onclick="setView('mine')"
+        class="view-btn"
+      >
+        👤 My Posts
+      </button>
+
+    </section>
+
+
+    <!-- =======================================================
+         STATUS
+    ======================================================== -->
+    <div
+      id="statusMessage"
+      class="hidden mb-4 rounded-xl px-4 py-3 text-sm"
+    ></div>
+
+
+    <!-- =======================================================
+         LOADING
+    ======================================================== -->
+    <div
+      id="loadingState"
+      class="bg-white rounded-2xl border border-gray-200 p-10 text-center"
+    >
+      <div class="text-3xl mb-3">⏳</div>
+      <p class="font-semibold text-gray-700">
+        Loading class discussions...
       </p>
-      <div
-        class="user-status"
-        id="userStatus"
+      <p class="text-sm text-gray-500 mt-1">
+        Please wait.
+      </p>
+    </div>
+
+
+    <!-- =======================================================
+         POSTS
+    ======================================================== -->
+    <section
+      id="postsContainer"
+      class="space-y-4"
+    ></section>
+
+
+    <!-- =======================================================
+         EMPTY STATE
+    ======================================================== -->
+    <section
+      id="emptyState"
+      class="hidden bg-white rounded-2xl border border-gray-200 p-10 text-center"
+    >
+      <div class="text-5xl mb-3">📭</div>
+
+      <h3 class="font-bold text-lg">
+        No posts found
+      </h3>
+
+      <p class="text-gray-500 text-sm mt-2">
+        Try changing your search or filters, or create the first post.
+      </p>
+
+      <button
+        onclick="openPostModal()"
+        class="mt-5 bg-blue-700 hover:bg-blue-800 text-white px-5 py-3 rounded-xl font-semibold"
       >
-        Checking your account...
-      </div>
-      <div class="actions">
-        <button
-          class="primary-btn"
-          onclick="openQuestionModal()"
-        >
-          + Ask a Question
-        </button>
-        <button
-          class="secondary-btn"
-          onclick="showMyQuestions()"
-        >
-          My Questions
-        </button>
-      </div>
+        Create Post
+      </button>
     </section>
-    <!-- ======================================================
-         SEARCH
-    ======================================================= -->
-    <section class="search-section">
-      <div class="search-box">
-        <input
-          type="search"
-          id="searchInput"
-          placeholder="Search discussions, topics or questions..."
-          oninput="filterDiscussions()"
-        >
-        <button
-          class="primary-btn"
-          onclick="filterDiscussions()"
-        >
-          Search
-        </button>
-      </div>
-      <div class="filters">
-        <select
-          id="subjectFilter"
-          onchange="filterDiscussions()"
-        >
-          <option value="">
-            All Subjects
-          </option>
-          <option value="Anatomy & Physiology">
-            Anatomy & Physiology
-          </option>
-          <option value="Pharmacology">
-            Pharmacology
-          </option>
-          <option value="Medical-Surgical Nursing">
-            Medical-Surgical Nursing
-          </option>
-          <option value="Fundamentals of Nursing">
-            Fundamentals of Nursing
-          </option>
-          <option value="Microbiology">
-            Microbiology
-          </option>
-          <option value="Maternal & Child Health">
-            Maternal & Child Health
-          </option>
-          <option value="Mental Health Nursing">
-            Mental Health Nursing
-          </option>
-          <option value="Community Health Nursing">
-            Community Health Nursing
-          </option>
-        </select>
-        <select
-          id="sortFilter"
-          onchange="sortDiscussions()"
-        >
-          <option value="latest">
-            Latest
-          </option>
-          <option value="popular">
-            Most Popular
-          </option>
-          <option value="replies">
-            Most Discussed
-          </option>
-        </select>
-      </div>
-    </section>
-    <!-- ======================================================
-         DISCUSSION LIST
-    ======================================================= -->
-    <section>
-      <div class="section-title">
-        <h3>
-          Recent Discussions
-        </h3>
-        <span
-          class="discussion-count"
-          id="discussionCount"
-        >
-          Loading...
-        </span>
-      </div>
-      <div
-        class="loading"
-        id="loadingState"
-      >
-        Loading discussions...
-      </div>
-      <div
-        id="discussionList"
-      ></div>
-    </section>
+
   </main>
-  <!-- ========================================================
-       ASK QUESTION MODAL
-  ========================================================= -->
+
+
+  <!-- =========================================================
+       CREATE POST MODAL
+  ========================================================== -->
   <div
-    class="modal"
-    id="questionModal"
+    id="postModal"
+    class="hidden fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center"
   >
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3>
-          Ask a Class Question
-        </h3>
+
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl modal-scroll">
+
+      <div class="sticky top-0 bg-white border-b border-gray-200 px-5 py-4 flex items-center justify-between z-10">
+
+        <div>
+          <h2 class="text-lg font-bold">
+            Create Class Post
+          </h2>
+
+          <p class="text-xs text-gray-500 mt-1">
+            Share something useful with your classmates.
+          </p>
+        </div>
+
         <button
-          class="close-btn"
-          onclick="closeQuestionModal()"
+          onclick="closePostModal()"
+          class="text-gray-500 hover:text-gray-900 text-2xl"
         >
           ×
         </button>
+
       </div>
-      <div
-        class="login-warning"
-        id="loginWarning"
-      >
-        You need to be logged in to post a question.
-        Please log in to your PulsePrep account first.
-      </div>
-      <p class="form-note">
-        Ask something you learned in class or something
-        you need help understanding. Be respectful and
-        provide enough information for other students to help.
-      </p>
+
+
       <form
-        id="questionForm"
-        onsubmit="submitQuestion(event)"
+        id="postForm"
+        class="p-5 space-y-4"
       >
-        <div class="form-group">
-          <label for="questionSubject">
-            Subject
+
+        <!-- CATEGORY -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Post Type
           </label>
+
           <select
-            id="questionSubject"
+            id="postCategory"
             required
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-blue-500 outline-none"
           >
-            <option value="">
-              Select subject
-            </option>
-            <option>
-              Anatomy & Physiology
-            </option>
-            <option>
-              Pharmacology
-            </option>
-            <option>
-              Medical-Surgical Nursing
-            </option>
-            <option>
-              Fundamentals of Nursing
-            </option>
-            <option>
-              Microbiology
-            </option>
-            <option>
-              Maternal & Child Health
-            </option>
-            <option>
-              Mental Health Nursing
-            </option>
-            <option>
-              Community Health Nursing
-            </option>
+            <option value="">Select post type</option>
+            <option value="Class Notes">📝 Class Notes</option>
+            <option value="Questions">❓ Questions</option>
+            <option value="Discussions">💬 Discussions</option>
+            <option value="Study Tips">💡 Study Tips</option>
+            <option value="Clinical Tips">🩺 Clinical Tips</option>
+            <option value="Exam Help">🔥 Exam Help</option>
           </select>
         </div>
-        <div class="form-group">
-          <label for="questionTopic">
+
+
+        <!-- SUBJECT -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Subject
+          </label>
+
+          <select
+            id="postSubject"
+            required
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+            <option value="">Select subject</option>
+          </select>
+        </div>
+
+
+        <!-- TOPIC -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">
             Topic
           </label>
+
           <input
+            id="postTopic"
             type="text"
-            id="questionTopic"
-            placeholder="Example: Therapeutic Communication"
-            required
+            maxlength="200"
+            placeholder="e.g. Cardiac output"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
           >
         </div>
-        <div class="form-group">
-          <label for="questionTitle">
-            Question Title
+
+
+        <!-- TITLE -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Title
           </label>
+
           <input
+            id="postTitle"
             type="text"
-            id="questionTitle"
-            placeholder="What do you want to understand?"
-            maxlength="150"
+            maxlength="250"
             required
+            placeholder="Enter your post title"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
           >
         </div>
-        <div class="form-group">
-          <label for="questionBody">
-            Explain your question
-          </label>
+
+
+        <!-- BODY -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+
+            <label class="block text-sm font-semibold">
+              Content
+            </label>
+
+            <span
+              id="bodyCounter"
+              class="text-xs text-gray-400"
+            >
+              0 characters
+            </span>
+
+          </div>
+
           <textarea
-            id="questionBody"
-            placeholder="Write your question here..."
+            id="postBody"
             required
+            rows="12"
+            placeholder="Write your notes, question, explanation, study tip or discussion here..."
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y"
           ></textarea>
+
+          <p class="text-xs text-gray-500 mt-1">
+            You can write very long class notes and explanations.
+          </p>
         </div>
+
+
+        <!-- ACTIONS -->
+        <div class="flex flex-col sm:flex-row gap-2 pt-2">
+
+          <button
+            type="button"
+            onclick="closePostModal()"
+            class="flex-1 border border-gray-300 hover:bg-gray-50 px-4 py-3 rounded-xl font-semibold"
+          >
+            Cancel
+          </button>
+
+          <button
+            id="submitPostButton"
+            type="submit"
+            class="flex-1 bg-blue-700 hover:bg-blue-800 text-white px-4 py-3 rounded-xl font-bold"
+          >
+            Publish Post
+          </button>
+
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================================
+       REPORT MODAL
+  ========================================================== -->
+  <div
+    id="reportModal"
+    class="hidden fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center"
+  >
+
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
+
+      <div class="p-5 border-b border-gray-200 flex justify-between items-center">
+
+        <div>
+          <h2 class="font-bold text-lg">
+            Report Post
+          </h2>
+
+          <p class="text-xs text-gray-500">
+            Tell us why this post should be reviewed.
+          </p>
+        </div>
+
+        <button
+          onclick="closeReportModal()"
+          class="text-2xl text-gray-500"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <form
+        id="reportForm"
+        class="p-5"
+      >
+
+        <input
+          type="hidden"
+          id="reportDiscussionId"
+        >
+
+        <label class="block text-sm font-semibold mb-2">
+          Reason
+        </label>
+
+        <select
+          id="reportReason"
+          required
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 bg-white"
+        >
+          <option value="">Select reason</option>
+          <option value="Spam">Spam</option>
+          <option value="Harassment">Harassment</option>
+          <option value="Inappropriate content">Inappropriate content</option>
+          <option value="False or misleading information">False or misleading information</option>
+          <option value="Academic misconduct">Academic misconduct</option>
+          <option value="Other">Other</option>
+        </select>
+
         <button
           type="submit"
-          class="primary-btn"
-          id="postQuestionButton"
-          style="width:100%;"
+          class="w-full bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-3 rounded-xl"
         >
-          Post Question
+          Submit Report
         </button>
+
       </form>
+
     </div>
+
   </div>
-  <!-- ========================================================
-       TOAST
-  ========================================================= -->
-  <div
-    class="toast"
-    id="toast"
-  ></div>
-  <!-- ========================================================
-       SUPABASE
-  ========================================================= -->
-  <script>
-    const SUPABASE_URL =
-      "https://eskwphjtiogguhvtktmh.supabase.co";
-    const SUPABASE_PUBLISHABLE_KEY =
-      "sb_publishable_o-Dr554qwhmu4SNpZL5dxQ__cP7MB9p";
-    let discussionSupabase = null;
-    let currentSession = null;
-    let allDiscussions = [];
-    let likedDiscussionIds = new Set();
-    /*
-      ==========================================================
-      LOAD SUPABASE
-      ==========================================================
-    */
-    const supabaseScript =
-      document.createElement("script");
-    supabaseScript.src =
-      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-    supabaseScript.onload = async function() {
-      try {
-        discussionSupabase =
-          window.supabase.createClient(
-            SUPABASE_URL,
-            SUPABASE_PUBLISHABLE_KEY
-          );
-        await initializeDiscussionPage();
-      } catch (error) {
-        console.error(error);
-        showToast(
-          "Unable to initialize PulsePrep."
-        );
-      }
-    };
-    supabaseScript.onerror = function() {
-      showToast(
-        "Unable to load the Supabase connection."
+
+
+<script>
+/* ============================================================
+   PULSEPREP CLASS DISCUSSION
+   ============================================================
+
+   IMPORTANT:
+   This page is intentionally self-contained.
+
+   It does NOT modify:
+   - Question Bank
+   - Exam Vault
+   - Payments
+   - Subject pages
+   - Existing PulsePrep features
+   ============================================================ */
+
+
+/* ============================================================
+   SUPABASE
+   ============================================================ */
+
+const SUPABASE_URL =
+  "https://eskwphjtiogguhvtktmh.supabase.co";
+
+/*
+ * Keep your existing publishable/anon key here if your current
+ * PulsePrep project does not already expose it globally.
+ *
+ * The page first tries the existing PulsePrep Supabase client.
+ */
+
+const SUPABASE_PUBLISHABLE_KEY =
+  window.SUPABASE_PUBLISHABLE_KEY ||
+  window.PULSEPREP_SUPABASE_KEY ||
+  "";
+
+
+/* ============================================================
+   SUBJECT LIST
+   ============================================================ */
+
+const PULSEPREP_SUBJECTS = [
+  "Anatomy & Physiology",
+  "Microbiology",
+  "First Aid & Emergency Care",
+  "Fundamentals of Nursing",
+  "Medical-Surgical Nursing",
+  "Pharmacology",
+  "Pathophysiology",
+  "Community Health Nursing",
+  "Maternal & Child Health",
+  "Midwifery",
+  "Paediatric Nursing",
+  "Mental Health/Psychiatric Nursing",
+  "Nutrition & Dietetics",
+  "Health Assessment",
+  "Nursing Ethics & Professional Practice",
+  "Research Methods",
+  "Biostatistics",
+  "Public Health",
+  "Health Promotion",
+  "Infection Prevention & Control",
+  "Therapeutic Communication",
+  "Medical Terminology",
+  "Nursing Informatics",
+  "Professional Adjustment",
+  "Communication in Nursing",
+  "Adult Health Nursing",
+  "Gerontological Nursing",
+  "Leadership & Management in Nursing",
+  "Epidemiology",
+  "Health Education"
+];
+
+
+/* ============================================================
+   GLOBAL STATE
+   ============================================================ */
+
+let supabaseClient = null;
+let currentUser = null;
+
+let allPosts = [];
+let currentCategory = "all";
+let currentView = "all";
+let reportPostId = null;
+
+
+/* ============================================================
+   INITIALIZE SUPABASE
+   ============================================================ */
+
+function initializeSupabase() {
+
+  /*
+   * Reuse the existing PulsePrep client if available.
+   */
+
+  if (window.pulseprepSupabase) {
+    supabaseClient = window.pulseprepSupabase;
+    return true;
+  }
+
+  /*
+   * Reuse window.supabaseClient if another PulsePrep file
+   * already created it.
+   */
+
+  if (window.supabaseClient) {
+    supabaseClient = window.supabaseClient;
+    return true;
+  }
+
+  /*
+   * Create a client only when a publishable key is available.
+   */
+
+  if (
+    window.supabase &&
+    typeof window.supabase.createClient === "function" &&
+    SUPABASE_PUBLISHABLE_KEY
+  ) {
+    supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
       );
-    };
-    document.head.appendChild(
-      supabaseScript
+
+    window.pulseprepSupabase = supabaseClient;
+
+    return true;
+  }
+
+  return false;
+}
+
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+
+async function loadCurrentUser() {
+
+  if (!supabaseClient) {
+    updateUserStatus("Login unavailable");
+    return;
+  }
+
+  try {
+
+    const result = await supabaseClient.auth.getUser();
+
+    if (result.error) {
+      currentUser = null;
+    } else {
+      currentUser = result.data.user || null;
+    }
+
+    updateUserStatus();
+
+  } catch (error) {
+
+    console.error("Unable to load user:", error);
+
+    currentUser = null;
+
+    updateUserStatus();
+
+  }
+}
+
+
+/* ============================================================
+   AUTH STATE
+   ============================================================ */
+
+function updateUserStatus() {
+
+  const status = document.getElementById("userStatus");
+  const loginButton = document.getElementById("loginButton");
+
+  if (!status) return;
+
+  if (currentUser) {
+
+    const name =
+      currentUser.user_metadata?.full_name ||
+      currentUser.user_metadata?.name ||
+      currentUser.email ||
+      "Student";
+
+    status.textContent = `👤 ${name}`;
+
+    status.classList.remove("hidden");
+
+    if (loginButton) {
+      loginButton.classList.add("hidden");
+    }
+
+  } else {
+
+    status.textContent = "🔐 Login required to post";
+
+    status.classList.remove("hidden");
+
+    if (loginButton) {
+      loginButton.classList.remove("hidden");
+    }
+  }
+}
+
+
+/* ============================================================
+   LOGIN BUTTON
+   ============================================================ */
+
+function handleLoginButton() {
+
+  /*
+   * Try the PulsePrep authentication functions first.
+   */
+
+  if (typeof window.openLoginModal === "function") {
+    window.openLoginModal();
+    return;
+  }
+
+  if (typeof window.showLoginModal === "function") {
+    window.showLoginModal();
+    return;
+  }
+
+  /*
+   * Otherwise send the student back to the main PulsePrep
+   * page where the existing authentication system lives.
+   */
+
+  window.location.href =
+    "index.html?login=required&return=class-discussion.html";
+}
+
+
+/* ============================================================
+   SUBJECT DROPDOWNS
+   ============================================================ */
+
+function populateSubjects() {
+
+  const filter = document.getElementById("subjectFilter");
+  const postSubject = document.getElementById("postSubject");
+
+  PULSEPREP_SUBJECTS.forEach(subject => {
+
+    if (filter) {
+
+      const option = document.createElement("option");
+
+      option.value = subject;
+      option.textContent = subject;
+
+      filter.appendChild(option);
+    }
+
+    if (postSubject) {
+
+      const option = document.createElement("option");
+
+      option.value = subject;
+      option.textContent = subject;
+
+      postSubject.appendChild(option);
+    }
+
+  });
+}
+
+
+/* ============================================================
+   LOAD POSTS
+   ============================================================ */
+
+async function loadPosts() {
+
+  const loading = document.getElementById("loadingState");
+
+  if (loading) {
+    loading.classList.remove("hidden");
+  }
+
+  try {
+
+    if (!supabaseClient) {
+      throw new Error(
+        "Supabase is not initialized. Please make sure the existing PulsePrep Supabase client is loaded."
+      );
+    }
+
+    const { data, error } = await supabaseClient
+      .from("discussion_posts")
+      .select("*")
+      .eq("is_hidden", false)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw error;
+    }
+
+    allPosts = data || [];
+
+    renderPosts();
+
+  } catch (error) {
+
+    console.error("Load discussions error:", error);
+
+    showStatus(
+      "Unable to load class discussions. Please refresh the page.",
+      "error"
     );
-    /*
-      ==========================================================
-      INITIALIZE
-      ==========================================================
-    */
-    async function initializeDiscussionPage() {
-      if (!discussionSupabase) return;
-      const {
-        data,
-        error
-      } =
-        await discussionSupabase.auth.getSession();
-      if (error) {
-        console.error(error);
-      }
-      currentSession =
-        data?.session || null;
-      updateUserStatus(
-        currentSession
+
+    allPosts = [];
+
+    renderPosts();
+
+  } finally {
+
+    if (loading) {
+      loading.classList.add("hidden");
+    }
+  }
+}
+
+
+/* ============================================================
+   FILTER POSTS
+   ============================================================ */
+
+function getFilteredPosts() {
+
+  const search =
+    document.getElementById("searchInput")
+      ?.value
+      .trim()
+      .toLowerCase() || "";
+
+  const subject =
+    document.getElementById("subjectFilter")
+      ?.value || "all";
+
+  const sort =
+    document.getElementById("sortFilter")
+      ?.value || "newest";
+
+
+  let posts = [...allPosts];
+
+
+  /* CATEGORY */
+
+  if (currentCategory !== "all") {
+
+    posts = posts.filter(post =>
+      String(post.topic || "").toLowerCase() ===
+        currentCategory.toLowerCase() ||
+
+      String(post.title || "").toLowerCase().includes(
+        currentCategory.toLowerCase()
+      )
+    );
+
+  }
+
+
+  /*
+   * Because the database schema contains topic rather than a
+   * dedicated category column, the category is also detected
+   * from the topic/title when necessary.
+   *
+   * New posts created by this page store the category in topic
+   * using:
+   *
+   * Category | actual topic
+   */
+
+  if (currentCategory !== "all") {
+
+    posts = posts.filter(post => {
+
+      const topic =
+        String(post.topic || "").toLowerCase();
+
+      const title =
+        String(post.title || "").toLowerCase();
+
+      const body =
+        String(post.body || "").toLowerCase();
+
+      const category =
+        currentCategory.toLowerCase();
+
+      return (
+        topic.includes(category) ||
+        title.includes(category) ||
+        body.includes(category)
       );
-      await loadDiscussions();
-      discussionSupabase.auth.onAuthStateChange(
-        async function(_event, session) {
-          currentSession = session || null;
-          updateUserStatus(
-            currentSession
-          );
-        }
-      );
+
+    });
+  }
+
+
+  /* SUBJECT */
+
+  if (subject !== "all") {
+
+    posts = posts.filter(post =>
+      String(post.subject || "").toLowerCase() ===
+      subject.toLowerCase()
+    );
+
+  }
+
+
+  /* MY POSTS */
+
+  if (currentView === "mine") {
+
+    if (!currentUser) {
+      return [];
     }
-    /*
-      ==========================================================
-      USER STATUS
-      ==========================================================
-    */
-    function updateUserStatus(session) {
-      const status =
-        document.getElementById(
-          "userStatus"
-        );
-      if (!session) {
-        status.innerHTML =
-          "You are currently <strong>not logged in</strong>. " +
-          "Log in to ask or answer questions.";
-        return;
-      }
-      const email =
-        session.user?.email || "PulsePrep Student";
-      status.innerHTML =
-        "Logged in as <strong>" +
-        escapeHtml(email) +
-        "</strong>";
-    }
-    /*
-      ==========================================================
-      LOAD DISCUSSIONS
-      ==========================================================
-    */
-    async function loadDiscussions() {
-      const loading =
-        document.getElementById(
-          "loadingState"
-        );
-      const list =
-        document.getElementById(
-          "discussionList"
-        );
-      loading.classList.add("show");
-      list.innerHTML = "";
-      const {
-        data,
-        error
-      } =
-        await discussionSupabase
-          .from("discussion_posts")
-          .select("*")
-          .eq("is_hidden", false)
-          .order("created_at", {
-            ascending: false
-          });
-      loading.classList.remove(
-        "show"
-      );
-      if (error) {
-        console.error(
-          "Discussion loading error:",
-          error
-        );
-        list.innerHTML =
-          '<div class="empty">' +
-            '<div class="empty-icon">⚠️</div>' +
-            '<h3>Unable to load discussions</h3>' +
-            '<p style="margin-top:8px;">' +
-              escapeHtml(error.message) +
-            '</p>' +
-          '</div>';
-        document
-          .getElementById("discussionCount")
-          .textContent = "Error";
-        return;
-      }
-      allDiscussions =
-        data || [];
-      /*
-        Load which discussions this user has liked.
-      */
-      await loadUserLikes();
-      renderDiscussions(
-        allDiscussions
-      );
-    }
-    /*
-      ==========================================================
-      LOAD USER LIKES
-      ==========================================================
-    */
-    async function loadUserLikes() {
-      likedDiscussionIds =
-        new Set();
-      if (!currentSession) {
-        return;
-      }
-      const {
-        data,
-        error
-      } =
-        await discussionSupabase
-          .from("discussion_likes")
-          .select("discussion_id")
-          .eq(
-            "user_id",
-            currentSession.user.id
-          );
-      if (error) {
-        console.warn(
-          "Unable to load likes:",
-          error
-        );
-        return;
-      }
-      (data || []).forEach(function(row) {
-        if (row.discussion_id) {
-          likedDiscussionIds.add(
-            row.discussion_id
-          );
-        }
-      });
-    }
-    /*
-      ==========================================================
-      RENDER
-      ==========================================================
-    */
-    function renderDiscussions(
-      discussions
-    ) {
-      const list =
-        document.getElementById(
-          "discussionList"
-        );
-      list.innerHTML = "";
-      if (!discussions.length) {
-        list.innerHTML =
-          '<div class="empty">' +
-            '<div class="empty-icon">💬</div>' +
-            '<h3>No discussions yet</h3>' +
-            '<p style="margin-top:8px;">' +
-              'Be the first student to ask a question.' +
-            '</p>' +
-          '</div>';
-        document
-          .getElementById("discussionCount")
-          .textContent =
-          "0 discussions";
-        return;
-      }
-      discussions.forEach(function(post) {
-        list.appendChild(
-          createDiscussionCard(post)
-        );
-      });
-      document
-        .getElementById("discussionCount")
-        .textContent =
-        discussions.length +
-        (
-          discussions.length === 1
-            ? " discussion"
-            : " discussions"
-        );
-    }
-    /*
-      ==========================================================
-      CREATE DISCUSSION CARD
-      ==========================================================
-    */
-    function createDiscussionCard(post) {
-      const article =
-        document.createElement("article");
-      article.className =
-        "discussion-card";
-      const authorName =
-        post.author_name ||
-        "PulsePrep Student";
-      const initial =
-        authorName
-          .charAt(0)
-          .toUpperCase();
-      const liked =
-        likedDiscussionIds.has(
-          post.id
-        );
-      const date =
-        formatDate(
-          post.created_at
-        );
-      article.dataset.subject =
-        post.subject || "";
-      article.dataset.title =
-        post.title || "";
-      article.dataset.popularity =
-        post.likes || 0;
-      article.dataset.replies =
-        post.reply_count || 0;
-      article.innerHTML = `
-        <div class="discussion-meta">
-          <div class="avatar">
-            ${escapeHtml(initial)}
+
+    posts = posts.filter(post =>
+      post.user_id === currentUser.id
+    );
+  }
+
+
+  /* SEARCH */
+
+  if (search) {
+
+    posts = posts.filter(post => {
+
+      const searchable = [
+        post.title,
+        post.body,
+        post.subject,
+        post.topic,
+        post.author_name
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return searchable.includes(search);
+    });
+  }
+
+
+  /* SORT */
+
+  if (sort === "oldest") {
+
+    posts.sort(
+      (a, b) =>
+        new Date(a.created_at) -
+        new Date(b.created_at)
+    );
+
+  } else if (sort === "popular") {
+
+    posts.sort(
+      (a, b) =>
+        Number(b.likes || 0) -
+        Number(a.likes || 0)
+    );
+
+  } else {
+
+    posts.sort(
+      (a, b) =>
+        new Date(b.created_at) -
+        new Date(a.created_at)
+    );
+  }
+
+
+  return posts;
+}
+
+
+/* ============================================================
+   RENDER POSTS
+   ============================================================ */
+
+function renderPosts() {
+
+  const container =
+    document.getElementById("postsContainer");
+
+  const empty =
+    document.getElementById("emptyState");
+
+  if (!container) return;
+
+  const posts = getFilteredPosts();
+
+  container.innerHTML = "";
+
+
+  if (!posts.length) {
+
+    empty?.classList.remove("hidden");
+
+    return;
+  }
+
+
+  empty?.classList.add("hidden");
+
+
+  posts.forEach(post => {
+
+    container.appendChild(
+      createPostCard(post)
+    );
+
+  });
+}
+
+
+/* ============================================================
+   CREATE POST CARD
+   ============================================================ */
+
+function createPostCard(post) {
+
+  const card = document.createElement("article");
+
+  card.className =
+    "bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden";
+
+
+  const category =
+    detectCategory(post);
+
+
+  const date =
+    formatDate(post.created_at);
+
+
+  const author =
+    post.author_name ||
+    "PulsePrep Student";
+
+
+  const initials =
+    getInitials(author);
+
+
+  card.innerHTML = `
+
+    <div class="p-5">
+
+      <div class="flex items-start justify-between gap-3">
+
+        <div class="flex items-center gap-3 min-w-0">
+
+          <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold shrink-0">
+            ${escapeHTML(initials)}
           </div>
-          <div class="author-info">
-            <strong>
-              ${escapeHtml(authorName)}
-            </strong>
-            <span>
-              ${escapeHtml(date)}
-            </span>
+
+          <div class="min-w-0">
+
+            <div class="font-semibold text-sm truncate">
+              ${escapeHTML(author)}
+            </div>
+
+            <div class="text-xs text-gray-500">
+              ${escapeHTML(date)}
+            </div>
+
           </div>
-          <span class="badge">
-            ${escapeHtml(post.subject || "General")}
+
+        </div>
+
+        <span class="text-xs font-semibold bg-blue-50 text-blue-700 px-2.5 py-1.5 rounded-lg whitespace-nowrap">
+          ${escapeHTML(category)}
+        </span>
+
+      </div>
+
+
+      <div class="mt-4">
+
+        <div class="flex flex-wrap gap-2 mb-2">
+
+          <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+            📚 ${escapeHTML(post.subject || "General")}
           </span>
+
           ${
             post.topic
               ? `
-                <span class="badge topic-badge">
-                  ${escapeHtml(post.topic)}
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+                  #${escapeHTML(cleanTopic(post.topic))}
                 </span>
               `
               : ""
           }
-          ${
-            post.is_answered
-              ? `
-                <span class="badge"
-                  style="background:#dcfce7;color:#166534;">
-                  ✓ Answered
-                </span>
-              `
-              : ""
-          }
+
         </div>
-        <h4>
-          ${escapeHtml(post.title)}
-        </h4>
-        <p>
-          ${escapeHtml(post.body)}
-        </p>
-        <div class="discussion-footer">
-          <div class="discussion-actions">
-            <button
-              class="small-btn ${liked ? "liked" : ""}"
-              onclick="likeDiscussion('${post.id}', this)"
-            >
-              👍 <span>${post.likes || 0}</span>
-            </button>
-            <button
-              class="small-btn"
-              onclick="openDiscussion('${post.id}')"
-            >
-              💬 Discuss
-            </button>
-            <button
-              class="small-btn"
-              onclick="reportDiscussion('${post.id}')"
-            >
-              🚩 Report
-            </button>
-          </div>
-          <span class="replies">
-            ${
-              post.reply_count || 0
-            }
-            ${
-              (post.reply_count || 0) === 1
-                ? "reply"
-                : "replies"
-            }
-          </span>
+
+
+        <h3 class="text-lg font-bold text-gray-900">
+          ${escapeHTML(post.title || "Untitled Post")}
+        </h3>
+
+
+        <div class="post-body text-sm text-gray-700 mt-3">
+          ${escapeHTML(post.body || "")}
         </div>
-      `;
-      return article;
-    }
-    /*
-      ==========================================================
-      LIKE
-      ==========================================================
-    */
-    async function likeDiscussion(
-      discussionId,
-      button
-    ) {
-      if (!currentSession) {
-        showToast(
-          "Please log in before liking a discussion."
-        );
-        return;
-      }
-      if (
-        likedDiscussionIds.has(
-          discussionId
-        )
-      ) {
-        showToast(
-          "You already liked this discussion."
-        );
-        return;
-      }
-      button.disabled = true;
-      const {
-        error
-      } =
-        await discussionSupabase
-          .from("discussion_likes")
-          .insert({
-            discussion_id:
-              discussionId,
-            user_id:
-              currentSession.user.id
-          });
-      if (error) {
-        console.error(
-          "Like error:",
-          error
-        );
-        button.disabled = false;
-        showToast(
-          "Unable to like this discussion."
-        );
-        return;
-      }
-      likedDiscussionIds.add(
-        discussionId
-      );
-      const post =
-        allDiscussions.find(
-          function(item) {
-            return item.id === discussionId;
-          }
-        );
-      if (post) {
-        post.likes =
-          Number(post.likes || 0) + 1;
-      }
-      button.classList.add(
-        "liked"
-      );
-      const span =
-        button.querySelector("span");
-      if (span) {
-        span.textContent =
-          post
-            ? post.likes
-            : "1";
-      }
-      showToast(
-        "Discussion liked."
-      );
-    }
-    /*
-      ==========================================================
-      OPEN DISCUSSION
-      ==========================================================
-    */
-    function openDiscussion(
-      discussionId
-    ) {
-      /*
-        The dedicated discussion/replies page
-        will be created next.
-        For now we store the ID so the next
-        page can use:
-        discussion.html?id=...
-      */
-      window.location.href =
-        "discussion.html?id=" +
-        encodeURIComponent(
-          discussionId
-        );
-    }
-    /*
-      ==========================================================
-      REPORT
-      ==========================================================
-    */
-    async function reportDiscussion(
-      discussionId
-    ) {
-      if (!currentSession) {
-        showToast(
-          "Please log in before reporting a discussion."
-        );
-        return;
-      }
-      const reason =
-        prompt(
-          "Why are you reporting this discussion?"
-        );
-      if (!reason) {
-        return;
-      }
-      const {
-        error
-      } =
-        await discussionSupabase
-          .from("discussion_reports")
-          .insert({
-            discussion_id:
-              discussionId,
-            reporter_user_id:
-              currentSession.user.id,
-            reason:
-              reason.trim(),
-            status:
-              "pending"
-          });
-      if (error) {
-        console.error(
-          "Report error:",
-          error
-        );
-        showToast(
-          "Unable to submit report."
-        );
-        return;
-      }
-      showToast(
-        "Report submitted for review."
-      );
-    }
-    /*
-      ==========================================================
-      SEARCH / FILTER
-      ==========================================================
-    */
-    function filterDiscussions() {
-      const search =
-        document
-          .getElementById("searchInput")
-          .value
-          .toLowerCase()
-          .trim();
-      const subject =
-        document
-          .getElementById("subjectFilter")
-          .value;
-      const filtered =
-        allDiscussions.filter(
-          function(post) {
-            const searchable =
-              (
-                (post.title || "") +
-                " " +
-                (post.body || "") +
-                " " +
-                (post.topic || "") +
-                " " +
-                (post.subject || "")
-              ).toLowerCase();
-            const matchesSearch =
-              !search ||
-              searchable.includes(search);
-            const matchesSubject =
-              !subject ||
-              post.subject === subject;
-            return (
-              matchesSearch &&
-              matchesSubject
-            );
-          }
-        );
-      renderDiscussions(
-        filtered
-      );
-    }
-    /*
-      ==========================================================
-      SORT
-      ==========================================================
-    */
-    function sortDiscussions() {
-      const sort =
-        document
-          .getElementById("sortFilter")
-          .value;
-      const sorted =
-        [...allDiscussions];
-      if (sort === "popular") {
-        sorted.sort(
-          function(a, b) {
-            return (
-              Number(b.likes || 0) -
-              Number(a.likes || 0)
-            );
-          }
-        );
-      }
-      if (sort === "replies") {
-        sorted.sort(
-          function(a, b) {
-            return (
-              Number(b.reply_count || 0) -
-              Number(a.reply_count || 0)
-            );
-          }
-        );
-      }
-      if (sort === "latest") {
-        sorted.sort(
-          function(a, b) {
-            return (
-              new Date(b.created_at) -
-              new Date(a.created_at)
-            );
-          }
-        );
-      }
-      renderDiscussions(
-        sorted
-      );
-    }
-    /*
-      ==========================================================
-      ASK QUESTION MODAL
-      ==========================================================
-    */
-    function openQuestionModal() {
-      const modal =
-        document.getElementById(
-          "questionModal"
-        );
-      const warning =
-        document.getElementById(
-          "loginWarning"
-        );
-      if (!currentSession) {
-        warning.style.display =
-          "block";
-      } else {
-        warning.style.display =
-          "none";
-      }
-      modal.classList.add(
-        "show"
-      );
-    }
-    function closeQuestionModal() {
-      document
-        .getElementById(
-          "questionModal"
-        )
-        .classList.remove(
-          "show"
-        );
-    }
-    /*
-      ==========================================================
-      SUBMIT QUESTION
-      ==========================================================
-    */
-    async function submitQuestion(
-      event
-    ) {
-      event.preventDefault();
-      if (!currentSession) {
-        showToast(
-          "Please log in to post a question."
-        );
-        return;
-      }
-      const subject =
-        document
-          .getElementById(
-            "questionSubject"
-          )
-          .value
-          .trim();
-      const topic =
-        document
-          .getElementById(
-            "questionTopic"
-          )
-          .value
-          .trim();
-      const title =
-        document
-          .getElementById(
-            "questionTitle"
-          )
-          .value
-          .trim();
-      const body =
-        document
-          .getElementById(
-            "questionBody"
-          )
-          .value
-          .trim();
-      if (
-        !subject ||
-        !topic ||
-        !title ||
-        !body
-      ) {
-        showToast(
-          "Please complete all fields."
-        );
-        return;
-      }
-      const button =
-        document.getElementById(
-          "postQuestionButton"
-        );
-      button.disabled =
-        true;
-      button.textContent =
-        "Posting...";
-      const email =
-        currentSession.user?.email ||
-        "PulsePrep Student";
-      const {
-        error
-      } =
-        await discussionSupabase
-          .from("discussion_posts")
-          .insert({
-            user_id:
-              currentSession.user.id,
-            author_name:
-              email,
-            subject:
-              subject,
-            topic:
-              topic,
-            title:
-              title,
-            body:
-              body
-          });
-      button.disabled =
-        false;
-      button.textContent =
-        "Post Question";
-      if (error) {
-        console.error(
-          "Post question error:",
-          error
-        );
-        showToast(
-          "Unable to post question: " +
-          error.message
-        );
-        return;
-      }
-      document
-        .getElementById(
-          "questionForm"
-        )
-        .reset();
-      closeQuestionModal();
-      showToast(
-        "Your question has been posted!"
-      );
-      await loadDiscussions();
-    }
-    /*
-      ==========================================================
-      MY QUESTIONS
-      ==========================================================
-    */
-    async function showMyQuestions() {
-      if (!currentSession) {
-        showToast(
-          "Please log in to view your questions."
-        );
-        return;
-      }
-      const mine =
-        allDiscussions.filter(
-          function(post) {
-            return (
-              post.user_id ===
-              currentSession.user.id
-            );
-          }
-        );
-      renderDiscussions(
-        mine
-      );
-      document
-        .getElementById(
-          "discussionCount"
-        )
-        .textContent =
-        mine.length +
-        (
-          mine.length === 1
-            ? " question"
-            : " questions"
-        );
-    }
-    /*
-      ==========================================================
-      BACK
-      ==========================================================
-    */
-    function goBack() {
-      if (
-        window.history.length > 1
-      ) {
-        window.history.back();
-      } else {
-        window.location.href =
-          "index.html";
-      }
-    }
-    /*
-      ==========================================================
-      TOAST
-      ==========================================================
-    */
-    function showToast(
-      message
-    ) {
-      const toast =
-        document.getElementById(
-          "toast"
-        );
-      toast.textContent =
-        message;
-      toast.classList.add(
-        "show"
-      );
-      setTimeout(
-        function() {
-          toast.classList.remove(
-            "show"
-          );
-        },
-        3000
-      );
-    }
-    /*
-      ==========================================================
-      DATE FORMAT
-      ==========================================================
-    */
-    function formatDate(
-      value
-    ) {
-      if (!value) {
-        return "Recently";
-      }
-      const date =
-        new Date(value);
-      if (
-        Number.isNaN(
-          date.getTime()
-        )
-      ) {
-        return "Recently";
-      }
-      return date.toLocaleString(
-        undefined,
-        {
-          dateStyle: "medium",
-          timeStyle: "short"
+
+      </div>
+
+
+      <div class="border-t border-gray-100 mt-5 pt-4 flex flex-wrap items-center gap-2">
+
+        <button
+          onclick="likePost('${post.id}')"
+          class="action-btn"
+        >
+          👍 ${Number(post.likes || 0)}
+        </button>
+
+        <button
+          onclick="openDiscussion('${post.id}')"
+          class="action-btn"
+        >
+          💬 ${Number(post.reply_count || 0)}
+        </button>
+
+        <button
+          onclick="openReportModal('${post.id}')"
+          class="action-btn report-btn"
+        >
+          🚩 Report
+        </button>
+
+        ${
+          currentUser &&
+          post.user_id === currentUser.id
+            ? `
+              <button
+                onclick="deletePost('${post.id}')"
+                class="action-btn text-red-600"
+              >
+                🗑️ Delete
+              </button>
+            `
+            : ""
         }
-      );
-    }
-    /*
-      ==========================================================
-      ESCAPE HTML
-      Prevents user-entered discussion content from
-      being interpreted as HTML.
-      ==========================================================
-    */
-    function escapeHtml(
-      value
+
+      </div>
+
+    </div>
+  `;
+
+
+  return card;
+}
+
+
+/* ============================================================
+   DETECT CATEGORY
+   ============================================================ */
+
+function detectCategory(post) {
+
+  const topic =
+    String(post.topic || "");
+
+
+  const categories = [
+    "Class Notes",
+    "Questions",
+    "Discussions",
+    "Study Tips",
+    "Clinical Tips",
+    "Exam Help"
+  ];
+
+
+  for (const category of categories) {
+
+    if (
+      topic
+        .toLowerCase()
+        .startsWith(category.toLowerCase() + " |")
     ) {
-      return String(
-        value ?? ""
-      )
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+      return category;
     }
+
+    if (
+      topic
+        .toLowerCase() ===
+      category.toLowerCase()
+    ) {
+      return category;
+    }
+  }
+
+
+  /*
+   * Try to detect from title/body for older posts.
+   */
+
+  const text = (
+    String(post.title || "") +
+    " " +
+    String(post.body || "")
+  ).toLowerCase();
+
+
+  if (
+    text.includes("study tip") ||
+    text.includes("study tips")
+  ) {
+    return "Study Tips";
+  }
+
+  if (
+    text.includes("clinical tip") ||
+    text.includes("clinical tips")
+  ) {
+    return "Clinical Tips";
+  }
+
+  if (
+    text.includes("exam help") ||
+    text.includes("past question")
+  ) {
+    return "Exam Help";
+  }
+
+  if (
+    text.includes("class note") ||
+    text.includes("lecture note")
+  ) {
+    return "Class Notes";
+  }
+
+  if (
+    text.includes("question") ||
+    text.includes("what is")
+  ) {
+    return "Questions";
+  }
+
+
+  return "Discussions";
+}
+
+
+/* ============================================================
+   CLEAN TOPIC
+   ============================================================ */
+
+function cleanTopic(topic) {
+
+  const separator = topic.indexOf(" | ");
+
+  if (separator !== -1) {
+    return topic.substring(separator + 3);
+  }
+
+  return topic;
+}
+
+
+/* ============================================================
+   OPEN POST MODAL
+   ============================================================ */
+
+async function openPostModal() {
+
+  await loadCurrentUser();
+
+  if (!currentUser) {
+
+    showStatus(
+      "Please log in before creating a class post.",
+      "error"
+    );
+
+    handleLoginButton();
+
+    return;
+  }
+
+
+  document
+    .getElementById("postModal")
+    ?.classList.remove("hidden");
+}
+
+
+/* ============================================================
+   CLOSE POST MODAL
+   ============================================================ */
+
+function closePostModal() {
+
+  document
+    .getElementById("postModal")
+    ?.classList.add("hidden");
+
+}
+
+
+/* ============================================================
+   SUBMIT POST
+   ============================================================ */
+
+async function submitPost(event) {
+
+  event.preventDefault();
+
+
+  if (!currentUser) {
+
+    showStatus(
+      "You must be logged in to create a post.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const category =
+    document.getElementById("postCategory")
+      .value
+      .trim();
+
+
+  const subject =
+    document.getElementById("postSubject")
+      .value
+      .trim();
+
+
+  const topic =
+    document.getElementById("postTopic")
+      .value
+      .trim();
+
+
+  const title =
+    document.getElementById("postTitle")
+      .value
+      .trim();
+
+
+  const body =
+    document.getElementById("postBody")
+      .value
+      .trim();
+
+
+  if (!category || !subject || !title || !body) {
+
+    showStatus(
+      "Please complete all required fields.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const button =
+    document.getElementById("submitPostButton");
+
+
+  button.disabled = true;
+  button.textContent = "Publishing...";
+
+
+  try {
+
+    const authorName =
+      currentUser.user_metadata?.full_name ||
+      currentUser.user_metadata?.name ||
+      currentUser.email ||
+      "PulsePrep Student";
+
+
     /*
-      ==========================================================
-      CLOSE MODAL WHEN CLICKING OUTSIDE
-      ==========================================================
-    */
+     * Store category together with topic because the upgraded
+     * discussion_posts table uses the topic field.
+     */
+
+    const storedTopic =
+      topic
+        ? `${category} | ${topic}`
+        : category;
+
+
+    const { data, error } =
+      await supabaseClient
+        .from("discussion_posts")
+        .insert({
+          user_id: currentUser.id,
+          author_name: authorName,
+          subject: subject,
+          topic: storedTopic,
+          title: title,
+          body: body,
+          likes: 0,
+          reply_count: 0,
+          is_answered: false,
+          is_pinned: false,
+          is_hidden: false
+        })
+        .select()
+        .single();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    /*
+     * Add the new post immediately to the local list.
+     */
+
+    if (data) {
+      allPosts.unshift(data);
+    }
+
+
     document
-      .getElementById(
-        "questionModal"
-      )
-      .addEventListener(
+      .getElementById("postForm")
+      .reset();
+
+
+    closePostModal();
+
+
+    renderPosts();
+
+
+    showStatus(
+      "Your post has been published successfully! 🎉",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error("Create post error:", error);
+
+    showStatus(
+      error.message ||
+      "Unable to publish your post.",
+      "error"
+    );
+
+  } finally {
+
+    button.disabled = false;
+    button.textContent = "Publish Post";
+  }
+}
+
+
+/* ============================================================
+   LIKE POST
+   ============================================================ */
+
+async function likePost(postId) {
+
+  if (!currentUser) {
+
+    showStatus(
+      "Please log in to like posts.",
+      "error"
+    );
+
+    handleLoginButton();
+
+    return;
+  }
+
+
+  try {
+
+    const post =
+      allPosts.find(item => item.id === postId);
+
+
+    if (!post) return;
+
+
+    const newLikes =
+      Number(post.likes || 0) + 1;
+
+
+    const { error } =
+      await supabaseClient
+        .from("discussion_posts")
+        .update({
+          likes: newLikes
+        })
+        .eq("id", postId);
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    post.likes = newLikes;
+
+    renderPosts();
+
+
+  } catch (error) {
+
+    console.error("Like error:", error);
+
+    showStatus(
+      "Unable to like this post.",
+      "error"
+    );
+  }
+}
+
+
+/* ============================================================
+   OPEN DISCUSSION
+   ============================================================ */
+
+function openDiscussion(postId) {
+
+  /*
+   * The post/reply system is kept ready for the discussion
+   * detail page.
+   *
+   * For now we use the current page and identify the post.
+   */
+
+  const post =
+    allPosts.find(item => item.id === postId);
+
+
+  if (!post) return;
+
+
+  const card =
+    [...document.querySelectorAll("#postsContainer article")]
+      .find(article => {
+        return article.innerText
+          .includes(post.title || "");
+      });
+
+
+  if (card) {
+
+    card.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+    card.classList.add(
+      "ring-2",
+      "ring-blue-500"
+    );
+
+    setTimeout(() => {
+
+      card.classList.remove(
+        "ring-2",
+        "ring-blue-500"
+      );
+
+    }, 2000);
+  }
+
+
+  showStatus(
+    "Discussion replies can be added through the discussion system.",
+    "success"
+  );
+}
+
+
+/* ============================================================
+   REPORT MODAL
+   ============================================================ */
+
+function openReportModal(postId) {
+
+  if (!currentUser) {
+
+    showStatus(
+      "Please log in before reporting a post.",
+      "error"
+    );
+
+    handleLoginButton();
+
+    return;
+  }
+
+
+  reportPostId = postId;
+
+
+  document.getElementById(
+    "reportDiscussionId"
+  ).value = postId;
+
+
+  document
+    .getElementById("reportModal")
+    ?.classList.remove("hidden");
+}
+
+
+/* ============================================================
+   CLOSE REPORT MODAL
+   ============================================================ */
+
+function closeReportModal() {
+
+  document
+    .getElementById("reportModal")
+    ?.classList.add("hidden");
+
+  reportPostId = null;
+}
+
+
+/* ============================================================
+   SUBMIT REPORT
+   ============================================================ */
+
+async function submitReport(event) {
+
+  event.preventDefault();
+
+
+  if (!currentUser) {
+
+    showStatus(
+      "Please log in before reporting.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const discussionId =
+    document.getElementById(
+      "reportDiscussionId"
+    ).value;
+
+
+  const reason =
+    document.getElementById(
+      "reportReason"
+    ).value;
+
+
+  if (!discussionId || !reason) {
+
+    showStatus(
+      "Please select a report reason.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  try {
+
+    const { error } =
+      await supabaseClient
+        .from("discussion_reports")
+        .insert({
+          discussion_id: discussionId,
+          reporter_user_id: currentUser.id,
+          reason: reason,
+          status: "pending"
+        });
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    closeReportModal();
+
+
+    document
+      .getElementById("reportForm")
+      .reset();
+
+
+    showStatus(
+      "Report submitted. Thank you for helping keep PulsePrep safe.",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error("Report error:", error);
+
+    showStatus(
+      error.message ||
+      "Unable to submit report.",
+      "error"
+    );
+  }
+}
+
+
+/* ============================================================
+   DELETE OWN POST
+   ============================================================ */
+
+async function deletePost(postId) {
+
+  if (!currentUser) return;
+
+
+  const post =
+    allPosts.find(item => item.id === postId);
+
+
+  if (!post) return;
+
+
+  if (post.user_id !== currentUser.id) {
+
+    showStatus(
+      "You can only delete your own posts.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const confirmed =
+    confirm(
+      "Delete this post? This action cannot be undone."
+    );
+
+
+  if (!confirmed) return;
+
+
+  try {
+
+    const { error } =
+      await supabaseClient
+        .from("discussion_posts")
+        .delete()
+        .eq("id", postId)
+        .eq("user_id", currentUser.id);
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    allPosts =
+      allPosts.filter(
+        post => post.id !== postId
+      );
+
+
+    renderPosts();
+
+
+    showStatus(
+      "Post deleted successfully.",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error("Delete post error:", error);
+
+    showStatus(
+      error.message ||
+      "Unable to delete the post.",
+      "error"
+    );
+  }
+}
+
+
+/* ============================================================
+   CATEGORY FILTER
+   ============================================================ */
+
+function setCategory(category) {
+
+  currentCategory = category;
+
+  document
+    .querySelectorAll(".category-btn")
+    .forEach(button => {
+
+      button.classList.remove(
+        "active-category"
+      );
+
+      if (
+        button.dataset.category === category
+      ) {
+
+        button.classList.add(
+          "active-category"
+        );
+      }
+    });
+
+
+  renderPosts();
+}
+
+
+/* ============================================================
+   VIEW
+   ============================================================ */
+
+function setView(view) {
+
+  currentView = view;
+
+
+  document
+    .querySelectorAll(".view-btn")
+    .forEach(button => {
+
+      button.classList.remove(
+        "active-view"
+      );
+    });
+
+
+  if (view === "mine") {
+
+    document
+      .getElementById("myPostsTab")
+      ?.classList.add("active-view");
+
+  } else {
+
+    document
+      .getElementById("allPostsTab")
+      ?.classList.add("active-view");
+  }
+
+
+  renderPosts();
+}
+
+
+/* ============================================================
+   STATUS MESSAGE
+   ============================================================ */
+
+function showStatus(message, type = "success") {
+
+  const box =
+    document.getElementById("statusMessage");
+
+
+  if (!box) return;
+
+
+  box.textContent = message;
+
+
+  box.className =
+    "mb-4 rounded-xl px-4 py-3 text-sm";
+
+
+  if (type === "error") {
+
+    box.classList.add(
+      "bg-red-50",
+      "border",
+      "border-red-200",
+      "text-red-700"
+    );
+
+  } else {
+
+    box.classList.add(
+      "bg-green-50",
+      "border",
+      "border-green-200",
+      "text-green-700"
+    );
+  }
+
+
+  box.classList.remove("hidden");
+
+
+  setTimeout(() => {
+
+    box.classList.add("hidden");
+
+  }, 5000);
+}
+
+
+/* ============================================================
+   FORMAT DATE
+   ============================================================ */
+
+function formatDate(value) {
+
+  if (!value) return "Recently";
+
+
+  const date =
+    new Date(value);
+
+
+  if (Number.isNaN(date.getTime())) {
+    return "Recently";
+  }
+
+
+  return date.toLocaleString(
+    undefined,
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }
+  );
+}
+
+
+/* ============================================================
+   INITIALS
+   ============================================================ */
+
+function getInitials(name) {
+
+  const parts =
+    String(name)
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+
+  if (!parts.length) return "P";
+
+
+  if (parts.length === 1) {
+    return parts[0]
+      .substring(0, 2)
+      .toUpperCase();
+  }
+
+
+  return (
+    parts[0][0] +
+    parts[parts.length - 1][0]
+  ).toUpperCase();
+}
+
+
+/* ============================================================
+   ESCAPE HTML
+   ============================================================ */
+
+function escapeHTML(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
+
+function setupEventListeners() {
+
+  /* CATEGORY BUTTONS */
+
+  document
+    .querySelectorAll(".category-btn")
+    .forEach(button => {
+
+      button.addEventListener(
         "click",
-        function(event) {
-          if (
-            event.target === this
-          ) {
-            closeQuestionModal();
-          }
+        () => {
+          setCategory(
+            button.dataset.category
+          );
         }
       );
-  </script>
+
+    });
+
+
+  /* SEARCH */
+
+  document
+    .getElementById("searchInput")
+    ?.addEventListener(
+      "input",
+      renderPosts
+    );
+
+
+  /* SUBJECT */
+
+  document
+    .getElementById("subjectFilter")
+    ?.addEventListener(
+      "change",
+      renderPosts
+    );
+
+
+  /* SORT */
+
+  document
+    .getElementById("sortFilter")
+    ?.addEventListener(
+      "change",
+      renderPosts
+    );
+
+
+  /* POST FORM */
+
+  document
+    .getElementById("postForm")
+    ?.addEventListener(
+      "submit",
+      submitPost
+    );
+
+
+  /* REPORT FORM */
+
+  document
+    .getElementById("reportForm")
+    ?.addEventListener(
+      "submit",
+      submitReport
+    );
+
+
+  /* LONG NOTE CHARACTER COUNT */
+
+  document
+    .getElementById("postBody")
+    ?.addEventListener(
+      "input",
+      updateBodyCounter
+    );
+
+
+  /* CLOSE MODALS WITH ESCAPE */
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      closePostModal();
+      closeReportModal();
+
+    }
+  );
+}
+
+
+/* ============================================================
+   CHARACTER COUNTER
+   ============================================================ */
+
+function updateBodyCounter() {
+
+  const body =
+    document.getElementById("postBody");
+
+
+  const counter =
+    document.getElementById("bodyCounter");
+
+
+  if (!body || !counter) return;
+
+
+  const length =
+    body.value.length;
+
+
+  counter.textContent =
+    `${length.toLocaleString()} characters`;
+}
+
+
+/* ============================================================
+   PAGE INITIALIZATION
+   ============================================================ */
+
+async function initializePage() {
+
+  populateSubjects();
+
+  setupEventListeners();
+
+
+  const connected =
+    initializeSupabase();
+
+
+  if (!connected) {
+
+    document
+      .getElementById("loadingState")
+      ?.classList.add("hidden");
+
+
+    showStatus(
+      "PulsePrep Supabase authentication is not available on this page yet. Make sure the existing Supabase publishable key is loaded.",
+      "error"
+    );
+
+
+    return;
+  }
+
+
+  await loadCurrentUser();
+
+  await loadPosts();
+
+}
+
+
+/* ============================================================
+   AUTH LISTENER
+   ============================================================ */
+
+function setupAuthListener() {
+
+  if (!supabaseClient) return;
+
+
+  supabaseClient.auth.onAuthStateChange(
+    async (_event, session) => {
+
+      currentUser =
+        session?.user || null;
+
+
+      updateUserStatus();
+
+
+      /*
+       * Re-render so "Delete" and "My Posts" update
+       * immediately after login/logout.
+       */
+
+      renderPosts();
+
+    }
+  );
+}
+
+
+/* ============================================================
+   CUSTOM CSS
+   ============================================================ */
+
+const customStyle =
+document.createElement("style");
+
+
+customStyle.textContent = `
+
+  .category-btn {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+
+  .category-btn:hover {
+    background: #eff6ff;
+    border-color: #93c5fd;
+  }
+
+  .active-category {
+    background: #1d4ed8 !important;
+    border-color: #1d4ed8 !important;
+    color: white !important;
+  }
+
+  .view-btn {
+    background: white;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .active-view {
+    background: #172554 !important;
+    color: white !important;
+    border-color: #172554 !important;
+  }
+
+  .action-btn {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    color: #374151;
+    padding: 7px 11px;
+    border-radius: 9px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+
+  .action-btn:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  .report-btn:hover {
+    background: #fff7ed;
+    border-color: #fed7aa;
+    color: #c2410c;
+  }
+
+`;
+
+
+document.head.appendChild(customStyle);
+
+
+/* ============================================================
+   START
+   ============================================================ */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    await initializePage();
+
+    setupAuthListener();
+
+  }
+);
+
+</script>
+
 </body>
 </html>
