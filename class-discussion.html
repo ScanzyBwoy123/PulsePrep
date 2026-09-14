@@ -803,7 +803,8 @@ function populateSubjects() {
 
 async function loadPosts() {
 
-  const loading = document.getElementById("loadingState");
+  const loading =
+    document.getElementById("loadingState");
 
   if (loading) {
     loading.classList.remove("hidden");
@@ -817,16 +818,43 @@ async function loadPosts() {
       );
     }
 
-    const { data, error } = await supabaseClient
+    /*
+     * Load all visible discussion posts.
+     *
+     * Older posts may have is_hidden = NULL because
+     * they were created before the is_hidden field/default
+     * was introduced.
+     *
+     * Therefore:
+     *   false = visible
+     *   NULL  = also visible
+     *   true  = hidden
+     */
+    const {
+      data,
+      error
+    } = await supabaseClient
       .from("discussion_posts")
       .select("*")
-      .eq("is_hidden", false)
-      .order("created_at", { ascending: false });
+      .or("is_hidden.eq.false,is_hidden.is.null")
+      .order("created_at", {
+        ascending: false
+      });
 
     if (error) {
-  console.error("SUPABASE DISCUSSION ERROR:", error);
-  throw error;
-}
+
+      console.error(
+        "SUPABASE DISCUSSION ERROR:",
+        error
+      );
+
+      throw error;
+    }
+
+    console.log(
+      "PulsePrep discussion posts loaded:",
+      data?.length || 0
+    );
 
     allPosts = data || [];
 
@@ -834,13 +862,16 @@ async function loadPosts() {
 
   } catch (error) {
 
-    console.error("Load discussions error:", error);
+    console.error(
+      "Load discussions error:",
+      error
+    );
 
     showStatus(
-  "Unable to load class discussions: " +
-  (error?.message || "Unknown error"),
-  "error"
-);
+      "Unable to load class discussions: " +
+      (error?.message || "Unknown error"),
+      "error"
+    );
 
     allPosts = [];
 
@@ -853,7 +884,6 @@ async function loadPosts() {
     }
   }
 }
-
 
 /* ============================================================
    FILTER POSTS
