@@ -801,33 +801,30 @@ function populateSubjects() {
    ============================================================ */
 
 async function loadPosts() {
-
   const loading =
     document.getElementById("loadingState");
-
   if (loading) {
     loading.classList.remove("hidden");
   }
-
   try {
-
     if (!supabaseClient) {
       throw new Error(
-        "Supabase is not initialized. Please make sure the existing PulsePrep Supabase client is loaded."
+        "Supabase is not initialized."
       );
     }
-
+    console.log(
+      "Loading PulsePrep Class Discussion posts..."
+    );
     /*
-     * Load all visible discussion posts.
+     * Load discussion posts.
      *
-     * Older posts may have is_hidden = NULL because
-     * they were created before the is_hidden field/default
-     * was introduced.
+     * Visible posts:
+     *   is_hidden = false
+     *   OR
+     *   is_hidden = NULL
      *
-     * Therefore:
-     *   false = visible
-     *   NULL  = also visible
-     *   true  = hidden
+     * Hidden posts:
+     *   is_hidden = true
      */
     const {
       data,
@@ -839,45 +836,37 @@ async function loadPosts() {
       .order("created_at", {
         ascending: false
       });
-
     if (error) {
-
       console.error(
         "SUPABASE DISCUSSION ERROR:",
         error
       );
-
-      throw error;
+      throw new Error(
+        error.message ||
+        "Unable to load discussion posts."
+      );
     }
-
     console.log(
       "PulsePrep discussion posts loaded:",
       data?.length || 0
     );
-
-    allPosts = data || [];
-
+    allPosts = Array.isArray(data)
+      ? data
+      : [];
     renderPosts();
-
   } catch (error) {
-
     console.error(
       "Load discussions error:",
       error
     );
-
     showStatus(
-  "Premium verification error: " +
-  (error?.message || "Unknown error"),
-  "error"
-);
-
+      "Unable to load class discussions: " +
+      (error?.message || "Unknown error"),
+      "error"
+    );
     allPosts = [];
-
     renderPosts();
-
   } finally {
-
     if (loading) {
       loading.classList.add("hidden");
     }
