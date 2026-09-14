@@ -863,8 +863,9 @@ async function loadPosts() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      throw error;
-    }
+  console.error("SUPABASE DISCUSSION ERROR:", error);
+  throw error;
+}
 
     allPosts = data || [];
 
@@ -875,9 +876,10 @@ async function loadPosts() {
     console.error("Load discussions error:", error);
 
     showStatus(
-      "Unable to load class discussions. Please refresh the page.",
-      "error"
-    );
+  "Unable to load class discussions: " +
+  (error?.message || "Unknown error"),
+  "error"
+);
 
     allPosts = [];
 
