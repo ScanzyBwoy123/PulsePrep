@@ -2219,7 +2219,60 @@ function showPremiumDiscussionLock(type) {
     </div>
   `;
 }
+function openPremiumDiscussionPlans() {
 
+  /*
+   * Use PulsePrep's existing Premium/payment section.
+   * We do NOT create another payment system.
+   */
+
+  if (typeof window.PulsePrepOpenPremiumPlans === "function") {
+
+    window.PulsePrepOpenPremiumPlans();
+
+    return;
+  }
+
+  /*
+   * Fallback: open the existing payment/pricing section
+   * if the helper function is not available on this page.
+   */
+
+  const payment =
+    document.getElementById("payment");
+
+  const pricing =
+    document.getElementById("pricing");
+
+  const target =
+    payment || pricing;
+
+  if (target) {
+
+    document
+      .querySelectorAll(".tab")
+      .forEach(tab => {
+        tab.style.display = "none";
+      });
+
+    target.style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+    return;
+  }
+
+  /*
+   * If this standalone page cannot find the payment section,
+   * send the student back to the main PulsePrep account page.
+   */
+
+  window.location.href =
+    "index.html?premium=required";
+}
 /* ============================================================
    FORMAT DATE
    ============================================================ */
