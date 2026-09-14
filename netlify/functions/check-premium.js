@@ -1,73 +1,52 @@
+// ============================================================
+// PULSEPREP — CLASS DISCUSSIONS PREMIUM CHECK
+// ============================================================
+
 const { createClient } = require("@supabase/supabase-js");
 
 exports.handler = async (event) => {
+
+  const headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store"
+  };
+
+  // ==========================================================
+  // OPTIONS
+  // ==========================================================
+
+  if (event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 204,
+      headers
+    };
+  }
+
+  // ==========================================================
+  // ONLY GET
+  // ==========================================================
+
+  if (event.httpMethod !== "GET") {
+    return {
+      statusCode: 405,
+      headers,
+      body: JSON.stringify({
+        authenticated: false,
+        premium: false,
+        error: "Method not allowed."
+      })
+    };
+  }
+
   try {
 
-    /*
-     * Only GET requests are allowed.
-     */
-    if (event.httpMethod !== "GET") {
-      return {
-        statusCode: 405,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          error: "Method not allowed"
-        })
-      };
-    }
+    // ========================================================
+    // SUPABASE CONFIGURATION
+    // ========================================================
 
-    /*
-     * ---------------------------------------------------------
-     * GET ACCESS TOKEN
-     * ---------------------------------------------------------
-     */
-    const authHeader =
-      event.headers?.authorization ||
-      event.headers?.Authorization;
-
-    if (
-      !authHeader ||
-      !authHeader.startsWith("Bearer ")
-    ) {
-      return {
-        statusCode: 401,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          error: "Authentication required"
-        })
-      };
-    }
-
-    const accessToken =
-      authHeader.substring(7).trim();
-
-    if (!accessToken) {
-      return {
-        statusCode: 401,
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          error: "Missing access token"
-        })
-      };
-    }
-
-    /*
-     * ---------------------------------------------------------
-     * SUPABASE CONFIGURATION
-     * ---------------------------------------------------------
-     *
-     * Use the existing PulsePrep Supabase project.
-     *
-     * SUPABASE_URL is supported if it exists.
-     * The fallback keeps this function tied to the
-     * existing PulsePrep project.
-     */
     const supabaseUrl =
       process.env.SUPABASE_URL ||
       "https://eskwphjtiogguhvtktmh.supabase.co";
@@ -83,37 +62,83 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 500,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers,
         body: JSON.stringify({
+          authenticated: false,
+          premium: false,
           error:
             "Premium verification is not configured correctly."
         })
       };
     }
 
-    /*
-     * ---------------------------------------------------------
-     * ADMIN SUPABASE CLIENT
-     * ---------------------------------------------------------
-     */
-    const supabaseAdmin = createClient(
-      supabaseUrl,
-      serviceRoleKey,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false
-        }
-      }
-    );
+    // ========================================================
+    // CREATE ADMIN SUPABASE CLIENT
+    // ========================================================
 
-    /*
-     * ---------------------------------------------------------
-     * VERIFY LOGGED-IN USER
-     * ---------------------------------------------------------
-     */
+    const supabaseAdmin =
+      createClient(
+        supabaseUrl,
+        serviceRoleKey,
+        {
+          auth: {
+            autoRefreshToken: false,
+            persistSession: false
+          }
+        }
+      );
+
+    // ========================================================
+    // GET AUTHORIZATION HEADER
+    // ========================================================
+
+    const authHeader =
+      event.headers?.authorization ||
+      event.headers?.Authorization;
+
+    if (!authHeader) {
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          authenticated: false,
+          premium: false,
+          email: null,
+          plan: null,
+          paidAt: null
+        })
+      };
+    }
+
+    // ========================================================
+    // EXTRACT TOKEN
+    // ========================================================
+
+    const accessToken =
+      authHeader
+        .replace(/^Bearer\s+/i, "")
+        .trim();
+
+    if (!accessToken) {
+
+      return {
+        statusCode: 200,
+        headers,
+        body: JSON.stringify({
+          authenticated: false,
+          premium: false,
+          email: null,
+          plan: null,
+          paidAt: null
+        })
+      };
+    }
+
+    // ========================================================
+    // VERIFY USER
+    // ========================================================
+
     const {
       data: userData,
       error: userError
@@ -122,7 +147,10 @@ exports.handler = async (event) => {
         accessToken
       );
 
-    if (userError || !userData?.user) {
+    if (
+      userError ||
+      !userData?.user
+    ) {
 
       console.error(
         "CHECK PREMIUM USER ERROR:",
@@ -130,47 +158,57 @@ exports.handler = async (event) => {
       );
 
       return {
-        statusCode: 401,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        statusCode: 200,
+        headers,
         body: JSON.stringify({
-          error:
-            "Invalid or expired login session."
+          authenticated: false,
+          premium: false,
+          email: null,
+          plan: null,
+          paidAt: null
         })
       };
     }
 
-    const user =
-      userData.user;
+    // ========================================================
+    // USER EMAIL
+    // ========================================================
 
     const email =
-      user.email
+      userData.user.email
         ?.trim()
         .toLowerCase();
 
     if (!email) {
 
       return {
-        statusCode: 403,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        statusCode: 200,
+        headers,
         body: JSON.stringify({
-          error:
-            "Your account does not have an email address."
+          authenticated: true,
+          premium: false,
+          email: null,
+          plan: null,
+          paidAt: null
         })
       };
     }
 
+    console.log(
+      "CHECK PREMIUM FOR:",
+      email
+    );
+
+    // ========================================================
+    // CHECK SUBSCRIPTION
+    // ========================================================
+
     /*
-     * ---------------------------------------------------------
-     * CHECK PREMIUM SUBSCRIPTION
-     * ---------------------------------------------------------
-     *
-     * A successful subscription for the logged-in
-     * student's email gives Premium access.
+     * We use ilike instead of eq for the email so that
+     * uppercase/lowercase differences cannot prevent
+     * a genuine Premium student from being recognized.
      */
+
     const {
       data: subscriptions,
       error: subscriptionError
@@ -180,12 +218,25 @@ exports.handler = async (event) => {
         .select(
           "email, reference, amount, status, plan, paid_at"
         )
-        .eq("email", email)
-        .eq("status", "success")
-        .order("paid_at", {
-          ascending: false
-        })
+        .ilike(
+          "email",
+          email
+        )
+        .eq(
+          "status",
+          "success"
+        )
+        .order(
+          "paid_at",
+          {
+            ascending: false
+          }
+        )
         .limit(1);
+
+    // ========================================================
+    // DATABASE ERROR
+    // ========================================================
 
     if (subscriptionError) {
 
@@ -196,10 +247,13 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 500,
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers,
         body: JSON.stringify({
+          authenticated: true,
+          premium: false,
+          email: email,
+          plan: null,
+          paidAt: null,
           error:
             "Unable to check your Premium subscription.",
           details:
@@ -208,31 +262,55 @@ exports.handler = async (event) => {
       };
     }
 
+    // ========================================================
+    // FIND SUBSCRIPTION
+    // ========================================================
+
     const subscription =
-      subscriptions?.[0] || null;
+      Array.isArray(subscriptions) &&
+      subscriptions.length > 0
+        ? subscriptions[0]
+        : null;
+
+    // ========================================================
+    // PREMIUM RESULT
+    // ========================================================
 
     const premium =
       subscription !== null;
 
-    /*
-     * ---------------------------------------------------------
-     * RETURN PREMIUM STATUS
-     * ---------------------------------------------------------
-     */
+    console.log(
+      "CHECK PREMIUM RESULT:",
+      {
+        email: email,
+        premium: premium,
+        plan: subscription?.plan || null
+      }
+    );
+
+    // ========================================================
+    // RETURN RESULT
+    // ========================================================
+
     return {
       statusCode: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-store"
-      },
+      headers,
       body: JSON.stringify({
+
         authenticated: true,
+
         premium: premium,
+
         email: email,
+
         plan:
-          subscription?.plan || null,
+          subscription?.plan ||
+          null,
+
         paidAt:
-          subscription?.paid_at || null
+          subscription?.paid_at ||
+          null
+
       })
     };
 
@@ -245,14 +323,15 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 500,
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers,
       body: JSON.stringify({
+        authenticated: false,
+        premium: false,
         error:
           "Internal Premium verification error.",
         details:
-          error?.message || "Unknown error"
+          error?.message ||
+          "Unknown error"
       })
     };
   }
