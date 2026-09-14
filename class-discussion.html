@@ -1951,7 +1951,274 @@ function showStatus(message, type = "success") {
 
   }, 5000);
 }
+function showPremiumDiscussionLock(type) {
 
+  const loading =
+    document.getElementById("loadingState");
+
+  if (loading) {
+    loading.classList.add("hidden");
+  }
+
+  const container =
+    document.getElementById("postsContainer") ||
+    document.getElementById("discussionPosts") ||
+    document.getElementById("posts");
+
+  if (!container) {
+    console.warn(
+      "PulsePrep: Class Discussion posts container was not found."
+    );
+    return;
+  }
+
+  if (type === "login") {
+
+    container.innerHTML = `
+      <div class="max-w-xl mx-auto py-12 px-4">
+
+        <div class="bg-white
+                    rounded-3xl
+                    border
+                    border-slate-200
+                    shadow-lg
+                    p-8
+                    md:p-10
+                    text-center">
+
+          <div class="w-16 h-16
+                      mx-auto
+                      rounded-2xl
+                      bg-blue-50
+                      text-blue-600
+                      flex
+                      items-center
+                      justify-center
+                      text-3xl">
+
+            🔐
+
+          </div>
+
+          <div class="inline-flex
+                      items-center
+                      gap-2
+                      mt-5
+                      px-3
+                      py-1
+                      rounded-full
+                      bg-blue-50
+                      text-blue-700
+                      text-xs
+                      font-bold
+                      uppercase">
+
+            PulsePrep Account
+
+          </div>
+
+          <h2 class="text-2xl
+                     md:text-3xl
+                     font-extrabold
+                     text-slate-900
+                     mt-4">
+
+            Login Required
+
+          </h2>
+
+          <p class="text-slate-500
+                    leading-7
+                    mt-3">
+
+            Please log in to your PulsePrep account
+            to access Class Discussions.
+
+          </p>
+
+          <button
+            type="button"
+            onclick="handleLoginButton()"
+            class="mt-7
+                   inline-flex
+                   items-center
+                   justify-center
+                   gap-2
+                   px-7
+                   py-3
+                   rounded-xl
+                   bg-blue-600
+                   hover:bg-blue-700
+                   text-white
+                   font-bold
+                   transition">
+
+            <i class="fa-solid fa-right-to-bracket"></i>
+
+            Login to PulsePrep
+
+          </button>
+
+        </div>
+
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="max-w-2xl mx-auto py-12 px-4">
+
+      <div class="bg-white
+                  rounded-3xl
+                  border
+                  border-amber-200
+                  shadow-lg
+                  p-8
+                  md:p-10
+                  text-center">
+
+        <div class="w-20 h-20
+                    mx-auto
+                    rounded-3xl
+                    bg-amber-50
+                    text-amber-600
+                    flex
+                    items-center
+                    justify-center
+                    text-4xl">
+
+          👑
+
+        </div>
+
+        <div class="inline-flex
+                    items-center
+                    gap-2
+                    mt-5
+                    px-4
+                    py-2
+                    rounded-full
+                    bg-amber-50
+                    text-amber-700
+                    text-xs
+                    font-extrabold
+                    uppercase
+                    tracking-wide">
+
+          <i class="fa-solid fa-crown"></i>
+
+          Premium Feature
+
+        </div>
+
+        <h2 class="text-2xl
+                   md:text-3xl
+                   font-extrabold
+                   text-slate-900
+                   mt-5">
+
+          Class Discussions is Premium
+
+        </h2>
+
+        <p class="text-slate-600
+                  leading-7
+                  mt-4">
+
+          Connect with other nursing students,
+          ask questions, share class notes,
+          discuss difficult topics and get
+          exam preparation support.
+
+        </p>
+
+        <div class="grid
+                    grid-cols-1
+                    sm:grid-cols-2
+                    gap-3
+                    text-left
+                    mt-7
+                    mb-8">
+
+          <div class="rounded-2xl
+                      bg-slate-50
+                      p-4">
+
+            <i class="fa-solid fa-comments
+                      text-blue-600
+                      mr-2"></i>
+
+            Student discussions
+
+          </div>
+
+          <div class="rounded-2xl
+                      bg-slate-50
+                      p-4">
+
+            <i class="fa-solid fa-circle-question
+                      text-blue-600
+                      mr-2"></i>
+
+            Ask questions
+
+          </div>
+
+          <div class="rounded-2xl
+                      bg-slate-50
+                      p-4">
+
+            <i class="fa-solid fa-book
+                      text-blue-600
+                      mr-2"></i>
+
+            Share class notes
+
+          </div>
+
+          <div class="rounded-2xl
+                      bg-slate-50
+                      p-4">
+
+            <i class="fa-solid fa-graduation-cap
+                      text-blue-600
+                      mr-2"></i>
+
+            Exam help
+
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          onclick="openPremiumDiscussionPlans()"
+          class="inline-flex
+                 items-center
+                 justify-center
+                 gap-2
+                 px-7
+                 py-3
+                 rounded-xl
+                 bg-amber-500
+                 hover:bg-amber-600
+                 text-white
+                 font-extrabold
+                 transition">
+
+          <i class="fa-solid fa-crown"></i>
+
+          Upgrade to Premium
+
+        </button>
+
+      </div>
+
+    </div>
+  `;
+}
 
 /* ============================================================
    FORMAT DATE
@@ -2199,7 +2466,63 @@ async function initializePage() {
 
     return;
   }
+  /*
+   * PREMIUM ACCESS CHECK
+   * Uses the same Premium system as Question Bank.
+   */
+  let premiumStatus;
 
+  try {
+
+    if (typeof window.checkPulsePrepPremium !== "function") {
+      throw new Error("Premium verification system is not loaded.");
+    }
+
+    premiumStatus =
+      await window.checkPulsePrepPremium();
+
+  } catch (error) {
+
+    console.error(
+      "Class Discussions Premium verification error:",
+      error
+    );
+
+    showStatus(
+      "Unable to verify your Premium access. Please refresh the page and try again.",
+      "error"
+    );
+
+    document
+      .getElementById("loadingState")
+      ?.classList.add("hidden");
+
+    return;
+  }
+
+  /*
+   * Student must be logged in.
+   */
+  if (!premiumStatus?.authenticated) {
+
+    showPremiumDiscussionLock(
+      "login"
+    );
+
+    return;
+  }
+
+  /*
+   * Student must have active Premium access.
+   */
+  if (premiumStatus.premium !== true) {
+
+    showPremiumDiscussionLock(
+      "premium"
+    );
+
+    return;
+  }
   await loadCurrentUser();
 
   await loadPosts();
