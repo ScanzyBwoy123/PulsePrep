@@ -16,17 +16,26 @@
       color: #172033;
       min-height: 100vh;
     }
+    button,
+    input,
+    select,
+    textarea {
+      font-family: inherit;
+    }
+    button {
+      cursor: pointer;
+    }
     /* =========================
        HEADER
     ========================= */
     .topbar {
       background: linear-gradient(135deg, #0b63ce, #084b9b);
       color: white;
-      padding: 18px 20px;
+      padding: 17px 20px;
       position: sticky;
       top: 0;
       z-index: 100;
-      box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 3px 12px rgba(0,0,0,.12);
     }
     .topbar-inner {
       max-width: 1100px;
@@ -51,30 +60,29 @@
       align-items: center;
       justify-content: center;
       font-size: 22px;
-      font-weight: bold;
+      font-weight: 800;
     }
     .brand-text h1 {
       font-size: 21px;
     }
     .brand-text p {
       font-size: 12px;
-      opacity: 0.85;
+      opacity: .85;
       margin-top: 2px;
     }
     .back-btn {
-      border: 1px solid rgba(255,255,255,0.35);
-      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,.35);
+      background: rgba(255,255,255,.12);
       color: white;
       padding: 10px 15px;
       border-radius: 9px;
-      cursor: pointer;
       font-weight: 600;
     }
     .back-btn:hover {
-      background: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,.2);
     }
     /* =========================
-       PAGE
+       MAIN
     ========================= */
     .container {
       max-width: 1100px;
@@ -86,7 +94,7 @@
       border-radius: 18px;
       padding: 25px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 18px rgba(20, 50, 90, 0.07);
+      box-shadow: 0 4px 18px rgba(20,50,90,.07);
     }
     .hero h2 {
       color: #0b63ce;
@@ -97,8 +105,16 @@
       color: #64748b;
       line-height: 1.6;
     }
+    .user-status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #64748b;
+    }
+    .user-status strong {
+      color: #0b63ce;
+    }
     /* =========================
-       ACTIONS
+       BUTTONS
     ========================= */
     .actions {
       display: flex;
@@ -112,7 +128,6 @@
       padding: 12px 18px;
       border-radius: 10px;
       font-weight: 700;
-      cursor: pointer;
       font-size: 14px;
     }
     .primary-btn {
@@ -121,6 +136,10 @@
     }
     .primary-btn:hover {
       background: #084b9b;
+    }
+    .primary-btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
     }
     .secondary-btn {
       background: #eaf2ff;
@@ -134,7 +153,7 @@
       padding: 18px;
       border-radius: 15px;
       margin-bottom: 20px;
-      box-shadow: 0 4px 18px rgba(20, 50, 90, 0.06);
+      box-shadow: 0 4px 18px rgba(20,50,90,.06);
     }
     .search-box {
       display: flex;
@@ -148,13 +167,14 @@
       outline: none;
       font-size: 14px;
     }
-    .search-box input:focus {
+    .search-box input:focus,
+    .filters select:focus,
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
       border-color: #0b63ce;
-      box-shadow: 0 0 0 3px rgba(11, 99, 206, 0.08);
+      box-shadow: 0 0 0 3px rgba(11,99,206,.08);
     }
-    /* =========================
-       FILTERS
-    ========================= */
     .filters {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -170,7 +190,7 @@
       outline: none;
     }
     /* =========================
-       DISCUSSIONS
+       SECTION
     ========================= */
     .section-title {
       display: flex;
@@ -186,12 +206,15 @@
       font-size: 13px;
       color: #64748b;
     }
+    /* =========================
+       DISCUSSION CARD
+    ========================= */
     .discussion-card {
       background: white;
       border-radius: 16px;
       padding: 20px;
       margin-bottom: 15px;
-      box-shadow: 0 4px 18px rgba(20, 50, 90, 0.06);
+      box-shadow: 0 4px 18px rgba(20,50,90,.06);
       border: 1px solid #edf1f7;
     }
     .discussion-card:hover {
@@ -214,6 +237,7 @@
       align-items: center;
       justify-content: center;
       font-weight: bold;
+      flex-shrink: 0;
     }
     .author-info strong {
       display: block;
@@ -232,6 +256,10 @@
       font-size: 11px;
       font-weight: 700;
     }
+    .topic-badge {
+      background: #f1f5f9;
+      color: #64748b;
+    }
     .discussion-card h4 {
       font-size: 18px;
       margin-bottom: 9px;
@@ -241,6 +269,7 @@
       color: #5f6b7a;
       line-height: 1.65;
       font-size: 14px;
+      white-space: pre-wrap;
     }
     .discussion-footer {
       border-top: 1px solid #edf1f7;
@@ -255,13 +284,13 @@
     .discussion-actions {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
     .small-btn {
       background: #f5f7fa;
       border: 1px solid #e4e9f0;
       padding: 8px 11px;
       border-radius: 8px;
-      cursor: pointer;
       color: #465467;
       font-size: 12px;
     }
@@ -269,13 +298,18 @@
       background: #eaf2ff;
       color: #0b63ce;
     }
+    .small-btn.liked {
+      background: #dcecff;
+      color: #0b63ce;
+    }
     .replies {
       color: #64748b;
       font-size: 12px;
     }
     /* =========================
-       EMPTY STATE
+       LOADING / EMPTY
     ========================= */
+    .loading,
     .empty {
       text-align: center;
       padding: 45px 20px;
@@ -283,8 +317,14 @@
       border-radius: 15px;
       color: #64748b;
     }
+    .loading {
+      display: none;
+    }
+    .loading.show {
+      display: block;
+    }
     .empty-icon {
-      font-size: 45px;
+      font-size: 42px;
       margin-bottom: 10px;
     }
     /* =========================
@@ -294,7 +334,7 @@
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(10, 25, 45, 0.58);
+      background: rgba(10,25,45,.58);
       z-index: 500;
       padding: 20px;
       overflow-y: auto;
@@ -310,14 +350,14 @@
       max-width: 600px;
       border-radius: 18px;
       padding: 25px;
-      position: relative;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+      box-shadow: 0 20px 50px rgba(0,0,0,.2);
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      gap: 15px;
     }
     .modal-header h3 {
       font-size: 21px;
@@ -329,7 +369,6 @@
       width: 35px;
       height: 35px;
       border-radius: 50%;
-      cursor: pointer;
       font-size: 18px;
     }
     .form-group {
@@ -350,22 +389,25 @@
       padding: 12px;
       font-size: 14px;
       outline: none;
-      font-family: inherit;
     }
     .form-group textarea {
       min-height: 150px;
       resize: vertical;
     }
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-      border-color: #0b63ce;
-      box-shadow: 0 0 0 3px rgba(11,99,206,0.08);
-    }
     .form-note {
       font-size: 12px;
       color: #7a8697;
       line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    .login-warning {
+      display: none;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      color: #9a3412;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 13px;
       margin-bottom: 15px;
     }
     /* =========================
@@ -382,7 +424,8 @@
       display: none;
       z-index: 1000;
       font-size: 13px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 25px rgba(0,0,0,.2);
+      max-width: 340px;
     }
     .toast.show {
       display: block;
@@ -421,44 +464,63 @@
   </style>
 </head>
 <body>
-  <!-- =========================
+  <!-- ========================================================
        HEADER
-  ========================= -->
+  ========================================================= -->
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <div class="brand-icon">P</div>
+        <div class="brand-icon">
+          P
+        </div>
         <div class="brand-text">
           <h1>PulsePrep</h1>
           <p>Student Learning Community</p>
         </div>
       </div>
-      <button class="back-btn" onclick="goBack()">
+      <button
+        class="back-btn"
+        onclick="goBack()"
+      >
         ← Back
       </button>
     </div>
   </header>
-  <!-- =========================
-       MAIN CONTENT
-  ========================= -->
+  <!-- ========================================================
+       MAIN
+  ========================================================= -->
   <main class="container">
-    <!-- HERO -->
     <section class="hero">
       <h2>💬 Class Discussions</h2>
       <p>
         Ask questions from class, discuss difficult topics,
-        share explanations and learn together with other students.
+        share explanations and learn together with other
+        PulsePrep students.
       </p>
+      <div
+        class="user-status"
+        id="userStatus"
+      >
+        Checking your account...
+      </div>
       <div class="actions">
-        <button class="primary-btn" onclick="openQuestionModal()">
+        <button
+          class="primary-btn"
+          onclick="openQuestionModal()"
+        >
           + Ask a Question
         </button>
-        <button class="secondary-btn" onclick="showMyQuestions()">
+        <button
+          class="secondary-btn"
+          onclick="showMyQuestions()"
+        >
           My Questions
         </button>
       </div>
     </section>
-    <!-- SEARCH -->
+    <!-- ======================================================
+         SEARCH
+    ======================================================= -->
     <section class="search-section">
       <div class="search-box">
         <input
@@ -475,8 +537,13 @@
         </button>
       </div>
       <div class="filters">
-        <select id="subjectFilter" onchange="filterDiscussions()">
-          <option value="">All Subjects</option>
+        <select
+          id="subjectFilter"
+          onchange="filterDiscussions()"
+        >
+          <option value="">
+            All Subjects
+          </option>
           <option value="Anatomy & Physiology">
             Anatomy & Physiology
           </option>
@@ -502,200 +569,60 @@
             Community Health Nursing
           </option>
         </select>
-        <select id="sortFilter" onchange="sortDiscussions()">
-          <option value="latest">Latest</option>
-          <option value="popular">Most Popular</option>
-          <option value="replies">Most Discussed</option>
+        <select
+          id="sortFilter"
+          onchange="sortDiscussions()"
+        >
+          <option value="latest">
+            Latest
+          </option>
+          <option value="popular">
+            Most Popular
+          </option>
+          <option value="replies">
+            Most Discussed
+          </option>
         </select>
       </div>
     </section>
-    <!-- DISCUSSIONS -->
+    <!-- ======================================================
+         DISCUSSION LIST
+    ======================================================= -->
     <section>
       <div class="section-title">
-        <h3>Recent Discussions</h3>
+        <h3>
+          Recent Discussions
+        </h3>
         <span
           class="discussion-count"
           id="discussionCount"
         >
-          3 discussions
+          Loading...
         </span>
       </div>
-      <div id="discussionList">
-        <!-- DISCUSSION 1 -->
-        <article
-          class="discussion-card"
-          data-subject="Pharmacology"
-          data-title="What is the difference between absorption and distribution?"
-          data-popularity="25"
-          data-replies="8"
-        >
-          <div class="discussion-meta">
-            <div class="avatar">
-              A
-            </div>
-            <div class="author-info">
-              <strong>Student</strong>
-              <span>Today • 9:15 AM</span>
-            </div>
-            <span class="badge">
-              Pharmacology
-            </span>
-          </div>
-          <h4>
-            What is the difference between absorption and distribution?
-          </h4>
-          <p>
-            I'm finding it difficult to understand the difference
-            between drug absorption and distribution. Can someone
-            explain it in simple terms?
-          </p>
-          <div class="discussion-footer">
-            <div class="discussion-actions">
-              <button
-                class="small-btn"
-                onclick="likeDiscussion(this)"
-              >
-                👍 <span>25</span>
-              </button>
-              <button
-                class="small-btn"
-                onclick="openDiscussion(this)"
-              >
-                💬 Discuss
-              </button>
-              <button
-                class="small-btn"
-                onclick="reportDiscussion()"
-              >
-                🚩 Report
-              </button>
-            </div>
-            <span class="replies">
-              8 replies
-            </span>
-          </div>
-        </article>
-        <!-- DISCUSSION 2 -->
-        <article
-          class="discussion-card"
-          data-subject="Anatomy & Physiology"
-          data-title="Can someone explain the cardiac cycle?"
-          data-popularity="18"
-          data-replies="5"
-        >
-          <div class="discussion-meta">
-            <div class="avatar">
-              M
-            </div>
-            <div class="author-info">
-              <strong>Student</strong>
-              <span>Yesterday • 6:40 PM</span>
-            </div>
-            <span class="badge">
-              Anatomy & Physiology
-            </span>
-          </div>
-          <h4>
-            Can someone explain the cardiac cycle?
-          </h4>
-          <p>
-            I understand systole and diastole separately,
-            but I'm confused about how they work together
-            during the complete cardiac cycle.
-          </p>
-          <div class="discussion-footer">
-            <div class="discussion-actions">
-              <button
-                class="small-btn"
-                onclick="likeDiscussion(this)"
-              >
-                👍 <span>18</span>
-              </button>
-              <button
-                class="small-btn"
-                onclick="openDiscussion(this)"
-              >
-                💬 Discuss
-              </button>
-              <button
-                class="small-btn"
-                onclick="reportDiscussion()"
-              >
-                🚩 Report
-              </button>
-            </div>
-            <span class="replies">
-              5 replies
-            </span>
-          </div>
-        </article>
-        <!-- DISCUSSION 3 -->
-        <article
-          class="discussion-card"
-          data-subject="Fundamentals of Nursing"
-          data-title="What are the principles of therapeutic communication?"
-          data-popularity="31"
-          data-replies="12"
-        >
-          <div class="discussion-meta">
-            <div class="avatar">
-              K
-            </div>
-            <div class="author-info">
-              <strong>Student</strong>
-              <span>2 days ago • 2:20 PM</span>
-            </div>
-            <span class="badge">
-              Fundamentals of Nursing
-            </span>
-          </div>
-          <h4>
-            What are the principles of therapeutic communication?
-          </h4>
-          <p>
-            Please can someone explain therapeutic communication
-            and give some examples that can help us remember it
-            for examinations?
-          </p>
-          <div class="discussion-footer">
-            <div class="discussion-actions">
-              <button
-                class="small-btn"
-                onclick="likeDiscussion(this)"
-              >
-                👍 <span>31</span>
-              </button>
-              <button
-                class="small-btn"
-                onclick="openDiscussion(this)"
-              >
-                💬 Discuss
-              </button>
-              <button
-                class="small-btn"
-                onclick="reportDiscussion()"
-              >
-                🚩 Report
-              </button>
-            </div>
-            <span class="replies">
-              12 replies
-            </span>
-          </div>
-        </article>
+      <div
+        class="loading"
+        id="loadingState"
+      >
+        Loading discussions...
       </div>
+      <div
+        id="discussionList"
+      ></div>
     </section>
   </main>
-  <!-- =========================
+  <!-- ========================================================
        ASK QUESTION MODAL
-  ========================= -->
+  ========================================================= -->
   <div
     class="modal"
     id="questionModal"
   >
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Ask a Class Question</h3>
+        <h3>
+          Ask a Class Question
+        </h3>
         <button
           class="close-btn"
           onclick="closeQuestionModal()"
@@ -703,17 +630,30 @@
           ×
         </button>
       </div>
+      <div
+        class="login-warning"
+        id="loginWarning"
+      >
+        You need to be logged in to post a question.
+        Please log in to your PulsePrep account first.
+      </div>
       <p class="form-note">
         Ask something you learned in class or something
         you need help understanding. Be respectful and
         provide enough information for other students to help.
       </p>
-      <form onsubmit="submitQuestion(event)">
+      <form
+        id="questionForm"
+        onsubmit="submitQuestion(event)"
+      >
         <div class="form-group">
           <label for="questionSubject">
             Subject
           </label>
-          <select id="questionSubject" required>
+          <select
+            id="questionSubject"
+            required
+          >
             <option value="">
               Select subject
             </option>
@@ -779,6 +719,7 @@
         <button
           type="submit"
           class="primary-btn"
+          id="postQuestionButton"
           style="width:100%;"
         >
           Post Question
@@ -786,122 +727,510 @@
       </form>
     </div>
   </div>
-  <!-- TOAST -->
+  <!-- ========================================================
+       TOAST
+  ========================================================= -->
   <div
     class="toast"
     id="toast"
   ></div>
-  <!-- =========================
-       JAVASCRIPT
-  ========================= -->
+  <!-- ========================================================
+       SUPABASE
+  ========================================================= -->
   <script>
+    const SUPABASE_URL =
+      "https://eskwphjtiogguhvtktmh.supabase.co";
+    const SUPABASE_PUBLISHABLE_KEY =
+      "sb_publishable_o-Dr554qwhmu4SNpZL5dxQ__cP7MB9p";
+    let discussionSupabase = null;
+    let currentSession = null;
+    let allDiscussions = [];
+    let likedDiscussionIds = new Set();
     /*
-      ==============================================
-      PULSEPREP CLASS DISCUSSION
-      FRONTEND VERSION
-      Supabase will be connected in the next step.
-      ==============================================
+      ==========================================================
+      LOAD SUPABASE
+      ==========================================================
     */
-    function goBack() {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.href = "index.html";
+    const supabaseScript =
+      document.createElement("script");
+    supabaseScript.src =
+      "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+    supabaseScript.onload = async function() {
+      try {
+        discussionSupabase =
+          window.supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_PUBLISHABLE_KEY
+          );
+        await initializeDiscussionPage();
+      } catch (error) {
+        console.error(error);
+        showToast(
+          "Unable to initialize PulsePrep."
+        );
       }
+    };
+    supabaseScript.onerror = function() {
+      showToast(
+        "Unable to load the Supabase connection."
+      );
+    };
+    document.head.appendChild(
+      supabaseScript
+    );
+    /*
+      ==========================================================
+      INITIALIZE
+      ==========================================================
+    */
+    async function initializeDiscussionPage() {
+      if (!discussionSupabase) return;
+      const {
+        data,
+        error
+      } =
+        await discussionSupabase.auth.getSession();
+      if (error) {
+        console.error(error);
+      }
+      currentSession =
+        data?.session || null;
+      updateUserStatus(
+        currentSession
+      );
+      await loadDiscussions();
+      discussionSupabase.auth.onAuthStateChange(
+        async function(_event, session) {
+          currentSession = session || null;
+          updateUserStatus(
+            currentSession
+          );
+        }
+      );
     }
-    function openQuestionModal() {
-      document
-        .getElementById("questionModal")
-        .classList.add("show");
-    }
-    function closeQuestionModal() {
-      document
-        .getElementById("questionModal")
-        .classList.remove("show");
-    }
-    function showToast(message) {
-      const toast =
-        document.getElementById("toast");
-      toast.textContent = message;
-      toast.classList.add("show");
-      setTimeout(function() {
-        toast.classList.remove("show");
-      }, 2500);
-    }
-    function submitQuestion(event) {
-      event.preventDefault();
-      const subject =
-        document.getElementById("questionSubject").value;
-      const topic =
-        document.getElementById("questionTopic").value.trim();
-      const title =
-        document.getElementById("questionTitle").value.trim();
-      const body =
-        document.getElementById("questionBody").value.trim();
-      if (!subject || !topic || !title || !body) {
-        showToast("Please complete all fields.");
+    /*
+      ==========================================================
+      USER STATUS
+      ==========================================================
+    */
+    function updateUserStatus(session) {
+      const status =
+        document.getElementById(
+          "userStatus"
+        );
+      if (!session) {
+        status.innerHTML =
+          "You are currently <strong>not logged in</strong>. " +
+          "Log in to ask or answer questions.";
         return;
       }
-      /*
-        TEMPORARY:
-        We are not saving to Supabase yet.
-        This prevents this new page from affecting
-        your existing database.
-      */
-      showToast(
-        "Question ready! Database connection will be added next."
-      );
-      document
-        .getElementById("questionSubject")
-        .value = "";
-      document
-        .getElementById("questionTopic")
-        .value = "";
-      document
-        .getElementById("questionTitle")
-        .value = "";
-      document
-        .getElementById("questionBody")
-        .value = "";
-      setTimeout(function() {
-        closeQuestionModal();
-      }, 700);
+      const email =
+        session.user?.email || "PulsePrep Student";
+      status.innerHTML =
+        "Logged in as <strong>" +
+        escapeHtml(email) +
+        "</strong>";
     }
-    function likeDiscussion(button) {
+    /*
+      ==========================================================
+      LOAD DISCUSSIONS
+      ==========================================================
+    */
+    async function loadDiscussions() {
+      const loading =
+        document.getElementById(
+          "loadingState"
+        );
+      const list =
+        document.getElementById(
+          "discussionList"
+        );
+      loading.classList.add("show");
+      list.innerHTML = "";
+      const {
+        data,
+        error
+      } =
+        await discussionSupabase
+          .from("discussion_posts")
+          .select("*")
+          .eq("is_hidden", false)
+          .order("created_at", {
+            ascending: false
+          });
+      loading.classList.remove(
+        "show"
+      );
+      if (error) {
+        console.error(
+          "Discussion loading error:",
+          error
+        );
+        list.innerHTML =
+          '<div class="empty">' +
+            '<div class="empty-icon">⚠️</div>' +
+            '<h3>Unable to load discussions</h3>' +
+            '<p style="margin-top:8px;">' +
+              escapeHtml(error.message) +
+            '</p>' +
+          '</div>';
+        document
+          .getElementById("discussionCount")
+          .textContent = "Error";
+        return;
+      }
+      allDiscussions =
+        data || [];
+      /*
+        Load which discussions this user has liked.
+      */
+      await loadUserLikes();
+      renderDiscussions(
+        allDiscussions
+      );
+    }
+    /*
+      ==========================================================
+      LOAD USER LIKES
+      ==========================================================
+    */
+    async function loadUserLikes() {
+      likedDiscussionIds =
+        new Set();
+      if (!currentSession) {
+        return;
+      }
+      const {
+        data,
+        error
+      } =
+        await discussionSupabase
+          .from("discussion_likes")
+          .select("discussion_id")
+          .eq(
+            "user_id",
+            currentSession.user.id
+          );
+      if (error) {
+        console.warn(
+          "Unable to load likes:",
+          error
+        );
+        return;
+      }
+      (data || []).forEach(function(row) {
+        if (row.discussion_id) {
+          likedDiscussionIds.add(
+            row.discussion_id
+          );
+        }
+      });
+    }
+    /*
+      ==========================================================
+      RENDER
+      ==========================================================
+    */
+    function renderDiscussions(
+      discussions
+    ) {
+      const list =
+        document.getElementById(
+          "discussionList"
+        );
+      list.innerHTML = "";
+      if (!discussions.length) {
+        list.innerHTML =
+          '<div class="empty">' +
+            '<div class="empty-icon">💬</div>' +
+            '<h3>No discussions yet</h3>' +
+            '<p style="margin-top:8px;">' +
+              'Be the first student to ask a question.' +
+            '</p>' +
+          '</div>';
+        document
+          .getElementById("discussionCount")
+          .textContent =
+          "0 discussions";
+        return;
+      }
+      discussions.forEach(function(post) {
+        list.appendChild(
+          createDiscussionCard(post)
+        );
+      });
+      document
+        .getElementById("discussionCount")
+        .textContent =
+        discussions.length +
+        (
+          discussions.length === 1
+            ? " discussion"
+            : " discussions"
+        );
+    }
+    /*
+      ==========================================================
+      CREATE DISCUSSION CARD
+      ==========================================================
+    */
+    function createDiscussionCard(post) {
+      const article =
+        document.createElement("article");
+      article.className =
+        "discussion-card";
+      const authorName =
+        post.author_name ||
+        "PulsePrep Student";
+      const initial =
+        authorName
+          .charAt(0)
+          .toUpperCase();
+      const liked =
+        likedDiscussionIds.has(
+          post.id
+        );
+      const date =
+        formatDate(
+          post.created_at
+        );
+      article.dataset.subject =
+        post.subject || "";
+      article.dataset.title =
+        post.title || "";
+      article.dataset.popularity =
+        post.likes || 0;
+      article.dataset.replies =
+        post.reply_count || 0;
+      article.innerHTML = `
+        <div class="discussion-meta">
+          <div class="avatar">
+            ${escapeHtml(initial)}
+          </div>
+          <div class="author-info">
+            <strong>
+              ${escapeHtml(authorName)}
+            </strong>
+            <span>
+              ${escapeHtml(date)}
+            </span>
+          </div>
+          <span class="badge">
+            ${escapeHtml(post.subject || "General")}
+          </span>
+          ${
+            post.topic
+              ? `
+                <span class="badge topic-badge">
+                  ${escapeHtml(post.topic)}
+                </span>
+              `
+              : ""
+          }
+          ${
+            post.is_answered
+              ? `
+                <span class="badge"
+                  style="background:#dcfce7;color:#166534;">
+                  ✓ Answered
+                </span>
+              `
+              : ""
+          }
+        </div>
+        <h4>
+          ${escapeHtml(post.title)}
+        </h4>
+        <p>
+          ${escapeHtml(post.body)}
+        </p>
+        <div class="discussion-footer">
+          <div class="discussion-actions">
+            <button
+              class="small-btn ${liked ? "liked" : ""}"
+              onclick="likeDiscussion('${post.id}', this)"
+            >
+              👍 <span>${post.likes || 0}</span>
+            </button>
+            <button
+              class="small-btn"
+              onclick="openDiscussion('${post.id}')"
+            >
+              💬 Discuss
+            </button>
+            <button
+              class="small-btn"
+              onclick="reportDiscussion('${post.id}')"
+            >
+              🚩 Report
+            </button>
+          </div>
+          <span class="replies">
+            ${
+              post.reply_count || 0
+            }
+            ${
+              (post.reply_count || 0) === 1
+                ? "reply"
+                : "replies"
+            }
+          </span>
+        </div>
+      `;
+      return article;
+    }
+    /*
+      ==========================================================
+      LIKE
+      ==========================================================
+    */
+    async function likeDiscussion(
+      discussionId,
+      button
+    ) {
+      if (!currentSession) {
+        showToast(
+          "Please log in before liking a discussion."
+        );
+        return;
+      }
+      if (
+        likedDiscussionIds.has(
+          discussionId
+        )
+      ) {
+        showToast(
+          "You already liked this discussion."
+        );
+        return;
+      }
+      button.disabled = true;
+      const {
+        error
+      } =
+        await discussionSupabase
+          .from("discussion_likes")
+          .insert({
+            discussion_id:
+              discussionId,
+            user_id:
+              currentSession.user.id
+          });
+      if (error) {
+        console.error(
+          "Like error:",
+          error
+        );
+        button.disabled = false;
+        showToast(
+          "Unable to like this discussion."
+        );
+        return;
+      }
+      likedDiscussionIds.add(
+        discussionId
+      );
+      const post =
+        allDiscussions.find(
+          function(item) {
+            return item.id === discussionId;
+          }
+        );
+      if (post) {
+        post.likes =
+          Number(post.likes || 0) + 1;
+      }
+      button.classList.add(
+        "liked"
+      );
       const span =
         button.querySelector("span");
-      let current =
-        parseInt(span.textContent) || 0;
-      current++;
-      span.textContent = current;
-      button.disabled = true;
-      button.style.opacity = "0.7";
-      showToast("Thanks for supporting this discussion.");
-    }
-    function openDiscussion(button) {
-      const card =
-        button.closest(".discussion-card");
-      const title =
-        card.querySelector("h4").textContent.trim();
-      showToast(
-        "Discussion page for: " + title
-      );
-      /*
-        Later this will open:
-        discussion.html?id=DISCUSSION_ID
-      */
-    }
-    function reportDiscussion() {
-      const confirmed =
-        confirm(
-          "Do you want to report this discussion for review?"
-        );
-      if (confirmed) {
-        showToast(
-          "Report received. An administrator can review it."
-        );
+      if (span) {
+        span.textContent =
+          post
+            ? post.likes
+            : "1";
       }
+      showToast(
+        "Discussion liked."
+      );
     }
+    /*
+      ==========================================================
+      OPEN DISCUSSION
+      ==========================================================
+    */
+    function openDiscussion(
+      discussionId
+    ) {
+      /*
+        The dedicated discussion/replies page
+        will be created next.
+        For now we store the ID so the next
+        page can use:
+        discussion.html?id=...
+      */
+      window.location.href =
+        "discussion.html?id=" +
+        encodeURIComponent(
+          discussionId
+        );
+    }
+    /*
+      ==========================================================
+      REPORT
+      ==========================================================
+    */
+    async function reportDiscussion(
+      discussionId
+    ) {
+      if (!currentSession) {
+        showToast(
+          "Please log in before reporting a discussion."
+        );
+        return;
+      }
+      const reason =
+        prompt(
+          "Why are you reporting this discussion?"
+        );
+      if (!reason) {
+        return;
+      }
+      const {
+        error
+      } =
+        await discussionSupabase
+          .from("discussion_reports")
+          .insert({
+            discussion_id:
+              discussionId,
+            reporter_user_id:
+              currentSession.user.id,
+            reason:
+              reason.trim(),
+            status:
+              "pending"
+          });
+      if (error) {
+        console.error(
+          "Report error:",
+          error
+        );
+        showToast(
+          "Unable to submit report."
+        );
+        return;
+      }
+      showToast(
+        "Report submitted for review."
+      );
+    }
+    /*
+      ==========================================================
+      SEARCH / FILTER
+      ==========================================================
+    */
     function filterDiscussions() {
       const search =
         document
@@ -913,87 +1242,358 @@
         document
           .getElementById("subjectFilter")
           .value;
-      const cards =
-        document.querySelectorAll(
-          ".discussion-card"
+      const filtered =
+        allDiscussions.filter(
+          function(post) {
+            const searchable =
+              (
+                (post.title || "") +
+                " " +
+                (post.body || "") +
+                " " +
+                (post.topic || "") +
+                " " +
+                (post.subject || "")
+              ).toLowerCase();
+            const matchesSearch =
+              !search ||
+              searchable.includes(search);
+            const matchesSubject =
+              !subject ||
+              post.subject === subject;
+            return (
+              matchesSearch &&
+              matchesSubject
+            );
+          }
         );
-      let visible = 0;
-      cards.forEach(function(card) {
-        const title =
-          card
-            .dataset
-            .title
-            .toLowerCase();
-        const cardSubject =
-          card.dataset.subject;
-        const content =
-          card.textContent.toLowerCase();
-        const matchesSearch =
-          !search ||
-          title.includes(search) ||
-          content.includes(search);
-        const matchesSubject =
-          !subject ||
-          cardSubject === subject;
-        if (
-          matchesSearch &&
-          matchesSubject
-        ) {
-          card.style.display = "block";
-          visible++;
-        } else {
-          card.style.display = "none";
-        }
-      });
-      document
-        .getElementById("discussionCount")
-        .textContent =
-        visible +
-        (visible === 1
-          ? " discussion"
-          : " discussions");
+      renderDiscussions(
+        filtered
+      );
     }
+    /*
+      ==========================================================
+      SORT
+      ==========================================================
+    */
     function sortDiscussions() {
       const sort =
         document
           .getElementById("sortFilter")
           .value;
-      const list =
-        document.getElementById("discussionList");
-      const cards =
-        Array.from(
-          list.querySelectorAll(".discussion-card")
+      const sorted =
+        [...allDiscussions];
+      if (sort === "popular") {
+        sorted.sort(
+          function(a, b) {
+            return (
+              Number(b.likes || 0) -
+              Number(a.likes || 0)
+            );
+          }
         );
-      cards.sort(function(a, b) {
-        if (sort === "popular") {
-          return (
-            parseInt(b.dataset.popularity) -
-            parseInt(a.dataset.popularity)
-          );
-        }
-        if (sort === "replies") {
-          return (
-            parseInt(b.dataset.replies) -
-            parseInt(a.dataset.replies)
-          );
-        }
-        return 0;
-      });
-      cards.forEach(function(card) {
-        list.appendChild(card);
-      });
-      filterDiscussions();
-    }
-    function showMyQuestions() {
-      showToast(
-        "Your personal questions will appear here after login is connected."
+      }
+      if (sort === "replies") {
+        sorted.sort(
+          function(a, b) {
+            return (
+              Number(b.reply_count || 0) -
+              Number(a.reply_count || 0)
+            );
+          }
+        );
+      }
+      if (sort === "latest") {
+        sorted.sort(
+          function(a, b) {
+            return (
+              new Date(b.created_at) -
+              new Date(a.created_at)
+            );
+          }
+        );
+      }
+      renderDiscussions(
+        sorted
       );
     }
     /*
-      Close modal when clicking outside it.
+      ==========================================================
+      ASK QUESTION MODAL
+      ==========================================================
+    */
+    function openQuestionModal() {
+      const modal =
+        document.getElementById(
+          "questionModal"
+        );
+      const warning =
+        document.getElementById(
+          "loginWarning"
+        );
+      if (!currentSession) {
+        warning.style.display =
+          "block";
+      } else {
+        warning.style.display =
+          "none";
+      }
+      modal.classList.add(
+        "show"
+      );
+    }
+    function closeQuestionModal() {
+      document
+        .getElementById(
+          "questionModal"
+        )
+        .classList.remove(
+          "show"
+        );
+    }
+    /*
+      ==========================================================
+      SUBMIT QUESTION
+      ==========================================================
+    */
+    async function submitQuestion(
+      event
+    ) {
+      event.preventDefault();
+      if (!currentSession) {
+        showToast(
+          "Please log in to post a question."
+        );
+        return;
+      }
+      const subject =
+        document
+          .getElementById(
+            "questionSubject"
+          )
+          .value
+          .trim();
+      const topic =
+        document
+          .getElementById(
+            "questionTopic"
+          )
+          .value
+          .trim();
+      const title =
+        document
+          .getElementById(
+            "questionTitle"
+          )
+          .value
+          .trim();
+      const body =
+        document
+          .getElementById(
+            "questionBody"
+          )
+          .value
+          .trim();
+      if (
+        !subject ||
+        !topic ||
+        !title ||
+        !body
+      ) {
+        showToast(
+          "Please complete all fields."
+        );
+        return;
+      }
+      const button =
+        document.getElementById(
+          "postQuestionButton"
+        );
+      button.disabled =
+        true;
+      button.textContent =
+        "Posting...";
+      const email =
+        currentSession.user?.email ||
+        "PulsePrep Student";
+      const {
+        error
+      } =
+        await discussionSupabase
+          .from("discussion_posts")
+          .insert({
+            user_id:
+              currentSession.user.id,
+            author_name:
+              email,
+            subject:
+              subject,
+            topic:
+              topic,
+            title:
+              title,
+            body:
+              body
+          });
+      button.disabled =
+        false;
+      button.textContent =
+        "Post Question";
+      if (error) {
+        console.error(
+          "Post question error:",
+          error
+        );
+        showToast(
+          "Unable to post question: " +
+          error.message
+        );
+        return;
+      }
+      document
+        .getElementById(
+          "questionForm"
+        )
+        .reset();
+      closeQuestionModal();
+      showToast(
+        "Your question has been posted!"
+      );
+      await loadDiscussions();
+    }
+    /*
+      ==========================================================
+      MY QUESTIONS
+      ==========================================================
+    */
+    async function showMyQuestions() {
+      if (!currentSession) {
+        showToast(
+          "Please log in to view your questions."
+        );
+        return;
+      }
+      const mine =
+        allDiscussions.filter(
+          function(post) {
+            return (
+              post.user_id ===
+              currentSession.user.id
+            );
+          }
+        );
+      renderDiscussions(
+        mine
+      );
+      document
+        .getElementById(
+          "discussionCount"
+        )
+        .textContent =
+        mine.length +
+        (
+          mine.length === 1
+            ? " question"
+            : " questions"
+        );
+    }
+    /*
+      ==========================================================
+      BACK
+      ==========================================================
+    */
+    function goBack() {
+      if (
+        window.history.length > 1
+      ) {
+        window.history.back();
+      } else {
+        window.location.href =
+          "index.html";
+      }
+    }
+    /*
+      ==========================================================
+      TOAST
+      ==========================================================
+    */
+    function showToast(
+      message
+    ) {
+      const toast =
+        document.getElementById(
+          "toast"
+        );
+      toast.textContent =
+        message;
+      toast.classList.add(
+        "show"
+      );
+      setTimeout(
+        function() {
+          toast.classList.remove(
+            "show"
+          );
+        },
+        3000
+      );
+    }
+    /*
+      ==========================================================
+      DATE FORMAT
+      ==========================================================
+    */
+    function formatDate(
+      value
+    ) {
+      if (!value) {
+        return "Recently";
+      }
+      const date =
+        new Date(value);
+      if (
+        Number.isNaN(
+          date.getTime()
+        )
+      ) {
+        return "Recently";
+      }
+      return date.toLocaleString(
+        undefined,
+        {
+          dateStyle: "medium",
+          timeStyle: "short"
+        }
+      );
+    }
+    /*
+      ==========================================================
+      ESCAPE HTML
+      Prevents user-entered discussion content from
+      being interpreted as HTML.
+      ==========================================================
+    */
+    function escapeHtml(
+      value
+    ) {
+      return String(
+        value ?? ""
+      )
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+    /*
+      ==========================================================
+      CLOSE MODAL WHEN CLICKING OUTSIDE
+      ==========================================================
     */
     document
-      .getElementById("questionModal")
+      .getElementById(
+        "questionModal"
+      )
       .addEventListener(
         "click",
         function(event) {
