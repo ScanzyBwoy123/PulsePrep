@@ -180,48 +180,52 @@ exports.handler = async (event) => {
     // ========================================================
 
     const {
-      data: subscription,
-      error: subscriptionError
-    } =
-      await supabase
-        .from("subscriptions")
-        .select(
-          "email, status, plan, paid_at"
-        )
-        .ilike(
-          "email",
-          email
-        )
-        .eq(
-          "status",
-          "success"
-        )
-        .order(
-          "paid_at",
-          {
-            ascending: false
-          }
-        )
-        .limit(1)
-        .maybeSingle();
+  data: subscriptions,
+  error: subscriptionError
+} =
+  await supabase
+    .from("subscriptions")
+    .select(
+      "email, reference, amount, status, plan, paid_at"
+    )
+    .ilike(
+      "email",
+      email
+    )
+    .eq(
+      "status",
+      "success"
+    )
+    .order(
+      "paid_at",
+      {
+        ascending: false
+      }
+    )
+    .limit(1);
 
-    if (subscriptionError) {
+if (subscriptionError) {
 
-      console.error(
-        "Discussion subscription check failed:",
-        subscriptionError
-      );
+  console.error(
+    "Discussion subscription check failed:",
+    subscriptionError
+  );
 
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({
-          success: false,
-          error: "Unable to verify Premium access."
-        })
-      };
-    }
+  return {
+    statusCode: 500,
+    headers,
+    body: JSON.stringify({
+      success: false,
+      error: "Unable to verify Premium access."
+    })
+  };
+}
 
+const subscription =
+  Array.isArray(subscriptions) &&
+  subscriptions.length > 0
+    ? subscriptions[0]
+    : null;
     // ========================================================
     // PREMIUM REQUIRED
     // ========================================================
