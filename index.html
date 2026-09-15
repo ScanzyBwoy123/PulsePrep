@@ -3900,7 +3900,10 @@ async function handleAuthSubmit() {
 
     if (pulsePrepAuthMode === "signup") {
 
-      await pulsePrepSignUp(email, password);
+      await pulsePrepSignUp(
+        email,
+        password
+      );
 
       showAuthMessage(
         "Account created successfully. Check your email if confirmation is required.",
@@ -3909,46 +3912,50 @@ async function handleAuthSubmit() {
 
     } else {
 
-      } else {
+      await pulsePrepLogin(
+        email,
+        password
+      );
 
-  await pulsePrepLogin(email, password);
+      showAuthMessage(
+        "Welcome back to PulsePrep!",
+        "success"
+      );
 
-  showAuthMessage(
-    "Welcome back to PulsePrep!",
-    "success"
-  );
+      const currentParams =
+        new URLSearchParams(
+          window.location.search
+        );
 
-  /*
-   * If the student came from Class Discussions,
-   * send them back there after successful login.
-   */
-  const currentParams =
-    new URLSearchParams(window.location.search);
+      const returnUrl =
+        currentParams.get("return");
 
-  const returnUrl =
-    currentParams.get("return");
+      if (
+        returnUrl ===
+        "class-discussion.html"
+      ) {
 
-  if (
-    returnUrl === "class-discussion.html"
-  ) {
+        setTimeout(() => {
 
-    setTimeout(() => {
+          window.location.href =
+            "class-discussion.html";
 
-      window.location.href =
-        "class-discussion.html";
+        }, 500);
 
-    }, 500);
-
-    return;
-  }
-}
+        return;
+      }
+    }
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "PulsePrep authentication error:",
+      error
+    );
 
     showAuthMessage(
-      error.message || "Authentication failed.",
+      error?.message ||
+      "Authentication failed. Please try again.",
       "error"
     );
 
@@ -3962,8 +3969,6 @@ async function handleAuthSubmit() {
         : "Create Student Account";
   }
 }
-
-
 function showAuthMessage(text, type) {
 
   const box =
