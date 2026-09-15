@@ -2,7 +2,8 @@
    PULSEPREP STUDENT DASHBOARD 2.0
    STAGE A — VISUAL DASHBOARD ONLY
 
-   This version does NOT change:
+   IMPORTANT:
+   This dashboard does NOT change:
    - Authentication
    - Supabase
    - Payments
@@ -10,81 +11,157 @@
    - Exam Vault
    - Class Discussions
    - AI
+
+   STAGE A ONLY:
+   - Visual dashboard
+   - Navigation buttons
+   - Static statistics
    ============================================================ */
-🚨🚨 NURSING STUDENTS, THIS ONE IS FOR YOU! 🚨🚨
 
-You read the notes.
-You highlight the pages.
-You tell yourself, “I understand it.” 😭
+(function () {
+  "use strict";
 
-Then the exam question comes:
+  /* ============================================================
+     PREVENT DUPLICATE DASHBOARD
+     ============================================================ */
 
-“A patient presents with…”
+  function removeExistingDashboard() {
+    const existing = document.getElementById("pulseprepDashboardV2");
 
-And suddenly your brain says:
-“Let us pray.” 😂💀
+    if (existing) {
+      existing.remove();
+    }
+  }
 
-NOT ANYMORE. 🩺🔥
 
-🚀 INTRODUCING PULSEPREP
+  /* ============================================================
+     FIND DASHBOARD CONTAINER
+     ============================================================ */
 
-A new nursing study & exam-preparation platform built to help you LEARN → PRACTICE → IMPROVE → PREPARE.
+  function getDashboardContainer() {
 
-📚 Nursing subjects
-🧠 Exam-style MCQs
-💊 Pharmacology practice
-🫀 Anatomy & Physiology
-💉 Dosage calculations
-📋 Nursing Process practice
-🎯 Challenging questions
-📊 Progress tracking
-🔥 And more coming...
+    /*
+      We expect the existing PulsePrep page to already contain
+      an element with id="dashboard".
 
-But here's the difference:
+      This code does NOT create or replace the existing dashboard.
+    */
 
-PulsePrep doesn't just ask you questions.
+    const dashboard = document.getElementById("dashboard");
 
-It makes you think.
+    if (!dashboard) {
+      console.warn(
+        "PulsePrep Student Dashboard: #dashboard container was not found."
+      );
 
-Because the goal isn't to memorize everything the night before the exam.
+      return null;
+    }
 
-The goal is to walk into that examination room thinking:
+    return dashboard;
+  }
 
-“I HAVE SEEN THIS TYPE OF QUESTION BEFORE.” 😤🔥
 
-One question.
-One explanation.
-One revision session.
-One step closer to being ready.
+  /* ============================================================
+     SAFE TAB NAVIGATION
+     ============================================================ */
 
-🩺 YOUR NOTES ARE IMPORTANT.
+  function openPulsePrepTab(tabId) {
 
-🧠 YOUR PRACTICE IS IMPORTANT.
+    try {
 
-🎯 YOUR PREPARATION IS EVERYTHING.
+      /*
+        Use the existing PulsePrep showTab() function
+        if it already exists.
+      */
 
-PULSEPREP IS HERE. 🚀
+      if (typeof window.showTab === "function") {
 
-And we're just getting started...
+        window.showTab(tabId);
 
-Welcome to the next generation of nursing exam preparation. ❤️‍🩹
+        return;
+      }
 
-#PulsePrep #NursingStudents #NursingSchool #NursingExam #NursingStudentsGhana #NursingEducation #Pharmacology #AnatomyAndPhysiology #NursingMCQs #StudySmart #NursingLife
 
-https://palseprep1.netlify.app 
+      /*
+        Fallback navigation if showTab() is not available.
+        This only changes visible tabs and does not touch data.
+      */
 
-Powered by Junior Dangote.
+      const tabs = document.querySelectorAll(".tab");
 
+      tabs.forEach(function (tab) {
+        tab.classList.remove("active");
+      });
+
+
+      const target = document.getElementById(tabId);
+
+      if (target) {
+        target.classList.add("active");
+      }
+
+    } catch (error) {
+
+      console.error(
+        "PulsePrep Dashboard navigation error:",
+        error
+      );
+
+    }
+  }
+
+
+  /* ============================================================
+     EXPOSE NAVIGATION SAFELY
+     ============================================================ */
+
+  window.pulsePrepOpenTab = openPulsePrepTab;
+
+
+  /* ============================================================
+     RENDER STUDENT DASHBOARD
+     ============================================================ */
+
+  function renderStudentDashboard() {
+
+    const dashboard = getDashboardContainer();
+
+    if (!dashboard) {
+      return;
+    }
+
+
+    /*
+      Remove an older copy if one exists.
+      This prevents duplicate dashboards after reloads.
+    */
+
+    removeExistingDashboard();
+
+
+    /* ============================================================
+       DASHBOARD SECTION
+       ============================================================ */
 
     const section = document.createElement("div");
 
     section.id = "pulseprepDashboardV2";
+
     section.className = "mt-6";
 
+
+    /* ============================================================
+       DASHBOARD HTML
+       ============================================================ */
+
     section.innerHTML = `
+
       <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 sm:p-6">
 
-        <!-- HEADER -->
+        <!-- =====================================================
+             HEADER
+             ===================================================== -->
+
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
           <div>
@@ -100,12 +177,18 @@ Powered by Junior Dangote.
 
             </span>
 
+
             <h3 class="text-2xl sm:text-3xl font-black text-slate-900 mt-3">
+
               Your Study Center
+
             </h3>
 
+
             <p class="text-slate-500 mt-1">
+
               Keep your nursing preparation organized and focused.
+
             </p>
 
           </div>
@@ -124,14 +207,20 @@ Powered by Junior Dangote.
 
             </div>
 
+
             <div>
 
               <p class="text-xs text-slate-500">
+
                 Current plan
+
               </p>
 
+
               <p class="font-extrabold text-slate-900">
+
                 Student
+
               </p>
 
             </div>
@@ -141,7 +230,9 @@ Powered by Junior Dangote.
         </div>
 
 
-        <!-- STATISTICS -->
+        <!-- =====================================================
+             STATISTICS
+             ===================================================== -->
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
 
@@ -161,18 +252,24 @@ Powered by Junior Dangote.
 
             </div>
 
+
             <p class="text-xs text-slate-500 mt-3">
+
               Study Goal
+
             </p>
 
+
             <p class="text-lg font-black text-slate-900">
+
               Get Started
+
             </p>
 
           </div>
 
 
-          <!-- STREAK -->
+          <!-- STUDY STREAK -->
 
           <div class="rounded-2xl
             bg-slate-50
@@ -187,12 +284,18 @@ Powered by Junior Dangote.
 
             </div>
 
+
             <p class="text-xs text-slate-500 mt-3">
+
               Study Streak
+
             </p>
 
+
             <p class="text-lg font-black text-slate-900">
+
               0 days
+
             </p>
 
           </div>
@@ -213,12 +316,18 @@ Powered by Junior Dangote.
 
             </div>
 
+
             <p class="text-xs text-slate-500 mt-3">
+
               Questions Done
+
             </p>
 
+
             <p class="text-lg font-black text-slate-900">
+
               0
+
             </p>
 
           </div>
@@ -239,12 +348,18 @@ Powered by Junior Dangote.
 
             </div>
 
+
             <p class="text-xs text-slate-500 mt-3">
+
               Progress
+
             </p>
 
+
             <p class="text-lg font-black text-slate-900">
+
               0%
+
             </p>
 
           </div>
@@ -252,12 +367,16 @@ Powered by Junior Dangote.
         </div>
 
 
-        <!-- LOWER DASHBOARD AREA -->
+        <!-- =====================================================
+             LOWER DASHBOARD AREA
+             ===================================================== -->
 
         <div class="grid lg:grid-cols-2 gap-5 mt-5">
 
 
-          <!-- CONTINUE LEARNING -->
+          <!-- ===================================================
+               CONTINUE LEARNING
+               =================================================== -->
 
           <div class="rounded-2xl
             border border-slate-200
@@ -268,14 +387,20 @@ Powered by Junior Dangote.
               <div>
 
                 <h4 class="font-black text-slate-900">
+
                   Continue Learning
+
                 </h4>
 
+
                 <p class="text-sm text-slate-500 mt-1">
+
                   Choose where you want to study next.
+
                 </p>
 
               </div>
+
 
               <i class="fa-solid fa-book-open
                 text-teal-600 text-xl">
@@ -287,11 +412,11 @@ Powered by Junior Dangote.
             <div class="grid sm:grid-cols-2 gap-3 mt-4">
 
 
-              <!-- SUBJECTS -->
+              <!-- NURSING SUBJECTS -->
 
               <button
                 type="button"
-                onclick="showTab('subject-library')"
+                id="pulsePrepSubjectsButton"
                 class="text-left rounded-xl
                 bg-teal-50
                 hover:bg-teal-100
@@ -301,22 +426,28 @@ Powered by Junior Dangote.
                   text-teal-700">
                 </i>
 
+
                 <p class="font-bold text-slate-900 mt-2">
+
                   Nursing Subjects
+
                 </p>
 
+
                 <p class="text-xs text-slate-500 mt-1">
+
                   Explore your subjects
+
                 </p>
 
               </button>
 
 
-              <!-- MCQS -->
+              <!-- PRACTICE MCQS -->
 
               <button
                 type="button"
-                onclick="showTab('mcq')"
+                id="pulsePrepMcqButton"
                 class="text-left rounded-xl
                 bg-blue-50
                 hover:bg-blue-100
@@ -326,12 +457,18 @@ Powered by Junior Dangote.
                   text-blue-700">
                 </i>
 
+
                 <p class="font-bold text-slate-900 mt-2">
+
                   Practice MCQs
+
                 </p>
 
+
                 <p class="text-xs text-slate-500 mt-1">
+
                   Test your knowledge
+
                 </p>
 
               </button>
@@ -341,7 +478,9 @@ Powered by Junior Dangote.
           </div>
 
 
-          <!-- NEXT STEP -->
+          <!-- ===================================================
+               NEXT STEP
+               =================================================== -->
 
           <div class="rounded-2xl
             border border-slate-200
@@ -352,14 +491,20 @@ Powered by Junior Dangote.
               <div>
 
                 <h4 class="font-black text-slate-900">
+
                   Your Next Step
+
                 </h4>
 
+
                 <p class="text-sm text-slate-500 mt-1">
+
                   Build a consistent nursing study routine.
+
                 </p>
 
               </div>
+
 
               <i class="fa-solid fa-arrow-trend-up
                 text-purple-600 text-xl">
@@ -380,12 +525,14 @@ Powered by Junior Dangote.
 
               </p>
 
+
               <p class="font-black
                 text-slate-900 mt-1">
 
                 Start with 10 practice questions
 
               </p>
+
 
               <p class="text-sm
                 text-slate-600 mt-1">
@@ -402,28 +549,99 @@ Powered by Junior Dangote.
         </div>
 
       </div>
+
     `;
 
+
+    /* ============================================================
+       ADD DASHBOARD TO EXISTING PAGE
+       ============================================================ */
+
     dashboard.appendChild(section);
+
+
+    /* ============================================================
+       SUBJECT BUTTON
+       ============================================================ */
+
+    const subjectsButton =
+      document.getElementById("pulsePrepSubjectsButton");
+
+
+    if (subjectsButton) {
+
+      subjectsButton.addEventListener(
+        "click",
+        function () {
+
+          openPulsePrepTab("subject-library");
+
+        }
+      );
+
+    }
+
+
+    /* ============================================================
+       MCQ BUTTON
+       ============================================================ */
+
+    const mcqButton =
+      document.getElementById("pulsePrepMcqButton");
+
+
+    if (mcqButton) {
+
+      mcqButton.addEventListener(
+        "click",
+        function () {
+
+          openPulsePrepTab("mcq");
+
+        }
+      );
+
+    }
+
   }
 
 
-  /*
-    Wait until the existing PulsePrep page
-    has finished loading.
-  */
+  /* ============================================================
+     WAIT FOR EXISTING PULSEPREP PAGE
+     ============================================================ */
+
+  function startDashboard() {
+
+    /*
+      Small delay allows the existing PulsePrep page to finish
+      creating its dashboard container before we insert ours.
+    */
+
+    setTimeout(function () {
+
+      renderStudentDashboard();
+
+    }, 100);
+
+  }
+
+
+  /* ============================================================
+     INITIALIZE
+     ============================================================ */
 
   if (document.readyState === "loading") {
 
     document.addEventListener(
       "DOMContentLoaded",
-      renderStudentDashboard
+      startDashboard
     );
 
   } else {
 
-    renderStudentDashboard();
+    startDashboard();
 
   }
+
 
 })();
