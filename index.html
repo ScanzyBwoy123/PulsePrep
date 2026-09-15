@@ -3712,16 +3712,53 @@ function escapeHTML(value) {
 
 
 /* ================= INITIALIZATION ================= */
-
 document.addEventListener(
   "DOMContentLoaded",
   async () => {
 
-    showTab("dashboard");
-
     const params =
       new URLSearchParams(window.location.search);
 
+    /*
+     * ----------------------------------------------------------
+     * CLASS DISCUSSION LOGIN HANDOFF
+     * ----------------------------------------------------------
+     * If the student came here from Class Discussions
+     * because login is required, open the Account tab
+     * and show the Login form.
+     */
+    const loginRequired =
+      params.get("login") === "required";
+
+    const returnUrl =
+      params.get("return");
+
+    if (loginRequired) {
+
+      showTab("account");
+
+      showAuthMode("login");
+
+      setTimeout(() => {
+
+        const emailInput =
+          document.getElementById("authEmail");
+
+        if (emailInput) {
+          emailInput.focus();
+        }
+
+      }, 100);
+    }
+
+
+    /*
+     * ----------------------------------------------------------
+     * EXISTING PAYMENT VERIFICATION
+     * ----------------------------------------------------------
+     * Keep the existing payment system working exactly
+     * as before.
+     */
     const reference =
       params.get("reference") ||
       params.get("trxref");
@@ -3736,11 +3773,14 @@ document.addEventListener(
         `/.netlify/functions/verify-payment?reference=${encodeURIComponent(reference)}`
       );
 
-      const data = await response.json();
+      const data =
+        await response.json();
 
       if (!response.ok || !data.success) {
+
         throw new Error(
-          data.error || "Payment could not be verified."
+          data.error ||
+          "Payment could not be verified."
         );
       }
 
@@ -3751,15 +3791,22 @@ document.addEventListener(
 
       premiumAccess = true;
 
-      document.getElementById(
-        "membershipBadge"
-      ).innerText = "Pro Student";
+      const membershipBadge =
+        document.getElementById(
+          "membershipBadge"
+        );
+
+      if (membershipBadge) {
+
+        membershipBadge.innerText =
+          "Pro Student";
+      }
 
       alert(
         "Payment verified successfully! Your PulsePrep Pro access is now active."
       );
 
-            showTab("mcq");
+      showTab("mcq");
 
       checkPremiumAccess();
 
@@ -3769,7 +3816,7 @@ document.addEventListener(
         window.location.pathname
       );
 
-        } catch (error) {
+    } catch (error) {
 
       console.error(
         "Payment verification error:",
@@ -3861,13 +3908,39 @@ async function handleAuthSubmit() {
 
     } else {
 
-      await pulsePrepLogin(email, password);
+      } else {
 
-      showAuthMessage(
-        "Welcome back to PulsePrep!",
-        "success"
-      );
-    }
+  await pulsePrepLogin(email, password);
+
+  showAuthMessage(
+    "Welcome back to PulsePrep!",
+    "success"
+  );
+
+  /*
+   * If the student came from Class Discussions,
+   * send them back there after successful login.
+   */
+  const currentParams =
+    new URLSearchParams(window.location.search);
+
+  const returnUrl =
+    currentParams.get("return");
+
+  if (
+    returnUrl === "class-discussion.html"
+  ) {
+
+    setTimeout(() => {
+
+      window.location.href =
+        "class-discussion.html";
+
+    }, 500);
+
+    return;
+  }
+}
 
   } catch (error) {
 
