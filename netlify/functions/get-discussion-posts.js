@@ -186,8 +186,8 @@ exports.handler = async (event) => {
   await supabase
     .from("subscriptions")
     .select(
-      "email, reference, amount, status, plan, paid_at"
-    )
+  "email, reference, amount, status, paid_at"
+)
     .ilike(
       "email",
       email
