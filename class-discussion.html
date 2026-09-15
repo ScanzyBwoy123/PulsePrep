@@ -2546,6 +2546,23 @@ await loadPosts();
 
 console.log("CLASS DISCUSSION: loadPosts finished");
 
+}
+
+/* ============================================================
+   START CLASS DISCUSSIONS
+   ============================================================ */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    await initializePage();
+
+    setupAuthListener();
+
+  }
+);
+
 </script>
 
 </body>
