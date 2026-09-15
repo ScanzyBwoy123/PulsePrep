@@ -892,11 +892,17 @@ async function loadPosts() {
 
     if (!response.ok) {
 
-      throw new Error(
-        result?.error ||
-        "Unable to load Class Discussions."
-      );
-    }
+  console.error(
+    "Class Discussions server error:",
+    result
+  );
+
+  throw new Error(
+    result?.details ||
+    result?.error ||
+    "Unable to load Class Discussions."
+  );
+}
 
     /* ========================================================
        SUCCESS
