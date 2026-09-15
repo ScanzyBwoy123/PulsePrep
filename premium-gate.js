@@ -349,6 +349,51 @@
 
       clearInterval(timer);
 
+      // Check the session that already exists
+      // before waiting for a new SIGNED_IN event.
+
+      window.pulseprepSupabase.auth.getSession()
+        .then(({ data, error }) => {
+
+          if (error) {
+
+            console.error(
+              "PulsePrep Question Bank initial session check error:",
+              error
+            );
+
+            return;
+          }
+
+          const currentSession =
+            data?.session;
+
+          if (currentSession) {
+
+            questionBankUnlocked = true;
+
+            pastPapersLoaded = false;
+
+            console.log(
+              "PulsePrep Question Bank unlocked from existing login."
+            );
+
+            setTimeout(
+              loadApprovedPastPapers,
+              100
+            );
+          }
+
+        })
+        .catch(error => {
+
+          console.error(
+            "PulsePrep Question Bank initial auth check failed:",
+            error
+          );
+
+        });
+
       window.pulseprepSupabase.auth.onAuthStateChange(
         (event, session) => {
 
