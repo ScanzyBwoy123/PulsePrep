@@ -216,7 +216,8 @@ if (subscriptionError) {
     headers,
     body: JSON.stringify({
       success: false,
-      error: "Unable to verify Premium access."
+      error: "Unable to verify Premium access.",
+details: subscriptionError?.message || "Unknown subscription database error"
     })
   };
 }
