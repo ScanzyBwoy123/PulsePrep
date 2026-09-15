@@ -11,22 +11,70 @@
    - Class Discussions
    - AI
    ============================================================ */
+🚨🚨 NURSING STUDENTS, THIS ONE IS FOR YOU! 🚨🚨
 
-(function () {
-  "use strict";
+You read the notes.
+You highlight the pages.
+You tell yourself, “I understand it.” 😭
 
-  function renderStudentDashboard() {
-    const dashboard = document.getElementById("dashboard");
+Then the exam question comes:
 
-    if (!dashboard) {
-      console.warn("PulsePrep Dashboard: #dashboard was not found.");
-      return;
-    }
+“A patient presents with…”
 
-    // Prevent duplicate rendering
-    if (document.getElementById("pulseprepDashboardV2")) {
-      return;
-    }
+And suddenly your brain says:
+“Let us pray.” 😂💀
+
+NOT ANYMORE. 🩺🔥
+
+🚀 INTRODUCING PULSEPREP
+
+A new nursing study & exam-preparation platform built to help you LEARN → PRACTICE → IMPROVE → PREPARE.
+
+📚 Nursing subjects
+🧠 Exam-style MCQs
+💊 Pharmacology practice
+🫀 Anatomy & Physiology
+💉 Dosage calculations
+📋 Nursing Process practice
+🎯 Challenging questions
+📊 Progress tracking
+🔥 And more coming...
+
+But here's the difference:
+
+PulsePrep doesn't just ask you questions.
+
+It makes you think.
+
+Because the goal isn't to memorize everything the night before the exam.
+
+The goal is to walk into that examination room thinking:
+
+“I HAVE SEEN THIS TYPE OF QUESTION BEFORE.” 😤🔥
+
+One question.
+One explanation.
+One revision session.
+One step closer to being ready.
+
+🩺 YOUR NOTES ARE IMPORTANT.
+
+🧠 YOUR PRACTICE IS IMPORTANT.
+
+🎯 YOUR PREPARATION IS EVERYTHING.
+
+PULSEPREP IS HERE. 🚀
+
+And we're just getting started...
+
+Welcome to the next generation of nursing exam preparation. ❤️‍🩹
+
+#PulsePrep #NursingStudents #NursingSchool #NursingExam #NursingStudentsGhana #NursingEducation #Pharmacology #AnatomyAndPhysiology #NursingMCQs #StudySmart #NursingLife
+
+https://palseprep1.netlify.app 
+
+Powered by Junior Dangote.
+
 
     const section = document.createElement("div");
 
