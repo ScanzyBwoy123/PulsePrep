@@ -2602,14 +2602,32 @@ async function initializePage() {
    */
   console.log("CLASS DISCUSSION: loadCurrentUser starting");
 
+// Wait for the shared PulsePrep authentication
+// system to finish initializing before checking
+// the student's session or Premium access.
+if (window.pulsePrepAuthReady) {
+  await window.pulsePrepAuthReady;
+}
+
+console.log(
+  "CLASS DISCUSSION: PulsePrep authentication ready"
+);
+
 await loadCurrentUser();
 
-console.log("CLASS DISCUSSION: loadCurrentUser finished");
+console.log(
+  "CLASS DISCUSSION: loadCurrentUser finished"
+);
 
-console.log("CLASS DISCUSSION: loadPosts starting");
+console.log(
+  "CLASS DISCUSSION: loadPosts starting"
+);
 
 await loadPosts();
 
+console.log(
+  "CLASS DISCUSSION: loadPosts finished"
+);
 console.log("CLASS DISCUSSION: loadPosts finished");
 
 }
