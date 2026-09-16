@@ -1999,7 +1999,19 @@ function showAnswer(question, selected) {
 
   const answerBox =
     document.getElementById("answerBox");
-
+  // Record this question for the logged-in student's dashboard.
+  if (typeof window.recordPulsePrepActivity === "function") {
+    window.recordPulsePrepActivity({
+      questionId:
+        question.id ??
+        question.question_id ??
+        question.question,
+      subject:
+        question.category ?? "Nursing",
+      isCorrect:
+        question.correctIndex === selected
+    });
+  }
   const answerText =
     document.getElementById("answerText");
 
