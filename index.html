@@ -2367,7 +2367,20 @@ function submitExamQuestion(selected) {
 
   const correctIndex =
     Number(question.correctIndex);
-
+  // Record this exam question for the logged-in student's dashboard.
+  if (typeof window.recordPulsePrepActivity === "function") {
+    window.recordPulsePrepActivity({
+      questionId:
+        question.id ??
+        question.question_id ??
+        question.question,
+      subject:
+        question.category ?? "Nursing",
+      isCorrect:
+        selected !== null &&
+        selected === correctIndex
+    });
+  }
   if (selected === null) {
 
     examUnanswered++;
