@@ -2355,9 +2355,15 @@
 
       pastPapersLoaded = true;
 
-      console.log(
-        `PulsePrep: Question Bank finished rendering ${papers.length} questions.`
-      );
+if (
+  typeof window.initializePulsePrepPractice === "function"
+) {
+  window.initializePulsePrepPractice();
+}
+
+console.log(
+  `PulsePrep: Question Bank finished rendering ${papers.length} questions.`
+);
 
     } catch (error) {
 
