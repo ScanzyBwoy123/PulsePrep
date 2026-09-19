@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>AI Question Generator | PulsePrep</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      background:
+        linear-gradient(
+          135deg,
+          #eff6ff 0%,
+          #f8fafc 50%,
+          #eef2ff 100%
+        );
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    .loader {
+      width: 22px;
+      height: 22px;
+      border: 3px solid #dbeafe;
+      border-top-color: #2563eb;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen text-slate-800">
+
+  <!-- HEADER -->
+  <header class="bg-slate-950 text-white shadow-lg">
+    <div class="max-w-6xl mx-auto px-5 py-5">
+
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+        <div>
+          <div class="flex items-center gap-3">
+            <div
+              class="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center text-xl"
+            >
+              🧠
+            </div>
+
+            <div>
+              <h1 class="text-xl font-extrabold">
+                PulsePrep
+              </h1>
+
+              <p class="text-sm text-slate-400">
+                AI Question Generator
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <a
+          href="admin-exam-vault.html"
+          class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition text-sm font-semibold"
+        >
+          ← Exam Vault
+        </a>
+
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- MAIN -->
+  <main class="max-w-6xl mx-auto px-5 py-8">
+
+    <!-- PAGE INTRO -->
+    <div class="mb-8">
+
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold mb-3"
+      >
+        ✨ AI POWERED
+      </div>
+
+      <h2 class="text-3xl md:text-4xl font-black text-slate-900">
+        Generate Nursing Questions
+      </h2>
+
+      <p class="mt-2 text-slate-600 max-w-2xl">
+        Generate high-quality nursing MCQs with AI and send them
+        directly to the Exam Vault for admin review.
+      </p>
+
+    </div>
+
+
+    <!-- WARNING / FLOW -->
+    <div
+      class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5"
+    >
+
+      <div class="flex gap-3">
+
+        <div class="text-xl">
+          ⚠️
+        </div>
+
+        <div>
+          <h3 class="font-bold text-amber-900">
+            AI questions require approval
+          </h3>
+
+          <p class="text-sm text-amber-800 mt-1">
+            Generated questions are saved as
+            <strong>Pending</strong>.
+            They will not appear to students until you review
+            and approve them in the Exam Vault.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- GENERATOR CARD -->
+    <section class="glass rounded-3xl shadow-xl border border-white p-6 md:p-8">
+
+      <form id="generatorForm">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+          <!-- SUBJECT -->
+          <div>
+
+            <label
+              for="subject"
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              Subject *
+            </label>
+
+            <input
+              id="subject"
+              type="text"
+              required
+              placeholder="e.g. Pharmacology"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+
+          </div>
+
+
+          <!-- TOPIC -->
+          <div>
+
+            <label
+              for="topic"
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              Topic
+            </label>
+
+            <input
+              id="topic"
+              type="text"
+              placeholder="e.g. Pharmacokinetics"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+
+            <p class="text-xs text-slate-500 mt-1">
+              Leave blank to cover the subject broadly.
+            </p>
+
+          </div>
+
+
+          <!-- DIFFICULTY -->
+          <div>
+
+            <label
+              for="difficulty"
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              Difficulty *
+            </label>
+
+            <select
+              id="difficulty"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="easy">
+                Easy
+              </option>
+
+              <option value="medium" selected>
+                Medium
+              </option>
+
+              <option value="hard">
+                Hard
+              </option>
+            </select>
+
+          </div>
+
+
+          <!-- COUNT -->
+          <div>
+
+            <label
+              for="count"
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              Number of Questions *
+            </label>
+
+            <select
+              id="count"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="5">
+                5 Questions
+              </option>
+
+              <option value="10" selected>
+                10 Questions
+              </option>
+
+              <option value="20">
+                20 Questions
+              </option>
+
+              <option value="30">
+                30 Questions
+              </option>
+
+              <option value="50">
+                50 Questions
+              </option>
+            </select>
+
+          </div>
+
+
+          <!-- SOURCE -->
+          <div>
+
+            <label
+              for="source"
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              Source
+            </label>
+
+            <input
+              id="source"
+              type="text"
+              value="PulsePrep AI"
+              placeholder="e.g. PulsePrep AI"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+
+          </div>
+
+
+          <!-- SCHOOL -->
+          <div>
+
+            <label
+              for="school"
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              School
+            </label>
+
+            <input
+              id="school"
+              type="text"
+              placeholder="e.g. General"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+
+          </div>
+
+
+          <!-- ACADEMIC YEAR -->
+          <div>
+
+            <label
+              for="academicYear"
+              class="block text-sm font-bold text-slate-700 mb-2"
+            >
+              Academic Year
+            </label>
+
+            <input
+              id="academicYear"
+              type="text"
+              placeholder="e.g. 2026"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+
+          </div>
+
+        </div>
+
+
+        <!-- GENERATE BUTTON -->
+        <div class="mt-8">
+
+          <button
+            id="generateButton"
+            type="submit"
+            class="w-full md:w-auto inline-flex items-center justify-center gap-3 px-7 py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold shadow-lg transition disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+
+            <span id="buttonLoader" class="loader hidden"></span>
+
+            <span id="buttonText">
+              ✨ Generate Questions
+            </span>
+
+          </button>
+
+        </div>
+
+      </form>
+
+
+      <!-- STATUS -->
+      <div
+        id="statusBox"
+        class="hidden mt-6 rounded-xl p-4"
+      ></div>
+
+    </section>
+
+
+    <!-- RESULT -->
+    <section
+      id="resultSection"
+      class="hidden mt-8"
+    >
+
+      <div class="bg-white rounded-3xl shadow-lg border border-slate-200 p-6">
+
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900">
+              Generation Complete
+            </h2>
+
+            <p
+              id="resultMessage"
+              class="text-slate-600 mt-1"
+            ></p>
+          </div>
+
+          <a
+            href="admin-exam-vault.html"
+            class="inline-flex items-center justify-center px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold"
+          >
+            Review in Exam Vault →
+          </a>
+
+        </div>
+
+
+        <!-- RESULT STATS -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
+
+          <div class="rounded-2xl bg-blue-50 p-5">
+            <p class="text-sm text-blue-600 font-semibold">
+              Generated
+            </p>
+
+            <p
+              id="generatedCount"
+              class="text-3xl font-black text-blue-900 mt-1"
+            >
+              0
+            </p>
+          </div>
+
+
+          <div class="rounded-2xl bg-amber-50 p-5">
+            <p class="text-sm text-amber-600 font-semibold">
+              Status
+            </p>
+
+            <p class="text-2xl font-black text-amber-900 mt-1">
+              Pending
+            </p>
+          </div>
+
+
+          <div class="rounded-2xl bg-emerald-50 p-5">
+            <p class="text-sm text-emerald-600 font-semibold">
+              Next Step
+            </p>
+
+            <p class="text-lg font-black text-emerald-900 mt-2">
+              Review & Approve
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+    <section class="mt-8">
+
+      <h2 class="text-xl font-extrabold text-slate-900 mb-4">
+        How it works
+      </h2>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200">
+          <div class="text-2xl mb-3">1️⃣</div>
+          <h3 class="font-bold">Choose subject</h3>
+          <p class="text-sm text-slate-500 mt-1">
+            Select the nursing subject and topic.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200">
+          <div class="text-2xl mb-3">2️⃣</div>
+          <h3 class="font-bold">Generate</h3>
+          <p class="text-sm text-slate-500 mt-1">
+            Gemini creates the MCQs and explanations.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200">
+          <div class="text-2xl mb-3">3️⃣</div>
+          <h3 class="font-bold">Review</h3>
+          <p class="text-sm text-slate-500 mt-1">
+            Check the questions inside the Exam Vault.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 border border-slate-200">
+          <div class="text-2xl mb-3">4️⃣</div>
+          <h3 class="font-bold">Approve</h3>
+          <p class="text-sm text-slate-500 mt-1">
+            Approved questions become available for students.
+          </p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <footer class="py-8 text-center text-sm text-slate-500">
+    PulsePrep © 2026
+  </footer>
+
+
+  <script>
+    // =========================================================
+    // SUPABASE CONFIG
+    // =========================================================
+
+    const SUPABASE_URL =
+      "https://eskwphjtiogguhvtktmh.supabase.co";
+
+    const SUPABASE_PUBLISHABLE_KEY =
+      "YOUR_EXISTING_SUPABASE_PUBLISHABLE_KEY";
+
+
+    const supabaseClient =
+      window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+
+    // =========================================================
+    // ELEMENTS
+    // =========================================================
+
+    const form =
+      document.getElementById("generatorForm");
+
+    const generateButton =
+      document.getElementById("generateButton");
+
+    const buttonText =
+      document.getElementById("buttonText");
+
+    const buttonLoader =
+      document.getElementById("buttonLoader");
+
+    const statusBox =
+      document.getElementById("statusBox");
+
+    const resultSection =
+      document.getElementById("resultSection");
+
+    const resultMessage =
+      document.getElementById("resultMessage");
+
+    const generatedCount =
+      document.getElementById("generatedCount");
+
+
+    // =========================================================
+    // STATUS
+    // =========================================================
+
+    function showStatus(
+      message,
+      type = "info"
+    ) {
+      statusBox.classList.remove(
+        "hidden",
+        "bg-blue-50",
+        "text-blue-800",
+        "bg-red-50",
+        "text-red-800",
+        "bg-green-50",
+        "text-green-800",
+        "bg-amber-50",
+        "text-amber-800"
+      );
+
+      if (type === "success") {
+        statusBox.classList.add(
+          "bg-green-50",
+          "text-green-800"
+        );
+      } else if (type === "error") {
+        statusBox.classList.add(
+          "bg-red-50",
+          "text-red-800"
+        );
+      } else if (type === "warning") {
+        statusBox.classList.add(
+          "bg-amber-50",
+          "text-amber-800"
+        );
+      } else {
+        statusBox.classList.add(
+          "bg-blue-50",
+          "text-blue-800"
+        );
+      }
+
+      statusBox.textContent = message;
+    }
+
+
+    // =========================================================
+    // BUTTON STATE
+    // =========================================================
+
+    function setLoading(loading) {
+      generateButton.disabled =
+        loading;
+
+      buttonLoader.classList.toggle(
+        "hidden",
+        !loading
+      );
+
+      if (loading) {
+        buttonText.textContent =
+          "Generating questions...";
+      } else {
+        buttonText.textContent =
+          "✨ Generate Questions";
+      }
+    }
+
+
+    // =========================================================
+    // GENERATE
+    // =========================================================
+
+    form.addEventListener(
+      "submit",
+      async (event) => {
+
+        event.preventDefault();
+
+        resultSection.classList.add(
+          "hidden"
+        );
+
+        const subject =
+          document
+            .getElementById("subject")
+            .value
+            .trim();
+
+        const topic =
+          document
+            .getElementById("topic")
+            .value
+            .trim();
+
+        const difficulty =
+          document
+            .getElementById("difficulty")
+            .value;
+
+        const count =
+          Number(
+            document
+              .getElementById("count")
+              .value
+          );
+
+        const source =
+          document
+            .getElementById("source")
+            .value
+            .trim();
+
+        const school =
+          document
+            .getElementById("school")
+            .value
+            .trim();
+
+        const academicYear =
+          document
+            .getElementById("academicYear")
+            .value
+            .trim();
+
+
+        if (!subject) {
+          showStatus(
+            "Please enter a subject.",
+            "error"
+          );
+          return;
+        }
+
+
+        try {
+
+          setLoading(true);
+
+          showStatus(
+            "Checking your administrator session...",
+            "info"
+          );
+
+
+          // ===================================================
+          // SESSION
+          // ===================================================
+
+          const {
+            data: {
+              session
+            }
+          } =
+            await supabaseClient.auth.getSession();
+
+
+          if (!session?.access_token) {
+
+            showStatus(
+              "You must be logged in as an administrator.",
+              "error"
+            );
+
+            return;
+          }
+
+
+          // ===================================================
+          // SEND TO NETLIFY FUNCTION
+          // ===================================================
+
+          showStatus(
+            `Generating ${count} ${difficulty} questions for ${subject}...`,
+            "info"
+          );
+
+
+          const response =
+            await fetch(
+              "/.netlify/functions/generate-ai-questions",
+              {
+                method: "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json",
+
+                  "Authorization":
+                    `Bearer ${session.access_token}`
+                },
+
+                body: JSON.stringify({
+                  subject,
+                  topic,
+                  difficulty,
+                  count,
+                  source,
+                  school,
+                  academic_year:
+                    academicYear
+                })
+              }
+            );
+
+
+          let data = {};
+
+          try {
+            data =
+              await response.json();
+          } catch {
+            data = {};
+          }
+
+
+          if (!response.ok || !data.success) {
+
+            const errorMessage =
+              data.error ||
+              "Unable to generate questions.";
+
+            throw new Error(
+              errorMessage
+            );
+          }
+
+
+          // ===================================================
+          // SUCCESS
+          // ===================================================
+
+          const amount =
+            Number(
+              data.generated || 0
+            );
+
+          generatedCount.textContent =
+            amount;
+
+          resultMessage.textContent =
+            `${amount} questions were generated successfully and saved as pending.`;
+
+          resultSection.classList.remove(
+            "hidden"
+          );
+
+          showStatus(
+            `Success! ${amount} questions are now waiting for your review.`,
+            "success"
+          );
+
+
+        } catch (error) {
+
+          console.error(
+            "AI generator error:",
+            error
+          );
+
+          showStatus(
+            error?.message ||
+              "Something went wrong while generating questions.",
+            "error"
+          );
+
+        } finally {
+
+          setLoading(false);
+
+        }
+
+      }
+    );
+
+
+    // =========================================================
+    // CHECK SESSION ON PAGE LOAD
+    // =========================================================
+
+    async function checkAdminSession() {
+
+      try {
+
+        const {
+          data: {
+            session
+          }
+        } =
+          await supabaseClient.auth.getSession();
+
+
+        if (!session) {
+
+          showStatus(
+            "Please log in to PulsePrep before using the AI Question Generator.",
+            "warning"
+          );
+
+          return;
+        }
+
+
+        showStatus(
+          "Administrator session detected. Ready to generate questions.",
+          "success"
+        );
+
+      } catch (error) {
+
+        console.error(
+          "Session check failed:",
+          error
+        );
+
+      }
+
+    }
+
+
+    checkAdminSession();
+
+  </script>
+
+</body>
+</html>
