@@ -216,7 +216,7 @@ exports.handler = async (event) => {
       await supabaseAdmin
         .from("subscriptions")
         .select(
-          "email, reference, amount, status, plan, paid_at"
+         "email, reference, amount, status, plan, paid_at, expires_at"
         )
         .ilike(
           "email",
@@ -276,8 +276,16 @@ exports.handler = async (event) => {
     // PREMIUM RESULT
     // ========================================================
 
-    const premium =
-      subscription !== null;
+    const expiresAt =
+  subscription?.expires_at
+    ? new Date(subscription.expires_at)
+    : null;
+
+const premium =
+  subscription !== null &&
+  expiresAt !== null &&
+  !Number.isNaN(expiresAt.getTime()) &&
+  expiresAt > new Date();
 
     console.log(
       "CHECK PREMIUM RESULT:",
@@ -303,13 +311,17 @@ exports.handler = async (event) => {
 
         email: email,
 
-        plan:
-          subscription?.plan ||
-          null,
+       plan:
+  subscription?.plan ||
+  null,
 
-        paidAt:
-          subscription?.paid_at ||
-          null
+paidAt:
+  subscription?.paid_at ||
+  null,
+
+expiresAt:
+  subscription?.expires_at ||
+  null 
 
       })
     };
