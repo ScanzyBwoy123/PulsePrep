@@ -99,7 +99,34 @@ exports.handler = async (event) => {
 
     const plan =
       transaction.metadata?.plan || null;
+const paidAt =
+  transaction.paid_at ||
+  new Date().toISOString();
 
+const planDurations = {
+  "Monthly NCLEX Pass": 28,
+  "Semester Bundle": 60,
+  "Annual Nursing Mastery": 70
+};
+
+const durationDays =
+  planDurations[plan];
+
+if (!durationDays) {
+  return {
+    statusCode: 400,
+    body: JSON.stringify({
+      success: false,
+      error: "Unknown subscription plan."
+    })
+  };
+}
+
+const expiresAt =
+  new Date(
+    new Date(paidAt).getTime() +
+    durationDays * 24 * 60 * 60 * 1000
+  ).toISOString();
     // Save successful payment/subscription
     const supabaseResponse = await fetch(
       `${supabaseUrl}/rest/v1/subscriptions`,
@@ -117,9 +144,8 @@ exports.handler = async (event) => {
           amount: transaction.amount,
           status: "success",
           plan,
-          paid_at:
-            transaction.paid_at ||
-            new Date().toISOString()
+          paid_at: paidAt,
+expires_at: expiresAt
         })
       }
     );
@@ -156,8 +182,8 @@ exports.handler = async (event) => {
         currency: transaction.currency,
         email,
         plan,
-        paidAt:
-          transaction.paid_at || null
+paidAt,
+expiresAt
       })
     };
 
