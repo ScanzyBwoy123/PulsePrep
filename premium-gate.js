@@ -2485,9 +2485,9 @@ console.log(
 
         const response =
           await fetch(
-            `/.netlify/functions/get-past-question-file?id=${encodeURIComponent(
-              paperId
-            )}`,
+            `https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/get-past-question-file?id=${encodeURIComponent(
+  paperId
+)}`
             {
               method: "GET",
 
