@@ -791,15 +791,18 @@
   "PulsePrep: Exam Vault session token exists:",
   !!session?.access_token
 );
-            {
-              method: "GET",
 
-              headers: {
-                "Authorization":
-                  `Bearer ${session.access_token}`
-              }
-            }
-          );
+const response =
+  await fetch(
+    url,
+    {
+      method: "GET",
+      headers: {
+        "Authorization":
+          `Bearer ${session.access_token}`
+      }
+    }
+  );
 
         let result = {};
 
