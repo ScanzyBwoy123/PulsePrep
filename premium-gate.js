@@ -781,7 +781,8 @@
       do {
 
         const url =
-          `/.netlify/functions/get-exam-vault-questions?page=${page}&limit=${limit}`;
+         const url =
+  `https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/get-exam-vault-questions?page=${page}&limit=${limit}`;
 
         console.log(
           `PulsePrep: Loading Exam Vault page ${page}...`
