@@ -787,9 +787,10 @@
           `PulsePrep: Loading Exam Vault page ${page}...`
         );
 
-        const response =
-          await fetch(
-            url,
+        console.log(
+  "PulsePrep: Exam Vault session token exists:",
+  !!session?.access_token
+);
             {
               method: "GET",
 
