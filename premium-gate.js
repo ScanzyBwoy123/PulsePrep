@@ -4,7 +4,7 @@
 
 (function () {
   "use strict";
-
+console.log("🔥 PULSEPREP PREMIUM-GATE.JS IS RUNNING 🔥");
   const wait = (ms) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
