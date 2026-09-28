@@ -104,7 +104,6 @@
     </div>
   </header>
 
-
   <!-- =========================================================
        MAIN
   ========================================================== -->
@@ -141,7 +140,6 @@
 
     </section>
 
-
     <!-- =======================================================
          CATEGORIES
     ======================================================== -->
@@ -176,7 +174,6 @@
       </button>
 
     </section>
-
 
     <!-- =======================================================
          SEARCH / FILTER
@@ -230,7 +227,6 @@
 
     </section>
 
-
     <!-- =======================================================
          USER TABS
     ======================================================== -->
@@ -254,7 +250,6 @@
 
     </section>
 
-
     <!-- =======================================================
          STATUS
     ======================================================== -->
@@ -262,7 +257,6 @@
       id="statusMessage"
       class="hidden mb-4 rounded-xl px-4 py-3 text-sm"
     ></div>
-
 
     <!-- =======================================================
          LOADING
@@ -280,7 +274,6 @@
       </p>
     </div>
 
-
     <!-- =======================================================
          POSTS
     ======================================================== -->
@@ -288,7 +281,6 @@
       id="postsContainer"
       class="space-y-4"
     ></section>
-
 
     <!-- =======================================================
          EMPTY STATE
@@ -316,7 +308,6 @@
     </section>
 
   </main>
-
 
   <!-- =========================================================
        CREATE POST MODAL
@@ -349,7 +340,6 @@
 
       </div>
 
-
       <form
         id="postForm"
         class="p-5 space-y-4"
@@ -376,7 +366,6 @@
           </select>
         </div>
 
-
         <!-- SUBJECT -->
         <div>
           <label class="block text-sm font-semibold mb-1">
@@ -391,7 +380,6 @@
             <option value="">Select subject</option>
           </select>
         </div>
-
 
         <!-- TOPIC -->
         <div>
@@ -408,7 +396,6 @@
           >
         </div>
 
-
         <!-- TITLE -->
         <div>
           <label class="block text-sm font-semibold mb-1">
@@ -424,7 +411,6 @@
             class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
           >
         </div>
-
 
         <!-- BODY -->
         <div>
@@ -456,7 +442,6 @@
           </p>
         </div>
 
-
         <!-- ACTIONS -->
         <div class="flex flex-col sm:flex-row gap-2 pt-2">
 
@@ -483,7 +468,6 @@
     </div>
 
   </div>
-
 
   <!-- =========================================================
        REPORT MODAL
@@ -557,7 +541,6 @@
 
   </div>
 
-
 <script>
 /* ============================================================
    PULSEPREP CLASS DISCUSSION
@@ -573,7 +556,6 @@
    - Subject pages
    - Existing PulsePrep features
    ============================================================ */
-
 
 /* ============================================================
    SUPABASE
@@ -623,7 +605,6 @@ const PULSEPREP_SUBJECTS = [
   "Health Education"
 ];
 
-
 /* ============================================================
    GLOBAL STATE
    ============================================================ */
@@ -635,7 +616,6 @@ let allPosts = [];
 let currentCategory = "all";
 let currentView = "all";
 let reportPostId = null;
-
 
 /* ============================================================
    INITIALIZE SUPABASE
@@ -691,7 +671,6 @@ async function loadCurrentUser() {
   }
 }
 
-
 /* ============================================================
    AUTH STATE
    ============================================================ */
@@ -731,7 +710,6 @@ function updateUserStatus() {
   }
 }
 
-
 /* ============================================================
    LOGIN BUTTON
    ============================================================ */
@@ -760,7 +738,6 @@ function handleLoginButton() {
   window.location.href =
     "index.html?login=required&return=class-discussion.html";
 }
-
 
 /* ============================================================
    SUBJECT DROPDOWNS
@@ -795,7 +772,6 @@ function populateSubjects() {
 
   });
 }
-
 
 /* ============================================================
    LOAD POSTS
@@ -966,9 +942,7 @@ function getFilteredPosts() {
     document.getElementById("sortFilter")
       ?.value || "newest";
 
-
   let posts = [...allPosts];
-
 
   /* CATEGORY */
 
@@ -984,7 +958,6 @@ function getFilteredPosts() {
     );
 
   }
-
 
   /*
    * Because the database schema contains topic rather than a
@@ -1022,7 +995,6 @@ function getFilteredPosts() {
     });
   }
 
-
   /* SUBJECT */
 
   if (subject !== "all") {
@@ -1033,7 +1005,6 @@ function getFilteredPosts() {
     );
 
   }
-
 
   /* MY POSTS */
 
@@ -1047,7 +1018,6 @@ function getFilteredPosts() {
       post.user_id === currentUser.id
     );
   }
-
 
   /* SEARCH */
 
@@ -1069,7 +1039,6 @@ function getFilteredPosts() {
       return searchable.includes(search);
     });
   }
-
 
   /* SORT */
 
@@ -1098,10 +1067,8 @@ function getFilteredPosts() {
     );
   }
 
-
   return posts;
 }
-
 
 /* ============================================================
    RENDER POSTS
@@ -1121,7 +1088,6 @@ function renderPosts() {
 
   container.innerHTML = "";
 
-
   if (!posts.length) {
 
     empty?.classList.remove("hidden");
@@ -1129,9 +1095,7 @@ function renderPosts() {
     return;
   }
 
-
   empty?.classList.add("hidden");
-
 
   posts.forEach(post => {
 
@@ -1141,7 +1105,6 @@ function renderPosts() {
 
   });
 }
-
 
 /* ============================================================
    CREATE POST CARD
@@ -1154,23 +1117,18 @@ function createPostCard(post) {
   card.className =
     "bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden";
 
-
   const category =
     detectCategory(post);
 
-
   const date =
     formatDate(post.created_at);
-
 
   const author =
     post.author_name ||
     "PulsePrep Student";
 
-
   const initials =
     getInitials(author);
-
 
   card.innerHTML = `
 
@@ -1204,7 +1162,6 @@ function createPostCard(post) {
 
       </div>
 
-
       <div class="mt-4">
 
         <div class="flex flex-wrap gap-2 mb-2">
@@ -1225,18 +1182,15 @@ function createPostCard(post) {
 
         </div>
 
-
         <h3 class="text-lg font-bold text-gray-900">
           ${escapeHTML(post.title || "Untitled Post")}
         </h3>
-
 
         <div class="post-body text-sm text-gray-700 mt-3">
           ${escapeHTML(post.body || "")}
         </div>
 
       </div>
-
 
       <div class="border-t border-gray-100 mt-5 pt-4 flex flex-wrap items-center gap-2">
 
@@ -1280,10 +1234,8 @@ function createPostCard(post) {
     </div>
   `;
 
-
   return card;
 }
-
 
 /* ============================================================
    DETECT CATEGORY
@@ -1294,7 +1246,6 @@ function detectCategory(post) {
   const topic =
     String(post.topic || "");
 
-
   const categories = [
     "Class Notes",
     "Questions",
@@ -1303,7 +1254,6 @@ function detectCategory(post) {
     "Clinical Tips",
     "Exam Help"
   ];
-
 
   for (const category of categories) {
 
@@ -1324,7 +1274,6 @@ function detectCategory(post) {
     }
   }
 
-
   /*
    * Try to detect from title/body for older posts.
    */
@@ -1334,7 +1283,6 @@ function detectCategory(post) {
     " " +
     String(post.body || "")
   ).toLowerCase();
-
 
   if (
     text.includes("study tip") ||
@@ -1371,10 +1319,8 @@ function detectCategory(post) {
     return "Questions";
   }
 
-
   return "Discussions";
 }
-
 
 /* ============================================================
    CLEAN TOPIC
@@ -1390,7 +1336,6 @@ function cleanTopic(topic) {
 
   return topic;
 }
-
 
 /* ============================================================
    OPEN POST MODAL
@@ -1412,12 +1357,10 @@ async function openPostModal() {
     return;
   }
 
-
   document
     .getElementById("postModal")
     ?.classList.remove("hidden");
 }
-
 
 /* ============================================================
    CLOSE POST MODAL
@@ -1431,7 +1374,6 @@ function closePostModal() {
 
 }
 
-
 /* ============================================================
    SUBMIT POST
    ============================================================ */
@@ -1439,7 +1381,6 @@ function closePostModal() {
 async function submitPost(event) {
 
   event.preventDefault();
-
 
   if (!currentUser) {
 
@@ -1451,36 +1392,30 @@ async function submitPost(event) {
     return;
   }
 
-
   const category =
     document.getElementById("postCategory")
       .value
       .trim();
-
 
   const subject =
     document.getElementById("postSubject")
       .value
       .trim();
 
-
   const topic =
     document.getElementById("postTopic")
       .value
       .trim();
-
 
   const title =
     document.getElementById("postTitle")
       .value
       .trim();
 
-
   const body =
     document.getElementById("postBody")
       .value
       .trim();
-
 
   if (!category || !subject || !title || !body) {
 
@@ -1492,14 +1427,11 @@ async function submitPost(event) {
     return;
   }
 
-
   const button =
     document.getElementById("submitPostButton");
 
-
   button.disabled = true;
   button.textContent = "Publishing...";
-
 
   try {
 
@@ -1508,7 +1440,6 @@ async function submitPost(event) {
       currentUser.user_metadata?.name ||
       currentUser.email ||
       "PulsePrep Student";
-
 
     /*
      * Store category together with topic because the upgraded
@@ -1519,7 +1450,6 @@ async function submitPost(event) {
       topic
         ? `${category} | ${topic}`
         : category;
-
 
     const { data, error } =
       await supabaseClient
@@ -1540,11 +1470,9 @@ async function submitPost(event) {
         .select()
         .single();
 
-
     if (error) {
       throw error;
     }
-
 
     /*
      * Add the new post immediately to the local list.
@@ -1554,23 +1482,18 @@ async function submitPost(event) {
       allPosts.unshift(data);
     }
 
-
     document
       .getElementById("postForm")
       .reset();
 
-
     closePostModal();
 
-
     renderPosts();
-
 
     showStatus(
       "Your post has been published successfully! 🎉",
       "success"
     );
-
 
   } catch (error) {
 
@@ -1588,7 +1511,6 @@ async function submitPost(event) {
     button.textContent = "Publish Post";
   }
 }
-
 
 /* ============================================================
    LIKE POST
@@ -1608,19 +1530,15 @@ async function likePost(postId) {
     return;
   }
 
-
   try {
 
     const post =
       allPosts.find(item => item.id === postId);
 
-
     if (!post) return;
-
 
     const newLikes =
       Number(post.likes || 0) + 1;
-
 
     const { error } =
       await supabaseClient
@@ -1630,16 +1548,13 @@ async function likePost(postId) {
         })
         .eq("id", postId);
 
-
     if (error) {
       throw error;
     }
 
-
     post.likes = newLikes;
 
     renderPosts();
-
 
   } catch (error) {
 
@@ -1651,7 +1566,6 @@ async function likePost(postId) {
     );
   }
 }
-
 
 /* ============================================================
    OPEN DISCUSSION
@@ -1669,9 +1583,7 @@ function openDiscussion(postId) {
   const post =
     allPosts.find(item => item.id === postId);
 
-
   if (!post) return;
-
 
   const card =
     [...document.querySelectorAll("#postsContainer article")]
@@ -1679,7 +1591,6 @@ function openDiscussion(postId) {
         return article.innerText
           .includes(post.title || "");
       });
-
 
   if (card) {
 
@@ -1703,13 +1614,11 @@ function openDiscussion(postId) {
     }, 2000);
   }
 
-
   showStatus(
     "Discussion replies can be added through the discussion system.",
     "success"
   );
 }
-
 
 /* ============================================================
    REPORT MODAL
@@ -1729,20 +1638,16 @@ function openReportModal(postId) {
     return;
   }
 
-
   reportPostId = postId;
-
 
   document.getElementById(
     "reportDiscussionId"
   ).value = postId;
 
-
   document
     .getElementById("reportModal")
     ?.classList.remove("hidden");
 }
-
 
 /* ============================================================
    CLOSE REPORT MODAL
@@ -1757,7 +1662,6 @@ function closeReportModal() {
   reportPostId = null;
 }
 
-
 /* ============================================================
    SUBMIT REPORT
    ============================================================ */
@@ -1765,7 +1669,6 @@ function closeReportModal() {
 async function submitReport(event) {
 
   event.preventDefault();
-
 
   if (!currentUser) {
 
@@ -1777,18 +1680,15 @@ async function submitReport(event) {
     return;
   }
 
-
   const discussionId =
     document.getElementById(
       "reportDiscussionId"
     ).value;
 
-
   const reason =
     document.getElementById(
       "reportReason"
     ).value;
-
 
   if (!discussionId || !reason) {
 
@@ -1799,7 +1699,6 @@ async function submitReport(event) {
 
     return;
   }
-
 
   try {
 
@@ -1813,25 +1712,20 @@ async function submitReport(event) {
           status: "pending"
         });
 
-
     if (error) {
       throw error;
     }
 
-
     closeReportModal();
-
 
     document
       .getElementById("reportForm")
       .reset();
 
-
     showStatus(
       "Report submitted. Thank you for helping keep PulsePrep safe.",
       "success"
     );
-
 
   } catch (error) {
 
@@ -1845,7 +1739,6 @@ async function submitReport(event) {
   }
 }
 
-
 /* ============================================================
    DELETE OWN POST
    ============================================================ */
@@ -1854,13 +1747,10 @@ async function deletePost(postId) {
 
   if (!currentUser) return;
 
-
   const post =
     allPosts.find(item => item.id === postId);
 
-
   if (!post) return;
-
 
   if (post.user_id !== currentUser.id) {
 
@@ -1872,15 +1762,12 @@ async function deletePost(postId) {
     return;
   }
 
-
   const confirmed =
     confirm(
       "Delete this post? This action cannot be undone."
     );
 
-
   if (!confirmed) return;
-
 
   try {
 
@@ -1891,26 +1778,21 @@ async function deletePost(postId) {
         .eq("id", postId)
         .eq("user_id", currentUser.id);
 
-
     if (error) {
       throw error;
     }
-
 
     allPosts =
       allPosts.filter(
         post => post.id !== postId
       );
 
-
     renderPosts();
-
 
     showStatus(
       "Post deleted successfully.",
       "success"
     );
-
 
   } catch (error) {
 
@@ -1923,7 +1805,6 @@ async function deletePost(postId) {
     );
   }
 }
-
 
 /* ============================================================
    CATEGORY FILTER
@@ -1951,10 +1832,8 @@ function setCategory(category) {
       }
     });
 
-
   renderPosts();
 }
-
 
 /* ============================================================
    VIEW
@@ -1964,7 +1843,6 @@ function setView(view) {
 
   currentView = view;
 
-
   document
     .querySelectorAll(".view-btn")
     .forEach(button => {
@@ -1973,7 +1851,6 @@ function setView(view) {
         "active-view"
       );
     });
-
 
   if (view === "mine") {
 
@@ -1988,10 +1865,8 @@ function setView(view) {
       ?.classList.add("active-view");
   }
 
-
   renderPosts();
 }
-
 
 /* ============================================================
    STATUS MESSAGE
@@ -2002,16 +1877,12 @@ function showStatus(message, type = "success") {
   const box =
     document.getElementById("statusMessage");
 
-
   if (!box) return;
-
 
   box.textContent = message;
 
-
   box.className =
     "mb-4 rounded-xl px-4 py-3 text-sm";
-
 
   if (type === "error") {
 
@@ -2032,9 +1903,7 @@ function showStatus(message, type = "success") {
     );
   }
 
-
   box.classList.remove("hidden");
-
 
   setTimeout(() => {
 
@@ -2372,15 +2241,12 @@ function formatDate(value) {
 
   if (!value) return "Recently";
 
-
   const date =
     new Date(value);
-
 
   if (Number.isNaN(date.getTime())) {
     return "Recently";
   }
-
 
   return date.toLocaleString(
     undefined,
@@ -2394,7 +2260,6 @@ function formatDate(value) {
   );
 }
 
-
 /* ============================================================
    INITIALS
    ============================================================ */
@@ -2407,9 +2272,7 @@ function getInitials(name) {
       .split(/\s+/)
       .filter(Boolean);
 
-
   if (!parts.length) return "P";
-
 
   if (parts.length === 1) {
     return parts[0]
@@ -2417,13 +2280,11 @@ function getInitials(name) {
       .toUpperCase();
   }
 
-
   return (
     parts[0][0] +
     parts[parts.length - 1][0]
   ).toUpperCase();
 }
-
 
 /* ============================================================
    ESCAPE HTML
@@ -2438,7 +2299,6 @@ function escapeHTML(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
-
 
 /* ============================================================
    EVENT LISTENERS
@@ -2463,7 +2323,6 @@ function setupEventListeners() {
 
     });
 
-
   /* SEARCH */
 
   document
@@ -2472,7 +2331,6 @@ function setupEventListeners() {
       "input",
       renderPosts
     );
-
 
   /* SUBJECT */
 
@@ -2483,7 +2341,6 @@ function setupEventListeners() {
       renderPosts
     );
 
-
   /* SORT */
 
   document
@@ -2492,7 +2349,6 @@ function setupEventListeners() {
       "change",
       renderPosts
     );
-
 
   /* POST FORM */
 
@@ -2503,7 +2359,6 @@ function setupEventListeners() {
       submitPost
     );
 
-
   /* REPORT FORM */
 
   document
@@ -2513,7 +2368,6 @@ function setupEventListeners() {
       submitReport
     );
 
-
   /* LONG NOTE CHARACTER COUNT */
 
   document
@@ -2522,7 +2376,6 @@ function setupEventListeners() {
       "input",
       updateBodyCounter
     );
-
 
   /* CLOSE MODALS WITH ESCAPE */
 
@@ -2541,7 +2394,6 @@ function setupEventListeners() {
   );
 }
 
-
 /* ============================================================
    CHARACTER COUNTER
    ============================================================ */
@@ -2551,22 +2403,17 @@ function updateBodyCounter() {
   const body =
     document.getElementById("postBody");
 
-
   const counter =
     document.getElementById("bodyCounter");
 
-
   if (!body || !counter) return;
-
 
   const length =
     body.value.length;
 
-
   counter.textContent =
     `${length.toLocaleString()} characters`;
 }
-
 
 /* ============================================================
    PAGE INITIALIZATION
