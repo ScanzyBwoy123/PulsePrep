@@ -307,70 +307,85 @@
       state.busy = false;
     }
   }
-
   async function submitAnswer(index) {
-    if (
-      !state.currentQuestion ||
-      state.busy
-    ) {
+    if (!state.currentQuestion || state.busy) {
       return;
     }
 
     const optionsElement =
-      document.getElementById(
-        "practiceOptions"
-      );
+      document.getElementById("practiceOptions");
 
-    const buttons =
-      [...optionsElement.querySelectorAll("button")];
+    const resultElement =
+      document.getElementById("practiceResult");
 
-    buttons.forEach(
-      (button) => {
-        button.disabled = true;
-      }
-    );
+    const statusElement =
+      document.getElementById("practiceStatus");
+
+    const buttons = [
+      ...optionsElement.querySelectorAll("button")
+    ];
+
+    // Prevent multiple taps while checking
+    buttons.forEach((button) => {
+      button.disabled = true;
+    });
+
+    state.busy = true;
+
+    if (statusElement) {
+      statusElement.textContent =
+        "Checking your answer...";
+    }
 
     try {
       const session = await getSession();
 
-      if (!session) {
+      if (!session || !session.access_token) {
         throw new Error(
           "Your session has expired. Please log in again."
         );
       }
 
       const response = await fetch(
-       "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/submit-practice-answer",
+        "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/submit-practice-answer",
         {
           method: "POST",
-
           headers: {
-            "Content-Type":
-              "application/json",
-
-            Authorization:
-              "Bearer " +
-              session.access_token
+            "Content-Type": "application/json",
+            "Authorization":
+              "Bearer " + session.access_token
           },
-
           body: JSON.stringify({
             question_id:
               state.currentQuestion.id,
 
             selected_answer:
-              String.fromCharCode(
-                65 + index
-              )
+              String.fromCharCode(65 + index)
           })
         }
       );
 
-      const data = await response.json();
+      let data = {};
+
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        throw new Error(
+          "The answer checker returned an invalid response."
+        );
+      }
 
       if (!response.ok) {
         throw new Error(
           data.error ||
+          data.message ||
           "Unable to check your answer."
+        );
+      }
+
+      if (typeof data.correct !== "boolean") {
+        throw new Error(
+          "The answer checker did not return a valid result."
         );
       }
 
@@ -382,12 +397,18 @@
 
       updateStats();
 
-      const correctIndex =
-        data.correctAnswer
-          ? data.correctAnswer
-              .charCodeAt(0) - 65
-          : -1;
+      // Determine the correct option
+      const correctAnswer =
+        String(data.correctAnswer || "")
+          .trim()
+          .toUpperCase();
 
+      const correctIndex =
+        ["A", "B", "C", "D"].indexOf(
+          correctAnswer
+        );
+
+      // Highlight answers
       buttons.forEach(
         (button, buttonIndex) => {
 
@@ -398,25 +419,30 @@
             "hover:border-teal-300"
           );
 
-          if (buttonIndex === correctIndex) {
-
+          // Correct answer
+          if (
+            correctIndex >= 0 &&
+            buttonIndex === correctIndex
+          ) {
             button.classList.add(
-              "border-emerald-400",
+              "border-emerald-500",
               "bg-emerald-50"
             );
+          }
 
-          } else if (
+          // User selected wrong answer
+          else if (
             buttonIndex === index &&
             !data.correct
           ) {
-
             button.classList.add(
-              "border-red-400",
+              "border-red-500",
               "bg-red-50"
             );
+          }
 
-          } else {
-
+          // Other answers
+          else {
             button.classList.add(
               "bg-slate-50",
               "border-slate-200"
@@ -425,10 +451,19 @@
         }
       );
 
-      const resultElement =
-        document.getElementById(
-          "practiceResult"
+      if (!resultElement) {
+        throw new Error(
+          "Practice result area could not be found."
         );
+      }
+
+      const explanation =
+        data.explanation ||
+        "No explanation was provided.";
+
+      const correctAnswerText =
+        data.correctAnswerText ||
+        "";
 
       resultElement.className =
         "mt-5 rounded-2xl border p-5 " +
@@ -451,27 +486,26 @@
           }
         </div>
 
-        <p class="mt-2 text-slate-800">
+        <p class="mt-3 text-slate-800">
           <strong>Correct answer:</strong>
-          ${escapeHtml(
-            data.correctAnswer
-          )}.
-          ${escapeHtml(
-            data.correctAnswerText
-          )}
+          ${escapeHtml(correctAnswer)}.
+          ${escapeHtml(correctAnswerText)}
         </p>
 
-        <p class="mt-2 text-slate-700 leading-6">
-          <strong>Explanation:</strong>
-          ${escapeHtml(
-            data.explanation
-          )}
-        </p>
+        <div class="mt-4 rounded-xl bg-white/70 p-4">
+          <p class="font-extrabold text-slate-900">
+            Explanation
+          </p>
+
+          <p class="mt-2 text-slate-700 leading-6">
+            ${escapeHtml(explanation)}
+          </p>
+        </div>
 
         <button
           id="practiceNextQuestion"
           type="button"
-          class="mt-4 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700">
+          class="mt-5 inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-teal-600 text-white font-extrabold hover:bg-teal-700">
 
           <i class="fa-solid fa-arrow-right"></i>
           Next Question
@@ -479,9 +513,14 @@
         </button>
       `;
 
-      resultElement.classList.remove(
-        "hidden"
-      );
+      resultElement.classList.remove("hidden");
+
+      if (statusElement) {
+        statusElement.textContent =
+          data.correct
+            ? "Your answer is correct."
+            : "Your answer is incorrect. Review the explanation below.";
+      }
 
       if (
         typeof window.recordPulsePrepActivity ===
@@ -500,27 +539,72 @@
         });
       }
 
-      document.getElementById(
-        "practiceNextQuestion"
-      ).onclick = loadQuestion;
+      const nextButton =
+        document.getElementById(
+          "practiceNextQuestion"
+        );
+
+      if (nextButton) {
+        nextButton.onclick = () => {
+          loadQuestion();
+        };
+      }
 
     } catch (error) {
 
-      buttons.forEach(
-        (button) => {
-          button.disabled = false;
-        }
-      );
-
-      const statusElement =
-        document.getElementById(
-          "practiceStatus"
-        );
+      buttons.forEach((button) => {
+        button.disabled = false;
+      });
 
       if (statusElement) {
         statusElement.textContent =
-          error.message;
+          "Answer checking failed: " +
+          (error.message ||
+            "Unknown error");
       }
+
+      if (resultElement) {
+        resultElement.className =
+          "mt-5 rounded-2xl border border-red-200 bg-red-50 p-5";
+
+        resultElement.innerHTML = `
+          <div class="font-extrabold text-lg text-red-800">
+            ⚠️ Unable to check answer
+          </div>
+
+          <p class="mt-2 text-red-700">
+            ${escapeHtml(
+              error.message ||
+              "Please try again."
+            )}
+          </p>
+
+          <button
+            id="practiceRetryAnswer"
+            type="button"
+            class="mt-4 px-5 py-3 rounded-xl bg-red-600 text-white font-extrabold">
+
+            Try Again
+
+          </button>
+        `;
+
+        resultElement.classList.remove("hidden");
+
+        const retryButton =
+          document.getElementById(
+            "practiceRetryAnswer"
+          );
+
+        if (retryButton) {
+          retryButton.onclick = () => {
+            submitAnswer(index);
+          };
+        }
+      }
+
+    } finally {
+      state.busy = false;
     }
   }
 
