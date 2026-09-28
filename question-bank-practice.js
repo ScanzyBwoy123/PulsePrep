@@ -210,7 +210,7 @@
       }
 
       const response = await fetch(
-        "/.netlify/functions/get-practice-question",
+        "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/get-practice-question",
         {
           method: "GET",
           headers: {
@@ -340,7 +340,7 @@
       }
 
       const response = await fetch(
-        "/.netlify/functions/submit-practice-answer",
+       "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/submit-practice-answer",
         {
           method: "POST",
 
