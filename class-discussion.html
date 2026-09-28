@@ -826,76 +826,48 @@ async function loadPosts() {
        SECURE SERVER REQUEST
        ======================================================== */
 
-    const response = await fetch(
-      "/.netlify/functions/get-discussion-posts",
-      {
-        method: "GET",
+    const { data, error } =
+  await supabaseClient
+    .from("discussion_posts")
+    .select("*")
+    .eq("is_hidden", false)
+    .order("created_at", {
+      ascending: false
+    });
 
-        headers: {
-          "Authorization":
-            `Bearer ${session.access_token}`
-        }
-      }
-    );
+if (error) {
+  throw error;
+}
 
-    let result = {};
+allPosts =
+  Array.isArray(data)
+    ? data
+    : [];
 
-    try {
-      result = await response.json();
-    } catch (jsonError) {
-      console.error(
-        "Discussion response JSON error:",
-        jsonError
-      );
-    }
+console.log(
+  "CLASS DISCUSSION: Posts loaded:",
+  allPosts.length
+);
+
+renderPosts();
+
+return;
+
 
     /* ========================================================
        PREMIUM REQUIRED
        ======================================================== */
 
-    if (
-      response.status === 403 &&
-      result?.premiumRequired
-    ) {
-
-      showPremiumDiscussionLock("premium");
-
-      return;
-    }
-
+    
     /* ========================================================
        OTHER SERVER ERRORS
        ======================================================== */
-
-    if (!response.ok) {
-
-  console.error(
-    "Class Discussions server error:",
-    result
-  );
-
-  throw new Error(
-    result?.details ||
-    result?.error ||
-    "Unable to load Class Discussions."
-  );
-}
+    
 
     /* ========================================================
        SUCCESS
        ======================================================== */
 
-    console.log(
-      "Premium Class Discussion posts loaded:",
-      result?.posts?.length || 0
-    );
-
-    allPosts =
-      Array.isArray(result?.posts)
-        ? result.posts
-        : [];
-
-    renderPosts();
 
   } catch (error) {
 
