@@ -201,6 +201,10 @@
   statusElement.textContent = "Step 1: Answer handler is working...";
 }
       const session = await getSession();
+         if (statusElement) {
+  statusElement.textContent =
+    "Step 2: Session loaded. Preparing answer check...";
+}
 if (statusElement) {
   statusElement.textContent = "Step 2: Session check started...";
 }
@@ -342,7 +346,10 @@ if (statusElement) {
 
     try {
       const session = await getSession();
-
+if (statusElement) {
+  statusElement.textContent =
+    "Step 3: Sending answer to the server...";
+}
       if (!session || !session.access_token) {
         throw new Error(
           "Your session has expired. Please log in again."
