@@ -779,7 +779,6 @@ function populateSubjects() {
 /* ============================================================
    LOAD POSTS — PREMIUM PROTECTED
    ============================================================ */
-
 async function loadPosts() {
 
   const loading =
@@ -792,87 +791,42 @@ async function loadPosts() {
   try {
 
     if (!supabaseClient) {
-      throw new Error(
-        "Supabase is not initialized."
-      );
+      throw new Error("Supabase is not initialized.");
     }
 
     console.log(
-      "Loading PulsePrep Premium Class Discussion posts..."
+      "CLASS DISCUSSION: Loading posts from Supabase..."
     );
 
-    /* ========================================================
-       GET CURRENT SESSION
-       ======================================================== */
+    const { data, error } =
+      await supabaseClient
+        .from("discussion_posts")
+        .select("*")
+        .eq("is_hidden", false)
+        .order("created_at", {
+          ascending: false
+        });
 
-    const {
-      data: {
-        session
-      }
-    } = await supabaseClient.auth.getSession();
-
-    /* ========================================================
-       LOGIN REQUIRED
-       ======================================================== */
-
-    if (!session?.access_token) {
-
-      showPremiumDiscussionLock("login");
-
-      return;
+    if (error) {
+      throw error;
     }
 
-    /* ========================================================
-       SECURE SERVER REQUEST
-       ======================================================== */
+    allPosts =
+      Array.isArray(data)
+        ? data
+        : [];
 
-    const { data, error } =
-  await supabaseClient
-    .from("discussion_posts")
-    .select("*")
-    .eq("is_hidden", false)
-    .order("created_at", {
-      ascending: false
-    });
+    console.log(
+      "CLASS DISCUSSION: Posts loaded:",
+      allPosts.length
+    );
 
-if (error) {
-  throw error;
-}
-
-allPosts =
-  Array.isArray(data)
-    ? data
-    : [];
-
-console.log(
-  "CLASS DISCUSSION: Posts loaded:",
-  allPosts.length
-);
-
-renderPosts();
-
-return;
-
-
-    /* ========================================================
-       PREMIUM REQUIRED
-       ======================================================== */
-
-    
-    /* ========================================================
-       OTHER SERVER ERRORS
-       ======================================================== */
-    
-
-    /* ========================================================
-       SUCCESS
-       ======================================================== */
-
+    renderPosts();
 
   } catch (error) {
 
     console.error(
-      "Load discussions error:",
+      "CLASS DISCUSSION: Load posts error:",
       error
     );
 
