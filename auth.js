@@ -139,9 +139,11 @@ async function initPulsePrepAuth() {
     }
 
     const session =
-      data?.session || null;
+  data?.session || null;
 
-    updateAuthUI(session);
+window.pulsePrepCurrentSession = session;
+
+updateAuthUI(session);
 
     if (
       typeof window.refreshPulsePrepAccountUI ===
@@ -173,7 +175,7 @@ async function initPulsePrepAuth() {
      */
     window.pulseprepSupabase.auth.onAuthStateChange(
       (_event, session) => {
-
+window.pulsePrepCurrentSession = session;
         updateAuthUI(session);
 
         if (
