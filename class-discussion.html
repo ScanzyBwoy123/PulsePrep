@@ -1,194 +1,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Class Discussion | PulsePrep</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Class Discussions | PulsePrep</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="auth.js"></script>
-
+<script src="auth.js"></script>
   <style>
-    html {
-      scroll-behavior: smooth;
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      background: #f8fafc;
-      color: #0f172a;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f7fb;
+      color: #172033;
     }
 
-    .discussion-card {
-      transition: transform .15s ease, box-shadow .15s ease;
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
     }
 
-    .discussion-card:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+    .post-body {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.75;
     }
 
-    .modal-backdrop {
-      background: rgba(15, 23, 42, .55);
-      backdrop-filter: blur(3px);
+    .hidden {
+      display: none !important;
     }
 
-    .line-clamp-3 {
+    .line-clamp-2 {
       display: -webkit-box;
-      -webkit-line-clamp: 3;
+      -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
     }
 
-    .reply-best {
-      border-left: 4px solid #16a34a;
+    .modal-scroll {
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
     }
 
     @media (max-width: 640px) {
-      .mobile-stack {
-        flex-direction: column;
+      .mobile-full {
+        width: 100%;
       }
     }
   </style>
 </head>
 
-<body class="min-h-screen">
+<body>
 
-  <!-- HEADER -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto px-4 py-3">
+  <!-- =========================================================
+       HEADER
+  ========================================================== -->
+  <header class="bg-blue-700 text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-3">
       <div class="flex items-center justify-between gap-3">
 
-        <a href="index.html"
-           class="flex items-center gap-2 min-w-0">
-          <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
-            P
-          </div>
+        <div class="flex items-center gap-3">
+          <a
+            href="index.html"
+            class="bg-white/15 hover:bg-white/25 rounded-lg px-3 py-2 transition"
+          >
+            ←
+          </a>
 
-          <div class="min-w-0">
-            <div class="font-bold text-slate-900 truncate">PulsePrep</div>
-            <div class="text-xs text-slate-500">Class Discussion</div>
+          <div>
+            <h1 class="font-bold text-lg sm:text-xl">
+              PulsePrep Class Discussions
+            </h1>
+            <p class="text-xs text-blue-100">
+              Learn together. Ask questions. Share knowledge.
+            </p>
           </div>
-        </a>
+        </div>
 
         <div class="flex items-center gap-2">
-          <span id="loginStatus"
-                class="hidden sm:inline text-xs text-slate-500">
-            Checking account...
+          <span
+            id="userStatus"
+            class="hidden sm:inline text-xs bg-white/15 px-3 py-2 rounded-lg"
+          >
+            Checking login...
           </span>
 
           <button
             id="loginButton"
-            type="button"
-            class="hidden px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">
+            onclick="handleLoginButton()"
+            class="hidden bg-white text-blue-700 font-semibold px-3 py-2 rounded-lg text-sm"
+          >
             Login
           </button>
-
-          <a
-            href="index.html"
-            class="px-3 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-700 hover:bg-slate-50">
-            Home
-          </a>
         </div>
 
       </div>
     </div>
   </header>
 
-  <!-- MAIN -->
-  <main class="max-w-6xl mx-auto px-4 py-6">
 
-    <!-- PAGE TITLE -->
-    <section class="mb-6">
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <!-- =========================================================
+       MAIN
+  ========================================================== -->
+  <main class="max-w-7xl mx-auto px-4 py-5">
+
+    <!-- INTRO -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-5 mb-5">
+
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
         <div>
-          <p class="text-sm font-semibold text-blue-600 mb-1">
-            STUDENT COMMUNITY
-          </p>
+          <div class="flex items-center gap-2 mb-2">
+            <span class="text-2xl">🎓</span>
+            <h2 class="text-xl font-bold">
+              Student Learning Community
+            </h2>
+          </div>
 
-          <h1 class="text-3xl font-bold text-slate-900">
-            Class Discussion
-          </h1>
-
-          <p class="text-slate-600 mt-1">
-            Ask questions, share knowledge and learn together with other nursing students.
+          <p class="text-gray-600 text-sm leading-6">
+            Ask questions, share class notes, discuss difficult topics,
+            exchange study tips and help other nursing students.
           </p>
         </div>
 
         <button
           id="createPostButton"
-          type="button"
-          class="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-sm">
-          + Create Post
-        </button>
-
-      </div>
-    </section>
-
-    <!-- STATUS -->
-    <div
-      id="statusMessage"
-      class="hidden mb-5 rounded-xl px-4 py-3 text-sm">
-    </div>
-
-    <!-- CATEGORY -->
-    <section class="bg-white border border-slate-200 rounded-2xl p-4 mb-5">
-
-      <div class="flex flex-wrap gap-2" id="categoryButtons">
-
-        <button type="button"
-                data-category="all"
-                class="category-button px-4 py-2 rounded-full bg-blue-600 text-white text-sm font-medium">
-          All
-        </button>
-
-        <button type="button"
-                data-category="Class Notes"
-                class="category-button px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
-          Class Notes
-        </button>
-
-        <button type="button"
-                data-category="Questions"
-                class="category-button px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
-          Questions
-        </button>
-
-        <button type="button"
-                data-category="Discussions"
-                class="category-button px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
-          Discussions
-        </button>
-
-        <button type="button"
-                data-category="Study Tips"
-                class="category-button px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
-          Study Tips
-        </button>
-
-        <button type="button"
-                data-category="Clinical Tips"
-                class="category-button px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
-          Clinical Tips
-        </button>
-
-        <button type="button"
-                data-category="Exam Help"
-                class="category-button px-4 py-2 rounded-full bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200">
-          Exam Help
+          onclick="openPostModal()"
+          class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-5 py-3 rounded-xl transition"
+        >
+          ＋ Create Post
         </button>
 
       </div>
 
     </section>
 
-    <!-- SEARCH / FILTER -->
-    <section class="bg-white border border-slate-200 rounded-2xl p-4 mb-5">
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+    <!-- =======================================================
+         CATEGORIES
+    ======================================================== -->
+    <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-5">
 
-        <div class="md:col-span-2">
-          <label class="block text-xs font-semibold text-slate-600 mb-1">
+      <button class="category-btn active-category" data-category="all">
+        📚 All
+      </button>
+
+      <button class="category-btn" data-category="Class Notes">
+        📝 Notes
+      </button>
+
+      <button class="category-btn" data-category="Questions">
+        ❓ Questions
+      </button>
+
+      <button class="category-btn" data-category="Discussions">
+        💬 Discussions
+      </button>
+
+      <button class="category-btn" data-category="Study Tips">
+        💡 Study Tips
+      </button>
+
+      <button class="category-btn" data-category="Clinical Tips">
+        🩺 Clinical Tips
+      </button>
+
+      <button class="category-btn" data-category="Exam Help">
+        🔥 Exam Help
+      </button>
+
+    </section>
+
+
+    <!-- =======================================================
+         SEARCH / FILTER
+    ======================================================== -->
+    <section class="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 mb-5">
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+        <div class="md:col-span-1">
+          <label class="block text-xs font-semibold text-gray-500 mb-1">
             Search
           </label>
 
@@ -196,2912 +194,2466 @@
             id="searchInput"
             type="search"
             placeholder="Search discussions..."
-            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+          >
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">
+          <label class="block text-xs font-semibold text-gray-500 mb-1">
             Subject
           </label>
 
           <select
             id="subjectFilter"
-            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <option value="">All Subjects</option>
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Subjects</option>
           </select>
         </div>
 
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">
+          <label class="block text-xs font-semibold text-gray-500 mb-1">
             Sort
           </label>
 
           <select
             id="sortFilter"
-            class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
+          >
             <option value="newest">Newest</option>
             <option value="oldest">Oldest</option>
-            <option value="popular">Most Popular</option>
+            <option value="popular">Most Liked</option>
           </select>
         </div>
 
       </div>
 
-      <div class="flex flex-wrap gap-2 mt-4">
+    </section>
 
-        <button
-          id="allPostsButton"
-          type="button"
-          class="view-button px-4 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-semibold">
-          All Posts
-        </button>
 
-        <button
-          id="myPostsButton"
-          type="button"
-          class="view-button px-4 py-2 rounded-lg text-slate-600 text-sm font-semibold hover:bg-slate-50">
-          My Posts
-        </button>
+    <!-- =======================================================
+         USER TABS
+    ======================================================== -->
+    <section class="flex flex-wrap gap-2 mb-5">
 
-        <button
-          id="refreshButton"
-          type="button"
-          class="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 text-sm font-semibold hover:bg-slate-50">
-          ↻ Refresh
-        </button>
+      <button
+        id="allPostsTab"
+        onclick="setView('all')"
+        class="view-btn active-view"
+      >
+        📚 All Posts
+      </button>
 
-      </div>
+      <button
+        id="myPostsTab"
+        onclick="setView('mine')"
+        class="view-btn"
+      >
+        👤 My Posts
+      </button>
 
     </section>
 
-    <!-- LOADING -->
-    <div id="loadingState"
-         class="bg-white border border-slate-200 rounded-2xl p-10 text-center">
-      <div class="animate-pulse">
-        <div class="w-10 h-10 bg-slate-200 rounded-full mx-auto mb-4"></div>
-        <div class="h-4 bg-slate-200 rounded w-40 mx-auto mb-2"></div>
-        <div class="h-3 bg-slate-100 rounded w-56 mx-auto"></div>
-      </div>
+
+    <!-- =======================================================
+         STATUS
+    ======================================================== -->
+    <div
+      id="statusMessage"
+      class="hidden mb-4 rounded-xl px-4 py-3 text-sm"
+    ></div>
+
+
+    <!-- =======================================================
+         LOADING
+    ======================================================== -->
+    <div
+      id="loadingState"
+      class="bg-white rounded-2xl border border-gray-200 p-10 text-center"
+    >
+      <div class="text-3xl mb-3">⏳</div>
+      <p class="font-semibold text-gray-700">
+        Loading class discussions...
+      </p>
+      <p class="text-sm text-gray-500 mt-1">
+        Please wait.
+      </p>
     </div>
 
-    <!-- POSTS -->
-    <section id="postsContainer"
-             class="space-y-4 hidden">
-    </section>
 
-    <!-- EMPTY -->
-    <section id="emptyState"
-             class="hidden bg-white border border-slate-200 rounded-2xl p-10 text-center">
+    <!-- =======================================================
+         POSTS
+    ======================================================== -->
+    <section
+      id="postsContainer"
+      class="space-y-4"
+    ></section>
 
-      <div class="text-5xl mb-4">💬</div>
 
-      <h2 class="text-xl font-bold text-slate-900">
-        No discussions found
-      </h2>
+    <!-- =======================================================
+         EMPTY STATE
+    ======================================================== -->
+    <section
+      id="emptyState"
+      class="hidden bg-white rounded-2xl border border-gray-200 p-10 text-center"
+    >
+      <div class="text-5xl mb-3">📭</div>
 
-      <p class="text-slate-500 mt-2">
-        Be the first student to start a discussion.
+      <h3 class="font-bold text-lg">
+        No posts found
+      </h3>
+
+      <p class="text-gray-500 text-sm mt-2">
+        Try changing your search or filters, or create the first post.
       </p>
 
       <button
-        id="emptyCreateButton"
-        type="button"
-        class="mt-5 px-5 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700">
-        Start a Discussion
+        onclick="openPostModal()"
+        class="mt-5 bg-blue-700 hover:bg-blue-800 text-white px-5 py-3 rounded-xl font-semibold"
+      >
+        Create Post
       </button>
-
     </section>
 
   </main>
 
 
-  <!-- CREATE POST MODAL -->
+  <!-- =========================================================
+       CREATE POST MODAL
+  ========================================================== -->
   <div
-    id="createPostModal"
-    class="hidden fixed inset-0 z-50 modal-backdrop overflow-y-auto">
+    id="postModal"
+    class="hidden fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center"
+  >
 
-    <div class="min-h-full flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl modal-scroll">
 
-      <div class="bg-white rounded-2xl w-full max-w-2xl shadow-xl">
+      <div class="sticky top-0 bg-white border-b border-gray-200 px-5 py-4 flex items-center justify-between z-10">
 
-        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200">
+        <div>
+          <h2 class="text-lg font-bold">
+            Create Class Post
+          </h2>
 
-          <div>
-            <h2 class="text-xl font-bold text-slate-900">
-              Create Discussion
-            </h2>
+          <p class="text-xs text-gray-500 mt-1">
+            Share something useful with your classmates.
+          </p>
+        </div>
 
-            <p class="text-sm text-slate-500">
-              Share a question, note or useful information.
-            </p>
+        <button
+          onclick="closePostModal()"
+          class="text-gray-500 hover:text-gray-900 text-2xl"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <form
+        id="postForm"
+        class="p-5 space-y-4"
+      >
+
+        <!-- CATEGORY -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Post Type
+          </label>
+
+          <select
+            id="postCategory"
+            required
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+            <option value="">Select post type</option>
+            <option value="Class Notes">📝 Class Notes</option>
+            <option value="Questions">❓ Questions</option>
+            <option value="Discussions">💬 Discussions</option>
+            <option value="Study Tips">💡 Study Tips</option>
+            <option value="Clinical Tips">🩺 Clinical Tips</option>
+            <option value="Exam Help">🔥 Exam Help</option>
+          </select>
+        </div>
+
+
+        <!-- SUBJECT -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Subject
+          </label>
+
+          <select
+            id="postSubject"
+            required
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+            <option value="">Select subject</option>
+          </select>
+        </div>
+
+
+        <!-- TOPIC -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Topic
+          </label>
+
+          <input
+            id="postTopic"
+            type="text"
+            maxlength="200"
+            placeholder="e.g. Cardiac output"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+        </div>
+
+
+        <!-- TITLE -->
+        <div>
+          <label class="block text-sm font-semibold mb-1">
+            Title
+          </label>
+
+          <input
+            id="postTitle"
+            type="text"
+            maxlength="250"
+            required
+            placeholder="Enter your post title"
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
+          >
+        </div>
+
+
+        <!-- BODY -->
+        <div>
+          <div class="flex items-center justify-between mb-1">
+
+            <label class="block text-sm font-semibold">
+              Content
+            </label>
+
+            <span
+              id="bodyCounter"
+              class="text-xs text-gray-400"
+            >
+              0 characters
+            </span>
+
           </div>
 
+          <textarea
+            id="postBody"
+            required
+            rows="12"
+            placeholder="Write your notes, question, explanation, study tip or discussion here..."
+            class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none resize-y"
+          ></textarea>
+
+          <p class="text-xs text-gray-500 mt-1">
+            You can write very long class notes and explanations.
+          </p>
+        </div>
+
+
+        <!-- ACTIONS -->
+        <div class="flex flex-col sm:flex-row gap-2 pt-2">
+
           <button
-            id="closeCreatePostButton"
             type="button"
-            class="w-10 h-10 rounded-full hover:bg-slate-100 text-slate-500 text-xl">
-            ×
+            onclick="closePostModal()"
+            class="flex-1 border border-gray-300 hover:bg-gray-50 px-4 py-3 rounded-xl font-semibold"
+          >
+            Cancel
+          </button>
+
+          <button
+            id="submitPostButton"
+            type="submit"
+            class="flex-1 bg-blue-700 hover:bg-blue-800 text-white px-4 py-3 rounded-xl font-bold"
+          >
+            Publish Post
           </button>
 
         </div>
 
-        <form id="createPostForm" class="p-5 space-y-4">
-
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">
-              Category
-            </label>
-
-            <select
-              id="postCategory"
-              required
-              class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-
-              <option value="">Select category</option>
-              <option value="Class Notes">Class Notes</option>
-              <option value="Questions">Questions</option>
-              <option value="Discussions">Discussions</option>
-              <option value="Study Tips">Study Tips</option>
-              <option value="Clinical Tips">Clinical Tips</option>
-              <option value="Exam Help">Exam Help</option>
-
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">
-              Subject
-            </label>
-
-            <select
-              id="postSubject"
-              required
-              class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">Select subject</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">
-              Topic <span class="font-normal text-slate-400">(optional)</span>
-            </label>
-
-            <input
-              id="postTopic"
-              type="text"
-              maxlength="150"
-              placeholder="e.g. Fluid and Electrolytes"
-              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">
-              Title
-            </label>
-
-            <input
-              id="postTitle"
-              type="text"
-              required
-              maxlength="200"
-              placeholder="Give your discussion a clear title"
-              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-1">
-              Message
-            </label>
-
-            <textarea
-              id="postBody"
-              required
-              rows="7"
-              maxlength="5000"
-              placeholder="Write your question or contribution..."
-              class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
-
-            <div class="text-right text-xs text-slate-400 mt-1">
-              <span id="bodyCount">0</span>/5000
-            </div>
-          </div>
-
-          <div class="flex justify-end gap-3 pt-2">
-
-            <button
-              id="cancelCreatePostButton"
-              type="button"
-              class="px-5 py-3 rounded-xl border border-slate-200 text-slate-700 font-semibold hover:bg-slate-50">
-              Cancel
-            </button>
-
-            <button
-              id="submitPostButton"
-              type="submit"
-              class="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">
-              Publish Post
-            </button>
-
-          </div>
-
-        </form>
-
-      </div>
+      </form>
 
     </div>
+
   </div>
 
 
-  <!-- DISCUSSION MODAL -->
-  <div
-    id="discussionModal"
-    class="hidden fixed inset-0 z-50 modal-backdrop overflow-y-auto">
-
-    <div class="min-h-full flex items-center justify-center p-4">
-
-      <div class="bg-white rounded-2xl w-full max-w-3xl shadow-xl">
-
-        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-200">
-
-          <div>
-            <h2 class="text-xl font-bold text-slate-900">
-              Discussion
-            </h2>
-
-            <p class="text-sm text-slate-500">
-              Read replies and join the conversation.
-            </p>
-          </div>
-
-          <button
-            id="closeDiscussionButton"
-            type="button"
-            class="w-10 h-10 rounded-full hover:bg-slate-100 text-slate-500 text-xl">
-            ×
-          </button>
-
-        </div>
-
-        <div id="discussionContent" class="p-5">
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-
-
-  <!-- REPORT MODAL -->
+  <!-- =========================================================
+       REPORT MODAL
+  ========================================================== -->
   <div
     id="reportModal"
-    class="hidden fixed inset-0 z-[60] modal-backdrop overflow-y-auto">
+    class="hidden fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center"
+  >
 
-    <div class="min-h-full flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl">
 
-      <div class="bg-white rounded-2xl w-full max-w-md shadow-xl">
+      <div class="p-5 border-b border-gray-200 flex justify-between items-center">
 
-        <div class="px-5 py-4 border-b border-slate-200">
-          <h2 class="text-lg font-bold text-slate-900">
+        <div>
+          <h2 class="font-bold text-lg">
             Report Post
           </h2>
 
-          <p class="text-sm text-slate-500 mt-1">
+          <p class="text-xs text-gray-500">
             Tell us why this post should be reviewed.
           </p>
         </div>
 
-        <form id="reportForm" class="p-5">
-
-          <textarea
-            id="reportReason"
-            required
-            maxlength="1000"
-            rows="5"
-            placeholder="Reason for reporting..."
-            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-red-500"></textarea>
-
-          <div class="flex justify-end gap-3 mt-4">
-
-            <button
-              id="cancelReportButton"
-              type="button"
-              class="px-4 py-2 rounded-lg border border-slate-200 text-slate-700 font-semibold">
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              class="px-4 py-2 rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">
-              Submit Report
-            </button>
-
-          </div>
-
-        </form>
+        <button
+          onclick="closeReportModal()"
+          class="text-2xl text-gray-500"
+        >
+          ×
+        </button>
 
       </div>
 
+      <form
+        id="reportForm"
+        class="p-5"
+      >
+
+        <input
+          type="hidden"
+          id="reportDiscussionId"
+        >
+
+        <label class="block text-sm font-semibold mb-2">
+          Reason
+        </label>
+
+        <select
+          id="reportReason"
+          required
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 bg-white"
+        >
+          <option value="">Select reason</option>
+          <option value="Spam">Spam</option>
+          <option value="Harassment">Harassment</option>
+          <option value="Inappropriate content">Inappropriate content</option>
+          <option value="False or misleading information">False or misleading information</option>
+          <option value="Academic misconduct">Academic misconduct</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <button
+          type="submit"
+          class="w-full bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-3 rounded-xl"
+        >
+          Submit Report
+        </button>
+
+      </form>
+
     </div>
+
   </div>
 
 
 <script>
 /* ============================================================
    PULSEPREP CLASS DISCUSSION
-   Supabase-powered discussion system
+   ============================================================
+
+   IMPORTANT:
+   This page is intentionally self-contained.
+
+   It does NOT modify:
+   - Question Bank
+   - Exam Vault
+   - Payments
+   - Subject pages
+   - Existing PulsePrep features
    ============================================================ */
 
-(function () {
-  "use strict";
 
-  let supabaseClient = null;
-  let currentUser = null;
+/* ============================================================
+   SUPABASE
+   ============================================================ */
 
-  let allPosts = [];
-  let currentCategory = "all";
-  let currentView = "all";
-  let currentDiscussionId = null;
-  let reportPostId = null;
+/*
+ * PulsePrep authentication is provided by auth.js.
+ * This page uses the same Supabase client as index.html.
+ *
+ * Do NOT add another Supabase URL or API key here.
+ */
+/* ============================================================
+   SUBJECT LIST
+   ============================================================ */
 
-  let initialized = false;
-  let authSubscription = null;
+const PULSEPREP_SUBJECTS = [
+  "Anatomy & Physiology",
+  "Microbiology",
+  "First Aid & Emergency Care",
+  "Fundamentals of Nursing",
+  "Medicine / Medical Nursing",
+  "Medical-Surgical Nursing",
+  "Pharmacology",
+  "Pathophysiology",
+  "Community Health Nursing",
+  "Maternal & Child Health",
+  "Midwifery",
+  "Paediatric Nursing",
+  "Mental Health/Psychiatric Nursing",
+  "Nutrition & Dietetics",
+  "Health Assessment",
+  "Nursing Ethics & Professional Practice",
+  "Research Methods",
+  "Biostatistics",
+  "Public Health",
+  "Health Promotion",
+  "Infection Prevention & Control",
+  "Therapeutic Communication",
+  "Medical Terminology",
+  "Nursing Informatics",
+  "Professional Adjustment",
+  "Communication in Nursing",
+  "Adult Health Nursing",
+  "Gerontological Nursing",
+  "Leadership & Management in Nursing",
+  "Epidemiology",
+  "Health Education"
+];
 
 
-  /* ============================================================
-     HELPERS
-     ============================================================ */
+/* ============================================================
+   GLOBAL STATE
+   ============================================================ */
 
-  function $(id) {
-    return document.getElementById(id);
+let supabaseClient = null;
+let currentUser = null;
+
+let allPosts = [];
+let currentCategory = "all";
+let currentView = "all";
+let reportPostId = null;
+
+
+/* ============================================================
+   INITIALIZE SUPABASE
+   ============================================================ */
+
+function initializeSupabase() {
+
+  /*
+   * Use the SAME Supabase client created by
+   * PulsePrep's existing auth.js.
+   *
+   * Do not create another client here.
+   */
+  if (window.pulseprepSupabase) {
+    supabaseClient = window.pulseprepSupabase;
+    return true;
   }
 
-  function escapeHTML(value) {
-    return String(value ?? "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
+  return false;
+}
+
+/* ============================================================
+   LOGIN
+   ============================================================ */
+
+async function loadCurrentUser() {
+
+  if (!supabaseClient) {
+    updateUserStatus("Login unavailable");
+    return;
   }
 
-  function escapeAttribute(value) {
-    return escapeHTML(value);
-  }
+  try {
 
-  function formatDate(dateValue) {
-    if (!dateValue) return "";
+    const result = await supabaseClient.auth.getUser();
 
-    const date = new Date(dateValue);
-
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
-
-    return date.toLocaleString(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short"
-    });
-  }
-
-  function timeAgo(dateValue) {
-    if (!dateValue) return "";
-
-    const date = new Date(dateValue);
-
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
-
-    const seconds = Math.floor(
-      (Date.now() - date.getTime()) / 1000
-    );
-
-    if (seconds < 60) {
-      return "just now";
-    }
-
-    const minutes = Math.floor(seconds / 60);
-
-    if (minutes < 60) {
-      return `${minutes}m ago`;
-    }
-
-    const hours = Math.floor(minutes / 60);
-
-    if (hours < 24) {
-      return `${hours}h ago`;
-    }
-
-    const days = Math.floor(hours / 24);
-
-    if (days < 30) {
-      return `${days}d ago`;
-    }
-
-    return formatDate(dateValue);
-  }
-
-  function showStatus(message, type = "info") {
-    const box = $("statusMessage");
-
-    if (!box) return;
-
-    box.className =
-      "mb-5 rounded-xl px-4 py-3 text-sm";
-
-    if (type === "success") {
-      box.classList.add(
-        "bg-green-50",
-        "text-green-800",
-        "border",
-        "border-green-200"
-      );
-    } else if (type === "error") {
-      box.classList.add(
-        "bg-red-50",
-        "text-red-800",
-        "border",
-        "border-red-200"
-      );
-    } else {
-      box.classList.add(
-        "bg-blue-50",
-        "text-blue-800",
-        "border",
-        "border-blue-200"
-      );
-    }
-
-    box.textContent = message;
-    box.classList.remove("hidden");
-
-    clearTimeout(showStatus.timer);
-
-    showStatus.timer = setTimeout(() => {
-      box.classList.add("hidden");
-    }, 4500);
-  }
-
-  function requireLogin() {
-    if (currentUser) {
-      return true;
-    }
-
-    showStatus(
-      "Please log in to participate in Class Discussion.",
-      "error"
-    );
-
-    const button = $("loginButton");
-
-    if (button) {
-      button.classList.remove("hidden");
-    }
-
-    return false;
-  }
-
-  function getCategory(post) {
-    if (!post) return "Discussions";
-
-    if (post.post_type) {
-      const known = [
-        "Class Notes",
-        "Questions",
-        "Discussions",
-        "Study Tips",
-        "Clinical Tips",
-        "Exam Help"
-      ];
-
-      if (known.includes(post.post_type)) {
-        return post.post_type;
-      }
-    }
-
-    const topic = String(post.topic || "");
-
-    if (topic.includes("|")) {
-      const firstPart = topic.split("|")[0].trim();
-
-      const known = [
-        "Class Notes",
-        "Questions",
-        "Discussions",
-        "Study Tips",
-        "Clinical Tips",
-        "Exam Help"
-      ];
-
-      if (known.includes(firstPart)) {
-        return firstPart;
-      }
-    }
-
-    const combined = [
-      post.title,
-      post.body,
-      post.topic
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-
-    if (
-      combined.includes("exam") ||
-      combined.includes("test") ||
-      combined.includes("past question")
-    ) {
-      return "Exam Help";
-    }
-
-    if (
-      combined.includes("clinical") ||
-      combined.includes("patient care")
-    ) {
-      return "Clinical Tips";
-    }
-
-    if (
-      combined.includes("study") ||
-      combined.includes("revision")
-    ) {
-      return "Study Tips";
-    }
-
-    if (
-      combined.includes("question") ||
-      combined.includes("how do")
-    ) {
-      return "Questions";
-    }
-
-    if (
-      combined.includes("note") ||
-      combined.includes("lecture")
-    ) {
-      return "Class Notes";
-    }
-
-    return "Discussions";
-  }
-
-
-  /* ============================================================
-     SUBJECTS
-     ============================================================ */
-
-  const fallbackSubjects = [
-    "Anatomy & Physiology",
-    "Microbiology",
-    "First Aid & Emergency Care",
-    "Fundamentals of Nursing",
-    "Medical-Surgical Nursing",
-    "Pharmacology",
-    "Pathophysiology",
-    "Community Health Nursing",
-    "Maternal & Child Health",
-    "Midwifery",
-    "Paediatric Nursing",
-    "Mental Health/Psychiatric Nursing",
-    "Nutrition & Dietetics",
-    "Health Assessment",
-    "Nursing Ethics & Professional Practice",
-    "Research Methods",
-    "Biostatistics",
-    "Public Health",
-    "Health Promotion",
-    "Infection Prevention & Control"
-  ];
-
-  function getSubjectList() {
-    const subjects = [];
-
-    try {
-      if (Array.isArray(window.subjects)) {
-        window.subjects.forEach(item => {
-          if (typeof item === "string") {
-            subjects.push(item);
-          } else if (item && item.name) {
-            subjects.push(item.name);
-          } else if (item && item.title) {
-            subjects.push(item.title);
-          }
-        });
-      }
-
-      if (
-        window.PulsePrepCurriculum &&
-        Array.isArray(window.PulsePrepCurriculum)
-      ) {
-        window.PulsePrepCurriculum.forEach(item => {
-          if (typeof item === "string") {
-            subjects.push(item);
-          } else if (item && item.name) {
-            subjects.push(item.name);
-          } else if (item && item.title) {
-            subjects.push(item.title);
-          }
-        });
-      }
-    } catch (error) {
-      console.warn("Could not read curriculum:", error);
-    }
-
-    fallbackSubjects.forEach(subject => {
-      subjects.push(subject);
-    });
-
-    return [...new Set(
-      subjects
-        .map(item => String(item).trim())
-        .filter(Boolean)
-    )].sort();
-  }
-
-  function populateSubjects() {
-    const filter = $("subjectFilter");
-    const postSubject = $("postSubject");
-
-    if (!filter || !postSubject) return;
-
-    const subjects = getSubjectList();
-
-    subjects.forEach(subject => {
-      const option1 = document.createElement("option");
-      option1.value = subject;
-      option1.textContent = subject;
-      filter.appendChild(option1);
-
-      const option2 = document.createElement("option");
-      option2.value = subject;
-      option2.textContent = subject;
-      postSubject.appendChild(option2);
-    });
-  }
-
-
-  /* ============================================================
-     AUTH
-     ============================================================ */
-
-  async function waitForSupabase() {
-    const started = Date.now();
-
-    while (
-      !window.pulseprepSupabase &&
-      Date.now() - started < 10000
-    ) {
-      await new Promise(resolve => setTimeout(resolve, 150));
-    }
-
-    return window.pulseprepSupabase || null;
-  }
-
-  async function loadCurrentUser() {
-    if (!supabaseClient) return null;
-
-    try {
-      const {
-        data,
-        error
-      } = await supabaseClient.auth.getUser();
-
-      if (error) {
-        currentUser = null;
-      } else {
-        currentUser = data?.user || null;
-      }
-    } catch (error) {
-      console.warn("Could not get current user:", error);
+    if (result.error) {
       currentUser = null;
-    }
-
-    updateAuthUI();
-
-    return currentUser;
-  }
-
-  function updateAuthUI() {
-    const status = $("loginStatus");
-    const loginButton = $("loginButton");
-    const createButton = $("createPostButton");
-
-    if (currentUser) {
-      const email = currentUser.email || "Student";
-
-      if (status) {
-        status.textContent = `Logged in as ${email}`;
-      }
-
-      if (loginButton) {
-        loginButton.classList.add("hidden");
-      }
-
-      if (createButton) {
-        createButton.disabled = false;
-        createButton.classList.remove(
-          "opacity-50",
-          "cursor-not-allowed"
-        );
-      }
     } else {
-      if (status) {
-        status.textContent = "Not logged in";
-      }
+      currentUser = result.data.user || null;
+    }
 
-      if (loginButton) {
-        loginButton.classList.remove("hidden");
-      }
+    updateUserStatus();
 
-      if (createButton) {
-        createButton.disabled = false;
-        createButton.classList.remove(
-          "opacity-50",
-          "cursor-not-allowed"
-        );
-      }
+  } catch (error) {
+
+    console.error("Unable to load user:", error);
+
+    currentUser = null;
+
+    updateUserStatus();
+
+  }
+}
+
+
+/* ============================================================
+   AUTH STATE
+   ============================================================ */
+
+function updateUserStatus() {
+
+  const status = document.getElementById("userStatus");
+  const loginButton = document.getElementById("loginButton");
+
+  if (!status) return;
+
+  if (currentUser) {
+
+    const name =
+      currentUser.user_metadata?.full_name ||
+      currentUser.user_metadata?.name ||
+      currentUser.email ||
+      "Student";
+
+    status.textContent = `👤 ${name}`;
+
+    status.classList.remove("hidden");
+
+    if (loginButton) {
+      loginButton.classList.add("hidden");
+    }
+
+  } else {
+
+    status.textContent = "🔐 Login required to post";
+
+    status.classList.remove("hidden");
+
+    if (loginButton) {
+      loginButton.classList.remove("hidden");
     }
   }
+}
 
-  function setupAuthListener() {
-    if (!supabaseClient || authSubscription) {
+
+/* ============================================================
+   LOGIN BUTTON
+   ============================================================ */
+
+function handleLoginButton() {
+
+  /*
+   * Try the PulsePrep authentication functions first.
+   */
+
+  if (typeof window.openLoginModal === "function") {
+    window.openLoginModal();
+    return;
+  }
+
+  if (typeof window.showLoginModal === "function") {
+    window.showLoginModal();
+    return;
+  }
+
+  /*
+   * Otherwise send the student back to the main PulsePrep
+   * page where the existing authentication system lives.
+   */
+
+  window.location.href =
+    "index.html?login=required&return=class-discussion.html";
+}
+
+
+/* ============================================================
+   SUBJECT DROPDOWNS
+   ============================================================ */
+
+function populateSubjects() {
+
+  const filter = document.getElementById("subjectFilter");
+  const postSubject = document.getElementById("postSubject");
+
+  PULSEPREP_SUBJECTS.forEach(subject => {
+
+    if (filter) {
+
+      const option = document.createElement("option");
+
+      option.value = subject;
+      option.textContent = subject;
+
+      filter.appendChild(option);
+    }
+
+    if (postSubject) {
+
+      const option = document.createElement("option");
+
+      option.value = subject;
+      option.textContent = subject;
+
+      postSubject.appendChild(option);
+    }
+
+  });
+}
+
+
+/* ============================================================
+   LOAD POSTS
+   ============================================================ */
+/* ============================================================
+   LOAD POSTS — PREMIUM PROTECTED
+   ============================================================ */
+
+async function loadPosts() {
+
+  const loading =
+    document.getElementById("loadingState");
+
+  if (loading) {
+    loading.classList.remove("hidden");
+  }
+
+  try {
+
+    if (!supabaseClient) {
+      throw new Error(
+        "Supabase is not initialized."
+      );
+    }
+
+    console.log(
+      "Loading PulsePrep Premium Class Discussion posts..."
+    );
+
+    /* ========================================================
+       GET CURRENT SESSION
+       ======================================================== */
+
+    const {
+      data: {
+        session
+      }
+    } = await supabaseClient.auth.getSession();
+
+    /* ========================================================
+       LOGIN REQUIRED
+       ======================================================== */
+
+    if (!session?.access_token) {
+
+      showPremiumDiscussionLock("login");
+
       return;
     }
 
-    try {
-      const result =
-        supabaseClient.auth.onAuthStateChange(
-          async (_event, session) => {
+    /* ========================================================
+       SECURE SERVER REQUEST
+       ======================================================== */
 
-            currentUser = session?.user || null;
+    const response = await fetch(
+      "/.netlify/functions/get-discussion-posts",
+      {
+        method: "GET",
 
-            updateAuthUI();
-
-            if (currentUser) {
-              await loadPosts();
-            } else {
-              renderPosts();
-            }
-          }
-        );
-
-      authSubscription =
-        result?.data?.subscription || null;
-
-    } catch (error) {
-      console.warn(
-        "Auth listener could not be initialized:",
-        error
-      );
-    }
-  }
-
-
-  /* ============================================================
-     LOAD POSTS
-     ============================================================ */
-
-  async function loadPosts() {
-    const loading = $("loadingState");
-    const postsContainer = $("postsContainer");
-
-    if (loading) {
-      loading.classList.remove("hidden");
-    }
-
-    if (postsContainer) {
-      postsContainer.classList.add("hidden");
-    }
-
-    try {
-      if (!supabaseClient) {
-        throw new Error(
-          "Supabase is not ready. Please refresh the page."
-        );
-      }
-
-      const {
-        data,
-        error
-      } = await supabaseClient
-        .from("discussion_posts")
-        .select("*")
-        .eq("is_hidden", false)
-        .order("created_at", {
-          ascending: false
-        });
-
-      if (error) {
-        throw error;
-      }
-
-      allPosts = Array.isArray(data) ? data : [];
-
-      renderPosts();
-
-    } catch (error) {
-
-      console.error("loadPosts error:", error);
-
-      allPosts = [];
-
-      if (loading) {
-        loading.classList.add("hidden");
-      }
-
-      if (postsContainer) {
-        postsContainer.classList.add("hidden");
-      }
-
-      const empty = $("emptyState");
-
-      if (empty) {
-        empty.classList.remove("hidden");
-
-        empty.innerHTML = `
-          <div class="text-5xl mb-4">⚠️</div>
-          <h2 class="text-xl font-bold text-slate-900">
-            Could not load discussions
-          </h2>
-          <p class="text-slate-500 mt-2">
-            ${escapeHTML(error.message || "Please try again.")}
-          </p>
-          <button
-            type="button"
-            id="retryPostsButton"
-            class="mt-5 px-5 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700">
-            Try Again
-          </button>
-        `;
-
-        const retry = $("retryPostsButton");
-
-        if (retry) {
-          retry.addEventListener(
-            "click",
-            loadPosts
-          );
+        headers: {
+          "Authorization":
+            `Bearer ${session.access_token}`
         }
       }
-    }
-  }
+    );
 
+    let result = {};
 
-  /* ============================================================
-     FILTERING
-     ============================================================ */
-
-  function getFilteredPosts() {
-    const search =
-      String($("searchInput")?.value || "")
-        .trim()
-        .toLowerCase();
-
-    const subject =
-      String($("subjectFilter")?.value || "")
-        .trim();
-
-    const sort =
-      $("sortFilter")?.value || "newest";
-
-    let posts = [...allPosts];
-
-    if (currentView === "mine") {
-      if (!currentUser) {
-        posts = [];
-      } else {
-        posts = posts.filter(
-          post =>
-            String(post.user_id) ===
-            String(currentUser.id)
-        );
-      }
-    }
-
-    if (currentCategory !== "all") {
-      posts = posts.filter(
-        post =>
-          getCategory(post) === currentCategory
+    try {
+      result = await response.json();
+    } catch (jsonError) {
+      console.error(
+        "Discussion response JSON error:",
+        jsonError
       );
     }
 
-    if (subject) {
-      posts = posts.filter(
-        post =>
-          String(post.subject || "")
-            .toLowerCase() ===
-          subject.toLowerCase()
-      );
+    /* ========================================================
+       PREMIUM REQUIRED
+       ======================================================== */
+
+    if (
+      response.status === 403 &&
+      result?.premiumRequired
+    ) {
+
+      showPremiumDiscussionLock("premium");
+
+      return;
     }
 
-    if (search) {
-      posts = posts.filter(post => {
+    /* ========================================================
+       OTHER SERVER ERRORS
+       ======================================================== */
 
-        const text = [
-          post.title,
-          post.body,
-          post.subject,
-          post.topic,
-          post.author_name,
-          getCategory(post)
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+    if (!response.ok) {
 
-        return text.includes(search);
-      });
-    }
+  console.error(
+    "Class Discussions server error:",
+    result
+  );
 
-    if (sort === "oldest") {
-      posts.sort(
-        (a, b) =>
-          new Date(a.created_at) -
-          new Date(b.created_at)
-      );
-    } else if (sort === "popular") {
-      posts.sort(
-        (a, b) =>
-          Number(b.likes || 0) -
-          Number(a.likes || 0)
-      );
-    } else {
-      posts.sort(
-        (a, b) =>
-          new Date(b.created_at) -
-          new Date(a.created_at)
-      );
-    }
+  throw new Error(
+    result?.details ||
+    result?.error ||
+    "Unable to load Class Discussions."
+  );
+}
 
-    return posts;
-  }
+    /* ========================================================
+       SUCCESS
+       ======================================================== */
 
+    console.log(
+      "Premium Class Discussion posts loaded:",
+      result?.posts?.length || 0
+    );
 
-  /* ============================================================
-     RENDER POSTS
-     ============================================================ */
+    allPosts =
+      Array.isArray(result?.posts)
+        ? result.posts
+        : [];
 
-  function renderPosts() {
-    const loading = $("loadingState");
-    const container = $("postsContainer");
-    const empty = $("emptyState");
+    renderPosts();
+
+  } catch (error) {
+
+    console.error(
+      "Load discussions error:",
+      error
+    );
+
+    allPosts = [];
+
+    showStatus(
+      "Unable to load Class Discussions: " +
+      (error?.message || "Unknown error"),
+      "error"
+    );
+
+    renderPosts();
+
+  } finally {
 
     if (loading) {
       loading.classList.add("hidden");
     }
 
-    if (!container || !empty) return;
+  }
+}
+/* ============================================================
+   FILTER POSTS
+   ============================================================ */
 
-    const posts = getFilteredPosts();
+function getFilteredPosts() {
 
-    if (!posts.length) {
-      container.innerHTML = "";
-      container.classList.add("hidden");
-      empty.classList.remove("hidden");
+  const search =
+    document.getElementById("searchInput")
+      ?.value
+      .trim()
+      .toLowerCase() || "";
 
-      empty.innerHTML = `
-        <div class="text-5xl mb-4">💬</div>
-        <h2 class="text-xl font-bold text-slate-900">
-          No discussions found
-        </h2>
-        <p class="text-slate-500 mt-2">
-          ${
-            currentView === "mine"
-              ? "You have not created any discussions yet."
-              : "Be the first student to start a discussion."
-          }
-        </p>
-        <button
-          id="emptyCreateButton"
-          type="button"
-          class="mt-5 px-5 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700">
-          Start a Discussion
-        </button>
-      `;
+  const subject =
+    document.getElementById("subjectFilter")
+      ?.value || "all";
 
-      $("emptyCreateButton")?.addEventListener(
-        "click",
-        openCreatePost
-      );
+  const sort =
+    document.getElementById("sortFilter")
+      ?.value || "newest";
 
-      return;
-    }
 
-    empty.classList.add("hidden");
-    container.classList.remove("hidden");
+  let posts = [...allPosts];
 
-    container.innerHTML =
-      posts.map(renderPostCard).join("");
 
-    attachPostListeners();
+  /* CATEGORY */
+
+  if (currentCategory !== "all") {
+
+    posts = posts.filter(post =>
+      String(post.topic || "").toLowerCase() ===
+        currentCategory.toLowerCase() ||
+
+      String(post.title || "").toLowerCase().includes(
+        currentCategory.toLowerCase()
+      )
+    );
+
   }
 
 
-  function renderPostCard(post) {
-    const category = getCategory(post);
+  /*
+   * Because the database schema contains topic rather than a
+   * dedicated category column, the category is also detected
+   * from the topic/title when necessary.
+   *
+   * New posts created by this page store the category in topic
+   * using:
+   *
+   * Category | actual topic
+   */
 
-    const isMine =
-      currentUser &&
-      String(post.user_id) ===
-      String(currentUser.id);
+  if (currentCategory !== "all") {
 
-    const topicText = String(
-      post.topic || ""
-    )
-      .replace(
-        `${category} |`,
-        ""
-      )
-      .trim();
+    posts = posts.filter(post => {
 
-    const bodyPreview =
-      String(post.body || "");
+      const topic =
+        String(post.topic || "").toLowerCase();
 
-    return `
-      <article
-        class="discussion-card bg-white border border-slate-200 rounded-2xl p-5"
-        data-post-id="${escapeAttribute(post.id)}">
+      const title =
+        String(post.title || "").toLowerCase();
 
-        <div class="flex items-start justify-between gap-3">
+      const body =
+        String(post.body || "").toLowerCase();
 
-          <div class="flex flex-wrap items-center gap-2">
+      const category =
+        currentCategory.toLowerCase();
 
-            <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
-              ${escapeHTML(category)}
-            </span>
+      return (
+        topic.includes(category) ||
+        title.includes(category) ||
+        body.includes(category)
+      );
 
-            ${
-              post.is_answered
-                ? `
-                  <span class="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold">
-                    ✓ Answered
-                  </span>
-                `
-                : ""
-            }
+    });
+  }
 
-            ${
-              post.is_pinned
-                ? `
-                  <span class="px-3 py-1 rounded-full bg-amber-50 text-amber-700 text-xs font-bold">
-                    📌 Pinned
-                  </span>
-                `
-                : ""
-            }
 
+  /* SUBJECT */
+
+  if (subject !== "all") {
+
+    posts = posts.filter(post =>
+      String(post.subject || "").toLowerCase() ===
+      subject.toLowerCase()
+    );
+
+  }
+
+
+  /* MY POSTS */
+
+  if (currentView === "mine") {
+
+    if (!currentUser) {
+      return [];
+    }
+
+    posts = posts.filter(post =>
+      post.user_id === currentUser.id
+    );
+  }
+
+
+  /* SEARCH */
+
+  if (search) {
+
+    posts = posts.filter(post => {
+
+      const searchable = [
+        post.title,
+        post.body,
+        post.subject,
+        post.topic,
+        post.author_name
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return searchable.includes(search);
+    });
+  }
+
+
+  /* SORT */
+
+  if (sort === "oldest") {
+
+    posts.sort(
+      (a, b) =>
+        new Date(a.created_at) -
+        new Date(b.created_at)
+    );
+
+  } else if (sort === "popular") {
+
+    posts.sort(
+      (a, b) =>
+        Number(b.likes || 0) -
+        Number(a.likes || 0)
+    );
+
+  } else {
+
+    posts.sort(
+      (a, b) =>
+        new Date(b.created_at) -
+        new Date(a.created_at)
+    );
+  }
+
+
+  return posts;
+}
+
+
+/* ============================================================
+   RENDER POSTS
+   ============================================================ */
+
+function renderPosts() {
+
+  const container =
+    document.getElementById("postsContainer");
+
+  const empty =
+    document.getElementById("emptyState");
+
+  if (!container) return;
+
+  const posts = getFilteredPosts();
+
+  container.innerHTML = "";
+
+
+  if (!posts.length) {
+
+    empty?.classList.remove("hidden");
+
+    return;
+  }
+
+
+  empty?.classList.add("hidden");
+
+
+  posts.forEach(post => {
+
+    container.appendChild(
+      createPostCard(post)
+    );
+
+  });
+}
+
+
+/* ============================================================
+   CREATE POST CARD
+   ============================================================ */
+
+function createPostCard(post) {
+
+  const card = document.createElement("article");
+
+  card.className =
+    "bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden";
+
+
+  const category =
+    detectCategory(post);
+
+
+  const date =
+    formatDate(post.created_at);
+
+
+  const author =
+    post.author_name ||
+    "PulsePrep Student";
+
+
+  const initials =
+    getInitials(author);
+
+
+  card.innerHTML = `
+
+    <div class="p-5">
+
+      <div class="flex items-start justify-between gap-3">
+
+        <div class="flex items-center gap-3 min-w-0">
+
+          <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold shrink-0">
+            ${escapeHTML(initials)}
           </div>
 
-          <div class="relative">
+          <div class="min-w-0">
 
-            <button
-              type="button"
-              class="post-menu-button w-9 h-9 rounded-lg hover:bg-slate-100 text-slate-500"
-              data-post-id="${escapeAttribute(post.id)}"
-              aria-label="Post options">
-              ⋮
-            </button>
+            <div class="font-semibold text-sm truncate">
+              ${escapeHTML(author)}
+            </div>
 
-            <div
-              class="post-menu hidden absolute right-0 top-10 z-10 bg-white border border-slate-200 rounded-xl shadow-lg p-1 w-36"
-              data-menu-for="${escapeAttribute(post.id)}">
-
-              ${
-                isMine
-                  ? `
-                    <button
-                      type="button"
-                      class="delete-post-button block w-full text-left px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50"
-                      data-post-id="${escapeAttribute(post.id)}">
-                      Delete Post
-                    </button>
-                  `
-                  : `
-                    <button
-                      type="button"
-                      class="report-post-button block w-full text-left px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50"
-                      data-post-id="${escapeAttribute(post.id)}">
-                      Report Post
-                    </button>
-                  `
-              }
-
+            <div class="text-xs text-gray-500">
+              ${escapeHTML(date)}
             </div>
 
           </div>
 
         </div>
 
+        <span class="text-xs font-semibold bg-blue-50 text-blue-700 px-2.5 py-1.5 rounded-lg whitespace-nowrap">
+          ${escapeHTML(category)}
+        </span>
+
+      </div>
+
+
+      <div class="mt-4">
+
+        <div class="flex flex-wrap gap-2 mb-2">
+
+          <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+            📚 ${escapeHTML(post.subject || "General")}
+          </span>
+
+          ${
+            post.topic
+              ? `
+                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md">
+                  #${escapeHTML(cleanTopic(post.topic))}
+                </span>
+              `
+              : ""
+          }
+
+        </div>
+
+
+        <h3 class="text-lg font-bold text-gray-900">
+          ${escapeHTML(post.title || "Untitled Post")}
+        </h3>
+
+
+        <div class="post-body text-sm text-gray-700 mt-3">
+          ${escapeHTML(post.body || "")}
+        </div>
+
+      </div>
+
+
+      <div class="border-t border-gray-100 mt-5 pt-4 flex flex-wrap items-center gap-2">
+
         <button
-          type="button"
-          class="open-discussion-button block text-left w-full mt-3"
-          data-post-id="${escapeAttribute(post.id)}">
-
-          <h2 class="text-xl font-bold text-slate-900 hover:text-blue-600 transition">
-            ${escapeHTML(post.title || "Untitled Discussion")}
-          </h2>
-
+          onclick="likePost('${post.id}')"
+          class="action-btn"
+        >
+          👍 ${Number(post.likes || 0)}
         </button>
 
-        <div class="flex flex-wrap gap-3 mt-2 text-xs text-slate-500">
+        <button
+          onclick="openDiscussion('${post.id}')"
+          class="action-btn"
+        >
+          💬 ${Number(post.reply_count || 0)}
+        </button>
 
-          ${
-            post.subject
-              ? `
-                <span>
-                  📚 ${escapeHTML(post.subject)}
-                </span>
-              `
-              : ""
-          }
+        <button
+          onclick="openReportModal('${post.id}')"
+          class="action-btn report-btn"
+        >
+          🚩 Report
+        </button>
 
-          ${
-            topicText
-              ? `
-                <span>
-                  • ${escapeHTML(topicText)}
-                </span>
-              `
-              : ""
-          }
+        ${
+          currentUser &&
+          post.user_id === currentUser.id
+            ? `
+              <button
+                onclick="deletePost('${post.id}')"
+                class="action-btn text-red-600"
+              >
+                🗑️ Delete
+              </button>
+            `
+            : ""
+        }
 
-        </div>
+      </div>
 
-        <p class="mt-4 text-slate-600 leading-7 line-clamp-3">
-          ${escapeHTML(bodyPreview)}
-        </p>
-
-        <div class="flex flex-wrap items-center justify-between gap-3 mt-5 pt-4 border-t border-slate-100">
-
-          <div class="text-sm text-slate-500">
-            <span class="font-semibold text-slate-700">
-              ${escapeHTML(post.author_name || "Student")}
-            </span>
-
-            <span class="mx-1">•</span>
-
-            <span title="${escapeAttribute(formatDate(post.created_at))}">
-              ${escapeHTML(timeAgo(post.created_at))}
-            </span>
-          </div>
-
-          <div class="flex items-center gap-2">
-
-            <button
-              type="button"
-              class="like-post-button px-3 py-2 rounded-lg text-sm font-semibold hover:bg-blue-50 text-slate-600"
-              data-post-id="${escapeAttribute(post.id)}">
-              👍 <span class="post-like-count">${Number(post.likes || 0)}</span>
-            </button>
-
-            <button
-              type="button"
-              class="open-discussion-button px-3 py-2 rounded-lg text-sm font-semibold hover:bg-slate-100 text-slate-600"
-              data-post-id="${escapeAttribute(post.id)}">
-              💬 ${Number(post.reply_count || 0)}
-            </button>
-
-          </div>
-
-        </div>
-
-      </article>
-    `;
-  }
+    </div>
+  `;
 
 
-  function attachPostListeners() {
-
-    document
-      .querySelectorAll(".open-discussion-button")
-      .forEach(button => {
-        button.addEventListener(
-          "click",
-          () => {
-            openDiscussion(
-              button.dataset.postId
-            );
-          }
-        );
-      });
-
-    document
-      .querySelectorAll(".like-post-button")
-      .forEach(button => {
-        button.addEventListener(
-          "click",
-          () => {
-            likePost(
-              button.dataset.postId
-            );
-          }
-        );
-      });
-
-    document
-      .querySelectorAll(".post-menu-button")
-      .forEach(button => {
-        button.addEventListener(
-          "click",
-          event => {
-            event.stopPropagation();
-
-            document
-              .querySelectorAll(".post-menu")
-              .forEach(menu => {
-                menu.classList.add("hidden");
-              });
-
-            const menu =
-              document.querySelector(
-                `[data-menu-for="${CSS.escape(button.dataset.postId)}"]`
-              );
-
-            menu?.classList.toggle("hidden");
-          }
-        );
-      });
-
-    document
-      .querySelectorAll(".delete-post-button")
-      .forEach(button => {
-        button.addEventListener(
-          "click",
-          () => {
-            deletePost(
-              button.dataset.postId
-            );
-          }
-        );
-      });
-
-    document
-      .querySelectorAll(".report-post-button")
-      .forEach(button => {
-        button.addEventListener(
-          "click",
-          () => {
-            openReportModal(
-              button.dataset.postId
-            );
-          }
-        );
-      });
-  }
+  return card;
+}
 
 
-  /* ============================================================
-     CREATE POST
-     ============================================================ */
+/* ============================================================
+   DETECT CATEGORY
+   ============================================================ */
 
-  function openCreatePost() {
-    if (!requireLogin()) return;
+function detectCategory(post) {
 
-    $("createPostModal")?.classList.remove("hidden");
-  }
+  const topic =
+    String(post.topic || "");
 
-  function closeCreatePost() {
-    $("createPostModal")?.classList.add("hidden");
-  }
 
-  async function submitPost(event) {
-    event.preventDefault();
+  const categories = [
+    "Class Notes",
+    "Questions",
+    "Discussions",
+    "Study Tips",
+    "Clinical Tips",
+    "Exam Help"
+  ];
 
-    if (!requireLogin()) return;
 
-    if (!supabaseClient) {
-      showStatus(
-        "Supabase is not ready. Please refresh.",
-        "error"
-      );
-      return;
+  for (const category of categories) {
+
+    if (
+      topic
+        .toLowerCase()
+        .startsWith(category.toLowerCase() + " |")
+    ) {
+      return category;
     }
 
-    const button = $("submitPostButton");
-
-    const category =
-      String($("postCategory")?.value || "")
-        .trim();
-
-    const subject =
-      String($("postSubject")?.value || "")
-        .trim();
-
-    const topic =
-      String($("postTopic")?.value || "")
-        .trim();
-
-    const title =
-      String($("postTitle")?.value || "")
-        .trim();
-
-    const body =
-      String($("postBody")?.value || "")
-        .trim();
-
-    if (!category || !subject || !title || !body) {
-      showStatus(
-        "Please complete all required fields.",
-        "error"
-      );
-      return;
+    if (
+      topic
+        .toLowerCase() ===
+      category.toLowerCase()
+    ) {
+      return category;
     }
+  }
 
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Publishing...";
-    }
 
-    try {
+  /*
+   * Try to detect from title/body for older posts.
+   */
 
-      let authorName =
-        currentUser.user_metadata?.full_name ||
-        currentUser.user_metadata?.name ||
-        currentUser.email ||
-        "PulsePrep Student";
+  const text = (
+    String(post.title || "") +
+    " " +
+    String(post.body || "")
+  ).toLowerCase();
 
-      const {
-        data,
-        error
-      } = await supabaseClient
+
+  if (
+    text.includes("study tip") ||
+    text.includes("study tips")
+  ) {
+    return "Study Tips";
+  }
+
+  if (
+    text.includes("clinical tip") ||
+    text.includes("clinical tips")
+  ) {
+    return "Clinical Tips";
+  }
+
+  if (
+    text.includes("exam help") ||
+    text.includes("past question")
+  ) {
+    return "Exam Help";
+  }
+
+  if (
+    text.includes("class note") ||
+    text.includes("lecture note")
+  ) {
+    return "Class Notes";
+  }
+
+  if (
+    text.includes("question") ||
+    text.includes("what is")
+  ) {
+    return "Questions";
+  }
+
+
+  return "Discussions";
+}
+
+
+/* ============================================================
+   CLEAN TOPIC
+   ============================================================ */
+
+function cleanTopic(topic) {
+
+  const separator = topic.indexOf(" | ");
+
+  if (separator !== -1) {
+    return topic.substring(separator + 3);
+  }
+
+  return topic;
+}
+
+
+/* ============================================================
+   OPEN POST MODAL
+   ============================================================ */
+
+async function openPostModal() {
+
+  await loadCurrentUser();
+
+  if (!currentUser) {
+
+    showStatus(
+      "Please log in before creating a class post.",
+      "error"
+    );
+
+    handleLoginButton();
+
+    return;
+  }
+
+
+  document
+    .getElementById("postModal")
+    ?.classList.remove("hidden");
+}
+
+
+/* ============================================================
+   CLOSE POST MODAL
+   ============================================================ */
+
+function closePostModal() {
+
+  document
+    .getElementById("postModal")
+    ?.classList.add("hidden");
+
+}
+
+
+/* ============================================================
+   SUBMIT POST
+   ============================================================ */
+
+async function submitPost(event) {
+
+  event.preventDefault();
+
+
+  if (!currentUser) {
+
+    showStatus(
+      "You must be logged in to create a post.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const category =
+    document.getElementById("postCategory")
+      .value
+      .trim();
+
+
+  const subject =
+    document.getElementById("postSubject")
+      .value
+      .trim();
+
+
+  const topic =
+    document.getElementById("postTopic")
+      .value
+      .trim();
+
+
+  const title =
+    document.getElementById("postTitle")
+      .value
+      .trim();
+
+
+  const body =
+    document.getElementById("postBody")
+      .value
+      .trim();
+
+
+  if (!category || !subject || !title || !body) {
+
+    showStatus(
+      "Please complete all required fields.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const button =
+    document.getElementById("submitPostButton");
+
+
+  button.disabled = true;
+  button.textContent = "Publishing...";
+
+
+  try {
+
+    const authorName =
+      currentUser.user_metadata?.full_name ||
+      currentUser.user_metadata?.name ||
+      currentUser.email ||
+      "PulsePrep Student";
+
+
+    /*
+     * Store category together with topic because the upgraded
+     * discussion_posts table uses the topic field.
+     */
+
+    const storedTopic =
+      topic
+        ? `${category} | ${topic}`
+        : category;
+
+
+    const { data, error } =
+      await supabaseClient
         .from("discussion_posts")
         .insert({
           user_id: currentUser.id,
           author_name: authorName,
           subject: subject,
-          topic: topic || null,
+          topic: storedTopic,
           title: title,
           body: body,
           likes: 0,
           reply_count: 0,
           is_answered: false,
           is_pinned: false,
-          is_hidden: false,
-          post_type: category
+          is_hidden: false
         })
         .select()
         .single();
 
-      if (error) {
-        throw error;
-      }
-
-      if (data) {
-        allPosts.unshift(data);
-      }
-
-      $("createPostForm")?.reset();
-
-      if ($("bodyCount")) {
-        $("bodyCount").textContent = "0";
-      }
-
-      closeCreatePost();
-
-      showStatus(
-        "Your discussion has been published.",
-        "success"
-      );
-
-      renderPosts();
-
-    } catch (error) {
-
-      console.error("submitPost error:", error);
-
-      showStatus(
-        error.message ||
-        "Could not publish your discussion.",
-        "error"
-      );
-
-    } finally {
-
-      if (button) {
-        button.disabled = false;
-        button.textContent = "Publish Post";
-      }
-    }
-  }
-
-
-  /* ============================================================
-     POST LIKES
-     ============================================================ */
-
-  async function likePost(postId) {
-    if (!requireLogin()) return;
-
-    try {
-
-      const {
-        data: existing,
-        error: existingError
-      } = await supabaseClient
-        .from("discussion_likes")
-        .select("id")
-        .eq("discussion_id", postId)
-        .eq("user_id", currentUser.id)
-        .is("reply_id", null)
-        .maybeSingle();
-
-      if (existingError) {
-        throw existingError;
-      }
-
-      if (existing) {
-
-        const {
-          error
-        } = await supabaseClient
-          .from("discussion_likes")
-          .delete()
-          .eq("id", existing.id)
-          .eq("user_id", currentUser.id);
-
-        if (error) throw error;
-
-      } else {
-
-        const {
-          error
-        } = await supabaseClient
-          .from("discussion_likes")
-          .insert({
-            discussion_id: postId,
-            reply_id: null,
-            user_id: currentUser.id
-          });
-
-        if (error) throw error;
-      }
-
-      await refreshPostLikeCount(postId);
-
-    } catch (error) {
-
-      console.error("likePost error:", error);
-
-      showStatus(
-        error.message ||
-        "Could not update the like.",
-        "error"
-      );
-    }
-  }
-
-
-  async function refreshPostLikeCount(postId) {
-
-    const {
-      count,
-      error
-    } = await supabaseClient
-      .from("discussion_likes")
-      .select("*", {
-        count: "exact",
-        head: true
-      })
-      .eq("discussion_id", postId)
-      .eq("user_id", currentUser.id)
-      .is("reply_id", null);
-
-    /*
-     * The query above counts the current user's like only.
-     * We therefore perform a second count for the full discussion.
-     */
 
     if (error) {
-      console.warn(
-        "Could not check current like:",
-        error
-      );
+      throw error;
     }
 
-    const {
-      count: totalLikes,
-      error: totalError
-    } = await supabaseClient
-      .from("discussion_likes")
-      .select("*", {
-        count: "exact",
-        head: true
-      })
-      .eq("discussion_id", postId)
-      .is("reply_id", null);
 
-    if (totalError) {
-      throw totalError;
+    /*
+     * Add the new post immediately to the local list.
+     */
+
+    if (data) {
+      allPosts.unshift(data);
     }
 
-    const post = allPosts.find(
-      item => String(item.id) === String(postId)
-    );
 
-    if (post) {
-      post.likes = totalLikes || 0;
-    }
+    document
+      .getElementById("postForm")
+      .reset();
 
-    await supabaseClient
-      .from("discussion_posts")
-      .update({
-        likes: totalLikes || 0
-      })
-      .eq("id", postId);
+
+    closePostModal();
+
 
     renderPosts();
-  }
 
 
-  /* ============================================================
-     DISCUSSION / REPLIES
-     ============================================================ */
-
-  async function openDiscussion(postId) {
-
-    const post = allPosts.find(
-      item =>
-        String(item.id) === String(postId)
+    showStatus(
+      "Your post has been published successfully! 🎉",
+      "success"
     );
 
-    if (!post) {
-      showStatus(
-        "Discussion could not be found.",
-        "error"
-      );
-      return;
-    }
 
-    currentDiscussionId = postId;
+  } catch (error) {
 
-    $("discussionModal")
-      ?.classList.remove("hidden");
+    console.error("Create post error:", error);
 
-    const content = $("discussionContent");
+    showStatus(
+      error.message ||
+      "Unable to publish your post.",
+      "error"
+    );
 
-    if (!content) return;
+  } finally {
 
-    content.innerHTML = `
-      <div class="animate-pulse">
-        <div class="h-6 bg-slate-200 rounded w-3/4 mb-3"></div>
-        <div class="h-4 bg-slate-100 rounded w-1/2 mb-5"></div>
-        <div class="h-24 bg-slate-100 rounded-xl"></div>
-      </div>
-    `;
+    button.disabled = false;
+    button.textContent = "Publish Post";
+  }
+}
 
-    try {
 
-      const {
-        data: replies,
-        error
-      } = await supabaseClient
-        .from("discussion_replies")
-        .select("*")
-        .eq("discussion_id", postId)
-        .eq("is_hidden", false)
-        .order("created_at", {
-          ascending: true
-        });
+/* ============================================================
+   LIKE POST
+   ============================================================ */
 
-      if (error) throw error;
+async function likePost(postId) {
 
-      renderDiscussion(post, replies || []);
+  if (!currentUser) {
 
-    } catch (error) {
+    showStatus(
+      "Please log in to like posts.",
+      "error"
+    );
 
-      console.error(
-        "openDiscussion error:",
-        error
-      );
+    handleLoginButton();
 
-      content.innerHTML = `
-        <div class="p-5 rounded-xl bg-red-50 text-red-700">
-          Could not load replies.
-          <div class="text-sm mt-1">
-            ${escapeHTML(error.message || "")}
-          </div>
-        </div>
-      `;
-    }
+    return;
   }
 
 
-  function renderDiscussion(post, replies) {
+  try {
 
-    const content = $("discussionContent");
+    const post =
+      allPosts.find(item => item.id === postId);
 
-    if (!content) return;
 
-    const category = getCategory(post);
+    if (!post) return;
 
-    const isPostOwner =
-      currentUser &&
-      String(currentUser.id) ===
-      String(post.user_id);
 
-    content.innerHTML = `
-      <!-- ORIGINAL POST -->
-      <article class="bg-slate-50 border border-slate-200 rounded-2xl p-5">
+    const newLikes =
+      Number(post.likes || 0) + 1;
 
-        <div class="flex flex-wrap gap-2 mb-3">
 
-          <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold">
-            ${escapeHTML(category)}
-          </span>
-
-          ${
-            post.is_answered
-              ? `
-                <span class="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold">
-                  ✓ Answered
-                </span>
-              `
-              : ""
-          }
-
-        </div>
-
-        <h2 class="text-2xl font-bold text-slate-900">
-          ${escapeHTML(post.title)}
-        </h2>
-
-        <div class="text-sm text-slate-500 mt-2">
-          ${escapeHTML(post.author_name || "Student")}
-          •
-          ${escapeHTML(formatDate(post.created_at))}
-        </div>
-
-        ${
-          post.subject
-            ? `
-              <div class="mt-3 text-sm font-semibold text-blue-700">
-                📚 ${escapeHTML(post.subject)}
-              </div>
-            `
-            : ""
-        }
-
-        ${
-          post.topic
-            ? `
-              <div class="mt-1 text-sm text-slate-500">
-                Topic: ${escapeHTML(
-                  String(post.topic)
-                    .replace(`${category} |`, "")
-                    .trim()
-                )}
-              </div>
-            `
-            : ""
-        }
-
-        <div class="mt-5 text-slate-700 leading-7 whitespace-pre-wrap">
-          ${escapeHTML(post.body)}
-        </div>
-
-        <div class="flex items-center gap-3 mt-5 pt-4 border-t border-slate-200">
-
-          <button
-            type="button"
-            id="discussionLikeButton"
-            class="px-3 py-2 rounded-lg bg-white border border-slate-200 text-sm font-semibold hover:bg-blue-50">
-            👍 ${Number(post.likes || 0)}
-          </button>
-
-          <span class="text-sm text-slate-500">
-            ${Number(replies.length)} repl${replies.length === 1 ? "y" : "ies"}
-          </span>
-
-        </div>
-
-      </article>
-
-
-      <!-- REPLIES -->
-      <section class="mt-6">
-
-        <div class="flex items-center justify-between mb-4">
-
-          <h3 class="text-lg font-bold text-slate-900">
-            Replies
-          </h3>
-
-          <span class="text-sm text-slate-500">
-            ${replies.length}
-          </span>
-
-        </div>
-
-        ${
-          replies.length
-            ? `
-              <div class="space-y-3">
-                ${replies
-                  .map(reply =>
-                    renderReply(
-                      reply,
-                      post,
-                      isPostOwner
-                    )
-                  )
-                  .join("")}
-              </div>
-            `
-            : `
-              <div class="rounded-xl border border-dashed border-slate-300 p-6 text-center text-slate-500">
-                No replies yet. Be the first to answer.
-              </div>
-            `
-        }
-
-      </section>
-
-
-      <!-- REPLY FORM -->
-      <section class="mt-6">
-
-        ${
-          currentUser
-            ? `
-              <form id="replyForm" class="bg-white border border-slate-200 rounded-2xl p-4">
-
-                <label class="block text-sm font-semibold text-slate-700 mb-2">
-                  Your Reply
-                </label>
-
-                <textarea
-                  id="replyBody"
-                  required
-                  maxlength="3000"
-                  rows="5"
-                  placeholder="Write your answer or contribution..."
-                  class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-y"></textarea>
-
-                <div class="flex justify-end mt-3">
-
-                  <button
-                    type="submit"
-                    id="submitReplyButton"
-                    class="px-5 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700">
-                    Post Reply
-                  </button>
-
-                </div>
-
-              </form>
-            `
-            : `
-              <div class="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-center">
-                <p class="text-blue-800 font-semibold">
-                  Log in to join this discussion.
-                </p>
-
-                <button
-                  type="button"
-                  id="discussionLoginButton"
-                  class="mt-3 px-5 py-2 rounded-lg bg-blue-600 text-white font-semibold">
-                  Login
-                </button>
-              </div>
-            `
-        }
-
-      </section>
-    `;
-
-    $("discussionLikeButton")
-      ?.addEventListener(
-        "click",
-        () => likePost(post.id)
-      );
-
-    $("replyForm")
-      ?.addEventListener(
-        "submit",
-        event =>
-          submitReply(
-            event,
-            post.id
-          )
-      );
-
-    $("discussionLoginButton")
-      ?.addEventListener(
-        "click",
-        () => {
-          closeDiscussion();
-          $("loginButton")?.click();
-        }
-      );
-
-    attachReplyListeners();
-  }
-
-
-  function renderReply(reply, post, isPostOwner) {
-
-    const isMine =
-      currentUser &&
-      String(reply.user_id) ===
-      String(currentUser.id);
-
-    return `
-      <article
-        class="bg-white border border-slate-200 rounded-xl p-4 ${
-          reply.is_best_answer
-            ? "reply-best"
-            : ""
-        }">
-
-        ${
-          reply.is_best_answer
-            ? `
-              <div class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold mb-3">
-                ✓ Best Answer
-              </div>
-            `
-            : ""
-        }
-
-        <div class="flex items-start justify-between gap-3">
-
-          <div>
-            <div class="font-semibold text-slate-800">
-              ${escapeHTML(
-                reply.author_name || "Student"
-              )}
-            </div>
-
-            <div
-              class="text-xs text-slate-400"
-              title="${escapeAttribute(formatDate(reply.created_at))}">
-              ${escapeHTML(timeAgo(reply.created_at))}
-            </div>
-          </div>
-
-          ${
-            isPostOwner || isMine
-              ? `
-                <button
-                  type="button"
-                  class="reply-menu-button text-slate-400 hover:text-slate-700 px-2"
-                  data-reply-id="${escapeAttribute(reply.id)}">
-                  ⋮
-                </button>
-              `
-              : ""
-          }
-
-        </div>
-
-        <div class="mt-3 text-slate-700 leading-7 whitespace-pre-wrap">
-          ${escapeHTML(reply.body)}
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2 mt-4">
-
-          <button
-            type="button"
-            class="like-reply-button px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-blue-50"
-            data-reply-id="${escapeAttribute(reply.id)}"
-            data-discussion-id="${escapeAttribute(post.id)}">
-            👍 ${Number(reply.likes || 0)}
-          </button>
-
-          ${
-            isPostOwner && !reply.is_best_answer
-              ? `
-                <button
-                  type="button"
-                  class="best-answer-button px-3 py-2 rounded-lg text-sm font-semibold text-green-700 hover:bg-green-50"
-                  data-reply-id="${escapeAttribute(reply.id)}"
-                  data-discussion-id="${escapeAttribute(post.id)}">
-                  ✓ Mark Best Answer
-                </button>
-              `
-              : ""
-          }
-
-        </div>
-
-      </article>
-    `;
-  }
-
-
-  function attachReplyListeners() {
-
-    document
-      .querySelectorAll(".like-reply-button")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-            likeReply(
-              button.dataset.replyId,
-              button.dataset.discussionId
-            );
-          }
-        );
-
-      });
-
-    document
-      .querySelectorAll(".best-answer-button")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-            markBestAnswer(
-              button.dataset.replyId,
-              button.dataset.discussionId
-            );
-          }
-        );
-
-      });
-  }
-
-
-  async function submitReply(event, discussionId) {
-
-    event.preventDefault();
-
-    if (!requireLogin()) return;
-
-    const body =
-      String($("replyBody")?.value || "")
-        .trim();
-
-    if (!body) {
-      showStatus(
-        "Please write a reply first.",
-        "error"
-      );
-      return;
-    }
-
-    const button = $("submitReplyButton");
-
-    if (button) {
-      button.disabled = true;
-      button.textContent = "Posting...";
-    }
-
-    try {
-
-      const authorName =
-        currentUser.user_metadata?.full_name ||
-        currentUser.user_metadata?.name ||
-        currentUser.email ||
-        "PulsePrep Student";
-
-      const {
-        error
-      } = await supabaseClient
-        .from("discussion_replies")
-        .insert({
-          discussion_id: discussionId,
-          user_id: currentUser.id,
-          author_name: authorName,
-          body: body,
-          likes: 0,
-          is_best_answer: false,
-          is_hidden: false
-        });
-
-      if (error) throw error;
-
-      /*
-       * Recalculate reply count rather than blindly
-       * incrementing it.
-       */
-
-      const {
-        count,
-        error: countError
-      } = await supabaseClient
-        .from("discussion_replies")
-        .select("*", {
-          count: "exact",
-          head: true
-        })
-        .eq("discussion_id", discussionId)
-        .eq("is_hidden", false);
-
-      if (!countError) {
-
-        await supabaseClient
-          .from("discussion_posts")
-          .update({
-            reply_count: count || 0,
-            updated_at: new Date().toISOString()
-          })
-          .eq("id", discussionId);
-
-      }
-
-      showStatus(
-        "Your reply has been posted.",
-        "success"
-      );
-
-      const post =
-        allPosts.find(
-          item =>
-            String(item.id) ===
-            String(discussionId)
-        );
-
-      if (post) {
-        post.reply_count = count || 0;
-      }
-
-      await openDiscussion(discussionId);
-
-      renderPosts();
-
-    } catch (error) {
-
-      console.error(
-        "submitReply error:",
-        error
-      );
-
-      showStatus(
-        error.message ||
-        "Could not post your reply.",
-        "error"
-      );
-
-    } finally {
-
-      if (button) {
-        button.disabled = false;
-        button.textContent = "Post Reply";
-      }
-    }
-  }
-
-
-  /* ============================================================
-     REPLY LIKES
-     ============================================================ */
-
-  async function likeReply(replyId, discussionId) {
-
-    if (!requireLogin()) return;
-
-    try {
-
-      const {
-        data: existing,
-        error: existingError
-      } = await supabaseClient
-        .from("discussion_likes")
-        .select("id")
-        .eq("discussion_id", discussionId)
-        .eq("reply_id", replyId)
-        .eq("user_id", currentUser.id)
-        .maybeSingle();
-
-      if (existingError) {
-        throw existingError;
-      }
-
-      if (existing) {
-
-        const {
-          error
-        } = await supabaseClient
-          .from("discussion_likes")
-          .delete()
-          .eq("id", existing.id)
-          .eq("user_id", currentUser.id);
-
-        if (error) throw error;
-
-      } else {
-
-        const {
-          error
-        } = await supabaseClient
-          .from("discussion_likes")
-          .insert({
-            discussion_id: discussionId,
-            reply_id: replyId,
-            user_id: currentUser.id
-          });
-
-        if (error) throw error;
-      }
-
-      const {
-        count,
-        error: countError
-      } = await supabaseClient
-        .from("discussion_likes")
-        .select("*", {
-          count: "exact",
-          head: true
-        })
-        .eq("reply_id", replyId);
-
-      if (countError) {
-        throw countError;
-      }
-
+    const { error } =
       await supabaseClient
-        .from("discussion_replies")
-        .update({
-          likes: count || 0,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", replyId);
-
-      await openDiscussion(discussionId);
-
-    } catch (error) {
-
-      console.error(
-        "likeReply error:",
-        error
-      );
-
-      showStatus(
-        error.message ||
-        "Could not update reply like.",
-        "error"
-      );
-    }
-  }
-
-
-  /* ============================================================
-     BEST ANSWER
-     ============================================================ */
-
-  async function markBestAnswer(
-    replyId,
-    discussionId
-  ) {
-
-    if (!requireLogin()) return;
-
-    const post =
-      allPosts.find(
-        item =>
-          String(item.id) ===
-          String(discussionId)
-      );
-
-    if (!post) return;
-
-    if (
-      String(post.user_id) !==
-      String(currentUser.id)
-    ) {
-      showStatus(
-        "Only the author of the discussion can mark a best answer.",
-        "error"
-      );
-      return;
-    }
-
-    try {
-
-      /*
-       * Remove best-answer status from all replies
-       * belonging to this discussion.
-       */
-
-      const {
-        error: clearError
-      } = await supabaseClient
-        .from("discussion_replies")
-        .update({
-          is_best_answer: false
-        })
-        .eq("discussion_id", discussionId);
-
-      if (clearError) {
-        throw clearError;
-      }
-
-      /*
-       * Mark selected reply.
-       */
-
-      const {
-        error: markError
-      } = await supabaseClient
-        .from("discussion_replies")
-        .update({
-          is_best_answer: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", replyId)
-        .eq("discussion_id", discussionId);
-
-      if (markError) {
-        throw markError;
-      }
-
-      /*
-       * Mark discussion answered.
-       */
-
-      const {
-        error: postError
-      } = await supabaseClient
         .from("discussion_posts")
         .update({
-          is_answered: true,
-          updated_at: new Date().toISOString()
+          likes: newLikes
         })
-        .eq("id", discussionId)
-        .eq("user_id", currentUser.id);
+        .eq("id", postId);
 
-      if (postError) {
-        throw postError;
-      }
 
-      post.is_answered = true;
-
-      showStatus(
-        "Best answer selected.",
-        "success"
-      );
-
-      await openDiscussion(discussionId);
-      renderPosts();
-
-    } catch (error) {
-
-      console.error(
-        "markBestAnswer error:",
-        error
-      );
-
-      showStatus(
-        error.message ||
-        "Could not mark the best answer.",
-        "error"
-      );
+    if (error) {
+      throw error;
     }
+
+
+    post.likes = newLikes;
+
+    renderPosts();
+
+
+  } catch (error) {
+
+    console.error("Like error:", error);
+
+    showStatus(
+      "Unable to like this post.",
+      "error"
+    );
+  }
+}
+
+
+/* ============================================================
+   OPEN DISCUSSION
+   ============================================================ */
+
+function openDiscussion(postId) {
+
+  /*
+   * The post/reply system is kept ready for the discussion
+   * detail page.
+   *
+   * For now we use the current page and identify the post.
+   */
+
+  const post =
+    allPosts.find(item => item.id === postId);
+
+
+  if (!post) return;
+
+
+  const card =
+    [...document.querySelectorAll("#postsContainer article")]
+      .find(article => {
+        return article.innerText
+          .includes(post.title || "");
+      });
+
+
+  if (card) {
+
+    card.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+
+    card.classList.add(
+      "ring-2",
+      "ring-blue-500"
+    );
+
+    setTimeout(() => {
+
+      card.classList.remove(
+        "ring-2",
+        "ring-blue-500"
+      );
+
+    }, 2000);
   }
 
 
-  /* ============================================================
-     DELETE POST
-     ============================================================ */
+  showStatus(
+    "Discussion replies can be added through the discussion system.",
+    "success"
+  );
+}
 
-  async function deletePost(postId) {
 
-    if (!requireLogin()) return;
+/* ============================================================
+   REPORT MODAL
+   ============================================================ */
 
-    const post =
-      allPosts.find(
-        item =>
-          String(item.id) ===
-          String(postId)
-      );
+function openReportModal(postId) {
 
-    if (!post) return;
+  if (!currentUser) {
 
-    if (
-      String(post.user_id) !==
-      String(currentUser.id)
-    ) {
-      showStatus(
-        "You can only delete your own posts.",
-        "error"
-      );
-      return;
-    }
+    showStatus(
+      "Please log in before reporting a post.",
+      "error"
+    );
 
-    const confirmed =
-      window.confirm(
-        "Are you sure you want to delete this discussion?"
-      );
+    handleLoginButton();
 
-    if (!confirmed) return;
-
-    try {
-
-      /*
-       * Delete replies first.
-       */
-
-      const {
-        error: repliesError
-      } = await supabaseClient
-        .from("discussion_replies")
-        .delete()
-        .eq("discussion_id", postId);
-
-      if (repliesError) {
-        console.warn(
-          "Could not delete replies:",
-          repliesError
-        );
-      }
-
-      /*
-       * Delete likes associated with the post.
-       */
-
-      const {
-        error: likesError
-      } = await supabaseClient
-        .from("discussion_likes")
-        .delete()
-        .eq("discussion_id", postId);
-
-      if (likesError) {
-        console.warn(
-          "Could not delete likes:",
-          likesError
-        );
-      }
-
-      /*
-       * Delete the discussion.
-       */
-
-      const {
-        error
-      } = await supabaseClient
-        .from("discussion_posts")
-        .delete()
-        .eq("id", postId)
-        .eq("user_id", currentUser.id);
-
-      if (error) {
-        throw error;
-      }
-
-      allPosts =
-        allPosts.filter(
-          item =>
-            String(item.id) !==
-            String(postId)
-        );
-
-      showStatus(
-        "Discussion deleted.",
-        "success"
-      );
-
-      renderPosts();
-
-    } catch (error) {
-
-      console.error(
-        "deletePost error:",
-        error
-      );
-
-      showStatus(
-        error.message ||
-        "Could not delete the discussion.",
-        "error"
-      );
-    }
+    return;
   }
 
 
-  /* ============================================================
-     REPORT POST
-     ============================================================ */
+  reportPostId = postId;
 
-  function openReportModal(postId) {
 
-    if (!requireLogin()) return;
+  document.getElementById(
+    "reportDiscussionId"
+  ).value = postId;
 
-    reportPostId = postId;
 
-    $("reportReason").value = "";
+  document
+    .getElementById("reportModal")
+    ?.classList.remove("hidden");
+}
 
-    $("reportModal")
-      ?.classList.remove("hidden");
+
+/* ============================================================
+   CLOSE REPORT MODAL
+   ============================================================ */
+
+function closeReportModal() {
+
+  document
+    .getElementById("reportModal")
+    ?.classList.add("hidden");
+
+  reportPostId = null;
+}
+
+
+/* ============================================================
+   SUBMIT REPORT
+   ============================================================ */
+
+async function submitReport(event) {
+
+  event.preventDefault();
+
+
+  if (!currentUser) {
+
+    showStatus(
+      "Please log in before reporting.",
+      "error"
+    );
+
+    return;
   }
 
-  function closeReportModal() {
 
-    reportPostId = null;
+  const discussionId =
+    document.getElementById(
+      "reportDiscussionId"
+    ).value;
 
-    $("reportModal")
-      ?.classList.add("hidden");
+
+  const reason =
+    document.getElementById(
+      "reportReason"
+    ).value;
+
+
+  if (!discussionId || !reason) {
+
+    showStatus(
+      "Please select a report reason.",
+      "error"
+    );
+
+    return;
   }
 
-  async function submitReport(event) {
 
-    event.preventDefault();
+  try {
 
-    if (!requireLogin()) return;
-
-    if (!reportPostId) {
-      closeReportModal();
-      return;
-    }
-
-    const reason =
-      String($("reportReason")?.value || "")
-        .trim();
-
-    if (!reason) {
-      showStatus(
-        "Please provide a reason.",
-        "error"
-      );
-      return;
-    }
-
-    try {
-
-      const {
-        error
-      } = await supabaseClient
+    const { error } =
+      await supabaseClient
         .from("discussion_reports")
         .insert({
-          discussion_id: reportPostId,
+          discussion_id: discussionId,
           reporter_user_id: currentUser.id,
           reason: reason,
           status: "pending"
         });
 
-      if (error) {
-        throw error;
-      }
 
-      closeReportModal();
-
-      showStatus(
-        "Thank you. The post has been reported for review.",
-        "success"
-      );
-
-    } catch (error) {
-
-      console.error(
-        "submitReport error:",
-        error
-      );
-
-      showStatus(
-        error.message ||
-        "Could not submit the report.",
-        "error"
-      );
+    if (error) {
+      throw error;
     }
-  }
 
 
-  /* ============================================================
-     FILTER EVENTS
-     ============================================================ */
+    closeReportModal();
 
-  function setupFilters() {
-
-    $("searchInput")
-      ?.addEventListener(
-        "input",
-        renderPosts
-      );
-
-    $("subjectFilter")
-      ?.addEventListener(
-        "change",
-        renderPosts
-      );
-
-    $("sortFilter")
-      ?.addEventListener(
-        "change",
-        renderPosts
-      );
 
     document
-      .querySelectorAll(".category-button")
-      .forEach(button => {
-
-        button.addEventListener(
-          "click",
-          () => {
-
-            currentCategory =
-              button.dataset.category ||
-              "all";
-
-            document
-              .querySelectorAll(".category-button")
-              .forEach(item => {
-
-                item.classList.remove(
-                  "bg-blue-600",
-                  "text-white"
-                );
-
-                item.classList.add(
-                  "bg-slate-100",
-                  "text-slate-700"
-                );
-              });
-
-            button.classList.remove(
-              "bg-slate-100",
-              "text-slate-700"
-            );
-
-            button.classList.add(
-              "bg-blue-600",
-              "text-white"
-            );
-
-            renderPosts();
-          }
-        );
-      });
+      .getElementById("reportForm")
+      .reset();
 
 
-    $("allPostsButton")
-      ?.addEventListener(
-        "click",
-        () => {
-
-          currentView = "all";
-
-          $("allPostsButton")
-            .classList.add(
-              "bg-blue-50",
-              "text-blue-700"
-            );
-
-          $("myPostsButton")
-            .classList.remove(
-              "bg-blue-50",
-              "text-blue-700"
-            );
-
-          renderPosts();
-        }
-      );
-
-
-    $("myPostsButton")
-      ?.addEventListener(
-        "click",
-        () => {
-
-          if (!requireLogin()) return;
-
-          currentView = "mine";
-
-          $("myPostsButton")
-            .classList.add(
-              "bg-blue-50",
-              "text-blue-700"
-            );
-
-          $("allPostsButton")
-            .classList.remove(
-              "bg-blue-50",
-              "text-blue-700"
-            );
-
-          renderPosts();
-        }
-      );
-  }
-
-
-  /* ============================================================
-     MODALS / GENERAL EVENTS
-     ============================================================ */
-
-  function closeDiscussion() {
-
-    currentDiscussionId = null;
-
-    $("discussionModal")
-      ?.classList.add("hidden");
-  }
-
-  function setupModalEvents() {
-
-    $("createPostButton")
-      ?.addEventListener(
-        "click",
-        openCreatePost
-      );
-
-    $("emptyCreateButton")
-      ?.addEventListener(
-        "click",
-        openCreatePost
-      );
-
-    $("closeCreatePostButton")
-      ?.addEventListener(
-        "click",
-        closeCreatePost
-      );
-
-    $("cancelCreatePostButton")
-      ?.addEventListener(
-        "click",
-        closeCreatePost
-      );
-
-    $("createPostForm")
-      ?.addEventListener(
-        "submit",
-        submitPost
-      );
-
-    $("closeDiscussionButton")
-      ?.addEventListener(
-        "click",
-        closeDiscussion
-      );
-
-    $("cancelReportButton")
-      ?.addEventListener(
-        "click",
-        closeReportModal
-      );
-
-    $("reportForm")
-      ?.addEventListener(
-        "submit",
-        submitReport
-      );
-
-    $("refreshButton")
-      ?.addEventListener(
-        "click",
-        async () => {
-
-          showStatus(
-            "Refreshing discussions...",
-            "info"
-          );
-
-          await loadPosts();
-        }
-      );
-
-    $("bodyCount")
-      ?.closest("textarea");
-
-    $("postBody")
-      ?.addEventListener(
-        "input",
-        event => {
-
-          const count =
-            String(event.target.value || "")
-              .length;
-
-          if ($("bodyCount")) {
-            $("bodyCount").textContent =
-              String(count);
-          }
-        }
-      );
-
-
-    $("loginButton")
-      ?.addEventListener(
-        "click",
-        () => {
-
-          /*
-           * auth.js owns the actual authentication UI.
-           * Try the common PulsePrep login functions
-           * without interfering with auth.js.
-           */
-
-          if (
-            typeof window.openLoginModal ===
-            "function"
-          ) {
-            window.openLoginModal();
-            return;
-          }
-
-          if (
-            typeof window.showLoginModal ===
-            "function"
-          ) {
-            window.showLoginModal();
-            return;
-          }
-
-          showStatus(
-            "Please use the Login option on the PulsePrep home page.",
-            "info"
-          );
-        }
-      );
-
-
-    $("createPostModal")
-      ?.addEventListener(
-        "click",
-        event => {
-
-          if (
-            event.target ===
-            $("createPostModal")
-          ) {
-            closeCreatePost();
-          }
-        }
-      );
-
-
-    $("discussionModal")
-      ?.addEventListener(
-        "click",
-        event => {
-
-          if (
-            event.target ===
-            $("discussionModal")
-          ) {
-            closeDiscussion();
-          }
-        }
-      );
-
-
-    $("reportModal")
-      ?.addEventListener(
-        "click",
-        event => {
-
-          if (
-            event.target ===
-            $("reportModal")
-          ) {
-            closeReportModal();
-          }
-        }
-      );
-
-
-    document.addEventListener(
-      "click",
-      event => {
-
-        if (
-          !event.target.closest(
-            ".post-menu-button"
-          ) &&
-          !event.target.closest(
-            ".post-menu"
-          )
-        ) {
-          document
-            .querySelectorAll(".post-menu")
-            .forEach(menu => {
-              menu.classList.add("hidden");
-            });
-        }
-      }
+    showStatus(
+      "Report submitted. Thank you for helping keep PulsePrep safe.",
+      "success"
     );
 
 
-    document.addEventListener(
-      "keydown",
-      event => {
+  } catch (error) {
 
-        if (event.key !== "Escape") {
-          return;
-        }
+    console.error("Report error:", error);
 
-        closeCreatePost();
-        closeDiscussion();
-        closeReportModal();
-      }
+    showStatus(
+      error.message ||
+      "Unable to submit report.",
+      "error"
     );
+  }
+}
+
+
+/* ============================================================
+   DELETE OWN POST
+   ============================================================ */
+
+async function deletePost(postId) {
+
+  if (!currentUser) return;
+
+
+  const post =
+    allPosts.find(item => item.id === postId);
+
+
+  if (!post) return;
+
+
+  if (post.user_id !== currentUser.id) {
+
+    showStatus(
+      "You can only delete your own posts.",
+      "error"
+    );
+
+    return;
   }
 
 
-  /* ============================================================
-     INITIALIZATION
-     ============================================================ */
+  const confirmed =
+    confirm(
+      "Delete this post? This action cannot be undone."
+    );
 
-  async function initializePage() {
 
-    if (initialized) return;
+  if (!confirmed) return;
 
-    initialized = true;
 
-    populateSubjects();
-    setupFilters();
-    setupModalEvents();
+  try {
 
-    try {
+    const { error } =
+      await supabaseClient
+        .from("discussion_posts")
+        .delete()
+        .eq("id", postId)
+        .eq("user_id", currentUser.id);
 
-      supabaseClient =
-        await waitForSupabase();
 
-      if (!supabaseClient) {
-
-        $("loadingState")
-          ?.classList.add("hidden");
-
-        showStatus(
-          "PulsePrep authentication is not ready. Please refresh the page.",
-          "error"
-        );
-
-        return;
-      }
-
-      /*
-       * Class Discussions are FREE.
-       * No Premium verification is performed here.
-       */
-
-      await loadCurrentUser();
-
-      setupAuthListener();
-
-      await loadPosts();
-
-    } catch (error) {
-
-      console.error(
-        "Class Discussion initialization error:",
-        error
-      );
-
-      $("loadingState")
-        ?.classList.add("hidden");
-
-      showStatus(
-        error.message ||
-        "Class Discussion could not be initialized.",
-        "error"
-      );
+    if (error) {
+      throw error;
     }
+
+
+    allPosts =
+      allPosts.filter(
+        post => post.id !== postId
+      );
+
+
+    renderPosts();
+
+
+    showStatus(
+      "Post deleted successfully.",
+      "success"
+    );
+
+
+  } catch (error) {
+
+    console.error("Delete post error:", error);
+
+    showStatus(
+      error.message ||
+      "Unable to delete the post.",
+      "error"
+    );
+  }
+}
+
+
+/* ============================================================
+   CATEGORY FILTER
+   ============================================================ */
+
+function setCategory(category) {
+
+  currentCategory = category;
+
+  document
+    .querySelectorAll(".category-btn")
+    .forEach(button => {
+
+      button.classList.remove(
+        "active-category"
+      );
+
+      if (
+        button.dataset.category === category
+      ) {
+
+        button.classList.add(
+          "active-category"
+        );
+      }
+    });
+
+
+  renderPosts();
+}
+
+
+/* ============================================================
+   VIEW
+   ============================================================ */
+
+function setView(view) {
+
+  currentView = view;
+
+
+  document
+    .querySelectorAll(".view-btn")
+    .forEach(button => {
+
+      button.classList.remove(
+        "active-view"
+      );
+    });
+
+
+  if (view === "mine") {
+
+    document
+      .getElementById("myPostsTab")
+      ?.classList.add("active-view");
+
+  } else {
+
+    document
+      .getElementById("allPostsTab")
+      ?.classList.add("active-view");
   }
 
 
-  /*
-   * Start the page.
-   */
+  renderPosts();
+}
 
-  if (
-    document.readyState ===
-    "loading"
-  ) {
 
-    document.addEventListener(
-      "DOMContentLoaded",
-      initializePage,
-      {
-        once: true
-      }
+/* ============================================================
+   STATUS MESSAGE
+   ============================================================ */
+
+function showStatus(message, type = "success") {
+
+  const box =
+    document.getElementById("statusMessage");
+
+
+  if (!box) return;
+
+
+  box.textContent = message;
+
+
+  box.className =
+    "mb-4 rounded-xl px-4 py-3 text-sm";
+
+
+  if (type === "error") {
+
+    box.classList.add(
+      "bg-red-50",
+      "border",
+      "border-red-200",
+      "text-red-700"
     );
 
   } else {
 
-    initializePage();
-
+    box.classList.add(
+      "bg-green-50",
+      "border",
+      "border-green-200",
+      "text-green-700"
+    );
   }
 
-})();
+
+  box.classList.remove("hidden");
+
+
+  setTimeout(() => {
+
+    box.classList.add("hidden");
+
+  }, 5000);
+}
+function showPremiumDiscussionLock(type) {
+
+  const loading =
+    document.getElementById("loadingState");
+
+  if (loading) {
+    loading.classList.add("hidden");
+  }
+
+  const container =
+    document.getElementById("postsContainer") ||
+    document.getElementById("discussionPosts") ||
+    document.getElementById("posts");
+
+  if (!container) {
+    console.warn(
+      "PulsePrep: Class Discussion posts container was not found."
+    );
+    return;
+  }
+
+  if (type === "login") {
+
+    container.innerHTML = `
+      <div class="max-w-xl mx-auto py-12 px-4">
+
+        <div class="bg-white
+                    rounded-3xl
+                    border
+                    border-slate-200
+                    shadow-lg
+                    p-8
+                    md:p-10
+                    text-center">
+
+          <div class="w-16 h-16
+                      mx-auto
+                      rounded-2xl
+                      bg-blue-50
+                      text-blue-600
+                      flex
+                      items-center
+                      justify-center
+                      text-3xl">
+
+            🔐
+
+          </div>
+
+          <div class="inline-flex
+                      items-center
+                      gap-2
+                      mt-5
+                      px-3
+                      py-1
+                      rounded-full
+                      bg-blue-50
+                      text-blue-700
+                      text-xs
+                      font-bold
+                      uppercase">
+
+            PulsePrep Account
+
+          </div>
+
+          <h2 class="text-2xl
+                     md:text-3xl
+                     font-extrabold
+                     text-slate-900
+                     mt-4">
+
+            Login Required
+
+          </h2>
+
+          <p class="text-slate-500
+                    leading-7
+                    mt-3">
+
+            Please log in to your PulsePrep account
+            to access Class Discussions.
+
+          </p>
+
+          <button
+            type="button"
+            onclick="handleLoginButton()"
+            class="mt-7
+                   inline-flex
+                   items-center
+                   justify-center
+                   gap-2
+                   px-7
+                   py-3
+                   rounded-xl
+                   bg-blue-600
+                   hover:bg-blue-700
+                   text-white
+                   font-bold
+                   transition">
+
+            <i class="fa-solid fa-right-to-bracket"></i>
+
+            Login to PulsePrep
+
+          </button>
+
+        </div>
+
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML = `
+    <div class="max-w-2xl mx-auto py-12 px-4">
+
+      <div class="bg-white
+                  rounded-3xl
+                  border
+                  border-amber-200
+                  shadow-lg
+                  p-8
+                  md:p-10
+                  text-center">
+
+        <div class="w-20 h-20
+                    mx-auto
+                    rounded-3xl
+                    bg-amber-50
+                    text-amber-600
+                    flex
+                    items-center
+                    justify-center
+                    text-4xl">
+
+          👑
+
+        </div>
+
+        <div class="inline-flex
+                    items-center
+                    gap-2
+                    mt-5
+                    px-4
+                    py-2
+                    rounded-full
+                    bg-amber-50
+                    text-amber-700
+                    text-xs
+                    font-extrabold
+                    uppercase
+                    tracking-wide">
+
+          <i class="fa-solid fa-crown"></i>
+
+          Premium Feature
+
+        </div>
+
+        <h2 class="text-2xl
+                   md:text-3xl
+                   font-extrabold
+                   text-slate-900
+                   mt-5">
+
+          Class Discussions is Premium
+
+        </h2>
+
+        <p class="text-slate-600
+                  leading-7
+                  mt-4">
+
+          Connect with other nursing students,
+          ask questions, share class notes,
+          discuss difficult topics and get
+          exam preparation support.
+
+        </p>
+
+        <div class="grid
+                    grid-cols-1
+                    sm:grid-cols-2
+                    gap-3
+                    text-left
+                    mt-7
+                    mb-8">
+
+          <div class="rounded-2xl
+                      bg-slate-50
+                      p-4">
+
+            <i class="fa-solid fa-comments
+                      text-blue-600
+                      mr-2"></i>
+
+            Student discussions
+
+          </div>
+
+          <div class="rounded-2xl
+                      bg-slate-50
+                      p-4">
+
+            <i class="fa-solid fa-circle-question
+                      text-blue-600
+                      mr-2"></i>
+
+            Ask questions
+
+          </div>
+
+          <div class="rounded-2xl
+                      bg-slate-50
+                      p-4">
+
+            <i class="fa-solid fa-book
+                      text-blue-600
+                      mr-2"></i>
+
+            Share class notes
+
+          </div>
+
+          <div class="rounded-2xl
+                      bg-slate-50
+                      p-4">
+
+            <i class="fa-solid fa-graduation-cap
+                      text-blue-600
+                      mr-2"></i>
+
+            Exam help
+
+          </div>
+
+        </div>
+
+        <button
+          type="button"
+          onclick="openPremiumDiscussionPlans()"
+          class="inline-flex
+                 items-center
+                 justify-center
+                 gap-2
+                 px-7
+                 py-3
+                 rounded-xl
+                 bg-amber-500
+                 hover:bg-amber-600
+                 text-white
+                 font-extrabold
+                 transition">
+
+          <i class="fa-solid fa-crown"></i>
+
+          Upgrade to Premium
+
+        </button>
+
+      </div>
+
+    </div>
+  `;
+}
+function openPremiumDiscussionPlans() {
+
+  /*
+   * Use PulsePrep's existing Premium/payment section.
+   * We do NOT create another payment system.
+   */
+
+  if (typeof window.PulsePrepOpenPremiumPlans === "function") {
+
+    window.PulsePrepOpenPremiumPlans();
+
+    return;
+  }
+
+  /*
+   * Fallback: open the existing payment/pricing section
+   * if the helper function is not available on this page.
+   */
+
+  const payment =
+    document.getElementById("payment");
+
+  const pricing =
+    document.getElementById("pricing");
+
+  const target =
+    payment || pricing;
+
+  if (target) {
+
+    document
+      .querySelectorAll(".tab")
+      .forEach(tab => {
+        tab.style.display = "none";
+      });
+
+    target.style.display = "block";
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+
+    return;
+  }
+
+  /*
+   * If this standalone page cannot find the payment section,
+   * send the student back to the main PulsePrep account page.
+   */
+
+  window.location.href =
+    "index.html?premium=required";
+}
+/* ============================================================
+   FORMAT DATE
+   ============================================================ */
+
+function formatDate(value) {
+
+  if (!value) return "Recently";
+
+
+  const date =
+    new Date(value);
+
+
+  if (Number.isNaN(date.getTime())) {
+    return "Recently";
+  }
+
+
+  return date.toLocaleString(
+    undefined,
+    {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }
+  );
+}
+
+
+/* ============================================================
+   INITIALS
+   ============================================================ */
+
+function getInitials(name) {
+
+  const parts =
+    String(name)
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+
+  if (!parts.length) return "P";
+
+
+  if (parts.length === 1) {
+    return parts[0]
+      .substring(0, 2)
+      .toUpperCase();
+  }
+
+
+  return (
+    parts[0][0] +
+    parts[parts.length - 1][0]
+  ).toUpperCase();
+}
+
+
+/* ============================================================
+   ESCAPE HTML
+   ============================================================ */
+
+function escapeHTML(value) {
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+
+/* ============================================================
+   EVENT LISTENERS
+   ============================================================ */
+
+function setupEventListeners() {
+
+  /* CATEGORY BUTTONS */
+
+  document
+    .querySelectorAll(".category-btn")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+          setCategory(
+            button.dataset.category
+          );
+        }
+      );
+
+    });
+
+
+  /* SEARCH */
+
+  document
+    .getElementById("searchInput")
+    ?.addEventListener(
+      "input",
+      renderPosts
+    );
+
+
+  /* SUBJECT */
+
+  document
+    .getElementById("subjectFilter")
+    ?.addEventListener(
+      "change",
+      renderPosts
+    );
+
+
+  /* SORT */
+
+  document
+    .getElementById("sortFilter")
+    ?.addEventListener(
+      "change",
+      renderPosts
+    );
+
+
+  /* POST FORM */
+
+  document
+    .getElementById("postForm")
+    ?.addEventListener(
+      "submit",
+      submitPost
+    );
+
+
+  /* REPORT FORM */
+
+  document
+    .getElementById("reportForm")
+    ?.addEventListener(
+      "submit",
+      submitReport
+    );
+
+
+  /* LONG NOTE CHARACTER COUNT */
+
+  document
+    .getElementById("postBody")
+    ?.addEventListener(
+      "input",
+      updateBodyCounter
+    );
+
+
+  /* CLOSE MODALS WITH ESCAPE */
+
+  document.addEventListener(
+    "keydown",
+    event => {
+
+      if (event.key !== "Escape") {
+        return;
+      }
+
+      closePostModal();
+      closeReportModal();
+
+    }
+  );
+}
+
+
+/* ============================================================
+   CHARACTER COUNTER
+   ============================================================ */
+
+function updateBodyCounter() {
+
+  const body =
+    document.getElementById("postBody");
+
+
+  const counter =
+    document.getElementById("bodyCounter");
+
+
+  if (!body || !counter) return;
+
+
+  const length =
+    body.value.length;
+
+
+  counter.textContent =
+    `${length.toLocaleString()} characters`;
+}
+
+
+/* ============================================================
+   PAGE INITIALIZATION
+   ============================================================ */
+
+async function initializePage() {
+  populateSubjects();
+  setupEventListeners();
+  /*
+   * ---------------------------------------------------------
+   * STEP 1: Connect to the existing PulsePrep Supabase client
+   * ---------------------------------------------------------
+   */
+  let connected = initializeSupabase();
+  let attempts = 0;
+  while (!connected && attempts < 50) {
+    await new Promise(resolve =>
+      setTimeout(resolve, 100)
+    );
+    connected = initializeSupabase();
+    attempts++;
+  }
+  if (!connected) {
+    document
+      .getElementById("loadingState")
+      ?.classList.add("hidden");
+    showStatus(
+      "PulsePrep authentication could not be loaded. Please refresh the page.",
+      "error"
+    );
+    return;
+  }
+  /*
+   * ---------------------------------------------------------
+   * STEP 2: Load the currently logged-in PulsePrep student
+   *
+   * Class Discussions are FREE.
+   * No Premium verification is required.
+   * ---------------------------------------------------------
+   */
+  console.log("CLASS DISCUSSION: loadCurrentUser starting");
+
+// Wait for the shared PulsePrep authentication
+// system to finish initializing before checking
+// the student's session or Premium access.
+if (window.pulsePrepAuthReady) {
+  await window.pulsePrepAuthReady;
+}
+
+console.log(
+  "CLASS DISCUSSION: PulsePrep authentication ready"
+);
+
+await loadCurrentUser();
+
+console.log(
+  "CLASS DISCUSSION: loadCurrentUser finished"
+);
+
+console.log(
+  "CLASS DISCUSSION: loadPosts starting"
+);
+
+await loadPosts();
+
+console.log(
+  "CLASS DISCUSSION: loadPosts finished"
+);
+console.log("CLASS DISCUSSION: loadPosts finished");
+
+}
+
+/* ============================================================
+   START CLASS DISCUSSIONS
+   ============================================================ */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+
+    await initializePage();
+
+    setupAuthListener();
+
+  }
+);
+
 </script>
 
 </body>
