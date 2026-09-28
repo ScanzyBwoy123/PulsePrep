@@ -2,11 +2,12 @@
   "use strict";
 
   const state = {
-    currentQuestion: null,
-    answered: 0,
-    score: 0,
-    busy: false
-  };
+  currentQuestion: null,
+  answered: 0,
+  score: 0,
+  busy: false,
+  answering: false
+};
 
   const escapeHtml = (value) =>
     String(value ?? "")
@@ -308,9 +309,11 @@
     }
   }
   async function submitAnswer(index) {
-    if (!state.currentQuestion || state.busy) {
-      return;
-    }
+  if (!state.currentQuestion || state.answering) {
+    return;
+  }
+
+  state.answering = true;
 
     const optionsElement =
       document.getElementById("practiceOptions");
@@ -604,8 +607,9 @@
       }
 
     } finally {
-      state.busy = false;
-    }
+  state.busy = false;
+  state.answering = false;
+}
   }
 
   window.initializePulsePrepPractice =
