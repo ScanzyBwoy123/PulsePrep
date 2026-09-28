@@ -154,15 +154,11 @@
   }
 
   async function getSession() {
-    if (!window.pulseprepSupabase) {
-      return null;
-    }
-
-    const result =
-      await window.pulseprepSupabase.auth.getSession();
-
-    return result.data?.session || null;
-  }
+  // Reuse the session already maintained by auth.js.
+  // This avoids another auth.getSession() call while
+  // the Question Bank is active.
+  return window.pulsePrepCurrentSession || null;
+}
 
   async function loadQuestion() {
     if (state.busy) {
