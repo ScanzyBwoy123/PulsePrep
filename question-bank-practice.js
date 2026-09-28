@@ -201,9 +201,13 @@
       </div>
     `;
 
-    try {
+    try {if (statusElement) {
+  statusElement.textContent = "Step 1: Answer handler is working...";
+}
       const session = await getSession();
-
+if (statusElement) {
+  statusElement.textContent = "Step 2: Session check started...";
+}
       if (!session) {
         throw new Error(
           "Please log in to use Endless Practice Mode."
