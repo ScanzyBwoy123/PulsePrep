@@ -738,7 +738,70 @@ if (!supabase) {
 
     setupDrugSearch();
 
-    loadDrugBank();
+    let attempts = 0;
+
+    const waitForSupabase =
+      setInterval(() => {
+
+        attempts++;
+
+        if (window.pulseprepSupabase) {
+
+          clearInterval(
+            waitForSupabase
+          );
+
+          loadDrugBank();
+
+        }
+
+        if (attempts >= 50) {
+
+          clearInterval(
+            waitForSupabase
+          );
+
+          const grid =
+            document.getElementById(
+              "drugBankGrid"
+            );
+
+          const loading =
+            document.getElementById(
+              "drugBankLoading"
+            );
+
+          if (loading) {
+            loading.classList.add(
+              "hidden"
+            );
+          }
+
+          if (grid) {
+            grid.innerHTML = `
+              <div
+                class="col-span-full
+                       bg-red-50
+                       border border-red-200
+                       text-red-700
+                       rounded-2xl
+                       p-5"
+              >
+                <strong>
+                  Drug Bank Error
+                </strong>
+
+                <p class="text-sm mt-1">
+                  PulsePrep Supabase could
+                  not be initialized.
+                </p>
+              </div>
+            `;
+          }
+
+        }
+
+      }, 200);
 
   }
 );
