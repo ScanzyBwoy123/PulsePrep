@@ -730,13 +730,12 @@
 
 
   document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-      setupDrugSearch();
-
-    }
-  );
+  "DOMContentLoaded",
+  () => {
+    setupDrugSearch();
+    loadDrugBank();
+  }
+);
 
 
 })();
