@@ -2399,6 +2399,73 @@ console.log(
   "CLASS DISCUSSION: loadCurrentUser finished"
 );
 
+/* =========================================================
+ * PREMIUM ACCESS CHECK
+ * Class Discussion requires an active Premium subscription.
+ * ========================================================= */
+
+console.log(
+  "CLASS DISCUSSION: Checking Premium access..."
+);
+
+if (
+  typeof window.checkPulsePrepPremium !==
+  "function"
+) {
+  console.error(
+    "CLASS DISCUSSION: Premium checker is unavailable."
+  );
+
+  if (
+    typeof showPremiumDiscussionLock ===
+    "function"
+  ) {
+    showPremiumDiscussionLock(
+      "premium"
+    );
+  }
+
+  return;
+}
+
+const premiumStatus =
+  await window.checkPulsePrepPremium();
+
+console.log(
+  "CLASS DISCUSSION: Premium status:",
+  premiumStatus
+);
+
+if (
+  !premiumStatus ||
+  premiumStatus.premium !== true
+) {
+  console.log(
+    "CLASS DISCUSSION: Premium required."
+  );
+
+  if (
+    typeof showPremiumDiscussionLock ===
+    "function"
+  ) {
+    showPremiumDiscussionLock(
+      premiumStatus?.logged_in === false
+        ? "login"
+        : "premium"
+    );
+  }
+
+  return;
+}
+
+console.log(
+  "CLASS DISCUSSION: Premium access granted."
+);
+
+/* =========================================================
+ * LOAD DISCUSSION POSTS
+ * ========================================================= */
+
 console.log(
   "CLASS DISCUSSION: loadPosts starting"
 );
@@ -2408,8 +2475,6 @@ await loadPosts();
 console.log(
   "CLASS DISCUSSION: loadPosts finished"
 );
-console.log("CLASS DISCUSSION: loadPosts finished");
-
 }
 
 /* ============================================================
