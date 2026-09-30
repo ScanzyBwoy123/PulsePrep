@@ -210,13 +210,14 @@
       <button onclick="showTab('payment')" class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap">
         <i class="fa-solid fa-mobile-screen-button mr-1"></i>
         Subscribe
-      </button>
 <button
   onclick="showTab('subject-library')"
   class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap"
 >
   <i class="fa-solid fa-book-open mr-1"></i>
   Subjects
+</button>
+
 <button
   onclick="showTab('question-bank')"
   class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap"
@@ -224,6 +225,7 @@
   <i class="fa-solid fa-file-circle-question mr-1"></i>
   Question Bank
 </button>
+
 <button
   onclick="showTab('drug-bank')"
   class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap"
@@ -231,6 +233,7 @@
   <i class="fa-solid fa-pills mr-1"></i>
   Drug Bank
 </button>
+
 <button
   onclick="showTab('ai-study-lab')"
   class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap"
@@ -238,6 +241,7 @@
   <i class="fa-solid fa-brain mr-1"></i>
   AI Study Lab
 </button>
+
 <a
   href="class-discussion.html"
   class="nav-btn px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap inline-flex items-center"
@@ -245,8 +249,6 @@
   <i class="fa-solid fa-comments mr-1"></i>
   Class Discussions
 </a>
-    </div>
-
   </div>
 <button
   onclick="document.getElementById('examMode').scrollIntoView({ behavior: 'smooth' })"
@@ -433,6 +435,178 @@
         </button>
 
       </div>
+
+    </div>
+
+  </div>
+
+</section>
+  <!-- =========================================================
+     PULSEPREP — DRUG BANK
+========================================================= -->
+
+<section id="drug-bank" class="tab">
+
+  <div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- Header -->
+    <div class="mb-8">
+
+      <div
+        class="inline-flex items-center gap-2
+               px-3 py-1 rounded-full
+               bg-emerald-50 text-emerald-700
+               text-xs font-extrabold uppercase"
+      >
+        <i class="fa-solid fa-pills"></i>
+        Nursing Drug Bank
+      </div>
+
+      <h2 class="text-3xl sm:text-4xl
+                 font-black text-slate-900 mt-3">
+        Medication Bank
+      </h2>
+
+      <p class="text-slate-500 mt-2 max-w-3xl">
+        Study medications by their uses, drug classes,
+        mechanisms, contraindications, adverse effects,
+        nursing responsibilities and examination points.
+      </p>
+
+    </div>
+
+    <!-- Search -->
+    <div
+      class="bg-white
+             border border-slate-200
+             rounded-2xl
+             shadow-sm
+             p-5 mb-6"
+    >
+
+      <label
+        for="drugBankSearch"
+        class="block font-extrabold
+               text-slate-900 mb-2"
+      >
+        🔎 Search Medication
+      </label>
+
+      <input
+        id="drugBankSearch"
+        type="search"
+        placeholder="Search by drug name, class or body system..."
+        class="w-full
+               border border-slate-300
+               rounded-xl
+               px-4 py-3
+               focus:outline-none
+               focus:ring-2
+               focus:ring-blue-500"
+      />
+
+    </div>
+
+    <!-- Loading -->
+    <div
+      id="drugBankLoading"
+      class="text-center py-10"
+    >
+      <div class="text-4xl mb-3">
+        💊
+      </div>
+
+      <p class="font-semibold text-slate-700">
+        Loading Drug Bank...
+      </p>
+    </div>
+
+    <!-- Empty -->
+    <div
+      id="drugBankEmpty"
+      class="hidden
+             text-center
+             bg-slate-50
+             rounded-2xl
+             p-10"
+    >
+
+      <div class="text-4xl mb-3">
+        🔎
+      </div>
+
+      <h3 class="font-extrabold text-slate-900">
+        No medications found
+      </h3>
+
+      <p class="text-slate-500 mt-2">
+        Try another medication name or drug class.
+      </p>
+
+    </div>
+
+    <!-- Drug Grid -->
+    <div
+      id="drugBankGrid"
+      class="grid
+             grid-cols-1
+             md:grid-cols-2
+             lg:grid-cols-3
+             gap-5"
+    ></div>
+
+  </div>
+
+  <!-- DRUG DETAILS MODAL -->
+
+  <div
+    id="drugBankModal"
+    class="hidden fixed inset-0
+           z-[9999]
+           bg-black/60
+           p-4
+           overflow-y-auto"
+  >
+
+    <div
+      class="max-w-4xl
+             mx-auto
+             bg-white
+             rounded-3xl
+             shadow-2xl
+             mt-6
+             mb-6
+             overflow-hidden"
+    >
+
+      <div
+        class="sticky top-0
+               bg-white
+               border-b
+               border-slate-200
+               p-4
+               flex justify-end
+               z-10"
+      >
+
+        <button
+          type="button"
+          onclick="closePulsePrepDrug()"
+          class="w-10 h-10
+                 rounded-full
+                 bg-slate-100
+                 hover:bg-slate-200
+                 font-bold"
+        >
+          ✕
+        </button>
+
+      </div>
+
+      <div
+        id="drugBankModalContent"
+        class="p-6 md:p-8"
+      ></div>
 
     </div>
 
@@ -652,208 +826,7 @@ Sodium is the major extracellular cation..."
         </option>
 
       </select>
-      <!-- =========================================================
-     PULSEPREP — DRUG BANK
-========================================================= -->
 
-<section id="drug-bank" class="tab">
-
-  <div class="max-w-7xl mx-auto px-4 py-6">
-
-    <!-- Header -->
-    <div class="mb-8">
-
-      <div
-        class="inline-flex items-center gap-2
-               px-3 py-1 rounded-full
-               bg-emerald-50 text-emerald-700
-               text-xs font-extrabold uppercase"
-      >
-
-        <i class="fa-solid fa-pills"></i>
-
-        Nursing Drug Bank
-
-      </div>
-
-
-      <h2 class="text-3xl sm:text-4xl
-                 font-black text-slate-900 mt-3">
-
-        Medication Bank
-
-      </h2>
-
-
-      <p class="text-slate-500 mt-2 max-w-3xl">
-
-        Study medications by their uses, drug classes,
-        mechanisms, contraindications, adverse effects,
-        nursing responsibilities and examination points.
-
-      </p>
-
-    </div>
-
-
-    <!-- Search -->
-    <div
-      class="bg-white
-             border border-slate-200
-             rounded-2xl
-             shadow-sm
-             p-5 mb-6"
-    >
-
-      <label
-        for="drugBankSearch"
-        class="block font-extrabold
-               text-slate-900 mb-2"
-      >
-
-        🔎 Search Medication
-
-      </label>
-
-
-      <input
-        id="drugBankSearch"
-        type="search"
-        placeholder="Search by drug name, class or body system..."
-        class="w-full
-               border border-slate-300
-               rounded-xl
-               px-4 py-3
-               focus:outline-none
-               focus:ring-2
-               focus:ring-blue-500"
-      />
-
-    </div>
-
-
-    <!-- Loading -->
-    <div
-      id="drugBankLoading"
-      class="text-center py-10"
-    >
-
-      <div class="text-4xl mb-3">
-        💊
-      </div>
-
-      <p class="font-semibold text-slate-700">
-        Loading Drug Bank...
-      </p>
-
-    </div>
-
-
-    <!-- Empty -->
-    <div
-      id="drugBankEmpty"
-      class="hidden
-             text-center
-             bg-slate-50
-             rounded-2xl
-             p-10"
-    >
-
-      <div class="text-4xl mb-3">
-        🔎
-      </div>
-
-      <h3 class="font-extrabold
-                 text-slate-900">
-
-        No medications found
-
-      </h3>
-
-      <p class="text-slate-500 mt-2">
-
-        Try another medication name or drug class.
-
-      </p>
-
-    </div>
-
-
-    <!-- Drug Grid -->
-    <div
-      id="drugBankGrid"
-      class="grid
-             grid-cols-1
-             md:grid-cols-2
-             lg:grid-cols-3
-             gap-5"
-    ></div>
-
-
-  </div>
-
-
-  <!-- =======================================================
-       DRUG DETAILS MODAL
-  ======================================================== -->
-
-  <div
-    id="drugBankModal"
-    class="hidden fixed inset-0
-           z-[9999]
-           bg-black/60
-           p-4
-           overflow-y-auto"
-  >
-
-    <div
-      class="max-w-4xl
-             mx-auto
-             bg-white
-             rounded-3xl
-             shadow-2xl
-             mt-6
-             mb-6
-             overflow-hidden"
-    >
-
-      <div
-        class="sticky top-0
-               bg-white
-               border-b
-               border-slate-200
-               p-4
-               flex justify-end
-               z-10"
-      >
-
-        <button
-          type="button"
-          onclick="closePulsePrepDrug()"
-          class="w-10 h-10
-                 rounded-full
-                 bg-slate-100
-                 hover:bg-slate-200
-                 font-bold"
-        >
-
-          ✕
-
-        </button>
-
-      </div>
-
-
-      <div
-        id="drugBankModalContent"
-        class="p-6 md:p-8"
-      ></div>
-
-    </div>
-
-  </div>
-
-</section>
 <!-- MCQ COUNT -->
 <div class="mt-6">
 
