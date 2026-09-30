@@ -691,7 +691,8 @@ document.addEventListener(
 
           const response =
             await fetch(
-              "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/initialize-payment"     {
+     "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/initialize-payment",
+{
 
                 method: "POST",
 
