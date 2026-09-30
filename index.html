@@ -518,6 +518,199 @@
 
 </div>
 </section>
+
+
+<!-- =========================================================
+     PULSEPREP — AI STUDY LAB
+========================================================= -->
+
+<section id="ai-study-lab" class="tab">
+
+  <div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- Header -->
+    <div class="mb-8">
+
+      <div class="inline-flex items-center gap-2
+                  px-3 py-1 rounded-full
+                  bg-blue-50 text-blue-700
+                  text-xs font-extrabold uppercase">
+
+        <i class="fa-solid fa-brain"></i>
+        AI Study Lab
+
+      </div>
+
+      <h2 class="text-3xl sm:text-4xl font-black
+                 text-slate-900 mt-3">
+
+        AI Study Lab
+
+      </h2>
+
+      <p class="text-slate-500 mt-2 max-w-2xl">
+
+        Turn your nursing notes into simple explanations,
+        key points, MCQs, theory questions, flashcards
+        and complete study packs.
+
+      </p>
+
+    </div>
+
+
+    <!-- Notes -->
+    <div class="bg-white rounded-2xl
+                border border-slate-200
+                shadow-sm p-6 mb-6">
+
+      <label
+        for="studyLabNotes"
+        class="block text-lg font-extrabold
+               text-slate-900 mb-3"
+      >
+        📖 Paste Your Nursing Notes
+      </label>
+
+      <textarea
+        id="studyLabNotes"
+        rows="14"
+        class="w-full border border-slate-300
+               rounded-2xl p-4
+               text-slate-800
+               focus:outline-none
+               focus:ring-2 focus:ring-blue-500"
+        placeholder="Paste your nursing notes here...
+
+Example:
+
+Electrolytes are substances that dissociate
+into ions in body fluids.
+
+Sodium is the major extracellular cation..."
+      ></textarea>
+
+      <p class="text-xs text-slate-500 mt-2">
+        You can paste lecture notes, textbook notes,
+        slides or revision material.
+      </p>
+
+    </div>
+
+
+    <!-- Study Mode -->
+    <div class="bg-white rounded-2xl
+                border border-slate-200
+                shadow-sm p-6 mb-6">
+
+      <label
+        for="studyLabMode"
+        class="block text-lg font-extrabold
+               text-slate-900 mb-3"
+      >
+        🎯 Choose Study Mode
+      </label>
+
+      <select
+        id="studyLabMode"
+        class="w-full border border-slate-300
+               rounded-xl px-4 py-3
+               text-slate-800
+               focus:outline-none
+               focus:ring-2 focus:ring-blue-500"
+      >
+
+        <option value="simple">
+          🧒 Explain Like I'm 10
+        </option>
+
+        <option value="breakdown">
+          🔎 Break Down Every Key Point
+        </option>
+
+        <option value="mcq">
+          📝 Create MCQs
+        </option>
+
+        <option value="theory">
+          📚 Theory Questions
+        </option>
+
+        <option value="flashcards">
+          🧠 Flashcards
+        </option>
+
+        <option value="complete">
+          📦 Complete Study Pack
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- Generate -->
+    <button
+      id="studyLabGenerateBtn"
+      onclick="generatePulsePrepStudyMaterial()"
+      class="w-full py-4 rounded-2xl
+             bg-blue-600 hover:bg-blue-700
+             text-white font-extrabold
+             text-lg shadow-lg transition"
+    >
+
+      <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
+
+      Generate Study Material
+
+    </button>
+
+
+    <!-- Status -->
+    <div
+      id="studyLabStatus"
+      class="hidden"
+    ></div>
+
+
+    <!-- Result -->
+    <div
+      id="studyLabResult"
+      class="mt-6 bg-white
+             rounded-2xl
+             border border-slate-200
+             shadow-sm p-6
+             min-h-[200px]"
+    >
+
+      <div class="text-center py-12 text-slate-400">
+
+        <div class="text-5xl mb-4">
+          🧠
+        </div>
+
+        <h3 class="text-lg font-bold text-slate-700">
+
+          Your AI study material will appear here
+
+        </h3>
+
+        <p class="text-sm mt-2">
+
+          Paste your notes, choose a study mode,
+          then tap Generate Study Material.
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
 <section id="subject-library" class="tab">
 
   <div class="max-w-7xl mx-auto px-4 py-6">
