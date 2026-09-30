@@ -2144,7 +2144,7 @@ async function startPayment(amount, plan) {
     );
 
     const data = await response.json();
-
+console.log("PAYSTACK RESPONSE:", data);
     if (!response.ok) {
       throw new Error(
         data.error || "Unable to initialize payment."
