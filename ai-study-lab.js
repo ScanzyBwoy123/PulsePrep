@@ -381,7 +381,8 @@ const mcqCount =
         await getSession();
 
 
-      const instruction = `
+      
+const instruction = `
 
 You are creating study material for a nursing student using PulsePrep AI Study Lab.
 
@@ -390,49 +391,30 @@ ${selectedMode.title}
 
 MODE INSTRUCTION:
 ${selectedMode.instruction}
-MCQ GENERATION REQUIREMENT:
 
-The student selected exactly ${mcqCount} MCQs.
+MCQ COUNT:
+${mcqCount}
 
-You MUST generate exactly ${mcqCount} separate MCQs.
-
-Do NOT generate 3, 4, 5, or any smaller number.
-
-Number every question clearly:
-1.
-2.
-3.
-4.
-5.
-Continue numbering until you reach ${mcqCount}.
-
-Every question must contain:
-- The question
-- Four options: A, B, C, D
-- The correct answer
-- Explanation of why the correct answer is correct
-- Explanation of why each incorrect option is wrong
-
-Do not stop early.
-
-Before finishing, silently count the questions and make sure the total is exactly ${mcqCount}.
 IMPORTANT RULES:
 
-1. Use ONLY the student's supplied notes as the main source.
-2. Correct obvious wording or spelling problems when necessary.
-3. Do not skip important information.
-4. Preserve important nursing terminology.
-5. Define difficult terminology in simple language.
-6. Organize the answer with clear headings.
-7. Make the material useful for nursing examinations.
-8. Highlight high-yield exam facts.
-9. Do not diagnose a real patient.
-10. Do not prescribe medication for a real patient.
-11. This is educational nursing study material.
-12. If the notes contain unsafe or incorrect medical information, clearly identify it rather than presenting it as fact.
-13. Keep the answer structured and easy to revise.
-14. Follow the requested quantity exactly. Never substitute a smaller number.
-15. For MCQs, number every question sequentially and continue until the requested total is reached.
+1. Follow the selected study mode exactly.
+2. Do NOT mix different study modes.
+3. If the mode is "Theory Questions", produce genuine theory/essay questions, NOT MCQs.
+4. If the mode is "Create MCQs", produce MCQs only.
+5. If the mode is "Flashcards", produce flashcards only.
+6. If the mode is "Explain Like I'm 10", explain the notes without creating questions.
+7. If the mode is "Break Down Every Key Point", provide a detailed point-by-point explanation.
+8. If the mode is "Complete Study Pack", include all requested sections.
+9. When MCQs are requested, the required number is EXACTLY ${mcqCount}.
+10. Never generate fewer MCQs than requested.
+11. Number every MCQ sequentially from 1 to ${mcqCount}.
+12. Before finishing, verify that the MCQ count is exactly ${mcqCount}.
+13. Use the student's supplied notes as the main source.
+14. Do not skip important information.
+15. Preserve important nursing terminology.
+16. Define difficult terminology clearly.
+17. Keep the material structured and easy to revise.
+18. This is educational nursing study material.
 
 STUDENT NOTES:
 
@@ -440,8 +422,11 @@ ${noteText}
 
 Now create the requested ${selectedMode.title} study material.
 `;
-
-
+const finalInstruction =
+  instruction.replace(
+    /\[MCQ_COUNT\]/g,
+    String(mcqCount)
+  );
       const response =
         await fetch(
           `${SUPABASE_URL}/functions/v1/ask-ai`,
@@ -461,9 +446,9 @@ Now create the requested ${selectedMode.title} study material.
             },
 
             body:
-              JSON.stringify({
-                message: instruction
-              })
+  JSON.stringify({
+    message: finalInstruction
+  })
           }
         );
 
