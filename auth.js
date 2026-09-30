@@ -486,9 +486,9 @@ async function checkPulsePrepPremium() {
 
 
   const response =
-    await fetch(
-      "/.netlify/functions/check-premium",
-      {
+  await fetch(
+    "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/initialize-payment",
+    {
 
         method: "GET",
 
