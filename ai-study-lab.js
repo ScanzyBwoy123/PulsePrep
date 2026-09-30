@@ -204,7 +204,9 @@ ${selectedMode.title}
 
 MODE INSTRUCTION:
 ${selectedMode.instruction}
-
+MCQ COUNT:
+Generate exactly ${mcqCount} MCQs when the selected mode requires MCQs.
+For Complete Study Pack, generate exactly ${mcqCount} MCQs.
 IMPORTANT RULES:
 
 1. Use ONLY the student's supplied notes as the main source.
