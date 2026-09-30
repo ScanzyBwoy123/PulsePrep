@@ -4,9 +4,9 @@
 
 (function () {
 
-  const supabase =
-    window.pulseprepSupabase;
-
+  function getSupabase() {
+    return window.pulseprepSupabase;
+  }
 
   // ----------------------------------------------------------
   // LOAD DRUGS
@@ -37,16 +37,19 @@
 
     try {
 
-      if (!window.pulseprepSupabase) {
-        throw new Error(
-          "Supabase is not ready yet."
-        );
-      }
+      const supabase =
+  getSupabase();
+
+if (!supabase) {
+  throw new Error(
+    "Supabase is not ready yet."
+  );
+}
 
 
       let query =
-        window.pulseprepSupabase
-          .from("drug_bank")
+  supabase
+    .from("drug_bank")
           .select("*")
           .eq("is_published", true)
           .order("generic_name", {
