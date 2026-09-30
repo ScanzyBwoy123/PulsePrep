@@ -691,8 +691,7 @@ document.addEventListener(
 
           const response =
             await fetch(
-              "/.netlify/functions/initialize-payment",
-              {
+              "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/initialize-payment"     {
 
                 method: "POST",
 
