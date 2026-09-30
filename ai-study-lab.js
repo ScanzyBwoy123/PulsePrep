@@ -204,9 +204,32 @@ ${selectedMode.title}
 
 MODE INSTRUCTION:
 ${selectedMode.instruction}
-MCQ COUNT:
-Generate exactly ${mcqCount} MCQs when the selected mode requires MCQs.
-For Complete Study Pack, generate exactly ${mcqCount} MCQs.
+MCQ GENERATION REQUIREMENT:
+
+The student selected exactly ${mcqCount} MCQs.
+
+You MUST generate exactly ${mcqCount} separate MCQs.
+
+Do NOT generate 3, 4, 5, or any smaller number.
+
+Number every question clearly:
+1.
+2.
+3.
+4.
+5.
+Continue numbering until you reach ${mcqCount}.
+
+Every question must contain:
+- The question
+- Four options: A, B, C, D
+- The correct answer
+- Explanation of why the correct answer is correct
+- Explanation of why each incorrect option is wrong
+
+Do not stop early.
+
+Before finishing, silently count the questions and make sure the total is exactly ${mcqCount}.
 IMPORTANT RULES:
 
 1. Use ONLY the student's supplied notes as the main source.
@@ -222,6 +245,8 @@ IMPORTANT RULES:
 11. This is educational nursing study material.
 12. If the notes contain unsafe or incorrect medical information, clearly identify it rather than presenting it as fact.
 13. Keep the answer structured and easy to revise.
+14. Follow the requested quantity exactly. Never substitute a smaller number.
+15. For MCQs, number every question sequentially and continue until the requested total is reached.
 
 STUDENT NOTES:
 
