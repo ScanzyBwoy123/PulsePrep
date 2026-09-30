@@ -2144,7 +2144,20 @@ console.log("INDEX.HTML START PAYMENT CALLED");
     );
 
     const data = await response.json();
+
 console.log("PAYSTACK RESPONSE:", data);
+
+status.className =
+  "max-w-xl mx-auto mt-6 p-4 rounded-xl text-sm bg-purple-50 border border-purple-200 text-purple-800";
+
+status.innerHTML = `
+  <strong>PAYSTACK RESPONSE:</strong>
+  <pre class="mt-3 text-xs whitespace-pre-wrap break-all">${escapeHTML(
+    JSON.stringify(data, null, 2)
+  )}</pre>
+`;
+
+status.classList.remove("hidden");
     if (!response.ok) {
       throw new Error(
         data.error || "Unable to initialize payment."
