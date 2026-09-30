@@ -377,8 +377,63 @@ const mcqCount =
 
     try {
 
-      const session =
-        await getSession();
+  /* =========================================================
+   * PREMIUM ACCESS CHECK
+   * AI Study Lab requires an active Premium subscription.
+   * ========================================================= */
+
+  console.log(
+    "AI STUDY LAB: Checking Premium access..."
+  );
+
+  if (
+    typeof window.checkPulsePrepPremium !==
+    "function"
+  ) {
+    console.error(
+      "AI STUDY LAB: Premium checker is unavailable."
+    );
+
+    showStudyLabStatus(
+      "Premium access could not be verified. Please refresh the page and try again.",
+      "error"
+    );
+
+    return;
+  }
+
+  const premiumStatus =
+    await window.checkPulsePrepPremium();
+
+  console.log(
+    "AI STUDY LAB: Premium status:",
+    premiumStatus
+  );
+
+  if (
+    !premiumStatus ||
+    premiumStatus.premium !== true
+  ) {
+    console.log(
+      "AI STUDY LAB: Premium access required."
+    );
+
+    showStudyLabStatus(
+      premiumStatus?.logged_in === false
+        ? "Please log in to your PulsePrep account to use AI Study Lab."
+        : "AI Study Lab is a Premium feature. Please subscribe to continue.",
+      "error"
+    );
+
+    return;
+  }
+
+  console.log(
+    "AI STUDY LAB: Premium access granted."
+  );
+
+  const session =
+    await getSession();
 
 
       
