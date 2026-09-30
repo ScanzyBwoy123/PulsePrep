@@ -2072,16 +2072,12 @@ function checkPremiumAccess() {
 
 }
 
-
 /*
   IMPORTANT:
-
   This function intentionally does NOT unlock the account.
-
-  The real version will call our Netlify Function after
-  Paystack confirms payment.
+  The real version will call our Supabase Edge Function
+  after Paystack confirms payment.
 */
-
 function unlockPremium() {
 
   premiumAccess = true;
@@ -2131,8 +2127,8 @@ async function startPayment(amount, plan) {
   try {
 
     const response = await fetch(
-      "/.netlify/functions/initialize-payment",
-      {
+  "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/initialize-payment",
+  {
         method: "POST",
 
         headers: {
