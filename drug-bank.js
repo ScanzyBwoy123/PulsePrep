@@ -734,77 +734,84 @@ if (!supabase) {
 
   document.addEventListener(
   "DOMContentLoaded",
-  () => {
+  async () => {
 
     setupDrugSearch();
 
-    let attempts = 0;
+    try {
 
-    const waitForSupabase =
-      setInterval(() => {
+      if (
+        window.pulsePrepAuthReady
+      ) {
 
-        attempts++;
+        await window.pulsePrepAuthReady;
 
-        if (window.pulseprepSupabase) {
+      }
 
-          clearInterval(
-            waitForSupabase
-          );
+      if (
+        !window.pulseprepSupabase
+      ) {
 
-          loadDrugBank();
+        throw new Error(
+          "Supabase initialization failed."
+        );
 
-        }
+      }
 
-        if (attempts >= 50) {
+      await loadDrugBank();
 
-          clearInterval(
-            waitForSupabase
-          );
+    } catch (error) {
 
-          const grid =
-            document.getElementById(
-              "drugBankGrid"
-            );
+      console.error(
+        "PulsePrep Drug Bank initialization error:",
+        error
+      );
 
-          const loading =
-            document.getElementById(
-              "drugBankLoading"
-            );
+      const loading =
+        document.getElementById(
+          "drugBankLoading"
+        );
 
-          if (loading) {
-            loading.classList.add(
-              "hidden"
-            );
-          }
+      const grid =
+        document.getElementById(
+          "drugBankGrid"
+        );
 
-          if (grid) {
-            grid.innerHTML = `
-              <div
-                class="col-span-full
-                       bg-red-50
-                       border border-red-200
-                       text-red-700
-                       rounded-2xl
-                       p-5"
-              >
-                <strong>
-                  Drug Bank Error
-                </strong>
+      if (loading) {
+        loading.classList.add(
+          "hidden"
+        );
+      }
 
-                <p class="text-sm mt-1">
-                  PulsePrep Supabase could
-                  not be initialized.
-                </p>
-              </div>
-            `;
-          }
+      if (grid) {
 
-        }
+        grid.innerHTML = `
+          <div
+            class="col-span-full
+                   bg-red-50
+                   border border-red-200
+                   text-red-700
+                   rounded-2xl
+                   p-5"
+          >
 
-      }, 200);
+            <strong>
+              Drug Bank Error
+            </strong>
+
+            <p class="text-sm mt-1">
+              ${escapeHTML(
+                error.message ||
+                "Unable to initialize Drug Bank."
+              )}
+            </p>
+
+          </div>
+        `;
+
+      }
+
+    }
 
   }
 );
-
-
-})();
