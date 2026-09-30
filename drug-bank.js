@@ -732,8 +732,11 @@
   document.addEventListener(
   "DOMContentLoaded",
   () => {
+
     setupDrugSearch();
+
     loadDrugBank();
+
   }
 );
 
