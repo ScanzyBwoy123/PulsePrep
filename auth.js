@@ -412,133 +412,92 @@ function updateAuthUI(session) {
 // ============================================================
 
 async function checkPulsePrepPremium() {
+  try {
+    const supabase = window.pulseprepSupabase;
 
-  /*
-   * Wait for the shared Supabase client.
-   */
-  if (!window.pulseprepSupabase) {
+    if (!supabase) {
+      return {
+        premium: false,
+        logged_in: false,
+        error: "Supabase is not initialized."
+      };
+    }
+
+    const {
+      data: { session },
+      error: sessionError
+    } = await supabase.auth.getSession();
+
+    if (sessionError || !session?.user) {
+      return {
+        premium: false,
+        logged_in: false,
+        error: "Please log in to your PulsePrep account."
+      };
+    }
+
+    const response = await fetch(
+      "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/check-premium",
+      {
+        method: "GET",
+        headers: {
+          Authorization:
+            `Bearer ${session.access_token}`,
+          "Content-Type": "application/json"
+        }
+      }
+    );
+
+    let data = {};
 
     try {
+      data = await response.json();
+    } catch {
+      data = {};
+    }
 
-      await window.pulsePrepAuthReady;
-
-    } catch (error) {
-
+    if (!response.ok) {
       console.error(
-        "Premium authentication wait error:",
-        error
+        "PulsePrep Premium check failed:",
+        data
       );
 
+      return {
+        premium: false,
+        logged_in: true,
+        error:
+          data.error ||
+          "Unable to check Premium status."
+      };
     }
-  }
-
-
-  if (!window.pulseprepSupabase) {
 
     return {
-
-      authenticated: false,
-      premium: false
-
+      premium: data.premium === true,
+      logged_in: data.logged_in === true,
+      user_id: data.user_id || session.user.id,
+      email:
+        data.email ||
+        session.user.email ||
+        null,
+      subscription:
+        data.subscription || null
     };
 
-  }
-
-
-  const {
-    data,
-    error
-  } =
-    await window.pulseprepSupabase.auth.getSession();
-
-
-  if (error) {
-
+  } catch (error) {
     console.error(
-      "Premium session error:",
+      "PulsePrep Premium check error:",
       error
     );
 
     return {
-
-      authenticated: false,
-      premium: false
-
+      premium: false,
+      logged_in: true,
+      error:
+        "Premium status check failed."
     };
-
   }
-
-
-  const session =
-    data?.session;
-
-
-  if (!session) {
-
-    return {
-
-      authenticated: false,
-      premium: false
-
-    };
-
-  }
-
-
-  const response =
-  await fetch(
-    "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/initialize-payment",
-    {
-
-        method: "GET",
-
-        headers: {
-
-          Authorization:
-            `Bearer ${session.access_token}`
-
-        }
-
-      }
-    );
-
-
-  if (!response.ok) {
-
-    let errorMessage =
-      "Unable to verify Premium status.";
-
-    try {
-
-      const errorData =
-        await response.json();
-
-      errorMessage =
-        errorData?.details ||
-        errorData?.error ||
-        errorMessage;
-
-    } catch (parseError) {
-
-      console.error(
-        "Premium error response could not be read:",
-        parseError
-      );
-
-    }
-
-    throw new Error(
-      errorMessage
-    );
-  }
-
-
-  return await response.json();
 }
 
-
-// Make Premium verification available
-// to the rest of PulsePrep.
 window.checkPulsePrepPremium =
   checkPulsePrepPremium;
 
