@@ -121,7 +121,10 @@
 
     const selectedMode =
       STUDY_MODES[mode.value];
-
+const mcqCount =
+  Number(
+    document.getElementById("studyLabMcqCount")?.value || 20
+  );
 
     if (!noteText) {
 
