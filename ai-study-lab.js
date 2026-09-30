@@ -8,48 +8,234 @@
     "https://eskwphjtiogguhvtktmh.supabase.co";
 
   const STUDY_MODES = {
-    simple: {
-      title: "Explain Like I'm 10",
-      icon: "🧒",
-      instruction:
-        "Explain the notes in very simple language as if teaching a beginner. Do not remove important nursing terminology. Define difficult terms immediately."
-    },
 
-    breakdown: {
-      title: "Break Down Every Key Point",
-      icon: "🔎",
-      instruction:
-        "Break the notes down point-by-point. Identify every important fact, definition, mechanism, cause, sign, symptom, complication, investigation, treatment, nursing intervention, prevention point and exam-relevant detail when applicable. Do not skip small but important points."
-    },
+  simple: {
+    title: "Explain Like I'm 10",
+    icon: "🧒",
+    instruction: `
+Explain the student's notes in very simple language as if teaching a beginner.
 
-    mcq: {
-      title: "Create MCQs",
-      icon: "📝",
-      instruction:
-        "Create nursing multiple-choice questions from the notes. Give four options A-D, identify the correct answer, explain why it is correct, and explain why each other option is incorrect. Test understanding rather than simply copying sentences."
-    },
+Do NOT create MCQs.
+Do NOT create theory questions.
+Do NOT create flashcards.
 
-    theory: {
-      title: "Theory Questions",
-      icon: "📚",
-      instruction:
-        "Create theory/essay questions from the notes. Provide a model answer for each question and list important marking points students should remember."
-    },
+Instead:
+- Explain every important concept.
+- Define difficult nursing and medical terminology.
+- Give simple examples where helpful.
+- Explain mechanisms and processes where applicable.
+- Highlight important nursing facts.
+- Preserve important nursing terminology.
+`
+  },
 
-    flashcards: {
-      title: "Flashcards",
-      icon: "🧠",
-      instruction:
-        "Turn the notes into useful nursing revision flashcards. Each flashcard should have a clear question on the front and a concise but accurate answer on the back."
-    },
 
-    complete: {
-      title: "Complete Study Pack",
-      icon: "📦",
-      instruction:
-        "Create a complete nursing study pack containing: a simple overview, detailed point-by-point explanation, key terminology, important facts, mechanisms/causes/signs/symptoms/complications/management where applicable, exam tips, MCQs with answers and rationales, theory questions with model answers, and flashcards."
-    }
-  };
+  breakdown: {
+    title: "Break Down Every Key Point",
+    icon: "🔎",
+    instruction: `
+Break the student's notes down point-by-point.
+
+Do NOT create MCQs.
+Do NOT create theory questions.
+Do NOT create flashcards.
+
+Identify and explain:
+- Every important fact
+- Definitions
+- Terminology
+- Causes
+- Mechanisms
+- Signs and symptoms
+- Complications
+- Investigations
+- Treatment
+- Nursing interventions
+- Prevention
+- Exam-relevant information
+
+Do not skip small but important details.
+`
+  },
+
+
+  mcq: {
+    title: "Create MCQs",
+    icon: "📝",
+    instruction: `
+CREATE MULTIPLE-CHOICE QUESTIONS ONLY.
+
+The student has selected [MCQ_COUNT] questions.
+
+You MUST generate exactly [MCQ_COUNT] separate MCQs.
+
+Number them continuously:
+
+1.
+2.
+3.
+4.
+5.
+Continue until [MCQ_COUNT].
+
+EVERY MCQ must contain:
+
+Question:
+
+A. Option
+B. Option
+C. Option
+D. Option
+
+Correct Answer:
+
+Explanation:
+
+Why A is incorrect:
+
+Why B is incorrect:
+
+Why C is incorrect:
+
+Why D is incorrect:
+
+Do NOT create theory questions.
+Do NOT create essay questions.
+Do NOT create flashcards.
+
+Do NOT stop early.
+
+The final number must be exactly [MCQ_COUNT].
+`
+  },
+
+
+  theory: {
+    title: "Theory Questions",
+    icon: "📚",
+    instruction: `
+CREATE THEORY AND ESSAY QUESTIONS ONLY.
+
+Do NOT create MCQs.
+Do NOT use A, B, C, D multiple-choice options.
+Do NOT create flashcards.
+
+Create nursing theory questions based on the student's notes.
+
+For every theory question, provide:
+
+Question:
+
+Model Answer:
+
+Important Marking Points:
+
+The model answer should be detailed enough for a nursing student preparing for an examination.
+
+Where applicable, include:
+- Definitions
+- Causes
+- Mechanisms
+- Signs and symptoms
+- Complications
+- Investigations
+- Treatment
+- Nursing management
+- Prevention
+- Important examination points
+
+The questions should test understanding, not simply copy sentences from the notes.
+`
+  },
+
+
+  flashcards: {
+    title: "Flashcards",
+    icon: "🧠",
+    instruction: `
+CREATE FLASHCARDS ONLY.
+
+Do NOT create MCQs.
+Do NOT create theory or essay questions.
+
+Turn the important information in the student's notes into nursing revision flashcards.
+
+Use this format:
+
+Flashcard 1
+Question:
+Answer:
+
+Flashcard 2
+Question:
+Answer:
+
+Continue until the important information has been covered.
+
+Answers must be concise, accurate and useful for examination revision.
+`
+  },
+
+
+  complete: {
+    title: "Complete Study Pack",
+    icon: "📦",
+    instruction: `
+CREATE A COMPLETE NURSING STUDY PACK.
+
+The study pack MUST contain these sections in this order:
+
+1. SIMPLE OVERVIEW
+
+Explain the topic clearly for a beginner.
+
+2. KEY TERMINOLOGY
+
+Define important nursing and medical terms.
+
+3. DETAILED POINT-BY-POINT EXPLANATION
+
+Explain every important point from the student's notes.
+
+4. IMPORTANT EXAM FACTS
+
+List high-yield facts students should remember.
+
+5. MCQs
+
+Create exactly [MCQ_COUNT] MCQs.
+
+Each MCQ MUST contain:
+- Question
+- A, B, C and D options
+- Correct answer
+- Explanation of the correct answer
+- Explanation of why each incorrect option is wrong
+
+Number the MCQs from 1 to [MCQ_COUNT].
+
+Do NOT stop before reaching [MCQ_COUNT].
+
+6. THEORY QUESTIONS
+
+Create genuine theory/essay questions.
+
+DO NOT turn the theory questions into MCQs.
+
+For each theory question provide:
+- Question
+- Model Answer
+- Important Marking Points
+
+7. FLASHCARDS
+
+Create revision flashcards covering the important information.
+
+Do not replace one section with another.
+`
+  }
+
+};
 
 
   // ----------------------------------------------------------
