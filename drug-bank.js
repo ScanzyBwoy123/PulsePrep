@@ -732,11 +732,20 @@ if (!supabase) {
     closePulsePrepDrug;
 
 
-  document.addEventListener(
-  "DOMContentLoaded",
-  () => {
+  document.addEventListener("DOMContentLoaded", () => {
 
-    setupDrugSearch();
+  setupDrugSearch();
 
-  }
-);
+  // Give Supabase time to initialize
+  setTimeout(() => {
+
+    if (
+      typeof window.loadPulsePrepDrugBank ===
+      "function"
+    ) {
+      window.loadPulsePrepDrugBank();
+    }
+
+  }, 1500);
+
+});
