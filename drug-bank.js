@@ -732,20 +732,23 @@ if (!supabase) {
     closePulsePrepDrug;
 
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
 
   setupDrugSearch();
 
-  // Give Supabase time to initialize
-  setTimeout(() => {
-
-    if (
-      typeof window.loadPulsePrepDrugBank ===
-      "function"
-    ) {
-      window.loadPulsePrepDrugBank();
+  // Wait for PulsePrep Supabase initialization
+  if (window.pulsePrepAuthReady) {
+    try {
+      await window.pulsePrepAuthReady;
+    } catch (error) {
+      console.error(
+        "PulsePrep auth initialization error:",
+        error
+      );
     }
+  }
 
-  }, 1500);
+  // Load the Drug Bank
+  await loadDrugBank();
 
 });
