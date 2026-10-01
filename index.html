@@ -2218,7 +2218,8 @@ function showTab(tabId) {
     tab.classList.remove("active");
   });
 
-  const selected = document.getElementById(tabId);
+  const selected =
+    document.getElementById(tabId);
 
   if (selected) {
     selected.classList.add("active");
@@ -2226,6 +2227,19 @@ function showTab(tabId) {
 
   if (tabId === "mcq") {
     checkPremiumAccess();
+  }
+
+  if (tabId === "drug-bank") {
+
+    if (
+      typeof window.loadPulsePrepDrugBank ===
+      "function"
+    ) {
+
+      window.loadPulsePrepDrugBank();
+
+    }
+
   }
 
 }
