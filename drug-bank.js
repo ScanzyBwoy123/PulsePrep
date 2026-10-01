@@ -732,23 +732,8 @@ if (!supabase) {
     closePulsePrepDrug;
 
 
-  document.addEventListener("DOMContentLoaded", async () => {
+  document.addEventListener("DOMContentLoaded", () => {
 
   setupDrugSearch();
-
-  // Wait for PulsePrep Supabase initialization
-  if (window.pulsePrepAuthReady) {
-    try {
-      await window.pulsePrepAuthReady;
-    } catch (error) {
-      console.error(
-        "PulsePrep auth initialization error:",
-        error
-      );
-    }
-  }
-
-  // Load the Drug Bank
-  await loadDrugBank();
 
 });
