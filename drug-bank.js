@@ -734,84 +734,9 @@ if (!supabase) {
 
   document.addEventListener(
   "DOMContentLoaded",
-  async () => {
+  () => {
 
     setupDrugSearch();
-
-    try {
-
-      if (
-        window.pulsePrepAuthReady
-      ) {
-
-        await window.pulsePrepAuthReady;
-
-      }
-
-      if (
-        !window.pulseprepSupabase
-      ) {
-
-        throw new Error(
-          "Supabase initialization failed."
-        );
-
-      }
-
-      await loadDrugBank();
-
-    } catch (error) {
-
-      console.error(
-        "PulsePrep Drug Bank initialization error:",
-        error
-      );
-
-      const loading =
-        document.getElementById(
-          "drugBankLoading"
-        );
-
-      const grid =
-        document.getElementById(
-          "drugBankGrid"
-        );
-
-      if (loading) {
-        loading.classList.add(
-          "hidden"
-        );
-      }
-
-      if (grid) {
-
-        grid.innerHTML = `
-          <div
-            class="col-span-full
-                   bg-red-50
-                   border border-red-200
-                   text-red-700
-                   rounded-2xl
-                   p-5"
-          >
-
-            <strong>
-              Drug Bank Error
-            </strong>
-
-            <p class="text-sm mt-1">
-              ${escapeHTML(
-                error.message ||
-                "Unable to initialize Drug Bank."
-              )}
-            </p>
-
-          </div>
-        `;
-
-      }
-
-    }
 
   }
 );
