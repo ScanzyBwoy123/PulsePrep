@@ -737,3 +737,5 @@ if (!supabase) {
   setupDrugSearch();
 
 });
+
+})();
