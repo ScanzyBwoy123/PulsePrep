@@ -4,600 +4,492 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PulsePrep AI Question Generator</title>
-
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /*
+      Make native select controls reliable on
+      iPhone, Android and desktop browsers.
+    */
+    select {
+      appearance: auto !important;
+      -webkit-appearance: menulist !important;
+      pointer-events: auto !important;
+      position: relative;
+      z-index: 20;
+      width: 100%;
+      min-height: 52px;
+      cursor: pointer;
+    }
+    option {
+      color: #0f172a;
+      background: #ffffff;
+    }
+    .select-wrapper {
+      position: relative;
+      z-index: 30;
+    }
+    .select-wrapper select {
+      display: block;
+    }
+  </style>
 </head>
-
 <body class="min-h-screen bg-slate-50 text-slate-900">
-
-  <!-- HEADER -->
+  <!-- =====================================================
+       HEADER
+  ====================================================== -->
   <header class="bg-slate-950 text-white shadow-lg">
     <div class="mx-auto max-w-6xl px-5 py-6">
-      <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div class="flex items-center gap-3">
-            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xl">
-              🧠
-            </div>
-
-            <div>
-              <h1 class="text-2xl font-black tracking-tight">
-                PulsePrep AI
-              </h1>
-
-              <p class="text-sm text-slate-300">
-                Question Generator
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <a
-          href="/admin-exam-vault.html"
-          class="inline-flex items-center justify-center rounded-xl bg-white/10 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/20"
-        >
-          Exam Vault →
-        </a>
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="flex items-center gap-3">
+      <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-2xl">
+        🧠
+      </div>
+      <div>
+        <h1 class="text-2xl font-black tracking-tight">
+          PulsePrep AI
+        </h1>
+        <p class="text-sm text-slate-300">
+          Nursing Question Generator
+        </p>
       </div>
     </div>
+    <a
+      href="admin-exam-vault.html"
+      class="inline-flex items-center justify-center rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/20"
+    >
+      Exam Vault →
+    </a>
+  </div>
+</div>
   </header>
-
-
-  <!-- MAIN -->
+  <!-- =====================================================
+       MAIN
+  ====================================================== -->
   <main class="mx-auto max-w-6xl px-5 py-8">
-
-    <!-- SESSION STATUS -->
+<!-- SESSION STATUS -->
+<div
+  id="sessionStatus"
+  class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+  role="status"
+  aria-live="polite"
+>
+  <div class="flex items-center gap-3">
     <div
-      id="sessionStatus"
-      class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+      class="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600"
+    ></div>
+    <span>
+      Checking administrator session...
+    </span>
+  </div>
+</div>
+<!-- =================================================
+     GENERATOR CARD
+================================================== -->
+<section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+  <!-- HEADER -->
+  <div class="bg-slate-950 px-6 py-8 text-white sm:px-8">
+    <div class="max-w-3xl">
+      <div class="mb-3 inline-flex rounded-full bg-blue-500/20 px-3 py-1 text-xs font-bold text-blue-200">
+        AI-POWERED CONTENT CREATION
+      </div>
+      <h2 class="text-2xl font-black sm:text-3xl">
+        Generate Nursing Questions
+      </h2>
+      <p class="mt-3 text-sm leading-6 text-slate-300 sm:text-base">
+        Select a nursing subject and topic, choose your difficulty
+        and number of questions, then let PulsePrep AI generate
+        structured MCQs for your Exam Vault.
+      </p>
+    </div>
+  </div>
+  <!-- FORM -->
+  <div class="p-6 sm:p-8">
+    <form id="generatorForm" class="space-y-6">
+      <!-- =================================================
+           SUBJECT + TOPIC
+      ================================================== -->
+      <div class="grid gap-6 md:grid-cols-2">
+        <!-- SUBJECT -->
+        <div class="select-wrapper">
+          <label
+            for="subject"
+            class="mb-2 block text-sm font-bold text-slate-700"
+          >
+            Subject
+            <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="subject"
+            name="subject"
+            required
+            class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          >
+            <option value="" selected disabled>
+              Select a nursing subject
+            </option>
+            <option value="Anatomy & Physiology">
+              Anatomy & Physiology
+            </option>
+            <option value="Microbiology">
+              Microbiology
+            </option>
+            <option value="First Aid & Emergency Care">
+              First Aid & Emergency Care
+            </option>
+            <option value="Fundamentals of Nursing">
+              Fundamentals of Nursing
+            </option>
+            <option value="Medical-Surgical Nursing">
+              Medical-Surgical Nursing
+            </option>
+            <option value="Pharmacology">
+              Pharmacology
+            </option>
+            <option value="Medicine / Medical Nursing">
+              Medicine / Medical Nursing
+            </option>
+            <option value="Pathophysiology">
+              Pathophysiology
+            </option>
+            <option value="Community Health Nursing">
+              Community Health Nursing
+            </option>
+            <option value="Maternal & Child Health">
+              Maternal & Child Health
+            </option>
+            <option value="Midwifery">
+              Midwifery
+            </option>
+            <option value="Paediatric Nursing">
+              Paediatric Nursing
+            </option>
+            <option value="Mental Health/Psychiatric Nursing">
+              Mental Health/Psychiatric Nursing
+            </option>
+            <option value="Nutrition & Dietetics">
+              Nutrition & Dietetics
+            </option>
+            <option value="Health Assessment">
+              Health Assessment
+            </option>
+            <option value="Nursing Ethics & Professional Practice">
+              Nursing Ethics & Professional Practice
+            </option>
+            <option value="Research Methods">
+              Research Methods
+            </option>
+            <option value="Biostatistics">
+              Biostatistics
+            </option>
+            <option value="Public Health">
+              Public Health
+            </option>
+            <option value="Health Promotion">
+              Health Promotion
+            </option>
+            <option value="Infection Prevention & Control">
+              Infection Prevention & Control
+            </option>
+          </select>
+          <p class="mt-2 text-xs text-slate-500">
+            Tap the field to choose a nursing subject.
+          </p>
+        </div>
+        <!-- TOPIC -->
+        <div class="select-wrapper">
+          <label
+            for="topic"
+            class="mb-2 block text-sm font-bold text-slate-700"
+          >
+            Topic
+            <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="topic"
+            name="topic"
+            required
+            disabled
+            class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          >
+            <option value="">
+              Select a subject first
+            </option>
+          </select>
+          <p class="mt-2 text-xs text-slate-500">
+            Topics will appear after selecting a subject.
+          </p>
+        </div>
+      </div>
+      <!-- =================================================
+           CUSTOM TOPIC
+      ================================================== -->
+      <div
+        id="customTopicContainer"
+        class="hidden rounded-2xl border border-blue-100 bg-blue-50 p-5"
+      >
+        <label
+          for="customTopic"
+          class="mb-2 block text-sm font-bold text-slate-700"
+        >
+          Custom Topic
+          <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="customTopic"
+          type="text"
+          maxlength="150"
+          autocomplete="off"
+          placeholder="Enter your own topic"
+          class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+        >
+        <p class="mt-2 text-xs text-slate-500">
+          Use this if the topic you need is not listed.
+        </p>
+      </div>
+      <!-- =================================================
+           DIFFICULTY + COUNT
+      ================================================== -->
+      <div class="grid gap-6 md:grid-cols-2">
+        <!-- DIFFICULTY -->
+        <div class="select-wrapper">
+          <label
+            for="difficulty"
+            class="mb-2 block text-sm font-bold text-slate-700"
+          >
+            Difficulty
+          </label>
+          <select
+            id="difficulty"
+            name="difficulty"
+            class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          >
+            <option value="easy">
+              Easy
+            </option>
+            <option value="medium" selected>
+              Medium
+            </option>
+            <option value="hard">
+              Hard
+            </option>
+          </select>
+        </div>
+        <!-- NUMBER -->
+        <div class="select-wrapper">
+          <label
+            for="count"
+            class="mb-2 block text-sm font-bold text-slate-700"
+          >
+            Number of Questions
+          </label>
+          <select
+            id="count"
+            name="count"
+            class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          >
+            <option value="5">
+              5 Questions
+            </option>
+            <option value="10" selected>
+              10 Questions
+            </option>
+            <option value="20">
+              20 Questions
+            </option>
+            <option value="30">
+              30 Questions
+            </option>
+            <option value="50">
+              50 Questions
+            </option>
+          </select>
+        </div>
+      </div>
+      <!-- =================================================
+           SOURCE
+      ================================================== -->
+      <div>
+        <label
+          for="source"
+          class="mb-2 block text-sm font-bold text-slate-700"
+        >
+          Source
+        </label>
+        <input
+          id="source"
+          name="source"
+          type="text"
+          maxlength="150"
+          value="PulsePrep AI"
+          autocomplete="off"
+          class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+        >
+      </div>
+      <!-- =================================================
+           SCHOOL + YEAR
+      ================================================== -->
+      <div class="grid gap-6 md:grid-cols-2">
+        <div>
+          <label
+            for="school"
+            class="mb-2 block text-sm font-bold text-slate-700"
+          >
+            School
+          </label>
+          <input
+            id="school"
+            name="school"
+            type="text"
+            maxlength="150"
+            autocomplete="off"
+            placeholder="Optional"
+            class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          >
+        </div>
+        <div>
+          <label
+            for="academicYear"
+            class="mb-2 block text-sm font-bold text-slate-700"
+          >
+            Academic Year
+          </label>
+          <input
+            id="academicYear"
+            name="academicYear"
+            type="text"
+            maxlength="20"
+            inputmode="numeric"
+            autocomplete="off"
+            placeholder="e.g. 2026"
+            class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          >
+        </div>
+      </div>
+      <!-- =================================================
+           GENERATE
+      ================================================== -->
+      <button
+        id="generateButton"
+        type="submit"
+        disabled
+        class="flex w-full items-center justify-center gap-3 rounded-xl bg-blue-600 px-5 py-4 text-base font-black text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <span id="generateButtonText">
+          Generate Questions
+        </span>
+      </button>
+    </form>
+    <!-- =================================================
+         STATUS
+    ================================================== -->
+    <div
+      id="generationStatus"
+      class="mt-6 hidden rounded-2xl border p-4"
       role="status"
       aria-live="polite"
-    >
-      <div class="flex items-center gap-3">
-        <div
-          class="h-5 w-5 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600"
-          aria-hidden="true"
-        ></div>
-
-        <span>
-          Checking administrator session...
-        </span>
+    ></div>
+    <!-- =================================================
+         RESULTS
+    ================================================== -->
+    <div
+      id="generationResults"
+      class="mt-6 hidden"
+      aria-live="polite"
+    ></div>
+  </div>
+</section>
+<!-- =====================================================
+     REVIEW INFORMATION
+====================================================== -->
+<section class="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+  <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+    <div>
+      <div class="mb-2 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-800">
+        REVIEW REQUIRED
       </div>
-    </div>
-
-
-    <!-- GENERATOR -->
-    <section class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
-
-      <!-- SECTION HEADER -->
-      <div class="border-b border-slate-200 bg-gradient-to-br from-slate-950 to-slate-800 px-6 py-7 text-white sm:px-8">
-
-        <div class="max-w-3xl">
-
-          <div class="mb-3 inline-flex items-center rounded-full bg-blue-500/20 px-3 py-1 text-xs font-bold text-blue-200">
-            AI-POWERED CONTENT CREATION
-          </div>
-
-          <h2 class="text-2xl font-black sm:text-3xl">
-            Generate Nursing Questions
-          </h2>
-
-          <p class="mt-2 text-sm leading-6 text-slate-300 sm:text-base">
-            Generate structured nursing multiple-choice questions with explanations,
-            then review and approve them before students receive access.
-          </p>
-
-        </div>
-      </div>
-
-
-      <!-- FORM -->
-      <div class="p-6 sm:p-8">
-
-        <form
-          id="generatorForm"
-          class="space-y-6"
-          novalidate
-        >
-
-          <!-- SUBJECT + TOPIC -->
-          <div class="grid gap-5 md:grid-cols-2">
-
-            <!-- SUBJECT -->
-            <div>
-
-              <label
-                for="subject"
-                class="mb-2 block text-sm font-bold text-slate-700"
-              >
-                Subject <span class="text-red-500">*</span>
-              </label>
-
-              <select
-                id="subject"
-                name="subject"
-                required
-                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              >
-
-                <option value="" selected disabled>
-                  Select a nursing subject
-                </option>
-
-                <option value="Anatomy & Physiology">
-                  Anatomy & Physiology
-                </option>
-
-                <option value="Microbiology">
-                  Microbiology
-                </option>
-
-                <option value="First Aid & Emergency Care">
-                  First Aid & Emergency Care
-                </option>
-
-                <option value="Fundamentals of Nursing">
-                  Fundamentals of Nursing
-                </option>
-
-                <option value="Medical-Surgical Nursing">
-                  Medical-Surgical Nursing
-                </option>
-
-                <option value="Pharmacology">
-                  Pharmacology
-                </option>
-<option value="Medicine / Medical Nursing">
-  Medicine / Medical Nursing
-</option>
-                <option value="Pathophysiology">
-                  Pathophysiology
-                </option>
-
-                <option value="Community Health Nursing">
-                  Community Health Nursing
-                </option>
-
-                <option value="Maternal & Child Health">
-                  Maternal & Child Health
-                </option>
-
-                <option value="Midwifery">
-                  Midwifery
-                </option>
-
-                <option value="Paediatric Nursing">
-                  Paediatric Nursing
-                </option>
-
-                <option value="Mental Health/Psychiatric Nursing">
-                  Mental Health/Psychiatric Nursing
-                </option>
-
-                <option value="Nutrition & Dietetics">
-                  Nutrition & Dietetics
-                </option>
-
-                <option value="Health Assessment">
-                  Health Assessment
-                </option>
-
-                <option value="Nursing Ethics & Professional Practice">
-                  Nursing Ethics & Professional Practice
-                </option>
-
-                <option value="Research Methods">
-                  Research Methods
-                </option>
-
-                <option value="Biostatistics">
-                  Biostatistics
-                </option>
-
-                <option value="Public Health">
-                  Public Health
-                </option>
-
-                <option value="Health Promotion">
-                  Health Promotion
-                </option>
-
-                <option value="Infection Prevention & Control">
-                  Infection Prevention & Control
-                </option>
-
-              </select>
-
-              <p class="mt-2 text-xs text-slate-500">
-                Choose a subject from the PulsePrep nursing curriculum.
-              </p>
-
-            </div>
-
-
-            <!-- TOPIC -->
-            <div>
-
-              <label
-                for="topic"
-                class="mb-2 block text-sm font-bold text-slate-700"
-              >
-                Topic
-              </label>
-
-              <select
-                id="topic"
-                name="topic"
-                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              >
-
-                <option value="" selected disabled>
-                  Select a subject first
-                </option>
-
-              </select>
-
-              <p class="mt-2 text-xs text-slate-500">
-                Topics automatically change according to the selected subject.
-              </p>
-
-            </div>
-
-          </div>
-
-
-          <!-- CUSTOM TOPIC -->
-          <div
-            id="customTopicContainer"
-            class="hidden"
-          >
-
-            <label
-              for="customTopic"
-              class="mb-2 block text-sm font-bold text-slate-700"
-            >
-              Custom Topic <span class="text-red-500">*</span>
-            </label>
-
-            <input
-              id="customTopic"
-              name="customTopic"
-              type="text"
-              maxlength="150"
-              autocomplete="off"
-              placeholder="Enter your own topic"
-              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-            >
-
-            <p class="mt-2 text-xs text-slate-500">
-              Use this when the topic you need is not listed.
-            </p>
-
-          </div>
-
-
-          <!-- DIFFICULTY + COUNT -->
-          <div class="grid gap-5 md:grid-cols-2">
-
-            <!-- DIFFICULTY -->
-            <div>
-
-              <label
-                for="difficulty"
-                class="mb-2 block text-sm font-bold text-slate-700"
-              >
-                Difficulty
-              </label>
-
-              <select
-                id="difficulty"
-                name="difficulty"
-                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              >
-
-                <option value="easy">
-                  Easy
-                </option>
-
-                <option value="medium" selected>
-                  Medium
-                </option>
-
-                <option value="hard">
-                  Hard
-                </option>
-
-              </select>
-
-            </div>
-
-
-            <!-- COUNT -->
-            <div>
-
-              <label
-                for="count"
-                class="mb-2 block text-sm font-bold text-slate-700"
-              >
-                Number of Questions
-              </label>
-
-              <select
-                id="count"
-                name="count"
-                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              >
-
-                <option value="5">
-                  5 Questions
-                </option>
-
-                <option value="10" selected>
-                  10 Questions
-                </option>
-
-                <option value="20">
-                  20 Questions
-                </option>
-
-                <option value="30">
-                  30 Questions
-                </option>
-
-                <option value="50">
-                  50 Questions
-                </option>
-
-              </select>
-
-            </div>
-
-          </div>
-
-
-          <!-- SOURCE -->
-          <div>
-
-            <label
-              for="source"
-              class="mb-2 block text-sm font-bold text-slate-700"
-            >
-              Source
-            </label>
-
-            <input
-              id="source"
-              name="source"
-              type="text"
-              maxlength="150"
-              value="PulsePrep AI"
-              autocomplete="off"
-              placeholder="e.g. PulsePrep AI"
-              class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-            >
-
-          </div>
-
-
-          <!-- SCHOOL + YEAR -->
-          <div class="grid gap-5 md:grid-cols-2">
-
-            <!-- SCHOOL -->
-            <div>
-
-              <label
-                for="school"
-                class="mb-2 block text-sm font-bold text-slate-700"
-              >
-                School
-              </label>
-
-              <input
-                id="school"
-                name="school"
-                type="text"
-                maxlength="150"
-                autocomplete="off"
-                placeholder="Optional"
-                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              >
-
-            </div>
-
-
-            <!-- ACADEMIC YEAR -->
-            <div>
-
-              <label
-                for="academicYear"
-                class="mb-2 block text-sm font-bold text-slate-700"
-              >
-                Academic Year
-              </label>
-
-              <input
-                id="academicYear"
-                name="academicYear"
-                type="text"
-                maxlength="20"
-                inputmode="numeric"
-                autocomplete="off"
-                placeholder="e.g. 2026"
-                class="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
-              >
-
-            </div>
-
-          </div>
-
-
-          <!-- GENERATE BUTTON -->
-          <button
-            id="generateButton"
-            type="submit"
-            disabled
-            class="flex w-full items-center justify-center gap-3 rounded-xl bg-blue-600 px-5 py-4 text-base font-black text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-
-            <span id="generateButtonText">
-              Generate Questions
-            </span>
-
-          </button>
-
-        </form>
-
-
-        <!-- STATUS -->
-        <div
-          id="generationStatus"
-          class="mt-6 hidden rounded-2xl border p-4"
-          role="status"
-          aria-live="polite"
-        ></div>
-
-
-        <!-- RESULTS -->
-        <div
-          id="generationResults"
-          class="mt-6 hidden"
-          aria-live="polite"
-        ></div>
-
-      </div>
-
-    </section>
-
-
-    <!-- NEXT STEP -->
-    <section class="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-
-      <div class="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-
-        <div>
-
-          <div class="mb-2 inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-black text-amber-800">
-            REVIEW REQUIRED
-          </div>
-
-          <h2 class="text-xl font-black text-slate-900">
-            Generated questions stay pending
-          </h2>
-
-          <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-            AI-generated questions are not immediately shown to students.
-            Review them in the Exam Vault and approve only the questions
-            you want to publish.
-          </p>
-
-        </div>
-
-        <a
-          href="/admin-exam-vault.html"
-          class="inline-flex shrink-0 items-center justify-center rounded-xl bg-slate-900 px-5 py-3 font-bold text-white transition hover:bg-slate-800"
-        >
-          Open Exam Vault →
-        </a>
-
-      </div>
-
-    </section>
-
-
-    <!-- HOW IT WORKS -->
-    <section class="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-
       <h2 class="text-xl font-black text-slate-900">
-        How PulsePrep AI Question Generation Works
+        Generated questions stay pending
       </h2>
-
-      <div class="mt-6 grid gap-4 md:grid-cols-3">
-
-        <div class="rounded-2xl bg-slate-50 p-5">
-
-          <div class="text-2xl">
-            1️⃣
-          </div>
-
-          <h3 class="mt-3 font-black">
-            Choose the content
-          </h3>
-
-          <p class="mt-2 text-sm leading-6 text-slate-500">
-            Select the nursing subject, topic, difficulty and number of questions.
-          </p>
-
-        </div>
-
-
-        <div class="rounded-2xl bg-slate-50 p-5">
-
-          <div class="text-2xl">
-            2️⃣
-          </div>
-
-          <h3 class="mt-3 font-black">
-            AI generates
-          </h3>
-
-          <p class="mt-2 text-sm leading-6 text-slate-500">
-            PulsePrep AI creates structured MCQs with four options,
-            one correct answer and an explanation.
-          </p>
-
-        </div>
-
-
-        <div class="rounded-2xl bg-slate-50 p-5">
-
-          <div class="text-2xl">
-            3️⃣
-          </div>
-
-          <h3 class="mt-3 font-black">
-            Review & publish
-          </h3>
-
-          <p class="mt-2 text-sm leading-6 text-slate-500">
-            Questions are stored as pending until an administrator reviews
-            and approves them.
-          </p>
-
-        </div>
-
-      </div>
-
-    </section>
-
+      <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+        AI-generated questions are saved as pending.
+        Review them in the Exam Vault before publishing them
+        to PulsePrep students.
+      </p>
+    </div>
+    <a
+      href="admin-exam-vault.html"
+      class="inline-flex shrink-0 items-center justify-center rounded-xl bg-slate-900 px-5 py-3 font-bold text-white transition hover:bg-slate-800"
+    >
+      Open Exam Vault →
+    </a>
+  </div>
+</section>
+<!-- =====================================================
+     HOW IT WORKS
+====================================================== -->
+<section class="mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+  <h2 class="text-xl font-black text-slate-900">
+    How PulsePrep AI Works
+  </h2>
+  <div class="mt-6 grid gap-4 md:grid-cols-3">
+    <div class="rounded-2xl bg-slate-50 p-5">
+      <div class="text-2xl">1️⃣</div>
+      <h3 class="mt-3 font-black">
+        Choose content
+      </h3>
+      <p class="mt-2 text-sm leading-6 text-slate-500">
+        Select a nursing subject and topic.
+      </p>
+    </div>
+    <div class="rounded-2xl bg-slate-50 p-5">
+      <div class="text-2xl">2️⃣</div>
+      <h3 class="mt-3 font-black">
+        Generate
+      </h3>
+      <p class="mt-2 text-sm leading-6 text-slate-500">
+        PulsePrep AI creates nursing MCQs with options,
+        correct answers and explanations.
+      </p>
+    </div>
+    <div class="rounded-2xl bg-slate-50 p-5">
+      <div class="text-2xl">3️⃣</div>
+      <h3 class="mt-3 font-black">
+        Review & publish
+      </h3>
+      <p class="mt-2 text-sm leading-6 text-slate-500">
+        Review generated questions in the Exam Vault
+        before students can access them.
+      </p>
+    </div>
+  </div>
+</section>
   </main>
-
-
+  <!-- =====================================================
+       JAVASCRIPT
+  ====================================================== -->
   <script>
-
-    /* =========================================================
-       PULSEPReP SUPABASE CONFIGURATION
-       ========================================================= */
-
+    /* =====================================================
+       SUPABASE
+    ====================================================== */
     const SUPABASE_URL =
       "https://eskwphjtiogguhvtktmh.supabase.co";
-
     const SUPABASE_PUBLISHABLE_KEY =
       "sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs";
-
     const supabaseClient =
       window.supabase.createClient(
         SUPABASE_URL,
         SUPABASE_PUBLISHABLE_KEY
       );
-
-
-    /* =========================================================
-       SUBJECT → TOPIC DATABASE
-       ========================================================= */
-
+    /* =====================================================
+       AI EDGE FUNCTION
+    ====================================================== */
+    const AI_GENERATOR_URL =
+      `${SUPABASE_URL}/functions/v1/generate-ai-questions`;
+    /* =====================================================
+       SUBJECT → TOPICS
+    ====================================================== */
     const PULSEPREP_TOPICS = {
-
       "Anatomy & Physiology": [
         "Anatomical Terminology",
         "Cells and Tissues",
@@ -615,7 +507,6 @@
         "Special Senses",
         "Homeostasis"
       ],
-
       "Microbiology": [
         "Introduction to Microbiology",
         "Bacteria",
@@ -632,7 +523,6 @@
         "Specimen Collection",
         "Immunity"
       ],
-
       "First Aid & Emergency Care": [
         "Principles of First Aid",
         "Basic Life Support",
@@ -649,7 +539,6 @@
         "Emergency Triage",
         "Wounds and Injuries"
       ],
-
       "Fundamentals of Nursing": [
         "Nursing Process",
         "Patient Safety",
@@ -669,26 +558,6 @@
         "Infection Prevention",
         "Admission and Discharge"
       ],
-      "Medicine / Medical Nursing": [
-  "Introduction to Medicine",
-  "History of Medicine",
-  "Signs and Symptoms of Disease",
-  "Medical Diagnosis",
-  "Cardiovascular Disorders",
-  "Respiratory Disorders",
-  "Gastrointestinal Disorders",
-  "Renal Disorders",
-  "Neurological Disorders",
-  "Endocrine Disorders",
-  "Infectious Diseases",
-  "Hematological Disorders",
-  "Musculoskeletal Disorders",
-  "Fluid and Electrolyte Disorders",
-  "Medical Emergencies",
-  "Patient Assessment",
-  "Medical Treatment and Management"
-],
-
       "Medical-Surgical Nursing": [
         "Cardiovascular Disorders",
         "Respiratory Disorders",
@@ -705,7 +574,6 @@
         "Shock",
         "Pain Management"
       ],
-
       "Pharmacology": [
         "Introduction to Pharmacology",
         "Pharmacokinetics",
@@ -728,7 +596,25 @@
         "CNS Drugs",
         "Drug Safety"
       ],
-
+      "Medicine / Medical Nursing": [
+        "Introduction to Medicine",
+        "History of Medicine",
+        "Signs and Symptoms of Disease",
+        "Medical Diagnosis",
+        "Cardiovascular Disorders",
+        "Respiratory Disorders",
+        "Gastrointestinal Disorders",
+        "Renal Disorders",
+        "Neurological Disorders",
+        "Endocrine Disorders",
+        "Infectious Diseases",
+        "Hematological Disorders",
+        "Musculoskeletal Disorders",
+        "Fluid and Electrolyte Disorders",
+        "Medical Emergencies",
+        "Patient Assessment",
+        "Medical Treatment and Management"
+      ],
       "Pathophysiology": [
         "Cellular Injury",
         "Inflammation",
@@ -746,7 +632,6 @@
         "Neurological Disorders",
         "Musculoskeletal Disorders"
       ],
-
       "Community Health Nursing": [
         "Community Assessment",
         "Primary Health Care",
@@ -763,7 +648,6 @@
         "Epidemiology",
         "Community Health Programs"
       ],
-
       "Maternal & Child Health": [
         "Antenatal Care",
         "Pregnancy",
@@ -779,7 +663,6 @@
         "Neonatal Complications",
         "High-Risk Pregnancy"
       ],
-
       "Midwifery": [
         "Reproductive Anatomy",
         "Physiology of Pregnancy",
@@ -796,7 +679,6 @@
         "Pre-eclampsia and Eclampsia",
         "Family Planning"
       ],
-
       "Paediatric Nursing": [
         "Growth and Development",
         "Pediatric Assessment",
@@ -811,7 +693,6 @@
         "Congenital Disorders",
         "Pediatric Medication Administration"
       ],
-
       "Mental Health/Psychiatric Nursing": [
         "Introduction to Mental Health",
         "Mental Health Assessment",
@@ -827,7 +708,6 @@
         "Psychiatric Medications",
         "Community Mental Health"
       ],
-
       "Nutrition & Dietetics": [
         "Basic Nutrition",
         "Macronutrients",
@@ -844,7 +724,6 @@
         "Parenteral Nutrition",
         "Nutrition Assessment"
       ],
-
       "Health Assessment": [
         "Health History",
         "General Survey",
@@ -860,7 +739,6 @@
         "Musculoskeletal Assessment",
         "Mental Status Examination"
       ],
-
       "Nursing Ethics & Professional Practice": [
         "Nursing Ethics",
         "Ethical Principles",
@@ -876,7 +754,6 @@
         "Documentation",
         "Professional Boundaries"
       ],
-
       "Research Methods": [
         "Introduction to Research",
         "Research Problem",
@@ -892,7 +769,6 @@
         "Data Analysis",
         "Validity and Reliability"
       ],
-
       "Biostatistics": [
         "Introduction to Biostatistics",
         "Types of Data",
@@ -909,7 +785,6 @@
         "Correlation",
         "Hypothesis Testing"
       ],
-
       "Public Health": [
         "Introduction to Public Health",
         "Population Health",
@@ -924,7 +799,6 @@
         "Maternal and Child Health",
         "Public Health Surveillance"
       ],
-
       "Health Promotion": [
         "Principles of Health Promotion",
         "Health Education",
@@ -937,7 +811,6 @@
         "Patient Education",
         "Health Promotion Models"
       ],
-
       "Infection Prevention & Control": [
         "Chain of Infection",
         "Standard Precautions",
@@ -953,584 +826,369 @@
         "Environmental Cleaning",
         "Antimicrobial Resistance"
       ]
-
     };
-
-
-    /* =========================================================
-       DOM ELEMENTS
-       ========================================================= */
-
-    const sessionStatus =
-      document.getElementById("sessionStatus");
-
-    const generatorForm =
-      document.getElementById("generatorForm");
-
-    const generateButton =
-      document.getElementById("generateButton");
-
-    const generateButtonText =
-      document.getElementById("generateButtonText");
-
-    const generationStatus =
-      document.getElementById("generationStatus");
-
-    const generationResults =
-      document.getElementById("generationResults");
-
+    /* =====================================================
+       DOM
+    ====================================================== */
     const subjectSelect =
       document.getElementById("subject");
-
     const topicSelect =
       document.getElementById("topic");
-
     const customTopicContainer =
       document.getElementById("customTopicContainer");
-
     const customTopicInput =
       document.getElementById("customTopic");
-
-
-    /* =========================================================
-       SAFE TEXT HELPER
-       ========================================================= */
-
-    function safeText(
-      value,
-      fallback = ""
-    ) {
+    const generatorForm =
+      document.getElementById("generatorForm");
+    const generateButton =
+      document.getElementById("generateButton");
+    const generateButtonText =
+      document.getElementById("generateButtonText");
+    const sessionStatus =
+      document.getElementById("sessionStatus");
+    const generationStatus =
+      document.getElementById("generationStatus");
+    const generationResults =
+      document.getElementById("generationResults");
+    /* =====================================================
+       SAFE TEXT
+    ====================================================== */
+    function safeText(value, fallback = "") {
       if (
         value === null ||
         value === undefined
       ) {
         return fallback;
       }
-
       return String(value);
     }
-
-
-    /* =========================================================
-       POPULATE TOPICS
-       ========================================================= */
-
-    function populateTopicOptions(
-      subject
-    ) {
-
-      topicSelect.replaceChildren();
-
-      const placeholder =
-        document.createElement("option");
-
-      placeholder.value = "";
-
-      placeholder.textContent =
-        subject
-          ? "Select a topic"
-          : "Select a subject first";
-
-      placeholder.disabled = true;
-      placeholder.selected = true;
-
-      topicSelect.appendChild(
-        placeholder
-      );
-
-
-      const topics =
-        PULSEPREP_TOPICS[subject] || [];
-
-
-      topics.forEach(topic => {
-
-        const option =
-          document.createElement("option");
-
-        option.value = topic;
-        option.textContent = topic;
-
-        topicSelect.appendChild(
-          option
-        );
-
-      });
-
-
-      if (subject) {
-
-        const customOption =
-          document.createElement("option");
-
-        customOption.value =
-          "Other / Custom Topic";
-
-        customOption.textContent =
-          "Other / Custom Topic";
-
-        topicSelect.appendChild(
-          customOption
-        );
-
-      }
-
-    }
-
-
-    /* =========================================================
-       HANDLE SUBJECT CHANGE
-       ========================================================= */
-
-    subjectSelect.addEventListener(
-      "change",
-      event => {
-
-        const selectedSubject =
-          event.target.value;
-
-        populateTopicOptions(
-          selectedSubject
-        );
-
-        customTopicContainer.classList.add(
-          "hidden"
-        );
-
-        customTopicInput.value = "";
-
-      }
-    );
-
-
-    /* =========================================================
-       HANDLE TOPIC CHANGE
-       ========================================================= */
-
-    topicSelect.addEventListener(
-      "change",
-      event => {
-
-        if (
-          event.target.value ===
-          "Other / Custom Topic"
-        ) {
-
-          customTopicContainer.classList.remove(
-            "hidden"
-          );
-
-          customTopicInput.focus();
-
-        } else {
-
-          customTopicContainer.classList.add(
-            "hidden"
-          );
-
-          customTopicInput.value = "";
-
-        }
-
-      }
-    );
-
-
-    /* =========================================================
-       INITIAL TOPIC STATE
-       ========================================================= */
-
-    populateTopicOptions("");
-
-
-    /* =========================================================
-       STATUS DISPLAY
-       ========================================================= */
-
+    /* =====================================================
+       STATUS
+    ====================================================== */
     function showStatus(
       message,
       type = "info"
     ) {
-
-      generationStatus.classList.remove(
-        "hidden",
-        "border-green-200",
-        "bg-green-50",
-        "text-green-800",
-        "border-red-200",
-        "bg-red-50",
-        "text-red-800",
-        "border-blue-200",
-        "bg-blue-50",
-        "text-blue-800"
-      );
-
-
+      generationStatus.className =
+        "mt-6 rounded-2xl border p-4";
       if (type === "success") {
-
         generationStatus.classList.add(
           "border-green-200",
           "bg-green-50",
           "text-green-800"
         );
-
       } else if (type === "error") {
-
         generationStatus.classList.add(
           "border-red-200",
           "bg-red-50",
           "text-red-800"
         );
-
       } else {
-
         generationStatus.classList.add(
           "border-blue-200",
           "bg-blue-50",
           "text-blue-800"
         );
-
       }
-
-
       generationStatus.textContent =
         safeText(message);
-
     }
-
-
-    /* =========================================================
-       RESET RESULTS
-       ========================================================= */
-
+    /* =====================================================
+       POPULATE TOPICS
+    ====================================================== */
+    function populateTopics(subject) {
+      topicSelect.innerHTML = "";
+      const firstOption =
+        document.createElement("option");
+      firstOption.value = "";
+      firstOption.textContent =
+        subject
+          ? "Select a topic"
+          : "Select a subject first";
+      firstOption.disabled = true;
+      firstOption.selected = true;
+      topicSelect.appendChild(
+        firstOption
+      );
+      if (!subject) {
+        topicSelect.disabled = true;
+        customTopicContainer.classList.add(
+          "hidden"
+        );
+        customTopicInput.value = "";
+        return;
+      }
+      topicSelect.disabled = false;
+      const topics =
+        PULSEPREP_TOPICS[subject] || [];
+      topics.forEach(topic => {
+        const option =
+          document.createElement("option");
+        option.value = topic;
+        option.textContent = topic;
+        topicSelect.appendChild(
+          option
+        );
+      });
+      const customOption =
+        document.createElement("option");
+      customOption.value =
+        "Other / Custom Topic";
+      customOption.textContent =
+        "Other / Custom Topic";
+      topicSelect.appendChild(
+        customOption
+      );
+    }
+    /* =====================================================
+       SUBJECT CHANGE
+    ====================================================== */
+    subjectSelect.addEventListener(
+      "change",
+      function () {
+        const subject =
+          this.value;
+        populateTopics(subject);
+        customTopicContainer.classList.add(
+          "hidden"
+        );
+        customTopicInput.value = "";
+      }
+    );
+    /* =====================================================
+       TOPIC CHANGE
+    ====================================================== */
+    topicSelect.addEventListener(
+      "change",
+      function () {
+        if (
+          this.value ===
+          "Other / Custom Topic"
+        ) {
+          customTopicContainer.classList.remove(
+            "hidden"
+          );
+          customTopicInput.focus();
+        } else {
+          customTopicContainer.classList.add(
+            "hidden"
+          );
+          customTopicInput.value = "";
+        }
+      }
+    );
+    /* =====================================================
+       INITIAL TOPIC STATE
+    ====================================================== */
+    populateTopics("");
+    /* =====================================================
+       CLEAR RESULTS
+    ====================================================== */
     function clearResults() {
-
-      generationResults.replaceChildren();
-
+      generationResults.innerHTML = "";
       generationResults.classList.add(
         "hidden"
       );
-
     }
-
-
-    /* =========================================================
-       CHECK ADMIN SESSION
-       ========================================================= */
-
-    async function checkSession() {
-
+    /* =====================================================
+       ADMIN SESSION
+    ====================================================== */
+    async function checkAdminSession() {
       try {
-
         const {
           data,
           error
         } =
           await supabaseClient.auth.getSession();
-
-
         if (error) {
           throw error;
         }
-
-
         const session =
           data?.session;
-
-
         if (
           !session ||
-          !session.user ||
-          !session.user.email
+          !session.user
         ) {
-
           sessionStatus.className =
             "mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800 shadow-sm";
-
           sessionStatus.textContent =
             "You are not logged in. Please log in with your PulsePrep administrator account.";
-
           generateButton.disabled =
             true;
-
           return null;
-
         }
-
-
         sessionStatus.className =
           "mb-6 rounded-2xl border border-green-200 bg-green-50 p-5 text-green-800 shadow-sm";
-
         sessionStatus.textContent =
           `Administrator session detected: ${session.user.email}`;
-
-
         generateButton.disabled =
           false;
-
-
         return session;
-
       } catch (error) {
-
         console.error(
-          "PulsePrep session check failed:",
+          "PulsePrep session error:",
           error
         );
-
-
         sessionStatus.className =
           "mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800 shadow-sm";
-
         sessionStatus.textContent =
-          "Unable to verify your PulsePrep session. Please refresh and try again.";
-
-
+          "Unable to verify your administrator session.";
         generateButton.disabled =
           true;
-
-
         return null;
-
       }
-
     }
-
-
-    /* =========================================================
-       AUTH STATE LISTENER
-       ========================================================= */
-
+    /* =====================================================
+       AUTH LISTENER
+    ====================================================== */
     supabaseClient.auth.onAuthStateChange(
-      () => {
-        checkSession();
+      function () {
+        checkAdminSession();
       }
     );
-
-
-    /* =========================================================
+    /* =====================================================
        FORM SUBMISSION
-       ========================================================= */
-
+    ====================================================== */
     generatorForm.addEventListener(
       "submit",
-      async event => {
-
+      async function (event) {
         event.preventDefault();
-
-
         clearResults();
-
-
         const session =
-          await checkSession();
-
-
+          await checkAdminSession();
         if (!session) {
-
           showStatus(
             "Please log in with your administrator account first.",
             "error"
           );
-
           return;
-
         }
-
-
+        /* -----------------------------------------------
+           VALUES
+        ------------------------------------------------ */
         const subject =
-          document
-            .getElementById("subject")
-            .value
-            .trim();
-
-
+          subjectSelect.value.trim();
         let topic =
-          document
-            .getElementById("topic")
-            .value
-            .trim();
-
-
+          topicSelect.value.trim();
         const difficulty =
           document
             .getElementById("difficulty")
             .value;
-
-
         const count =
           Number(
             document
               .getElementById("count")
               .value
           );
-
-
         const source =
           document
             .getElementById("source")
             .value
             .trim();
-
-
         const school =
           document
             .getElementById("school")
             .value
             .trim();
-
-
         const academicYear =
           document
             .getElementById("academicYear")
             .value
             .trim();
-
-
-        /* ---------------------------------------------------
+        /* -----------------------------------------------
            VALIDATE SUBJECT
-           --------------------------------------------------- */
-
+        ------------------------------------------------ */
         if (!subject) {
-
           showStatus(
-            "Please select a subject.",
+            "Please select a nursing subject.",
             "error"
           );
-
           subjectSelect.focus();
-
           return;
-
         }
-
-
-        /* ---------------------------------------------------
+        /* -----------------------------------------------
            VALIDATE TOPIC
-           --------------------------------------------------- */
-
+        ------------------------------------------------ */
         if (
           topic ===
           "Other / Custom Topic"
         ) {
-
           topic =
             customTopicInput.value.trim();
-
-
           if (!topic) {
-
             showStatus(
               "Please enter your custom topic.",
               "error"
             );
-
             customTopicInput.focus();
-
             return;
-
           }
-
         } else if (!topic) {
-
           showStatus(
             "Please select a topic.",
             "error"
           );
-
           topicSelect.focus();
-
           return;
-
         }
-
-
-        /* ---------------------------------------------------
+        /* -----------------------------------------------
            VALIDATE COUNT
-           --------------------------------------------------- */
-
+        ------------------------------------------------ */
         if (
           !Number.isInteger(count) ||
           count < 5 ||
           count > 50
         ) {
-
           showStatus(
-            "Please select a valid number of questions.",
+            "Please select between 5 and 50 questions.",
             "error"
           );
-
           return;
-
         }
-
-
-        /* ---------------------------------------------------
+        /* -----------------------------------------------
            LOCK BUTTON
-           --------------------------------------------------- */
-
+        ------------------------------------------------ */
         generateButton.disabled =
           true;
-
         generateButtonText.textContent =
           "Generating Questions...";
-
-
         showStatus(
-          "PulsePrep AI is generating your questions. This may take a moment...",
+          "PulsePrep AI is generating your nursing questions...",
           "info"
         );
-
-
         try {
-
-          /* ---------------------------------------------------
-             GET FRESH ACCESS TOKEN
-             --------------------------------------------------- */
-
+          /* ---------------------------------------------
+             GET ACCESS TOKEN
+          ---------------------------------------------- */
           const {
             data: sessionData,
             error: sessionError
           } =
             await supabaseClient.auth.getSession();
-
-
           if (sessionError) {
             throw sessionError;
           }
-
-
           const accessToken =
             sessionData?.session?.access_token;
-
-
           if (!accessToken) {
-
             throw new Error(
               "Your login session has expired. Please log in again."
             );
-
           }
-
-
-          /* ---------------------------------------------------
-             CALL NETLIFY FUNCTION
-             --------------------------------------------------- */
-
+          /* ---------------------------------------------
+             CALL SUPABASE EDGE FUNCTION
+          ---------------------------------------------- */
           const response =
-  await fetch(
-    "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/generate-ai-questions",
-    {
+            await fetch(
+              AI_GENERATOR_URL,
+              {
                 method: "POST",
-
                 headers: {
                   "Content-Type":
                     "application/json",
-
                   "Authorization":
                     `Bearer ${accessToken}`
                 },
-
                 body: JSON.stringify({
                   subject,
                   topic,
@@ -1543,212 +1201,91 @@
                 })
               }
             );
-
-
+          /* ---------------------------------------------
+             READ RESPONSE
+          ---------------------------------------------- */
           let data = {};
-
           try {
-
             data =
               await response.json();
-
           } catch {
-
             data = {};
-
           }
-
-
           if (
             !response.ok ||
             !data.success
           ) {
-
-            const errorMessage =
+            throw new Error(
               safeText(
                 data.error ||
                 data.details ||
                 `Request failed with status ${response.status}.`,
                 "Unable to generate questions."
-              );
-
-
-            throw new Error(
-              errorMessage
+              )
             );
-
           }
-
-
-          /* ---------------------------------------------------
+          /* ---------------------------------------------
              SUCCESS
-             --------------------------------------------------- */
-
+          ---------------------------------------------- */
           const generatedCount =
-            Number.isFinite(
-              Number(data.generated)
-            )
-              ? Number(data.generated)
-              : 0;
-
-
+            Number(data.generated) || 0;
           showStatus(
             `Successfully generated ${generatedCount} question(s). They were saved as pending for review.`,
             "success"
           );
-
-
-          /* ---------------------------------------------------
-             SAFE RESULT RENDERING
-             --------------------------------------------------- */
-
-          generationResults.replaceChildren();
-
-
-          const resultCard =
-            document.createElement("div");
-
-          resultCard.className =
-            "rounded-2xl border border-green-200 bg-green-50 p-6";
-
-
-          const resultBadge =
-            document.createElement("div");
-
-          resultBadge.className =
-            "mb-3 inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-black text-green-800";
-
-          resultBadge.textContent =
-            "GENERATION COMPLETE";
-
-
-          const resultTitle =
-            document.createElement("h3");
-
-          resultTitle.className =
-            "text-xl font-black text-green-900";
-
-          resultTitle.textContent =
-            "Questions are ready for review";
-
-
-          const resultMessage =
-            document.createElement("p");
-
-          resultMessage.className =
-            "mt-2 leading-6 text-green-800";
-
-
-          resultMessage.appendChild(
-            document.createTextNode(
-              `${generatedCount} question(s) were generated and saved as `
-            )
-          );
-
-
-          const pendingLabel =
-            document.createElement("strong");
-
-          pendingLabel.textContent =
-            "pending";
-
-
-          resultMessage.appendChild(
-            pendingLabel
-          );
-
-
-          resultMessage.appendChild(
-            document.createTextNode(
-              ". They will not appear to students until approved."
-            )
-          );
-
-
-          const reviewLink =
-            document.createElement("a");
-
-          reviewLink.href =
-            "/admin-exam-vault.html";
-
-          reviewLink.className =
-            "mt-5 inline-flex items-center justify-center rounded-xl bg-green-700 px-5 py-3 font-bold text-white transition hover:bg-green-800";
-
-          reviewLink.textContent =
-            "Review Questions in Exam Vault →";
-
-
-          resultCard.appendChild(
-            resultBadge
-          );
-
-          resultCard.appendChild(
-            resultTitle
-          );
-
-          resultCard.appendChild(
-            resultMessage
-          );
-
-          resultCard.appendChild(
-            reviewLink
-          );
-
-
-          generationResults.appendChild(
-            resultCard
-          );
-
-
+          /* ---------------------------------------------
+             RESULT CARD
+          ---------------------------------------------- */
+          generationResults.innerHTML = `
+            <div class="rounded-2xl border border-green-200 bg-green-50 p-6">
+              <div class="mb-3 inline-flex rounded-full bg-green-100 px-3 py-1 text-xs font-black text-green-800">
+                GENERATION COMPLETE
+              </div>
+              <h3 class="text-xl font-black text-green-900">
+                Questions are ready for review
+              </h3>
+              <p class="mt-2 leading-6 text-green-800">
+                ${generatedCount} question(s) were generated
+                successfully and saved as
+                <strong>pending</strong>.
+              </p>
+              <a
+                href="admin-exam-vault.html"
+                class="mt-5 inline-flex items-center justify-center rounded-xl bg-green-700 px-5 py-3 font-bold text-white transition hover:bg-green-800"
+              >
+                Review Questions in Exam Vault →
+              </a>
+            </div>
+          `;
           generationResults.classList.remove(
             "hidden"
           );
-
-
-          /* ---------------------------------------------------
+          /* ---------------------------------------------
              RESET FORM
-             --------------------------------------------------- */
-
+          ---------------------------------------------- */
           generatorForm.reset();
-
-
           document
             .getElementById("difficulty")
             .value =
             "medium";
-
-
           document
             .getElementById("count")
             .value =
             "10";
-
-
           document
             .getElementById("source")
             .value =
             "PulsePrep AI";
-
-
-          populateTopicOptions("");
-
-
+          populateTopics("");
           customTopicContainer.classList.add(
             "hidden"
           );
-
-
           customTopicInput.value = "";
-
-
         } catch (error) {
-
           console.error(
-            "PulsePrep AI question generation error:",
+            "PulsePrep AI generator error:",
             error
           );
-
-
           showStatus(
             safeText(
               error?.message,
@@ -1756,29 +1293,18 @@
             ),
             "error"
           );
-
-
         } finally {
-
           generateButton.disabled =
             false;
-
           generateButtonText.textContent =
             "Generate Questions";
-
         }
-
       }
     );
-
-
-    /* =========================================================
-       INITIALIZE
-       ========================================================= */
-
-    checkSession();
-
+    /* =====================================================
+       START
+    ====================================================== */
+    checkAdminSession();
   </script>
-
 </body>
 </html>
