@@ -2545,9 +2545,8 @@ let examModeType = "";
 
 async function getExamQuestions(amount) {
 
-  const response = await fetch(
-    "/.netlify/functions/get-questions"
-  );
+  const response = await fetch( "/.netlify/functions/get-questions"
+                              );
 
   const data = await response.json();
 
@@ -4283,7 +4282,7 @@ document.addEventListener(
     try {
 
       const response = await fetch(
-        `/.netlify/functions/verify-payment?reference=${encodeURIComponent(reference)}`
+        `https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/verify-payment?reference=${encodeURIComponent(reference)}`
       );
 
       const data =
