@@ -936,608 +936,868 @@
       ]
 
     };
+   <script>
+/* =========================================================
+   DOM ELEMENTS
+   ========================================================= */
 
-    /* =========================================================
-       DOM ELEMENTS
-       ========================================================= */
+const sessionStatus =
+  document.getElementById("sessionStatus");
 
-    const sessionStatus =
-      document.getElementById("sessionStatus");
+const generatorForm =
+  document.getElementById("generatorForm");
 
-    const generatorForm =
-      document.getElementById("generatorForm");
+const generateButton =
+  document.getElementById("generateButton");
 
-    const generateButton =
-      document.getElementById("generateButton");
+const generateButtonText =
+  document.getElementById("generateButtonText");
 
-    const generateButtonText =
-      document.getElementById("generateButtonText");
+const generationStatus =
+  document.getElementById("generationStatus");
 
-    const generationStatus =
-      document.getElementById("generationStatus");
+const generationResults =
+  document.getElementById("generationResults");
 
-    const generationResults =
-      document.getElementById("generationResults");
+const subjectSelect =
+  document.getElementById("subject");
 
-    const subjectSelect =
-      document.getElementById("subject");
+const topicSelect =
+  document.getElementById("topic");
 
-    const topicSelect =
-      document.getElementById("topic");
+const customTopicContainer =
+  document.getElementById("customTopicContainer");
 
-    const customTopicContainer =
-      document.getElementById("customTopicContainer");
+const customTopicInput =
+  document.getElementById("customTopic");
 
-    const customTopicInput =
-      document.getElementById("customTopic");
 
-    /* =========================================================
-       SAFE TEXT HELPER
-       ========================================================= */
+/* =========================================================
+   SUPABASE EDGE FUNCTION
+   ========================================================= */
 
-    function safeText(
-      value,
-      fallback = ""
-    ) {
-      if (
-        value === null ||
-        value === undefined
-      ) {
-        return fallback;
-      }
+const AI_GENERATOR_URL =
+  "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/generate-ai-questions";
 
-      return String(value);
+
+/* =========================================================
+   SAFE TEXT HELPER
+   ========================================================= */
+
+function safeText(
+  value,
+  fallback = ""
+) {
+
+  if (
+    value === null ||
+    value === undefined
+  ) {
+    return fallback;
+  }
+
+  return String(value);
+}
+
+
+/* =========================================================
+   POPULATE TOPICS
+   INDEPENDENT OF SUPABASE
+   ========================================================= */
+
+function populateTopicOptions(subject) {
+
+  if (!topicSelect) {
+    console.error(
+      "PulsePrep: Topic dropdown was not found."
+    );
+    return;
+  }
+
+  topicSelect.replaceChildren();
+
+  const placeholder =
+    document.createElement("option");
+
+  placeholder.value = "";
+
+  placeholder.textContent =
+    subject
+      ? "Select a topic"
+      : "Select a subject first";
+
+  placeholder.disabled = true;
+  placeholder.selected = true;
+
+  topicSelect.appendChild(
+    placeholder
+  );
+
+
+  /* -------------------------------------------------------
+     NO SUBJECT SELECTED
+     ------------------------------------------------------- */
+
+  if (!subject) {
+
+    if (customTopicContainer) {
+      customTopicContainer.classList.add(
+        "hidden"
+      );
     }
 
-    /* =========================================================
-       POPULATE TOPICS
-       ========================================================= */
+    if (customTopicInput) {
+      customTopicInput.value = "";
+    }
 
-    function populateTopicOptions(
-      subject
-    ) {
+    return;
+  }
 
-      topicSelect.replaceChildren();
 
-      const placeholder =
-        document.createElement("option");
+  /* -------------------------------------------------------
+     GET TOPICS FROM LOCAL DATABASE
+     ------------------------------------------------------- */
 
-      placeholder.value = "";
+  const topics =
+    Array.isArray(PULSEPREP_TOPICS[subject])
+      ? PULSEPREP_TOPICS[subject]
+      : [];
 
-      placeholder.textContent =
-        subject
-          ? "Select a topic"
-          : "Select a subject first";
 
-      placeholder.disabled = true;
-      placeholder.selected = true;
+  console.log(
+    "PulsePrep subject:",
+    subject
+  );
 
-      topicSelect.appendChild(
-        placeholder
+  console.log(
+    "PulsePrep topics:",
+    topics
+  );
+
+
+  /* -------------------------------------------------------
+     ADD TOPICS
+     ------------------------------------------------------- */
+
+  topics.forEach(function(topic) {
+
+    const option =
+      document.createElement("option");
+
+    option.value = topic;
+
+    option.textContent = topic;
+
+    topicSelect.appendChild(
+      option
+    );
+
+  });
+
+
+  /* -------------------------------------------------------
+     ADD CUSTOM TOPIC OPTION
+     ------------------------------------------------------- */
+
+  const customOption =
+    document.createElement("option");
+
+  customOption.value =
+    "Other / Custom Topic";
+
+  customOption.textContent =
+    "Other / Custom Topic";
+
+  topicSelect.appendChild(
+    customOption
+  );
+
+
+  console.log(
+    "PulsePrep: Topics loaded successfully."
+  );
+}
+
+
+/* =========================================================
+   SUBJECT CHANGE
+   ========================================================= */
+
+if (subjectSelect) {
+
+  subjectSelect.addEventListener(
+    "change",
+    function() {
+
+      const selectedSubject =
+        subjectSelect.value.trim();
+
+      console.log(
+        "Subject changed:",
+        selectedSubject
       );
 
-      const topics =
-        PULSEPREP_TOPICS[subject] || [];
+      populateTopicOptions(
+        selectedSubject
+      );
 
-      topics.forEach(topic => {
-
-        const option =
-          document.createElement("option");
-
-        option.value = topic;
-        option.textContent = topic;
-
-        topicSelect.appendChild(
-          option
-        );
-
-      });
-
-      if (subject) {
-
-        const customOption =
-          document.createElement("option");
-
-        customOption.value =
-          "Other / Custom Topic";
-
-        customOption.textContent =
-          "Other / Custom Topic";
-
-        topicSelect.appendChild(
-          customOption
-        );
-
-      }
-
-    }
-
-    /* =========================================================
-       HANDLE SUBJECT CHANGE
-       ========================================================= */
-
-    subjectSelect.addEventListener(
-      "change",
-      event => {
-
-        const selectedSubject =
-          event.target.value;
-
-        populateTopicOptions(
-          selectedSubject
-        );
+      if (customTopicContainer) {
 
         customTopicContainer.classList.add(
           "hidden"
         );
 
+      }
+
+      if (customTopicInput) {
+
         customTopicInput.value = "";
 
       }
-    );
 
-    /* =========================================================
-       HANDLE TOPIC CHANGE
-       ========================================================= */
+    }
+  );
 
-    topicSelect.addEventListener(
-      "change",
-      event => {
+}
 
-        if (
-          event.target.value ===
-          "Other / Custom Topic"
-        ) {
+
+/* =========================================================
+   TOPIC CHANGE
+   ========================================================= */
+
+if (topicSelect) {
+
+  topicSelect.addEventListener(
+    "change",
+    function() {
+
+      const selectedTopic =
+        topicSelect.value.trim();
+
+      console.log(
+        "Topic changed:",
+        selectedTopic
+      );
+
+
+      if (
+        selectedTopic ===
+        "Other / Custom Topic"
+      ) {
+
+        if (customTopicContainer) {
 
           customTopicContainer.classList.remove(
             "hidden"
           );
 
+        }
+
+        if (customTopicInput) {
+
           customTopicInput.focus();
 
-        } else {
-
-          customTopicContainer.classList.add(
-            "hidden"
-          );
-
-          customTopicInput.value = "";
-
         }
 
+        return;
       }
+
+
+      if (customTopicContainer) {
+
+        customTopicContainer.classList.add(
+          "hidden"
+        );
+
+      }
+
+      if (customTopicInput) {
+
+        customTopicInput.value = "";
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   INITIALIZE TOPIC DROPDOWN
+   ========================================================= */
+
+if (subjectSelect) {
+
+  populateTopicOptions(
+    subjectSelect.value.trim()
+  );
+
+}
+
+
+/* =========================================================
+   STATUS DISPLAY
+   ========================================================= */
+
+function showStatus(
+  message,
+  type = "info"
+) {
+
+  if (!generationStatus) {
+    return;
+  }
+
+  generationStatus.classList.remove(
+    "hidden",
+    "border-green-200",
+    "bg-green-50",
+    "text-green-800",
+    "border-red-200",
+    "bg-red-50",
+    "text-red-800",
+    "border-blue-200",
+    "bg-blue-50",
+    "text-blue-800"
+  );
+
+
+  if (type === "success") {
+
+    generationStatus.classList.add(
+      "border-green-200",
+      "bg-green-50",
+      "text-green-800"
     );
 
-    /* =========================================================
-       INITIAL TOPIC STATE
-       ========================================================= */
+  }
 
-    populateTopicOptions("");
+  else if (type === "error") {
 
-    /* =========================================================
-       STATUS DISPLAY
-       ========================================================= */
+    generationStatus.classList.add(
+      "border-red-200",
+      "bg-red-50",
+      "text-red-800"
+    );
 
-    function showStatus(
-      message,
-      type = "info"
+  }
+
+  else {
+
+    generationStatus.classList.add(
+      "border-blue-200",
+      "bg-blue-50",
+      "text-blue-800"
+    );
+
+  }
+
+
+  generationStatus.textContent =
+    safeText(message);
+}
+
+
+/* =========================================================
+   CLEAR RESULTS
+   ========================================================= */
+
+function clearResults() {
+
+  if (!generationResults) {
+    return;
+  }
+
+  generationResults.replaceChildren();
+
+  generationResults.classList.add(
+    "hidden"
+  );
+}
+
+
+/* =========================================================
+   CHECK ADMIN SESSION
+   ========================================================= */
+
+async function checkSession() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    const session =
+      data?.session;
+
+
+    if (
+      !session ||
+      !session.user ||
+      !session.user.email
     ) {
 
-      generationStatus.classList.remove(
-        "hidden",
-        "border-green-200",
-        "bg-green-50",
-        "text-green-800",
-        "border-red-200",
-        "bg-red-50",
-        "text-red-800",
-        "border-blue-200",
-        "bg-blue-50",
-        "text-blue-800"
-      );
-
-      if (type === "success") {
-
-        generationStatus.classList.add(
-          "border-green-200",
-          "bg-green-50",
-          "text-green-800"
-        );
-
-      } else if (type === "error") {
-
-        generationStatus.classList.add(
-          "border-red-200",
-          "bg-red-50",
-          "text-red-800"
-        );
-
-      } else {
-
-        generationStatus.classList.add(
-          "border-blue-200",
-          "bg-blue-50",
-          "text-blue-800"
-        );
-
-      }
-
-      generationStatus.textContent =
-        safeText(message);
-
-    }
-
-    /* =========================================================
-       RESET RESULTS
-       ========================================================= */
-
-    function clearResults() {
-
-      generationResults.replaceChildren();
-
-      generationResults.classList.add(
-        "hidden"
-      );
-
-    }
-
-    /* =========================================================
-       CHECK ADMIN SESSION
-       ========================================================= */
-
-    async function checkSession() {
-
-      try {
-
-        const {
-          data,
-          error
-        } =
-          await supabaseClient.auth.getSession();
-
-        if (error) {
-          throw error;
-        }
-
-        const session =
-          data?.session;
-
-        if (
-          !session ||
-          !session.user ||
-          !session.user.email
-        ) {
-
-          sessionStatus.className =
-            "mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800 shadow-sm";
-
-          sessionStatus.textContent =
-            "You are not logged in. Please log in with your PulsePrep administrator account.";
-
-          generateButton.disabled =
-            true;
-
-          return null;
-
-        }
-
-        sessionStatus.className =
-          "mb-6 rounded-2xl border border-green-200 bg-green-50 p-5 text-green-800 shadow-sm";
-
-        sessionStatus.textContent =
-          `Administrator session detected: ${session.user.email}`;
-
-        generateButton.disabled =
-          false;
-
-        return session;
-
-      } catch (error) {
-
-        console.error(
-          "PulsePrep session check failed:",
-          error
-        );
+      if (sessionStatus) {
 
         sessionStatus.className =
           "mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800 shadow-sm";
 
         sessionStatus.textContent =
-          "Unable to verify your PulsePrep session. Please refresh and try again.";
+          "You are not logged in. Please log in with your PulsePrep administrator account.";
+
+      }
+
+
+      if (generateButton) {
 
         generateButton.disabled =
           true;
 
-        return null;
-
       }
+
+
+      return null;
+    }
+
+
+    if (sessionStatus) {
+
+      sessionStatus.className =
+        "mb-6 rounded-2xl border border-green-200 bg-green-50 p-5 text-green-800 shadow-sm";
+
+      sessionStatus.textContent =
+        `Administrator session detected: ${session.user.email}`;
 
     }
 
-    /* =========================================================
-       AUTH STATE LISTENER
-       ========================================================= */
 
-    supabaseClient.auth.onAuthStateChange(
-      () => {
-        checkSession();
-      }
+    if (generateButton) {
+
+      generateButton.disabled =
+        false;
+
+    }
+
+
+    return session;
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "PulsePrep session check failed:",
+      error
     );
 
-    /* =========================================================
-       FORM SUBMISSION
-       ========================================================= */
 
-    generatorForm.addEventListener(
-      "submit",
-      async event => {
+    if (sessionStatus) {
 
-        event.preventDefault();
+      sessionStatus.className =
+        "mb-6 rounded-2xl border border-red-200 bg-red-50 p-5 text-red-800 shadow-sm";
 
-        clearResults();
+      sessionStatus.textContent =
+        "Unable to verify your PulsePrep session. Please refresh and try again.";
 
-        const session =
-          await checkSession();
+    }
 
-        if (!session) {
 
-          showStatus(
-            "Please log in with your administrator account first.",
-            "error"
-          );
+    if (generateButton) {
 
-          return;
+      generateButton.disabled =
+        true;
 
-        }
+    }
 
-        const subject =
+
+    return null;
+  }
+}
+
+
+/* =========================================================
+   AUTH STATE LISTENER
+   ========================================================= */
+
+if (
+  typeof supabaseClient !== "undefined" &&
+  supabaseClient?.auth
+) {
+
+  supabaseClient.auth.onAuthStateChange(
+    function() {
+
+      checkSession();
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   FORM SUBMISSION
+   ========================================================= */
+
+if (generatorForm) {
+
+  generatorForm.addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+      clearResults();
+
+
+      /* ---------------------------------------------------
+         CHECK LOGIN
+         --------------------------------------------------- */
+
+      const session =
+        await checkSession();
+
+
+      if (!session) {
+
+        showStatus(
+          "Please log in with your administrator account first.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      /* ---------------------------------------------------
+         GET FORM VALUES
+         --------------------------------------------------- */
+
+      const subject =
+        subjectSelect
+          ? subjectSelect.value.trim()
+          : "";
+
+
+      let topic =
+        topicSelect
+          ? topicSelect.value.trim()
+          : "";
+
+
+      const difficulty =
+        document
+          .getElementById("difficulty")
+          ?.value ||
+        "medium";
+
+
+      const count =
+        Number(
           document
-            .getElementById("subject")
-            .value
-            .trim();
+            .getElementById("count")
+            ?.value ||
+          10
+        );
 
-        let topic =
-          document
-            .getElementById("topic")
-            .value
-            .trim();
 
-        const difficulty =
-          document
-            .getElementById("difficulty")
-            .value;
+      const source =
+        document
+          .getElementById("source")
+          ?.value
+          ?.trim() ||
+        "PulsePrep AI";
 
-        const count =
-          Number(
-            document
-              .getElementById("count")
-              .value
-          );
 
-        const source =
-          document
-            .getElementById("source")
-            .value
-            .trim();
+      const school =
+        document
+          .getElementById("school")
+          ?.value
+          ?.trim() ||
+        "";
 
-        const school =
-          document
-            .getElementById("school")
-            .value
-            .trim();
 
-        const academicYear =
-          document
-            .getElementById("academicYear")
-            .value
-            .trim();
+      const academicYear =
+        document
+          .getElementById("academicYear")
+          ?.value
+          ?.trim() ||
+        "";
 
-        /* ---------------------------------------------------
-           VALIDATE SUBJECT
-           --------------------------------------------------- */
 
-        if (!subject) {
+      /* ---------------------------------------------------
+         VALIDATE SUBJECT
+         --------------------------------------------------- */
 
-          showStatus(
-            "Please select a subject.",
-            "error"
-          );
+      if (!subject) {
 
+        showStatus(
+          "Please select a subject.",
+          "error"
+        );
+
+        if (subjectSelect) {
           subjectSelect.focus();
-
-          return;
-
         }
 
-        /* ---------------------------------------------------
-           VALIDATE TOPIC
-           --------------------------------------------------- */
+        return;
+      }
 
-        if (
-          topic ===
-          "Other / Custom Topic"
-        ) {
 
-          topic =
-            customTopicInput.value.trim();
+      /* ---------------------------------------------------
+         VALIDATE TOPIC
+         --------------------------------------------------- */
 
-          if (!topic) {
+      if (
+        topic ===
+        "Other / Custom Topic"
+      ) {
 
-            showStatus(
-              "Please enter your custom topic.",
-              "error"
-            );
+        topic =
+          customTopicInput
+            ? customTopicInput.value.trim()
+            : "";
 
+
+        if (!topic) {
+
+          showStatus(
+            "Please enter your custom topic.",
+            "error"
+          );
+
+          if (customTopicInput) {
             customTopicInput.focus();
-
-            return;
-
           }
 
-        } else if (!topic) {
+          return;
+        }
 
-          showStatus(
-            "Please select a topic.",
-            "error"
-          );
+      }
 
+      else if (!topic) {
+
+        showStatus(
+          "Please select a topic.",
+          "error"
+        );
+
+        if (topicSelect) {
           topicSelect.focus();
-
-          return;
-
         }
 
-        /* ---------------------------------------------------
-           VALIDATE COUNT
-           --------------------------------------------------- */
+        return;
+      }
 
-        if (
-          !Number.isInteger(count) ||
-          count < 5 ||
-          count > 50
-        ) {
 
-          showStatus(
-            "Please select a valid number of questions.",
-            "error"
-          );
+      /* ---------------------------------------------------
+         VALIDATE QUESTION COUNT
+         --------------------------------------------------- */
 
-          return;
+      if (
+        !Number.isInteger(count) ||
+        count < 5 ||
+        count > 50
+      ) {
 
-        }
+        showStatus(
+          "Please select between 5 and 50 questions.",
+          "error"
+        );
 
-        /* ---------------------------------------------------
-           LOCK BUTTON
-           --------------------------------------------------- */
+        return;
+      }
+
+
+      /* ---------------------------------------------------
+         LOCK BUTTON
+         --------------------------------------------------- */
+
+      if (generateButton) {
 
         generateButton.disabled =
           true;
+
+      }
+
+
+      if (generateButtonText) {
 
         generateButtonText.textContent =
           "Generating Questions...";
 
-        showStatus(
-          "PulsePrep AI is generating your questions. This may take a moment...",
-          "info"
-        );
+      }
+
+
+      showStatus(
+        "PulsePrep AI is generating your questions. This may take a moment...",
+        "info"
+      );
+
+
+      try {
+
+        /* ---------------------------------------------------
+           GET FRESH ACCESS TOKEN
+           --------------------------------------------------- */
+
+        const {
+          data: sessionData,
+          error: sessionError
+        } =
+          await supabaseClient.auth.getSession();
+
+
+        if (sessionError) {
+          throw sessionError;
+        }
+
+
+        const accessToken =
+          sessionData
+            ?.session
+            ?.access_token;
+
+
+        if (!accessToken) {
+
+          throw new Error(
+            "Your login session has expired. Please log in again."
+          );
+        }
+
+
+        /* ---------------------------------------------------
+           CALL SUPABASE EDGE FUNCTION
+           --------------------------------------------------- */
+
+        const response =
+          await fetch(
+            AI_GENERATOR_URL,
+            {
+              method: "POST",
+
+              headers: {
+
+                "Content-Type":
+                  "application/json",
+
+                "Authorization":
+                  `Bearer ${accessToken}`
+
+              },
+
+              body:
+                JSON.stringify({
+
+                  subject,
+
+                  topic,
+
+                  difficulty,
+
+                  count,
+
+                  source,
+
+                  school,
+
+                  academic_year:
+                    academicYear
+
+                })
+
+            }
+          );
+
+
+        /* ---------------------------------------------------
+           READ RESPONSE
+           --------------------------------------------------- */
+
+        let data = {};
 
         try {
 
-          /* ---------------------------------------------------
-             GET FRESH ACCESS TOKEN
-             --------------------------------------------------- */
+          data =
+            await response.json();
 
-          const {
-            data: sessionData,
-            error: sessionError
-          } =
-            await supabaseClient.auth.getSession();
+        }
 
-          if (sessionError) {
-            throw sessionError;
-          }
+        catch {
 
-          const accessToken =
-            sessionData?.session?.access_token;
+          data = {};
 
-          if (!accessToken) {
+        }
 
-            throw new Error(
-              "Your login session has expired. Please log in again."
+
+        /* ---------------------------------------------------
+           HANDLE ERROR
+           --------------------------------------------------- */
+
+        if (
+          !response.ok ||
+          !data.success
+        ) {
+
+          const errorMessage =
+            safeText(
+              data.error ||
+              data.details ||
+              `Request failed with status ${response.status}.`,
+              "Unable to generate questions."
             );
 
-          }
 
-          /* ---------------------------------------------------
-             CALL NETLIFY FUNCTION
-             --------------------------------------------------- */
-
-          const response =
-  await fetch(
-    "https://eskwphjtiogguhvtktmh.supabase.co/functions/v1/generate-ai-questions",
-    {
-                method: "POST",
-
-                headers: {
-                  "Content-Type":
-                    "application/json",
-
-                  "Authorization":
-                    `Bearer ${accessToken}`
-                },
-
-                body: JSON.stringify({
-                  subject,
-                  topic,
-                  difficulty,
-                  count,
-                  source,
-                  school,
-                  academic_year:
-                    academicYear
-                })
-              }
-            );
-
-          let data = {};
-
-          try {
-
-            data =
-              await response.json();
-
-          } catch {
-
-            data = {};
-
-          }
-
-          if (
-            !response.ok ||
-            !data.success
-          ) {
-
-            const errorMessage =
-              safeText(
-                data.error ||
-                data.details ||
-                `Request failed with status ${response.status}.`,
-                "Unable to generate questions."
-              );
-
-            throw new Error(
-              errorMessage
-            );
-
-          }
-
-          /* ---------------------------------------------------
-             SUCCESS
-             --------------------------------------------------- */
-
-          const generatedCount =
-            Number.isFinite(
-              Number(data.generated)
-            )
-              ? Number(data.generated)
-              : 0;
-
-          showStatus(
-            `Successfully generated ${generatedCount} question(s). They were saved as pending for review.`,
-            "success"
+          throw new Error(
+            errorMessage
           );
+        }
 
-          /* ---------------------------------------------------
-             SAFE RESULT RENDERING
-             --------------------------------------------------- */
+
+        /* ---------------------------------------------------
+           SUCCESS
+           --------------------------------------------------- */
+
+        const generatedCount =
+          Number.isFinite(
+            Number(data.generated)
+          )
+            ? Number(data.generated)
+            : 0;
+
+
+        showStatus(
+          `Successfully generated ${generatedCount} question(s). They were saved as pending for review.`,
+          "success"
+        );
+
+
+        /* ---------------------------------------------------
+           RESULT CARD
+           --------------------------------------------------- */
+
+        if (generationResults) {
 
           generationResults.replaceChildren();
+
 
           const resultCard =
             document.createElement("div");
 
           resultCard.className =
             "rounded-2xl border border-green-200 bg-green-50 p-6";
+
 
           const resultBadge =
             document.createElement("div");
@@ -1548,6 +1808,7 @@
           resultBadge.textContent =
             "GENERATION COMPLETE";
 
+
           const resultTitle =
             document.createElement("h3");
 
@@ -1557,45 +1818,29 @@
           resultTitle.textContent =
             "Questions are ready for review";
 
+
           const resultMessage =
             document.createElement("p");
 
           resultMessage.className =
             "mt-2 leading-6 text-green-800";
 
-          resultMessage.appendChild(
-            document.createTextNode(
-              `${generatedCount} question(s) were generated and saved as `
-            )
-          );
+          resultMessage.textContent =
+            `${generatedCount} question(s) were generated and saved as pending. They will not appear to students until approved.`;
 
-          const pendingLabel =
-            document.createElement("strong");
-
-          pendingLabel.textContent =
-            "pending";
-
-          resultMessage.appendChild(
-            pendingLabel
-          );
-
-          resultMessage.appendChild(
-            document.createTextNode(
-              ". They will not appear to students until approved."
-            )
-          );
 
           const reviewLink =
             document.createElement("a");
 
           reviewLink.href =
-            "/admin-exam-vault.html";
+            "admin-exam-vault.html";
 
           reviewLink.className =
             "mt-5 inline-flex items-center justify-center rounded-xl bg-green-700 px-5 py-3 font-bold text-white transition hover:bg-green-800";
 
           reviewLink.textContent =
             "Review Questions in Exam Vault →";
+
 
           resultCard.appendChild(
             resultBadge
@@ -1613,62 +1858,120 @@
             reviewLink
           );
 
+
           generationResults.appendChild(
             resultCard
           );
+
 
           generationResults.classList.remove(
             "hidden"
           );
 
-          /* ---------------------------------------------------
-             RESET FORM
-             --------------------------------------------------- */
+        }
 
-          generatorForm.reset();
 
-          document
-            .getElementById("difficulty")
-            .value =
+        /* ---------------------------------------------------
+           RESET FORM
+           --------------------------------------------------- */
+
+        generatorForm.reset();
+
+
+        const difficultySelect =
+          document.getElementById(
+            "difficulty"
+          );
+
+        if (difficultySelect) {
+
+          difficultySelect.value =
             "medium";
 
-          document
-            .getElementById("count")
-            .value =
+        }
+
+
+        const countSelect =
+          document.getElementById(
+            "count"
+          );
+
+        if (countSelect) {
+
+          countSelect.value =
             "10";
 
-          document
-            .getElementById("source")
-            .value =
+        }
+
+
+        const sourceInput =
+          document.getElementById(
+            "source"
+          );
+
+        if (sourceInput) {
+
+          sourceInput.value =
             "PulsePrep AI";
 
-          populateTopicOptions("");
+        }
+
+
+        /* ---------------------------------------------------
+           RESET TOPICS
+           --------------------------------------------------- */
+
+        populateTopicOptions("");
+
+
+        if (customTopicContainer) {
 
           customTopicContainer.classList.add(
             "hidden"
           );
 
-          customTopicInput.value = "";
+        }
 
-        } catch (error) {
 
-          console.error(
-            "PulsePrep AI question generation error:",
-            error
-          );
+        if (customTopicInput) {
 
-          showStatus(
-            safeText(
-              error?.message,
-              "Unable to generate questions. Please try again."
-            ),
-            "error"
-          );
+          customTopicInput.value =
+            "";
 
-        } finally {
+        }
+
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "PulsePrep AI question generation error:",
+          error
+        );
+
+
+        showStatus(
+          safeText(
+            error?.message,
+            "Unable to generate questions. Please try again."
+          ),
+          "error"
+        );
+
+      }
+
+      finally {
+
+        if (generateButton) {
 
           generateButton.disabled =
             false;
+
+        }
+
+
+        if (generateButtonText) {
 
           generateButtonText.textContent =
             "Generate Questions";
@@ -1676,15 +1979,33 @@
         }
 
       }
-    );
 
-    /* =========================================================
-       INITIALIZE
-       ========================================================= */
+    }
+  );
 
-    checkSession();
+}
 
-  </script>
+
+/* =========================================================
+   INITIAL SESSION CHECK
+   ========================================================= */
+
+checkSession();
+
+
+/* =========================================================
+   FINAL CONFIRMATION
+   ========================================================= */
+
+console.log(
+  "PulsePrep AI Question Generator loaded successfully."
+);
+
+console.log(
+  "Subject → Topic system is independent of Supabase."
+);
+
+</script>
 
 </body>
 </html>
