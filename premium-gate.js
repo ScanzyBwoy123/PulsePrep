@@ -370,19 +370,22 @@ console.log("🔥 PULSEPREP PREMIUM-GATE.JS IS RUNNING 🔥");
 
           if (currentSession) {
 
-            questionBankUnlocked = true;
+  questionBankUnlocked = true;
 
-            pastPapersLoaded = false;
+  pastPapersLoaded = false;
 
-            console.log(
-              "PulsePrep Question Bank unlocked from existing login."
-            );
+  // Remove the old Login Required message
+  removeQuestionBankLoginCard();
 
-            setTimeout(
-              loadApprovedPastPapers,
-              100
-            );
-          }
+  console.log(
+    "PulsePrep Question Bank unlocked from existing login."
+  );
+
+  setTimeout(
+    loadApprovedPastPapers,
+    100
+  );
+}
 
         })
         .catch(error => {
@@ -482,7 +485,40 @@ console.log("🔥 PULSEPREP PREMIUM-GATE.JS IS RUNNING 🔥");
 
     }, 100);
   }
+// ==========================================================
+// REMOVE STALE QUESTION BANK LOGIN CARD
+// ==========================================================
 
+function removeQuestionBankLoginCard() {
+
+  const container =
+    document.getElementById(
+      "questionBankContent"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  const loginHeading =
+    Array.from(
+      container.querySelectorAll("h3")
+    ).find(
+      heading =>
+        heading.textContent.trim() ===
+        "Login Required"
+    );
+
+  if (loginHeading) {
+
+    const loginCard =
+      loginHeading.closest(".max-w-xl");
+
+    if (loginCard) {
+      loginCard.remove();
+    }
+  }
+}
   // ==========================================================
   // HTML SAFETY
   // ==========================================================
@@ -1108,8 +1144,12 @@ const response =
       // CREATE / FIND DISPLAY SECTION
       // ------------------------------------------------------
 
-      const loadingPlaceholder =
-        container.querySelector("h3");
+      // The user is authenticated at this point.
+// Remove any stale login card before rendering questions.
+removeQuestionBankLoginCard();
+
+const loadingPlaceholder =
+  container.querySelector("h3");
 
       if (
         loadingPlaceholder &&
