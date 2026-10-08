@@ -213,32 +213,28 @@ function escapeHTML(value) {
     })[character]);
 }
 /* Confirm the administrator is signed in */
-async function getAdminToken() {
-    const { data, error } =
-        await supabaseClient.auth.getSession();
-    if (error) {
-        throw error;
-    }
-    const session = data.session;
-    if (!session) {
+async function sendRequest(payload) {
+    const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + SUPABASE_KEY
+        },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
         throw new Error(
-            "Please sign in to PulsePrep first, then reopen this page."
+            data.error ||
+            data.message ||
+            "The request failed. Please try again."
         );
     }
-    const { data: userData, error: userError } =
-        await supabaseClient.auth.getUser();
-    if (userError) {
-        throw userError;
-    }
-    const email = String(
-        userData.user?.email || ""
-    ).toLowerCase();
-    if (email !== "scanzybwoy8@gmail.com") {
-        throw new Error(
-            "Your account is not authorized to create shareable exams."
-        );
-    }
-    return session.access_token;
+
+    return data;
 }
 /* Send requests to the Supabase Edge Function */
 async function sendRequest(payload) {
