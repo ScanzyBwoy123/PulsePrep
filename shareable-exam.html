@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PulsePrep | Nursing Examination</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .answer-option {
+            display: flex;
+            gap: 12px;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .answer-option:hover {
+            background: #eff6ff;
+        }
+        .answer-option:has(input:checked) {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .correct-answer {
+            border: 1px solid #16a34a;
+            background: #f0fdf4;
+        }
+        .wrong-answer {
+            border: 1px solid #dc2626;
+            background: #fef2f2;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800">
+<header class="bg-blue-900 text-white shadow">
+    <div class="max-w-3xl mx-auto px-4 py-5">
+        <p class="text-sm text-blue-200 font-semibold">
+            PULSEPREP NURSING EDUCATION
+        </p>
+        <h1 id="examTitle" class="text-2xl font-bold mt-2">
+            Loading examination...
+        </h1>
+        <p id="examDetails" class="text-sm text-blue-100 mt-2"></p>
+    </div>
+</header>
+<main class="max-w-3xl mx-auto p-4 sm:p-6">
+    <div id="message"
+         class="hidden rounded-xl p-4 mb-4 text-sm">
+    </div>
+    <!-- Student details and start screen -->
+    <section id="startSection"
+             class="bg-white rounded-2xl shadow-sm border p-5">
+        <h2 class="text-xl font-bold">
+            Welcome to your examination
+        </h2>
+        <p class="text-slate-500 text-sm mt-2">
+            Enter your details if required, then start your examination.
+            Your answers and correct answers will not be revealed until
+            you submit.
+        </p>
+        <div class="grid sm:grid-cols-2 gap-4 mt-5">
+            <div>
+                <label for="studentName"
+                       class="block font-medium text-sm mb-1">
+                    Student name (optional)
+                </label>
+                <input id="studentName"
+                       type="text"
+                       maxlength="120"
+                       placeholder="Enter your name"
+                       class="w-full border rounded-lg p-3">
+            </div>
+            <div>
+                <label for="studentEmail"
+                       class="block font-medium text-sm mb-1">
+                    Email (optional)
+                </label>
+                <input id="studentEmail"
+                       type="email"
+                       maxlength="200"
+                       placeholder="Enter your email"
+                       class="w-full border rounded-lg p-3">
+            </div>
+        </div>
+        <div class="mt-5 bg-blue-50 rounded-xl p-4 text-sm">
+            <p>📚 <strong>Questions:</strong> <span id="questionCount">—</span></p>
+            <p class="mt-2">⏱️ <strong>Time limit:</strong> <span id="timeLimit">—</span></p>
+            <p class="mt-2">📊 <strong>Results:</strong> Available after submission</p>
+        </div>
+        <button id="startButton"
+                disabled
+                class="w-full mt-5 bg-blue-700 hover:bg-blue-800
+                       disabled:opacity-50 text-white font-bold
+                       rounded-lg p-3">
+            Start Examination
+        </button>
+    </section>
+    <!-- Examination -->
+    <section id="examSection" class="hidden">
+        <div class="sticky top-0 z-10 bg-white border shadow-sm
+                    rounded-xl p-4 mb-4 flex justify-between items-center">
+            <div>
+                <p class="text-xs text-slate-500">TIME REMAINING</p>
+                <p id="countdown"
+                   class="text-2xl font-bold text-amber-700">
+                    00:00
+                </p>
+            </div>
+            <div class="text-right">
+                <p class="text-xs text-slate-500">ANSWERED</p>
+                <p id="answeredCount"
+                   class="text-xl font-bold">
+                    0 / 0
+                </p>
+            </div>
+        </div>
+        <form id="examForm" class="space-y-4"></form>
+    </section>
+    <!-- Results -->
+    <section id="resultsSection"
+             class="hidden bg-white border shadow-sm rounded-2xl p-5">
+        <div class="text-center border-b pb-5">
+            <p class="text-sm font-bold uppercase tracking-wide text-emerald-700">
+                Examination completed
+            </p>
+            <h2 id="scorePercent"
+                class="text-5xl font-extrabold mt-3">
+                0%
+            </h2>
+            <p class="text-slate-500 mt-2">
+                Your final examination score
+            </p>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5">
+            <div class="bg-slate-50 rounded-xl p-3 text-center">
+                <p id="totalResult" class="text-2xl font-bold">0</p>
+                <p class="text-xs text-slate-500">Total</p>
+            </div>
+            <div class="bg-emerald-50 rounded-xl p-3 text-center">
+                <p id="correctResult" class="text-2xl font-bold text-emerald-700">0</p>
+                <p class="text-xs text-slate-500">Correct</p>
+            </div>
+            <div class="bg-red-50 rounded-xl p-3 text-center">
+                <p id="incorrectResult" class="text-2xl font-bold text-red-700">0</p>
+                <p class="text-xs text-slate-500">Incorrect</p>
+            </div>
+            <div class="bg-amber-50 rounded-xl p-3 text-center">
+                <p id="unansweredResult" class="text-2xl font-bold text-amber-700">0</p>
+                <p class="text-xs text-slate-500">Unanswered</p>
+            </div>
+        </div>
+        <h3 class="text-xl font-bold mt-7 mb-4">
+            Review your answers
+        </h3>
+        <div id="answerReview" class="space-y-4"></div>
+        <p class="text-xs text-slate-500 mt-6 text-center">
+            PulsePrep Nursing Education
+        </p>
+    </section>
+</main>
+<script>
+"use strict";
+/* PulsePrep Supabase configuration */
+const SUPABASE_URL =
+    "https://eskwphjtiogguhvtktmh.supabase.co";
+const SUPABASE_KEY =
+    "sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs";
+const API_URL =
+    SUPABASE_URL + "/functions/v1/shareable-exam";
+/* Page state */
+const $ = id => document.getElementById(id);
+let exam = null;
+let questions = [];
+let deadline = null;
+let timerInterval = null;
+let startedAt = null;
+let submitting = false;
+let submitted = false;
+/* Safe HTML text */
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+/* Messages */
+function showMessage(message, isError = false) {
+    const box = $("message");
+    box.textContent = message;
+    box.className =
+        "rounded-xl p-4 mb-4 text-sm " +
+        (isError
+            ? "bg-red-50 text-red-800"
+            : "bg-blue-50 text-blue-900");
+    box.classList.remove("hidden");
+}
+/* Load published examination */
+async function loadExam() {
+    const params = new URLSearchParams(window.location.search);
+    const slug = params.get("slug");
+    if (!slug) {
+        $("examTitle").textContent = "Invalid examination link";
+        showMessage(
+            "This link is missing its examination code. Ask your instructor for the correct link.",
+            true
+        );
+        return;
+    }
+    try {
+        const response = await fetch(
+            API_URL + "?slug=" + encodeURIComponent(slug),
+            {
+                method: "GET",
+                headers: {
+                    "apikey": SUPABASE_KEY
+                },
+                cache: "no-store"
+            }
+        );
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                data.message ||
+                "This examination could not be loaded."
+            );
+        }
+        exam = data.exam || data;
+        questions = Array.isArray(data.questions)
+            ? data.questions
+            : [];
+        if (!questions.length) {
+            throw new Error(
+                "No questions are available in this examination."
+            );
+        }
+        if (!exam.duration_minutes ||
+            Number(exam.duration_minutes) < 1) {
+            throw new Error(
+                "The examination has an invalid time limit."
+            );
+        }
+        $("examTitle").textContent =
+            exam.title || "PulsePrep Nursing Examination";
+        $("examDetails").textContent = [
+            exam.subject,
+            exam.topic,
+            questions.length + " questions"
+        ].filter(Boolean).join(" • ");
+        $("questionCount").textContent = questions.length;
+        $("timeLimit").textContent =
+            exam.duration_minutes + " minutes";
+        $("startButton").disabled = false;
+    } catch (error) {
+        $("examTitle").textContent = "Unable to load examination";
+        showMessage(
+            error.message || "Please refresh the page and try again.",
+            true
+        );
+    }
+}
+/* Render questions without revealing answer keys */
+function renderQuestions() {
+    $("examForm").innerHTML = questions.map((question, index) => {
+        const questionId = String(question.id);
+        const options = ["a", "b", "c", "d"];
+        return `
+            <article class="bg-white border shadow-sm rounded-2xl p-5">
+                <p class="text-xs uppercase tracking-wide
+                          font-bold text-blue-700">
+                    Question ${index + 1} of ${questions.length}
+                </p>
+                ${
+                    question.scenario
+                        ? `<div class="bg-blue-50 rounded-xl p-3 mt-3 text-sm">
+                             ${escapeHTML(question.scenario)}
+                           </div>`
+                        : ""
+                }
+                <h2 class="font-semibold text-lg leading-relaxed mt-3">
+                    ${escapeHTML(question.question)}
+                </h2>
+                <div class="mt-4">
+                    ${options.map(letter => `
+                        <label class="answer-option">
+                            <input
+                                type="radio"
+                                name="question_${escapeHTML(questionId)}"
+                                value="${letter.toUpperCase()}"
+                                class="mt-1 flex-shrink-0">
+                            <span>
+                                <strong>${letter.toUpperCase()}.</strong>
+                                ${escapeHTML(question["option_" + letter])}
+                            </span>
+                        </label>
+                    `).join("")}
+                </div>
+            </article>
+        `;
+    }).join("") + `
+        <div class="bg-white border rounded-2xl p-5">
+            <p class="text-sm text-slate-600 mb-4">
+                When you submit, your answers will be marked and your
+                results will be displayed.
+            </p>
+            <button
+                id="submitButton"
+                type="submit"
+                class="w-full bg-emerald-700 hover:bg-emerald-800
+                       text-white font-bold rounded-lg p-3">
+                Submit Examination
+            </button>
+        </div>
+    `;
+    $("examForm").querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener("change", updateAnsweredCount);
+    });
+    updateAnsweredCount();
+}
+/* Count answered questions */
+function updateAnsweredCount() {
+    let answered = 0;
+    questions.forEach(question => {
+        const name = "question_" + String(question.id);
+        if (document.querySelector(
+            'input[name="' + CSS.escape(name) + '"]:checked'
+        )) {
+            answered++;
+        }
+    });
+    $("answeredCount").textContent =
+        answered + " / " + questions.length;
+}
+/* Start examination and timer */
+$("startButton").addEventListener("click", () => {
+    if (!exam || submitted) return;
+    startedAt = new Date().toISOString();
+    deadline =
+        Date.now() + Number(exam.duration_minutes) * 60 * 1000;
+    $("startSection").classList.add("hidden");
+    $("examSection").classList.remove("hidden");
+    renderQuestions();
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});
+function updateTimer() {
+    if (!deadline || submitted || submitting) return;
+    const seconds = Math.max(
+        0,
+        Math.floor((deadline - Date.now()) / 1000)
+    );
+    const minutes = String(
+        Math.floor(seconds / 60)
+    ).padStart(2, "0");
+    const remainingSeconds = String(
+        seconds % 60
+    ).padStart(2, "0");
+    $("countdown").textContent =
+        minutes + ":" + remainingSeconds;
+    if (seconds <= 0) {
+        clearInterval(timerInterval);
+        submitExam(true);
+    }
+}
+/* Collect answers and submit to the server */
+async function submitExam(autoSubmit = false) {
+    if (submitted || submitting || !exam) return;
+    if (!autoSubmit && !window.confirm(
+        "Are you sure you want to submit your examination?"
+    )) {
+        return;
+    }
+    submitting = true;
+    clearInterval(timerInterval);
+    const submitButton = $("submitButton");
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = "Submitting…";
+    }
+    const answers = {};
+    questions.forEach(question => {
+        const inputName = "question_" + String(question.id);
+        const checked = document.querySelector(
+            'input[name="' + CSS.escape(inputName) + '"]:checked'
+        );
+        if (checked) {
+            answers[question.id] = checked.value;
+        }
+    });
+    try {
+        const slug =
+            new URLSearchParams(window.location.search).get("slug");
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "apikey": SUPABASE_KEY
+            },
+            body: JSON.stringify({
+                action: "submit",
+                slug: slug,
+                answers: answers,
+                student_name: $("studentName").value.trim(),
+                student_email: $("studentEmail").value.trim(),
+                started_at: startedAt
+            })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+            throw new Error(
+                data.error ||
+                data.message ||
+                "Your answers could not be submitted."
+            );
+        }
+        submitted = true;
+        submitting = false;
+        $("examSection").classList.add("hidden");
+        $("startSection").classList.add("hidden");
+        displayResults(data);
+    } catch (error) {
+        submitting = false;
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = "Submit Examination";
+        }
+        showMessage(
+            (error.message || "Submission failed.") +
+            " Your answers remain on this page. Please try again.",
+            true
+        );
+    }
+}
+$("examForm").addEventListener("submit", event => {
+    event.preventDefault();
+    submitExam(false);
+});
+/* Display result and answer review */
+function displayResults(data) {
+    const result = data.result || data.attempt || data;
+    const review = Array.isArray(data.review)
+        ? data.review
+        : Array.isArray(data.questions)
+            ? data.questions
+            : [];
+    const total = Number(
+        result.total_questions ?? questions.length
+    );
+    const correct = Number(
+        result.correct_count ?? result.correct ?? 0
+    );
+    const incorrect = Number(
+        result.incorrect_count ?? result.incorrect ?? 0
+    );
+    const unanswered = Number(
+        result.unanswered_count ?? result.unanswered ?? 0
+    );
+    const percentage = Number(
+        result.score_percent ?? result.percentage ?? 0
+    );
+    $("scorePercent").textContent =
+        (Number.isFinite(percentage) ? percentage : 0) + "%";
+    $("totalResult").textContent = total;
+    $("correctResult").textContent = correct;
+    $("incorrectResult").textContent = incorrect;
+    $("unansweredResult").textContent = unanswered;
+    $("resultsSection").classList.remove("hidden");
+    const reviewContainer = $("answerReview");
+    if (!review.length) {
+        reviewContainer.innerHTML = `
+            <p class="bg-amber-50 text-amber-900 rounded-xl p-4 text-sm">
+                Your score was returned, but detailed answer review was
+                not included in the server response. We will check the
+                backend response format during testing.
+            </p>
+        `;
+        $("resultsSection").scrollIntoView({ behavior: "smooth" });
+        return;
+    }
+    reviewContainer.innerHTML = review.map((item, index) => {
+        const questionId = item.question_id ?? item.id;
+        const sourceQuestion = questions.find(
+            q => String(q.id) === String(questionId)
+        );
+        const questionText =
+            item.question || sourceQuestion?.question || "Question";
+        const yourAnswer =
+            item.student_answer ??
+            item.your_answer ??
+            item.selected_answer ??
+            "";
+        const correctAnswer =
+            item.correct_answer ??
+            item.correctAnswer ??
+            "";
+        const isCorrect =
+            String(yourAnswer).toUpperCase() ===
+            String(correctAnswer).toUpperCase();
+        const options = item.options || (
+            sourceQuestion ? {
+                A: sourceQuestion.option_a,
+                B: sourceQuestion.option_b,
+                C: sourceQuestion.option_c,
+                D: sourceQuestion.option_d
+            } : null
+        );
+        return `
+            <article class="border rounded-xl p-4
+                ${isCorrect ? "correct-answer" : "wrong-answer"}">
+                <h3 class="font-semibold">
+                    Question ${index + 1}: ${escapeHTML(questionText)}
+                </h3>
+                <p class="text-sm mt-3">
+                    Your answer:
+                    <strong>${yourAnswer ? escapeHTML(yourAnswer) : "Not answered"}</strong>
+                    ${yourAnswer ? (isCorrect ? "✓ Correct" : "✗ Incorrect") : ""}
+                </p>
+                <p class="text-sm text-emerald-800 font-bold mt-2">
+                    Correct answer: ${escapeHTML(correctAnswer || "Not provided")}
+                </p>
+                ${
+                    options
+                        ? `<div class="text-sm text-slate-700 mt-3 space-y-1">
+                            ${Object.entries(options).map(([key, value]) => `
+                                <p><strong>${escapeHTML(key)}.</strong>
+                                ${escapeHTML(value)}</p>
+                            `).join("")}
+                           </div>`
+                        : ""
+                }
+                ${
+                    item.explanation
+                        ? `<div class="bg-white/80 rounded-lg p-3 mt-3 text-sm">
+                            <strong>Explanation:</strong>
+                            ${escapeHTML(item.explanation)}
+                           </div>`
+                        : ""
+                }
+            </article>
+        `;
+    }).join("");
+    $("resultsSection").scrollIntoView({ behavior: "smooth" });
+}
+/* Load exam details on page open */
+loadExam();
+</script>
+</body>
+</html>
