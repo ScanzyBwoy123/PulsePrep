@@ -3,48 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>PulsePrep | Shareable Exam Builder</title>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body class="bg-slate-100 min-h-screen text-slate-800">
-
 <header class="bg-blue-900 text-white p-5 shadow">
     <div class="max-w-5xl mx-auto">
         <p class="text-sm text-blue-200">PULSEPREP</p>
-
         <h1 class="text-2xl font-bold">
             Shareable MCQ Exam Builder
         </h1>
-
         <p class="text-sm mt-1">
             Create nursing exams and share them with students.
         </p>
     </div>
 </header>
-
 <main class="max-w-5xl mx-auto p-4 sm:p-6">
-
     <div id="message"
          role="status"
          aria-live="polite"
          class="hidden rounded-lg p-4 mb-4">
     </div>
-
     <!-- EXAM DETAILS -->
     <section class="bg-white rounded-xl shadow-sm border p-5">
-
         <h2 class="text-xl font-bold mb-4">
             1. Exam Details
         </h2>
-
         <label for="examTitle" class="block font-medium mb-1">
             Exam Title
         </label>
-
         <input
             id="examTitle"
             type="text"
@@ -52,11 +40,9 @@
             placeholder="e.g. Fluid and Electrolyte Balance Test"
             required
         >
-
         <label for="subject" class="block font-medium mb-1">
             Nursing or Medical Subject
         </label>
-
         <input
             id="subject"
             name="subject"
@@ -67,7 +53,6 @@
             autocomplete="off"
             required
         >
-
         <datalist id="subjectSuggestions">
             <option value="Anatomy">
             <option value="Physiology">
@@ -123,26 +108,21 @@
             <option value="Clinical Medicine">
             <option value="Medicine">
         </datalist>
-
         <p class="text-sm text-gray-500 mb-4">
             Select a suggested subject or type your own.
         </p>
-
         <label for="topic" class="block font-medium mb-1">
             Topic (Optional)
         </label>
-
         <input
             id="topic"
             type="text"
             class="w-full border rounded-lg p-3 mb-4"
             placeholder="e.g. Fluid and electrolyte imbalance"
         >
-
         <label for="duration" class="block font-medium mb-1">
             Time Limit (Minutes)
         </label>
-
         <input
             id="duration"
             type="number"
@@ -152,7 +132,6 @@
             class="w-full border rounded-lg p-3 mb-5"
             required
         >
-
         <button
             id="loadQuestions"
             type="button"
@@ -160,36 +139,27 @@
         >
             Load Approved Questions
         </button>
-
     </section>
-
     <!-- QUESTION SELECTION -->
     <section
         id="questionSection"
         class="hidden bg-white rounded-xl shadow-sm border p-5 mt-5"
     >
-
         <div class="flex justify-between items-center gap-3 flex-wrap">
-
             <h2 class="text-xl font-bold">
                 2. Select Questions
             </h2>
-
             <span
                 id="selectedCount"
                 class="bg-blue-100 text-blue-800 px-3 py-2 rounded-full text-sm"
             >
                 0 selected
             </span>
-
         </div>
-
         <p class="text-sm text-slate-500 mt-2 mb-4">
             Select the approved questions students should answer.
         </p>
-
         <div class="flex gap-2 mb-4 flex-wrap">
-
             <button
                 id="selectAll"
                 type="button"
@@ -197,7 +167,6 @@
             >
                 Select All
             </button>
-
             <button
                 id="clearSelection"
                 type="button"
@@ -205,11 +174,8 @@
             >
                 Clear Selection
             </button>
-
         </div>
-
         <div id="questionList" class="space-y-3"></div>
-
         <button
             id="publishExam"
             type="button"
@@ -217,36 +183,28 @@
         >
             Publish Exam and Generate Link
         </button>
-
     </section>
-
     <!-- GENERATED EXAM LINK -->
     <section
         id="shareSection"
         class="hidden bg-white rounded-xl shadow-sm border p-5 mt-5"
     >
-
         <h2 class="text-xl font-bold text-emerald-700">
             Your Exam Has Been Published!
         </h2>
-
         <p class="text-sm text-slate-600 mt-2">
             Share this link with your students. They can take the exam
             and see their results after submitting.
         </p>
-
         <label for="shareLink" class="block font-medium mt-4 mb-1">
             Student Exam Link
         </label>
-
         <input
             id="shareLink"
             readonly
             class="w-full border rounded-lg p-3"
         >
-
         <div class="flex flex-wrap gap-3 mt-4">
-
             <button
                 id="copyLink"
                 type="button"
@@ -254,7 +212,6 @@
             >
                 Copy Link
             </button>
-
             <a
                 id="whatsappLink"
                 target="_blank"
@@ -263,7 +220,6 @@
             >
                 Share on WhatsApp
             </a>
-
             <a
                 id="openExam"
                 target="_blank"
@@ -272,51 +228,29 @@
             >
                 Open Exam
             </a>
-
         </div>
-
     </section>
-
 </main>
-
 <script>
 "use strict";
-
 /* =========================================
    PULSEPREP SUPABASE CONFIGURATION
 ========================================= */
-
 const SUPABASE_URL =
     "https://eskwphjtiogguhvtktmh.supabase.co";
-
 const SUPABASE_KEY =
     "sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs";
-
 const API_URL =
     SUPABASE_URL + "/functions/v1/shareable-exam";
-
-const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_KEY
-);
-
 const selectedQuestions = new Set();
-
 let approvedQuestions = [];
-
 const $ = id => document.getElementById(id);
-
-
 /* =========================================
    DISPLAY MESSAGES
 ========================================= */
-
 function showMessage(message, error = false) {
-
     const box = $("message");
-
     box.textContent = message;
-
     box.className =
         "rounded-lg p-4 mb-4 " +
         (
@@ -324,17 +258,12 @@ function showMessage(message, error = false) {
                 ? "bg-red-100 text-red-800"
                 : "bg-blue-100 text-blue-900"
         );
-
     box.classList.remove("hidden");
 }
-
-
 /* =========================================
    ESCAPE HTML
 ========================================= */
-
 function escapeHTML(value) {
-
     return String(value ?? "").replace(
         /[&<>"']/g,
         character => ({
@@ -345,202 +274,153 @@ function escapeHTML(value) {
             "'": "&#39;"
         })[character]
     );
-
 }
-
-
-/* =========================================
-   GET SIGNED-IN USER SESSION
-   No email-specific restriction.
-========================================= */
-
-/* Login is not required to use the exam builder. */
-async function getAdminToken() {
-return null;
-}
-
 /* =========================================
    SEND REQUEST TO SUPABASE
-   This function appears only once.
+   LOGIN TOKEN NOT REQUIRED
 ========================================= */
-
 async function sendRequest(payload) {
-
-    const token = await getAdminToken();
-
     const response = await fetch(API_URL, {
-
         method: "POST",
-
         headers: {
             "Content-Type": "application/json",
-            "apikey": SUPABASE_KEY,
-            "Authorization": "Bearer " + token
+            "apikey": SUPABASE_KEY
         },
-
         body: JSON.stringify(payload)
-
     });
-
     const data = await response.json().catch(() => ({}));
-
     if (!response.ok) {
-
         throw new Error(
             data.error ||
             data.message ||
             "The request failed. Please try again."
         );
-
     }
-
     return data;
-
 }
-
-
 /* =========================================
    UPDATE SELECTED QUESTION COUNT
 ========================================= */
-
 function updateCount() {
-
     $("selectedCount").textContent =
         selectedQuestions.size + " selected";
-
 }
-
-
 /* =========================================
    RENDER APPROVED QUESTIONS
 ========================================= */
-
 function renderQuestions() {
-
     const list = $("questionList");
-
+    if (!approvedQuestions.length) {
+        list.innerHTML = `
+            <div class="rounded-lg border border-amber-200
+                        bg-amber-50 p-4 text-amber-800">
+                No approved questions are available for this selection.
+            </div>
+        `;
+        updateCount();
+        return;
+    }
     list.innerHTML = approvedQuestions.map(question => {
-
         const id = String(question.id);
-
         return `
-            <label class="block border rounded-xl p-4 cursor-pointer hover:bg-slate-50">
-
+            <label class="block border rounded-xl p-4
+                          cursor-pointer hover:bg-slate-50">
                 <div class="flex gap-3">
-
                     <input
                         type="checkbox"
                         class="questionCheckbox mt-1"
                         data-id="${escapeHTML(id)}"
                         ${selectedQuestions.has(id) ? "checked" : ""}
                     >
-
-                    <div class="min-w-0">
-
+                    <div class="min-w-0 flex-1">
                         <p class="text-xs text-slate-500 mb-1">
                             ${escapeHTML(question.topic || "General topic")}
                         </p>
-
                         <p class="font-semibold">
                             ${escapeHTML(question.question)}
                         </p>
-
                         <div class="text-sm text-slate-600 mt-3 space-y-1">
-
-                            <p>A. ${escapeHTML(question.option_a)}</p>
-                            <p>B. ${escapeHTML(question.option_b)}</p>
-                            <p>C. ${escapeHTML(question.option_c)}</p>
-                            <p>D. ${escapeHTML(question.option_d)}</p>
-
+                            ${
+                                question.option_a != null
+                                ? `<p>A. ${escapeHTML(question.option_a)}</p>`
+                                : ""
+                            }
+                            ${
+                                question.option_b != null
+                                ? `<p>B. ${escapeHTML(question.option_b)}</p>`
+                                : ""
+                            }
+                            ${
+                                question.option_c != null
+                                ? `<p>C. ${escapeHTML(question.option_c)}</p>`
+                                : ""
+                            }
+                            ${
+                                question.option_d != null
+                                ? `<p>D. ${escapeHTML(question.option_d)}</p>`
+                                : ""
+                            }
                         </div>
-
+                        ${
+                            question.difficulty
+                            ? `<p class="text-xs text-slate-500 mt-2">
+                                   Difficulty: ${escapeHTML(question.difficulty)}
+                               </p>`
+                            : ""
+                        }
                     </div>
-
                 </div>
-
             </label>
         `;
-
     }).join("");
-
     document.querySelectorAll(".questionCheckbox").forEach(box => {
-
         box.addEventListener("change", () => {
-
             const id = box.dataset.id;
-
             if (box.checked) {
-
                 if (selectedQuestions.size >= 100) {
-
                     box.checked = false;
-
                     showMessage(
                         "An exam can contain a maximum of 100 questions.",
                         true
                     );
-
                     return;
-
                 }
-
                 selectedQuestions.add(id);
-
             } else {
-
                 selectedQuestions.delete(id);
-
             }
-
             updateCount();
-
         });
-
     });
-
     updateCount();
-
 }
-
-
 /* =========================================
    LOAD APPROVED QUESTIONS
 ========================================= */
-
 $("loadQuestions").addEventListener("click", async () => {
-
     try {
-
         const subject = $("subject").value.trim();
-
         const topic = $("topic").value.trim();
-
         if (!subject) {
-
             throw new Error(
                 "Please select or enter a nursing subject."
             );
-
         }
-
         $("loadQuestions").disabled = true;
-
         $("loadQuestions").textContent = "Loading questions...";
-
         selectedQuestions.clear();
-
         approvedQuestions = [];
-
+        $("questionSection").classList.remove("hidden");
+        $("questionList").innerHTML = `
+            <p class="text-slate-500">
+                Loading approved questions...
+            </p>
+        `;
         const data = await sendRequest({
-
             action: "approved-questions",
-
             subject: subject,
-
             topic: topic
-
         });
-
         approvedQuestions = Array.isArray(data.questions)
             ? data.questions
             : Array.isArray(data.data)
@@ -548,200 +428,121 @@ $("loadQuestions").addEventListener("click", async () => {
                 : Array.isArray(data)
                     ? data
                     : [];
-
-        $("questionSection").classList.remove("hidden");
-
         renderQuestions();
-
         if (approvedQuestions.length === 0) {
-
             showMessage(
                 "No approved questions were found for this subject or topic. Check the Exam Vault and approve questions first.",
                 true
             );
-
         } else {
-
             showMessage(
                 approvedQuestions.length +
                 " approved questions loaded. Select the questions for your exam."
             );
-
         }
-
     } catch (error) {
-
         showMessage(
             error.message || "Unable to load questions.",
             true
         );
-
     } finally {
-
         $("loadQuestions").disabled = false;
-
         $("loadQuestions").textContent =
             "Load Approved Questions";
-
     }
-
 });
-
-
 /* =========================================
    SELECT ALL QUESTIONS
 ========================================= */
-
 $("selectAll").addEventListener("click", () => {
-
     approvedQuestions.slice(0, 100).forEach(question => {
-
         selectedQuestions.add(String(question.id));
-
     });
-
     renderQuestions();
-
 });
-
-
 /* =========================================
    CLEAR QUESTION SELECTION
 ========================================= */
-
 $("clearSelection").addEventListener("click", () => {
-
     selectedQuestions.clear();
-
     renderQuestions();
-
 });
-
-
 /* =========================================
    PUBLISH EXAM AND GENERATE LINK
 ========================================= */
-
 $("publishExam").addEventListener("click", async () => {
-
     try {
-
         const title =
             $("examTitle").value.trim();
-
         const subject =
             $("subject").value.trim();
-
         const topic =
             $("topic").value.trim();
-
         const duration =
             Number($("duration").value);
-
-
         if (!title) {
-
             throw new Error(
                 "Please enter an exam title."
             );
-
         }
-
         if (!subject) {
-
             throw new Error(
                 "Please select or enter a subject."
             );
-
         }
-
         if (
             !Number.isInteger(duration) ||
             duration < 1 ||
             duration > 300
         ) {
-
             throw new Error(
                 "The time limit must be between 1 and 300 minutes."
             );
-
         }
-
         if (selectedQuestions.size < 1) {
-
             throw new Error(
                 "Please select at least one question."
             );
-
         }
-
         if (selectedQuestions.size > 100) {
-
             throw new Error(
                 "An exam cannot contain more than 100 questions."
             );
-
         }
-
-
         $("publishExam").disabled = true;
-
         $("publishExam").textContent =
             "Publishing exam...";
-
-
         const data = await sendRequest({
-
             action: "create",
-
             title: title,
-
             subject: subject,
-
             topic: topic,
-
             duration_minutes: duration,
-
             question_ids: Array.from(selectedQuestions)
-
         });
-
-
         const slug =
             data.slug ||
             data.exam?.slug;
-
-
         if (!slug) {
-
             throw new Error(
                 data.error ||
                 "The server did not return an exam code. Please check the Supabase function."
             );
-
         }
-
-
         /*
-         * Build the student exam link using the current
-         * GitHub Pages project path.
+         * Use the current website's folder path.
+         * This works when the builder and student exam
+         * page are deployed in the same project directory.
          */
-
         const folderPath =
             window.location.pathname.replace(/[^/]*$/, "");
-
         const shareURL =
             window.location.origin +
             folderPath +
             "shareable-exam.html?slug=" +
             encodeURIComponent(slug);
-
-
         $("shareLink").value = shareURL;
-
         $("openExam").href = shareURL;
-
-
         $("whatsappLink").href =
             "https://wa.me/?text=" +
             encodeURIComponent(
@@ -750,82 +551,49 @@ $("publishExam").addEventListener("click", async () => {
                 "\nTake the exam here: " +
                 shareURL
             );
-
-
         $("shareSection").classList.remove("hidden");
-
-
         showMessage(
             "Your exam was published successfully. Copy the link and share it with your students."
         );
-
-
         $("shareSection").scrollIntoView({
             behavior: "smooth"
         });
-
-
     } catch (error) {
-
         showMessage(
             error.message || "Unable to publish the exam.",
             true
         );
-
     } finally {
-
         $("publishExam").disabled = false;
-
         $("publishExam").textContent =
             "Publish Exam and Generate Link";
-
     }
-
 });
-
-
 /* =========================================
    COPY EXAM LINK
 ========================================= */
-
 $("copyLink").addEventListener("click", async () => {
-
     const link = $("shareLink").value;
-
     if (!link) {
-
         showMessage(
             "There is no exam link to copy yet.",
             true
         );
-
         return;
-
     }
-
     try {
-
         await navigator.clipboard.writeText(link);
-
         showMessage(
             "Exam link copied successfully."
         );
-
     } catch (error) {
-
         $("shareLink").focus();
-
         $("shareLink").select();
-
         showMessage(
             "The link is selected. Copy it using your browser's Copy command."
         );
-
     }
-
 });
-
 </script>
-
 </body>
 </html>
