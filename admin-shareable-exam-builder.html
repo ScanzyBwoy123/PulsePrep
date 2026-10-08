@@ -23,30 +23,78 @@
         <input id="examTitle"
                class="w-full border rounded-lg p-3 mb-4"
                placeholder="e.g. Fluid and Electrolyte Balance Test">
-        <label class="block font-medium mb-1">Nursing subject</label>
-        <select id="subject" class="w-full border rounded-lg p-3 mb-4">
-            <option value="">Select subject</option>
-            <option>Anatomy &amp; Physiology</option>
-            <option>Microbiology</option>
-            <option>First Aid &amp; Emergency Care</option>
-            <option>Fundamentals of Nursing</option>
-            <option>Medical-Surgical Nursing</option>
-            <option>Pharmacology</option>
-            <option>Pathophysiology</option>
-            <option>Community Health Nursing</option>
-            <option>Maternal &amp; Child Health</option>
-            <option>Midwifery</option>
-            <option>Paediatric Nursing</option>
-            <option>Mental Health/Psychiatric Nursing</option>
-            <option>Nutrition &amp; Dietetics</option>
-            <option>Health Assessment</option>
-            <option>Nursing Ethics &amp; Professional Practice</option>
-            <option>Research Methods</option>
-            <option>Biostatistics</option>
-            <option>Public Health</option>
-            <option>Health Promotion</option>
-            <option>Infection Prevention &amp; Control</option>
-        </select>
+        <label for="subject" class="block font-medium mb-1">
+    Nursing or Medical Subject
+</label>
+<input
+    id="subject"
+    name="subject"
+    type="text"
+    list="subjectSuggestions"
+    class="w-full border rounded-lg p-3 mb-2"
+    placeholder="Select or type a subject"
+    autocomplete="off"
+    required
+>
+<datalist id="subjectSuggestions">
+    <option value="Anatomy">
+    <option value="Physiology">
+    <option value="Anatomy & Physiology">
+    <option value="Biochemistry">
+    <option value="Microbiology">
+    <option value="Pathology">
+    <option value="Parasitology">
+    <option value="Immunology">
+    <option value="Pharmacology">
+    <option value="Medical Terminology">
+    <option value="Fundamentals of Nursing">
+    <option value="Medical-Surgical Nursing">
+    <option value="Adult Health Nursing">
+    <option value="Surgical Nursing">
+    <option value="Perioperative Nursing">
+    <option value="Emergency Nursing">
+    <option value="Critical Care Nursing">
+    <option value="Oncology Nursing">
+    <option value="Renal Nursing">
+    <option value="Geriatric Nursing">
+    <option value="Palliative Care Nursing">
+    <option value="Health Assessment">
+    <option value="Clinical Nursing Skills">
+    <option value="First Aid & Emergency Care">
+    <option value="Professional Adjustment">
+    <option value="Nursing Ethics & Professional Practice">
+    <option value="Nursing Informatics">
+    <option value="Nursing Leadership and Management">
+    <option value="Nursing Education">
+    <option value="Midwifery">
+    <option value="Obstetric Nursing">
+    <option value="Maternal & Child Health">
+    <option value="Paediatric Nursing">
+    <option value="Neonatal Nursing">
+    <option value="Reproductive Health">
+    <option value="Community Health Nursing">
+    <option value="Public Health">
+    <option value="Epidemiology">
+    <option value="Health Promotion">
+    <option value="Infection Prevention & Control">
+    <option value="Disaster Nursing">
+    <option value="Mental Health/Psychiatric Nursing">
+    <option value="Psychology">
+    <option value="Sociology">
+    <option value="Nutrition & Dietetics">
+    <option value="Nursing Research">
+    <option value="Research Methods">
+    <option value="Biostatistics">
+    <option value="Communication in Nursing">
+    <option value="Nursing Administration">
+    <option value="Pathophysiology">
+    <option value="Clinical Medicine">
+    <option value="Medicine">
+</datalist>
+<p class="text-sm text-gray-500 mb-4">
+    Choose a suggested subject or type your own subject.
+    You are not limited to the suggestions.
+</p>
         <label class="block font-medium mb-1">Topic (optional)</label>
         <input id="topic"
                class="w-full border rounded-lg p-3 mb-4"
