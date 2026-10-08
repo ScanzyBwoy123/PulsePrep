@@ -354,29 +354,10 @@ function escapeHTML(value) {
    No email-specific restriction.
 ========================================= */
 
+/* Login is not required to use the exam builder. */
 async function getAdminToken() {
-
-    const { data, error } =
-        await supabaseClient.auth.getSession();
-
-    if (error) {
-        throw error;
-    }
-
-    const session = data.session;
-
-    if (!session) {
-
-        throw new Error(
-            "Please sign in to PulsePrep first, then reopen this page."
-        );
-
-    }
-
-    return session.access_token;
-
+return null;
 }
-
 
 /* =========================================
    SEND REQUEST TO SUPABASE
