@@ -65,15 +65,20 @@
         </p>
         <div class="grid sm:grid-cols-2 gap-4 mt-5">
             <div>
-                <label for="studentName"
-                       class="block font-medium text-sm mb-1">
-                    Student name (optional)
-                </label>
                 <input id="studentName"
-                       type="text"
-                       maxlength="120"
-                       placeholder="Enter your name"
-                       class="w-full border rounded-lg p-3">
+       type="text"
+       maxlength="120"
+       placeholder="Enter your full name"
+       autocomplete="name"
+       required
+       class="w-full border rounded-lg p-3">
+                <input id="studentEmail"
+       type="email"
+       maxlength="200"
+       placeholder="Enter your email address"
+       autocomplete="email"
+       required
+       class="w-full border rounded-lg p-3">
             </div>
             <div>
                 <label for="studentEmail"
@@ -258,7 +263,7 @@ async function loadExam() {
         $("questionCount").textContent = questions.length;
         $("timeLimit").textContent =
             exam.duration_minutes + " minutes";
-        $("startButton").disabled = false;
+        updateStartButton();
     } catch (error) {
         $("examTitle").textContent = "Unable to load examination";
         showMessage(
@@ -339,6 +344,21 @@ function updateAnsweredCount() {
     $("answeredCount").textContent =
         answered + " / " + questions.length;
 }
+    function updateStartButton() {
+    const name = $("studentName").value.trim();
+    const emailInput = $("studentEmail");
+    const email = emailInput.value.trim();
+
+    $("startButton").disabled =
+        !exam ||
+        !name ||
+        !email ||
+        !emailInput.checkValidity() ||
+        submitted;
+}
+
+$("studentName").addEventListener("input", updateStartButton);
+$("studentEmail").addEventListener("input", updateStartButton);
 /* Start examination and timer */
 $("startButton").addEventListener("click", () => {
     if (!exam || submitted) return;
