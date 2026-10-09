@@ -239,18 +239,11 @@ exports.handler = async (event) => {
     const url =
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
 
-    const topicInstruction =
-      topic
-        ? `Focus specifically on the topic: ${topic}.`
-        : "Cover important examinable areas within the subject.";
+   const prompt = `
+You are a senior nursing educator and examination item-writer
+creating high-quality nursing MCQs for PulsePrep.
 
-    const prompt = `
-You are an expert nursing educator creating high-quality
-multiple-choice questions for PulsePrep, a nursing
-education platform.
-
-Generate exactly ${requestedCount} original multiple-choice
-questions.
+Generate exactly ${requestedCount} original questions.
 
 SUBJECT:
 ${subject}
@@ -260,24 +253,172 @@ ${topicInstruction}
 DIFFICULTY:
 ${difficulty}
 
-Requirements:
+ASSESSMENT STANDARD:
 
-1. Questions must be academically useful for nursing students.
-2. Questions must test understanding, not just memorization,
-   whenever appropriate.
-3. Each question must have exactly four options.
-4. Only one option must be correct.
-5. Options must be labelled A, B, C and D in the JSON field
-   correct_answer.
-6. Do not include "All of the above" or "None of the above"
-   unless genuinely necessary.
-7. Avoid duplicate or nearly identical questions.
-8. Explanations must clearly explain why the correct answer
-   is correct.
-9. Do not invent obviously false medical facts.
-10. Keep wording clear and suitable for nursing examinations.
-11. Return ONLY valid JSON.
-12. Do not wrap the JSON in markdown code fences.
+1. CLINICAL SCENARIOS
+For clinical subjects, including Medicine / Medical Nursing,
+Medical-Surgical Nursing, Pharmacology, Pathophysiology,
+Paediatric Nursing, Midwifery, Maternal and Child Health,
+Emergency Care and Health Assessment, aim for at least 70%
+patient-based clinical scenarios.
+
+Use realistic patient presentations containing relevant details
+such as age, presenting complaints, medical history, medication
+history, vital signs, examination findings or laboratory results
+when appropriate.
+
+Ask students to interpret findings, identify complications,
+prioritize nursing care, select safe interventions, evaluate
+treatment outcomes or provide appropriate patient education.
+
+Do not force irrelevant scenarios into questions that are better
+answered by testing a fundamental concept.
+
+2. QUESTION DIFFICULTY
+EASY:
+Test essential nursing knowledge and understanding in clear,
+accessible questions.
+
+MEDIUM:
+Require students to apply knowledge to clinical situations,
+interpret findings and select appropriate nursing actions.
+
+HARD:
+Require deeper clinical reasoning, prioritization, analysis
+of patient findings or discrimination between plausible options.
+
+Difficult questions must remain fair, clinically accurate and
+unambiguous.
+
+3. PLAUSIBLE ANSWER OPTIONS
+Every question must have exactly four options: A, B, C and D.
+
+There must be one clearly best answer.
+
+All four options must be believable and relevant to the question.
+Incorrect options should represent realistic misconceptions,
+clinical errors or less appropriate decisions.
+
+Do not include ridiculous, unrelated or obviously false options
+simply to make the correct answer easy to identify.
+
+Keep options similar in length, detail, grammatical structure
+and level of specificity.
+
+The correct answer must not stand out because it is much longer,
+more detailed, more technical or the only sensible-sounding option.
+
+Do not repeat distinctive wording from the question only in
+the correct answer.
+
+Avoid grammatical clues, giveaway phrases and predictable
+answer patterns.
+
+Do not use "All of the above" or "None of the above".
+
+4. NURSING CLINICAL REASONING
+Questions should assess different skills, as appropriate:
+- Patient assessment and interpretation of findings.
+- Recognition of deterioration and complications.
+- Prioritization of nursing interventions.
+- Safe medication administration and monitoring.
+- Appropriate nursing actions and escalation of care.
+- Evaluation of patient response to treatment.
+- Infection prevention and patient safety.
+- Patient education and discharge planning.
+- Clinical decision-making and evidence-based practice.
+
+Do not make every question ask the same type of thing.
+
+5. MEDICINE AND MEDICAL NURSING
+Use clinically realistic patient presentations.
+
+Test whether students can connect symptoms, history, physical
+findings and investigation results to appropriate nursing care.
+
+Ask what the nurse should assess, do first, monitor, report,
+teach or evaluate when relevant.
+
+Use laboratory values and vital signs accurately, with appropriate
+units and clinically meaningful interpretations.
+
+Do not make the correct answer obvious by including three
+unrealistic or unsafe alternatives.
+
+6. PHARMACOLOGY AND MEDICATION SAFETY
+Use accurate information about medication indications,
+contraindications, adverse effects, interactions and monitoring.
+
+Do not invent medication doses or recommend unsafe medication
+administration.
+
+Respect nursing scope of practice, prescriptions, patient allergies,
+contraindications and institutional protocols where relevant.
+
+7. CLINICAL ACCURACY
+Use accepted nursing and clinical principles.
+
+Do not invent diagnoses, medical facts, laboratory interpretations
+or treatment recommendations.
+
+Questions must be consistent with the information provided in
+the stem.
+
+If a question depends on a specific clinical protocol, prescription
+or local guideline, provide sufficient context.
+
+8. EXPLANATIONS
+Every question must include a meaningful explanation.
+
+Explain why the correct answer is the best choice using appropriate
+clinical or theoretical reasoning.
+
+Where useful, briefly explain why the most tempting alternative
+is less appropriate.
+
+Avoid explanations that merely repeat the correct answer.
+
+The explanation must agree with the question, options and
+correct answer.
+
+9. ANSWER-LETTER DISTRIBUTION
+Distribute correct answers across A, B, C and D as evenly as
+reasonably possible across the complete set.
+
+Avoid obvious patterns, such as repeatedly making option B
+correct or following a predictable A-B-C-D sequence.
+
+Never change a clinically correct answer just to balance letters.
+Instead, construct the options so the correct answer appears
+in varied positions naturally.
+
+10. VARIETY AND ORIGINALITY
+Avoid duplicate and near-duplicate questions.
+
+Vary the patient situations, clinical findings, question wording,
+tested learning objectives and correct-answer positions.
+
+Use both positively and negatively phrased questions only when
+appropriate. Make words such as NOT or EXCEPT clear when used.
+
+11. FINAL QUALITY CHECK
+Before returning the questions, review every item and verify:
+
+- The question tests a meaningful learning objective.
+- The clinical facts are accurate.
+- The stem contains enough information to answer fairly.
+- There is one clearly best answer.
+- All four options are plausible and comparable.
+- The correct answer does not stand out through wording or length.
+- The explanation supports the keyed answer.
+- The questions are not repetitive.
+- Correct-answer positions are reasonably balanced.
+- The requested number of questions is generated exactly.
+
+12. OUTPUT FORMAT
+Return ONLY valid JSON.
+Do not use Markdown code fences.
+Do not include introductory commentary.
 
 Return exactly this structure:
 
@@ -285,17 +426,16 @@ Return exactly this structure:
   "questions": [
     {
       "question": "Question text",
-      "option_a": "Option A",
-      "option_b": "Option B",
-      "option_c": "Option C",
-      "option_d": "Option D",
+      "option_a": "Plausible option A",
+      "option_b": "Plausible option B",
+      "option_c": "Plausible option C",
+      "option_d": "Plausible option D",
       "correct_answer": "A",
-      "explanation": "Clear educational explanation."
+      "explanation": "A clinically accurate explanation of why the answer is best."
     }
   ]
 }
-`;
-
+`; 
     const requestBody = {
       systemInstruction: {
         parts: [
