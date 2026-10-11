@@ -94,7 +94,16 @@ const $=id=>document.getElementById(id);
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function dt(v){if(!v)return '—';const d=new Date(v);return isNaN(d)?'—':d.toLocaleString()}
 function status(msg,bad=false){$('status').textContent=msg;$('status').className='message'+(bad?' error':'')}
-async function isSignedIn(){const {data:{session}}=await sb.auth.getSession();$('login').classList.toggle('hidden',!!session);$('dashboard').classList.toggle('hidden',!session);$('logout').classList.toggle('hidden',!session);return !!session}
+async function isSignedIn() {
+    const { data: { session } } = await sb.auth.getSession();
+
+    $("login").classList.toggle("hidden", !!session);
+    $("dashboard").classList.toggle("hidden", !session);
+    $("feedbackDashboard").classList.toggle("hidden", !session);
+    $("logout").classList.toggle("hidden", !session);
+
+    return !!session;
+}
 async function adminCall(body){const {data:{session}}=await sb.auth.getSession();if(!session)throw Error('Please sign in again.');const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},body:JSON.stringify(body)});const d=await r.json().catch(()=>({error:'Unexpected response from server'}));if(!r.ok||d.error)throw Error(d.error||'Request failed');return d}
 async function load(){if(!await isSignedIn())return;$('detail').classList.add('hidden');$('dashboard').classList.remove('hidden');status('Loading student submissions…');try{const d=await adminCall({action:'admin-results'});results=d.results||[];render();status('Loaded '+results.length+' submission(s).')}catch(e){status(e.message,true)}}
 function render(){const q=$('search').value.trim().toLowerCase();const list=results.filter(r=>[r.student_name,r.student_email,r.exam_title,r.subject,r.student_id].some(v=>String(v||'').toLowerCase().includes(q)));$('total').textContent=results.length;$('average').textContent=results.length?(results.reduce((s,r)=>s+Number(r.score_percent||0),0)/results.length).toFixed(1)+'%':'—';$('students').textContent=new Set(results.map(r=>(r.student_email||'').trim().toLowerCase()).filter(Boolean)).size;$('examCount').textContent=new Set(results.map(r=>r.exam_id)).size;$('rows').innerHTML=list.length?list.map(r=>`<tr><td><b>${esc(r.student_name||'Name not provided')}</b><div class="muted break">ID: ${esc(r.student_id||'Not signed in')}</div></td><td class="break">${esc(r.student_email||'Not provided')}</td><td>${esc(r.exam_title)}<div class="muted">${esc(r.subject||'')}</div></td><td><b>${Number(r.score_percent||0).toFixed(1)}%</b></td><td>${Number(r.correct_count||0)} / ${Number(r.total_questions||0)}<div class="muted">Wrong: ${Number(r.incorrect_count||0)} · Blank: ${Number(r.unanswered_count||0)}</div></td><td>${esc(dt(r.submitted_at))}</td><td><button data-id="${esc(r.id)}" class="review">View answers</button></td></tr>`).join(''):'<tr><td colspan="7">No matching submissions.</td></tr>';document.querySelectorAll('.review').forEach(b=>b.addEventListener('click',()=>showReview(b.dataset.id)))}
@@ -103,5 +112,161 @@ async function signInAdmin(){const btn=$('loginButton');const msg=$('loginMsg');
 $('loginButton').addEventListener('click',signInAdmin);$('loginForm').addEventListener('submit',e=>{e.preventDefault();signInAdmin()});
 $('logout').addEventListener('click',async()=>{await sb.auth.signOut();await isSignedIn()});$('refresh').addEventListener('click',load);$('search').addEventListener('input',render);$('closeDetail').addEventListener('click',()=>{ $('detail').classList.add('hidden');$('dashboard').classList.remove('hidden') });
 $('export').addEventListener('click',()=>{const rows=[['Student Name','Email','Student ID','Exam','Subject','Score %','Correct','Incorrect','Unanswered','Started At','Submitted At'],...results.map(r=>[r.student_name,r.student_email,r.student_id,r.exam_title,r.subject,r.score_percent,r.correct_count,r.incorrect_count,r.unanswered_count,r.started_at,r.submitted_at])];const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='pulseprep-exam-results.csv';a.click();URL.revokeObjectURL(url)});
+    /* PULSEPREP ADMIN FEEDBACK LOADER */
+
+function feedbackStatus(message, isError = false) {
+    const box = $("feedbackStatus");
+    box.textContent = message;
+    box.className = "message" + (isError ? " error" : "");
+}
+
+async function loadStudentFeedback() {
+    const button = $("loadFeedbackButton");
+
+    button.disabled = true;
+    button.textContent = "Loading...";
+
+    feedbackStatus("Loading student feedback from Supabase...");
+
+    try {
+        const data = await adminCall({
+            action: "admin-feedbacks"
+        });
+
+        const feedbacks = data.feedbacks || [];
+
+        $("feedbackTotal").textContent = feedbacks.length;
+
+        const ratings = feedbacks
+            .map(item => Number(item.question_quality_rating))
+            .filter(rating => Number.isFinite(rating) && rating >= 1 && rating <= 5);
+
+        $("feedbackAverageRating").textContent = ratings.length
+            ? (
+                ratings.reduce((sum, rating) => sum + rating, 0) /
+                ratings.length
+            ).toFixed(1) + " / 5"
+            : "—";
+
+        $("feedbackReportedCount").textContent =
+            feedbacks.filter(item => item.question_problem_type).length;
+
+        $("feedbackHelpCount").textContent =
+            feedbacks.filter(item =>
+                (item.difficult_areas || []).length > 0 ||
+                item.topic_needing_help
+            ).length;
+
+        const difficulties = {};
+        const improvements = {};
+
+        feedbacks.forEach(item => {
+            (item.difficult_areas || []).forEach(topic => {
+                difficulties[topic] = (difficulties[topic] || 0) + 1;
+            });
+
+            (item.improvement_areas || []).forEach(topic => {
+                improvements[topic] = (improvements[topic] || 0) + 1;
+            });
+        });
+
+        function renderCounts(counts) {
+            const entries = Object.entries(counts)
+                .sort((a, b) => b[1] - a[1]);
+
+            if (!entries.length) {
+                return "<p>No responses recorded yet.</p>";
+            }
+
+            return entries.map(([label, count]) =>
+                `<p><b>${esc(label)}</b>: ${count} response(s)</p>`
+            ).join("");
+        }
+
+        $("feedbackDifficultTopics").innerHTML =
+            renderCounts(difficulties);
+
+        $("feedbackImprovementTopics").innerHTML =
+            renderCounts(improvements);
+
+        $("feedbackRows").innerHTML = feedbacks.length
+            ? feedbacks.map(item => {
+                const reportedQuestion = item.question_problem_type
+                    ? "Question " +
+                      esc(item.reported_question_order || "unspecified") +
+                      ": " + esc(item.question_problem_type) +
+                      (item.question_problem_details
+                          ? "<br>" + esc(item.question_problem_details)
+                          : "")
+                    : "None reported";
+
+                const suggestions = [
+                    item.learning_suggestions,
+                    item.additional_recommendations
+                ].filter(Boolean).map(esc).join("<br>");
+
+                return `
+                    <tr>
+                        <td>${esc(dt(item.created_at))}</td>
+                        <td>
+                            <b>${esc(item.student_name || "Student")}</b>
+                            <div class="muted break">
+                                ${esc(item.student_email || "Email unavailable")}
+                            </div>
+                        </td>
+                        <td>
+                            ${esc(item.exam_title || "Unknown exam")}
+                            <div class="muted">
+                                ${esc(item.subject || "")}
+                            </div>
+                        </td>
+                        <td>
+                            ${item.question_quality_rating
+                                ? esc(item.question_quality_rating) + " / 5"
+                                : "Not rated"}
+                        </td>
+                        <td>
+                            ${(item.difficult_areas || [])
+                                .map(esc).join("<br>") || "—"}
+                            ${item.topic_needing_help
+                                ? "<br><b>Needs help:</b> " +
+                                  esc(item.topic_needing_help)
+                                : ""}
+                        </td>
+                        <td>
+                            ${(item.improvement_areas || [])
+                                .map(esc).join("<br>") || "—"}
+                        </td>
+                        <td>${suggestions || "—"}</td>
+                        <td>${reportedQuestion}</td>
+                    </tr>
+                `;
+            }).join("")
+            : `<tr><td colspan="8">
+                No student feedback has been submitted yet.
+               </td></tr>`;
+
+        feedbackStatus(
+            "Successfully loaded " + feedbacks.length +
+            " feedback submission(s)."
+        );
+
+    } catch (error) {
+        feedbackStatus(
+            error.message || "Could not load student feedback.",
+            true
+        );
+    } finally {
+        button.disabled = false;
+        button.textContent = "Load Student Feedback";
+    }
+}
+
+$("loadFeedbackButton").addEventListener(
+    "click",
+    loadStudentFeedback
+);
+
+/* END PULSEPREP ADMIN FEEDBACK LOADER */
 sb.auth.onAuthStateChange(()=>setTimeout(load,0));isSignedIn().then(ok=>{if(ok)load()});
 </script></body></html>
