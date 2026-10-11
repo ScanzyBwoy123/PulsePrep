@@ -163,6 +163,289 @@
             Review your answers
         </h3>
         <div id="answerReview" class="space-y-4"></div>
+        <!-- PULSEPREP STUDENT FEEDBACK -->
+<section id="feedbackSection" class="mt-8 border-t border-slate-200 pt-6">
+
+    <div class="rounded-2xl bg-blue-50 border border-blue-100 p-5">
+        <h3 class="text-2xl font-bold text-blue-800">
+            💬 Help Us Improve PulsePrep!
+        </h3>
+
+        <p class="text-sm text-slate-600 mt-2">
+            Tell us what you found difficult and what we can improve.
+            Your feedback will help us make nursing practice questions
+            and learning resources better for everyone.
+        </p>
+    </div>
+
+    <form id="feedbackForm" class="mt-5 space-y-5">
+
+        <!-- Difficult areas -->
+        <fieldset class="border rounded-xl p-4">
+            <legend class="font-bold px-1">
+                1. Which areas did you find difficult?
+            </legend>
+
+            <div class="space-y-3 mt-3">
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="difficult_areas"
+                        value="Understanding the questions">
+                    Understanding the questions
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="difficult_areas"
+                        value="Understanding the topic">
+                    Understanding the topic
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="difficult_areas"
+                        value="Medication and pharmacology">
+                    Medication and pharmacology
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="difficult_areas"
+                        value="Clinical scenario questions">
+                    Clinical scenario questions
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="difficult_areas"
+                        value="Choosing nursing interventions">
+                    Choosing nursing interventions
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="difficult_areas"
+                        value="Remembering important facts">
+                    Remembering important facts
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="difficult_areas"
+                        value="Managing examination time">
+                    Managing examination time
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="difficult_areas"
+                        value="Understanding answer explanations">
+                    Understanding answer explanations
+                </label>
+
+            </div>
+        </fieldset>
+
+        <!-- Topics requiring help -->
+        <div>
+            <label for="topicNeedingHelp"
+                class="block font-bold mb-2">
+                2. Which topic would you like us to explain better?
+            </label>
+
+            <textarea
+                id="topicNeedingHelp"
+                maxlength="2000"
+                rows="3"
+                class="w-full border rounded-xl p-3"
+                placeholder="Tell us the topic you struggled with..."
+            ></textarea>
+        </div>
+
+        <!-- Improvements -->
+        <fieldset class="border rounded-xl p-4">
+            <legend class="font-bold px-1">
+                3. What should we improve?
+            </legend>
+
+            <div class="space-y-3 mt-3">
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="improvement_areas"
+                        value="More clinical scenarios">
+                    More clinical scenarios
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="improvement_areas"
+                        value="Clearer questions">
+                    Clearer questions
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="improvement_areas"
+                        value="Better answer explanations">
+                    Better answer explanations
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="improvement_areas"
+                        value="More questions on difficult topics">
+                    More questions on difficult topics
+                </label>
+
+                <label class="flex gap-2 items-center font-normal">
+                    <input type="checkbox" name="improvement_areas"
+                        value="More challenging questions">
+                    More challenging questions
+                </label>
+
+            </div>
+        </fieldset>
+
+        <!-- Learning suggestions -->
+        <div>
+            <label for="learningSuggestions"
+                class="block font-bold mb-2">
+                4. What would help you learn better?
+            </label>
+
+            <textarea
+                id="learningSuggestions"
+                maxlength="3000"
+                rows="3"
+                class="w-full border rounded-xl p-3"
+                placeholder="Share your suggestions..."
+            ></textarea>
+        </div>
+
+        <!-- Additional recommendations -->
+        <div>
+            <label for="additionalRecommendations"
+                class="block font-bold mb-2">
+                5. Any other recommendations?
+            </label>
+
+            <textarea
+                id="additionalRecommendations"
+                maxlength="3000"
+                rows="3"
+                class="w-full border rounded-xl p-3"
+                placeholder="What should PulsePrep do differently?"
+            ></textarea>
+        </div>
+
+        <!-- Question rating -->
+        <div>
+            <label for="questionRating"
+                class="block font-bold mb-2">
+                6. How would you rate these questions?
+            </label>
+
+            <select id="questionRating"
+                class="w-full border rounded-xl p-3 bg-white">
+
+                <option value="">Select a rating (optional)</option>
+                <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                <option value="4">⭐⭐⭐⭐ Good</option>
+                <option value="3">⭐⭐⭐ Average</option>
+                <option value="2">⭐⭐ Poor</option>
+                <option value="1">⭐ Very poor</option>
+
+            </select>
+        </div>
+
+        <!-- Report a question -->
+        <details class="border rounded-xl p-4">
+
+            <summary class="font-bold cursor-pointer">
+                🚩 Report a problem with a question
+            </summary>
+
+            <p class="text-sm text-slate-500 mt-2">
+                Report a question that is confusing, has a possible
+                incorrect answer, or contains a mistake.
+            </p>
+
+            <label for="reportedQuestionOrder"
+                class="block font-bold mt-4 mb-2">
+                Question number
+            </label>
+
+            <select id="reportedQuestionOrder"
+                class="w-full border rounded-xl p-3 bg-white">
+                <option value="">Select question number</option>
+            </select>
+
+            <label for="questionProblemType"
+                class="block font-bold mt-4 mb-2">
+                What is the problem?
+            </label>
+
+            <select id="questionProblemType"
+                class="w-full border rounded-xl p-3 bg-white">
+
+                <option value="">Select a problem</option>
+                <option>Confusing question</option>
+                <option>Possible incorrect answer key</option>
+                <option>More than one answer seems correct</option>
+                <option>Explanation is insufficient</option>
+                <option>Question contains an error</option>
+                <option>Other</option>
+
+            </select>
+
+            <label for="questionProblemDetails"
+                class="block font-bold mt-4 mb-2">
+                Explain the problem
+            </label>
+
+            <textarea
+                id="questionProblemDetails"
+                maxlength="2000"
+                rows="3"
+                class="w-full border rounded-xl p-3"
+                placeholder="Tell us what seems wrong..."
+            ></textarea>
+
+        </details>
+
+        <!-- Submission messages -->
+        <div id="feedbackMessage"
+            class="hidden rounded-lg p-3 text-sm"
+            role="status">
+        </div>
+
+        <!-- Buttons -->
+        <button
+            id="feedbackSubmitButton"
+            type="submit"
+            class="w-full bg-blue-700 hover:bg-blue-800
+                   text-white font-bold rounded-xl p-4">
+            Submit Feedback
+        </button>
+
+        <button
+            id="feedbackSkipButton"
+            type="button"
+            class="w-full border border-slate-300
+                   rounded-xl p-3 font-semibold">
+            Skip for Now
+        </button>
+
+    </form>
+
+    <!-- Thank-you message -->
+    <div id="feedbackThanks"
+        class="hidden mt-5 rounded-xl bg-emerald-50
+               border border-emerald-200 p-5"
+        role="status">
+
+        <h4 class="font-bold text-lg text-emerald-800">
+            Thank you for helping us improve PulsePrep! ❤️
+        </h4>
+
+        <p id="feedbackThanksText" class="text-sm mt-2">
+            Your feedback is important to us.
+        </p>
+
+    </div>
+
+</section>
+<!-- END STUDENT FEEDBACK -->
         <p class="text-xs text-slate-500 mt-6 text-center">
             PulsePrep Nursing Education
         </p>
