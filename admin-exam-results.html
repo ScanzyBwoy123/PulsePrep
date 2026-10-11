@@ -1,97 +1,552 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>PulsePrep Admin — Exam Results</title>
+
 <style>
-:root{font-family:Arial,sans-serif;color:#172033;background:#f1f5f9}*{box-sizing:border-box}body{margin:0}header{background:#0f172a;color:white;padding:22px 5%;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap}h1{margin:5px 0;font-size:25px}main{max-width:1250px;margin:24px auto;padding:0 16px}.card{background:white;border-radius:14px;padding:20px;margin-bottom:18px;box-shadow:0 2px 10px #0f172a0d}.hidden{display:none!important}label{display:block;font-weight:bold;margin:12px 0}input{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:8px;margin-top:6px}button,.button{border:0;border-radius:8px;background:#1d4ed8;color:white;padding:11px 15px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block}button.secondary{background:#334155}button.green{background:#047857}.muted{color:#64748b;font-size:13px}.message{padding:12px;border-radius:8px;background:#e2e8f0;margin:12px 0}.error{background:#fee2e2;color:#991b1b}.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}.stat strong{display:block;font-size:29px;margin-top:8px}table{border-collapse:collapse;width:100%;min-width:900px}th,td{text-align:left;padding:12px;border-bottom:1px solid #e2e8f0;vertical-align:top;font-size:14px}th{background:#f8fafc;color:#475569}.tablewrap{overflow-x:auto}.question{border:1px solid #cbd5e1;border-radius:10px;padding:15px;margin:12px 0}.correct{color:#047857;font-weight:bold}.wrong{color:#b91c1c;font-weight:bold}.toprow{display:flex;gap:10px;flex-wrap:wrap}.toprow input{flex:1;min-width:220px;margin:0}.answerline{margin:6px 0}.break{overflow-wrap:anywhere}
+:root {
+    font-family: Arial, sans-serif;
+    color: #172033;
+    background: #f1f5f9;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+header {
+    background: #0f172a;
+    color: white;
+    padding: 22px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+h1 {
+    margin: 5px 0;
+    font-size: 25px;
+}
+
+main {
+    max-width: 1250px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+.card {
+    background: white;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 10px #0f172a0d;
+}
+
+.hidden {
+    display: none !important;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin: 12px 0;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    margin-top: 6px;
+}
+
+button,
+.button {
+    border: 0;
+    border-radius: 8px;
+    background: #1d4ed8;
+    color: white;
+    padding: 11px 15px;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+button.secondary {
+    background: #334155;
+}
+
+button.green {
+    background: #047857;
+}
+
+.muted {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.message {
+    padding: 12px;
+    border-radius: 8px;
+    background: #e2e8f0;
+    margin: 12px 0;
+}
+
+.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px;
+}
+
+.stat strong {
+    display: block;
+    font-size: 29px;
+    margin-top: 8px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 900px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+    vertical-align: top;
+    font-size: 14px;
+}
+
+th {
+    background: #f8fafc;
+    color: #475569;
+}
+
+.tablewrap {
+    overflow-x: auto;
+}
+
+.question {
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 12px 0;
+}
+
+.correct {
+    color: #047857;
+    font-weight: bold;
+}
+
+.wrong {
+    color: #b91c1c;
+    font-weight: bold;
+}
+
+.toprow {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.toprow input {
+    flex: 1;
+    min-width: 220px;
+    margin: 0;
+}
+
+.answerline {
+    margin: 6px 0;
+}
+
+.break {
+    overflow-wrap: anywhere;
+}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'"></script>
+
+<script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+    onerror="this.onerror=null;this.src='https://unpkg.com/@supabase/supabase-js@2'">
+</script>
 </head>
+
 <body>
-<header><div><div style="color:#93c5fd;font-size:12px;font-weight:bold;letter-spacing:2px">PULSEPREP ADMIN</div><h1>Student Exam Results</h1><div class="muted" style="color:#cbd5e1">Student details, scores, submitted answers and review</div></div><div class="toprow"><a class="button" href="./admin-shareable-exam-builder.html">Exam Builder</a><button id="logout" class="secondary hidden">Sign out</button></div></header>
-<main>
-<section id="login" class="card" style="max-width:480px;margin:40px auto"><h2>Administrator sign in</h2><p class="muted">Sign in with the administrator account authorized for PulsePrep.</p><form id="loginForm"><label>Email<input id="email" type="email" autocomplete="username" required></label><label>Password<input id="password" type="password" autocomplete="current-password" required></label><button type="button" id="loginButton">Sign in</button></form><div id="loginMsg" class="message hidden"></div></section>
-<section id="dashboard" class="hidden"><div id="status" class="message">Loading submissions…</div><div class="stats"><div class="card stat">Submissions<strong id="total">0</strong></div><div class="card stat">Average score<strong id="average">—</strong></div><div class="card stat">Students identified by email<strong id="students">0</strong></div><div class="card stat">Exams attempted<strong id="examCount">0</strong></div></div><div class="card"><div class="toprow"><input id="search" placeholder="Search by student, email or exam"><button id="refresh">Refresh</button><button id="export" class="green">Export CSV</button></div><p class="muted">Latest 500 submissions. If a student did not sign in, their account ID will show as unavailable.</p><div class="tablewrap"><table><thead><tr><th>Student / ID</th><th>Email</th><th>Examination</th><th>Score</th><th>Correct / Total</th><th>Submitted</th><th>Review</th></tr></thead><tbody id="rows"><tr><td colspan="7">No results loaded.</td></tr></tbody></table></div></div></<!-- PULSEPREP STUDENT FEEDBACK DASHBOARD -->
-<section id="feedbackDashboard" class="card hidden">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-        <div>
-            <h2 style="margin:0 0 8px">Student Feedback &amp; Quality Reports</h2>
-            <p class="muted">Understand student difficulties and improve examination quality.</p>
+
+<header>
+    <div>
+        <div style="color:#93c5fd;font-size:12px;font-weight:bold;letter-spacing:2px">
+            PULSEPREP ADMIN
         </div>
-        <button type="button" id="loadFeedbackButton" class="green">
-            Load Student Feedback
+
+        <h1>Student Exam Results</h1>
+
+        <div class="muted" style="color:#cbd5e1">
+            Student details, scores, submitted answers and review
+        </div>
+    </div>
+
+    <div class="toprow">
+        <a class="button" href="./admin-shareable-exam-builder.html">
+            Exam Builder
+        </a>
+
+        <button id="logout" class="secondary hidden">
+            Sign out
         </button>
     </div>
-<div class="stats" style="margin:20px 0">
-    <div class="card stat">
-        Total Feedback
-        <strong id="feedbackTotal">0</strong>
-    </div>
-    <div class="card stat">
-        Average Question Rating
-        <strong id="feedbackAverageRating">—</strong>
-    </div>
-    <div class="card stat">
-        Questions Reported
-        <strong id="feedbackReportedCount">0</strong>
-    </div>
-    <div class="card stat">
-        Students Needing Help
-        <strong id="feedbackHelpCount">0</strong>
-    </div>
-</div>
-<div id="feedbackStatus" class="message">
-    Select "Load Student Feedback" to view student responses.
-</div>
-<div class="card">
-    <h3>Common Difficulties</h3>
-    <div id="feedbackDifficultTopics" class="break">
-        No feedback loaded yet.
-    </div>
-</div>
-<div class="card">
-    <h3>Student Suggestions for Improvement</h3>
-    <div id="feedbackImprovementTopics" class="break">
-        No feedback loaded yet.
-    </div>
-</div>
-<div class="card">
-    <h3>Individual Feedback Submissions</h3>
-    <div class="tablewrap">
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Student</th>
-                    <th>Examination</th>
-                    <th>Rating</th>
-                    <th>Difficult Areas</th>
-                    <th>Suggested Improvements</th>
-                    <th>Recommendations</th>
-                    <th>Reported Question</th>
-                </tr>
-            </thead>
-            <tbody id="feedbackRows">
-                <tr>
-                    <td colspan="8">No feedback loaded yet.</td>
-                </tr>
-        </tbody></table></div></div></section>
-<!-- PULSEPREP STUDENT FEEDBACK DASHBOARD -->
-<section id="detail" class="card hidden"><div class="toprow" style="justify-content:space-between;align-items:center"><div><h2 id="detailTitle">Submission review</h2><div id="detailSub" class="muted"></div></div><button id="closeDetail" class="secondary">Back to results</button></div><div id="detailBody"></div></section>
+</header>
+
+<main>
+
+    <!-- ADMIN LOGIN -->
+    <section
+        id="login"
+        class="card"
+        style="max-width:480px;margin:40px auto">
+
+        <h2>Administrator sign in</h2>
+
+        <p class="muted">
+            Sign in with the administrator account authorized for PulsePrep.
+        </p>
+
+        <form id="loginForm">
+            <label>
+                Email
+                <input
+                    id="email"
+                    type="email"
+                    autocomplete="username"
+                    required>
+            </label>
+
+            <label>
+                Password
+                <input
+                    id="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required>
+            </label>
+
+            <button type="button" id="loginButton">
+                Sign in
+            </button>
+        </form>
+
+        <div id="loginMsg" class="message hidden"></div>
+    </section>
+
+
+    <!-- STUDENT EXAM RESULTS DASHBOARD -->
+    <section id="dashboard" class="hidden">
+
+        <div id="status" class="message">
+            Loading submissions…
+        </div>
+
+        <div class="stats">
+
+            <div class="card stat">
+                Submissions
+                <strong id="total">0</strong>
+            </div>
+
+            <div class="card stat">
+                Average score
+                <strong id="average">—</strong>
+            </div>
+
+            <div class="card stat">
+                Students identified by email
+                <strong id="students">0</strong>
+            </div>
+
+            <div class="card stat">
+                Exams attempted
+                <strong id="examCount">0</strong>
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <div class="toprow">
+                <input
+                    id="search"
+                    placeholder="Search by student, email or exam">
+
+                <button id="refresh">
+                    Refresh
+                </button>
+
+                <button id="export" class="green">
+                    Export CSV
+                </button>
+            </div>
+
+            <p class="muted">
+                Latest 500 submissions. If a student did not sign in,
+                their account ID will show as unavailable.
+            </p>
+
+            <div class="tablewrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student / ID</th>
+                            <th>Email</th>
+                            <th>Examination</th>
+                            <th>Score</th>
+                            <th>Correct / Total</th>
+                            <th>Submitted</th>
+                            <th>Review</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="rows">
+                        <tr>
+                            <td colspan="7">No results loaded.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </section>
+    <!-- IMPORTANT: The results dashboard is now properly closed. -->
+
+
+    <!-- STUDENT FEEDBACK DASHBOARD -->
+    <section id="feedbackDashboard" class="card hidden">
+
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+            <div>
+                <h2 style="margin:0 0 8px">
+                    Student Feedback &amp; Quality Reports
+                </h2>
+
+                <p class="muted">
+                    Understand student difficulties and improve examination quality.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                id="loadFeedbackButton"
+                class="green">
+                Load Student Feedback
+            </button>
+        </div>
+
+        <div class="stats" style="margin:20px 0">
+
+            <div class="card stat">
+                Total Feedback
+                <strong id="feedbackTotal">0</strong>
+            </div>
+
+            <div class="card stat">
+                Average Question Rating
+                <strong id="feedbackAverageRating">—</strong>
+            </div>
+
+            <div class="card stat">
+                Questions Reported
+                <strong id="feedbackReportedCount">0</strong>
+            </div>
+
+            <div class="card stat">
+                Students Needing Help
+                <strong id="feedbackHelpCount">0</strong>
+            </div>
+
+        </div>
+
+        <div id="feedbackStatus" class="message">
+            Select "Load Student Feedback" to view student responses.
+        </div>
+
+        <div class="card">
+            <h3>Common Difficulties</h3>
+
+            <div id="feedbackDifficultTopics" class="break">
+                No feedback loaded yet.
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Student Suggestions for Improvement</h3>
+
+            <div id="feedbackImprovementTopics" class="break">
+                No feedback loaded yet.
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Individual Feedback Submissions</h3>
+
+            <div class="tablewrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Student</th>
+                            <th>Examination</th>
+                            <th>Rating</th>
+                            <th>Difficult Areas</th>
+                            <th>Suggested Improvements</th>
+                            <th>Recommendations</th>
+                            <th>Reported Question</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="feedbackRows">
+                        <tr>
+                            <td colspan="8">
+                                No feedback loaded yet.
+                            </td>
+                        </tr>
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- SUBMISSION REVIEW: KEPT OUTSIDE THE RESULTS DASHBOARD -->
+    <section id="detail" class="card hidden">
+
+        <div
+            class="toprow"
+            style="justify-content:space-between;align-items:center">
+
+            <div>
+                <h2 id="detailTitle">Submission review</h2>
+                <div id="detailSub" class="muted"></div>
+            </div>
+
+            <button id="closeDetail" class="secondary">
+                Back to results
+            </button>
+        </div>
+
+        <div id="detailBody"></div>
+
+    </section>
+
 </main>
+
 <script>
-const SUPABASE_URL='https://eskwphjtiogguhvtktmh.supabase.co';
-const SUPABASE_KEY='sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs';
-const API_URL=SUPABASE_URL+'/functions/v1/shareable-exam';
-if(!window.supabase||!window.supabase.createClient){const m=document.getElementById('loginMsg');m.classList.remove('hidden');m.classList.add('error');m.textContent='The sign-in security library did not load. Check your internet connection, then reload this page. If this continues, try another browser/network.';document.getElementById('loginButton').disabled=true;throw new Error('Supabase JavaScript library failed to load');}
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);let results=[];
-const $=id=>document.getElementById(id);
-function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function dt(v){if(!v)return '—';const d=new Date(v);return isNaN(d)?'—':d.toLocaleString()}
-function status(msg,bad=false){$('status').textContent=msg;$('status').className='message'+(bad?' error':'')}
+"use strict";
+
+const SUPABASE_URL =
+    "https://eskwphjtiogguhvtktmh.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_3Au4wDDzZ8o7DCyax8eF-Q_lxT-kGJs";
+
+const API_URL =
+    SUPABASE_URL + "/functions/v1/shareable-exam";
+
+
+/* CHECK SUPABASE LIBRARY */
+
+if (!window.supabase || !window.supabase.createClient) {
+    const message = document.getElementById("loginMsg");
+
+    message.classList.remove("hidden");
+    message.classList.add("error");
+
+    message.textContent =
+        "The sign-in security library did not load. Check your internet " +
+        "connection, then reload this page. If this continues, try another " +
+        "browser or network.";
+
+    document.getElementById("loginButton").disabled = true;
+
+    throw new Error("Supabase JavaScript library failed to load");
+}
+
+
+/* INITIALIZE SUPABASE */
+
+const sb = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+let results = [];
+
+const $ = id => document.getElementById(id);
+
+
+/* HELPER FUNCTIONS */
+
+function esc(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+function dt(value) {
+    if (!value) return "—";
+
+    const date = new Date(value);
+
+    return isNaN(date)
+        ? "—"
+        : date.toLocaleString();
+}
+
+function status(message, bad = false) {
+    $("status").textContent = message;
+
+    $("status").className =
+        "message" + (bad ? " error" : "");
+}
+
+
+/* AUTHENTICATION STATE */
+
 async function isSignedIn() {
-    const { data: { session } } = await sb.auth.getSession();
+    const {
+        data: { session },
+        error
+    } = await sb.auth.getSession();
+
+    if (error) {
+        throw error;
+    }
 
     $("login").classList.toggle("hidden", !!session);
     $("dashboard").classList.toggle("hidden", !session);
@@ -100,21 +555,526 @@ async function isSignedIn() {
 
     return !!session;
 }
-async function adminCall(body){const {data:{session}}=await sb.auth.getSession();if(!session)throw Error('Please sign in again.');const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+session.access_token},body:JSON.stringify(body)});const d=await r.json().catch(()=>({error:'Unexpected response from server'}));if(!r.ok||d.error)throw Error(d.error||'Request failed');return d}
-async function load(){if(!await isSignedIn())return;$('detail').classList.add('hidden');$('dashboard').classList.remove('hidden');status('Loading student submissions…');try{const d=await adminCall({action:'admin-results'});results=d.results||[];render();status('Loaded '+results.length+' submission(s).')}catch(e){status(e.message,true)}}
-function render(){const q=$('search').value.trim().toLowerCase();const list=results.filter(r=>[r.student_name,r.student_email,r.exam_title,r.subject,r.student_id].some(v=>String(v||'').toLowerCase().includes(q)));$('total').textContent=results.length;$('average').textContent=results.length?(results.reduce((s,r)=>s+Number(r.score_percent||0),0)/results.length).toFixed(1)+'%':'—';$('students').textContent=new Set(results.map(r=>(r.student_email||'').trim().toLowerCase()).filter(Boolean)).size;$('examCount').textContent=new Set(results.map(r=>r.exam_id)).size;$('rows').innerHTML=list.length?list.map(r=>`<tr><td><b>${esc(r.student_name||'Name not provided')}</b><div class="muted break">ID: ${esc(r.student_id||'Not signed in')}</div></td><td class="break">${esc(r.student_email||'Not provided')}</td><td>${esc(r.exam_title)}<div class="muted">${esc(r.subject||'')}</div></td><td><b>${Number(r.score_percent||0).toFixed(1)}%</b></td><td>${Number(r.correct_count||0)} / ${Number(r.total_questions||0)}<div class="muted">Wrong: ${Number(r.incorrect_count||0)} · Blank: ${Number(r.unanswered_count||0)}</div></td><td>${esc(dt(r.submitted_at))}</td><td><button data-id="${esc(r.id)}" class="review">View answers</button></td></tr>`).join(''):'<tr><td colspan="7">No matching submissions.</td></tr>';document.querySelectorAll('.review').forEach(b=>b.addEventListener('click',()=>showReview(b.dataset.id)))}
-async function showReview(id){$('detail').classList.remove('hidden');$('dashboard').classList.add('hidden');$('detailTitle').textContent='Loading review…';$('detailSub').textContent='';$('detailBody').textContent='';try{const d=await adminCall({action:'admin-results',attempt_id:id});const a=d.attempt;$('detailTitle').textContent=a.student_name||'Student submission';$('detailSub').textContent=(a.student_email||'Email not provided')+' · '+a.exam_title+' · '+Number(a.score_percent||0).toFixed(1)+'%';$('detailBody').innerHTML=`<div class="card"><p><b>Student ID:</b> <span class="break">${esc(a.student_id||'Not signed in')}</span></p><p><b>Started:</b> ${esc(dt(a.started_at))}</p><p><b>Submitted:</b> ${esc(dt(a.submitted_at))}</p><p><b>Result:</b> ${Number(a.correct_count||0)} correct, ${Number(a.incorrect_count||0)} incorrect, ${Number(a.unanswered_count||0)} unanswered out of ${Number(a.total_questions||0)}</p></div>`+(d.review||[]).map(x=>`<article class="question"><div class="muted">Question ${esc(x.question_order)} — ${x.is_correct?'<span class="correct">Correct</span>':x.your_answer?'<span class="wrong">Incorrect</span>':'Unanswered'}</div><p><b>${esc(x.question)}</b></p>${x.scenario?`<p>${esc(x.scenario)}</p>`:''}${['a','b','c','d'].map(l=>{const L=l.toUpperCase();const c=L===x.correct_answer;const y=L===x.your_answer;return `<p class="answerline ${c?'correct':y?'wrong':''}">${L}. ${esc(x['option_'+l])}${y?' — Student answer':''}${c?' — Correct answer':''}</p>`}).join('')}${x.explanation?`<div class="message"><b>Explanation:</b> ${esc(x.explanation)}</div>`:''}</article>`).join('')}catch(e){$('detailBody').textContent=e.message}}
-async function signInAdmin(){const btn=$('loginButton');const msg=$('loginMsg');msg.classList.remove('hidden','error');msg.textContent='Signing in…';btn.disabled=true;btn.textContent='Signing in…';try{const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});if(error)throw error;if(!data.session)throw Error('Sign-in did not return a session. Please check your Supabase Auth account.');msg.textContent='Signed in. Loading student results…';await load()}catch(err){msg.textContent=err.message||'Sign-in failed. Please try again.';msg.classList.add('error')}finally{btn.disabled=false;btn.textContent='Sign in'}}
-$('loginButton').addEventListener('click',signInAdmin);$('loginForm').addEventListener('submit',e=>{e.preventDefault();signInAdmin()});
-$('logout').addEventListener('click',async()=>{await sb.auth.signOut();await isSignedIn()});$('refresh').addEventListener('click',load);$('search').addEventListener('input',render);$('closeDetail').addEventListener('click',()=>{ $('detail').classList.add('hidden');$('dashboard').classList.remove('hidden') });
-$('export').addEventListener('click',()=>{const rows=[['Student Name','Email','Student ID','Exam','Subject','Score %','Correct','Incorrect','Unanswered','Started At','Submitted At'],...results.map(r=>[r.student_name,r.student_email,r.student_id,r.exam_title,r.subject,r.score_percent,r.correct_count,r.incorrect_count,r.unanswered_count,r.started_at,r.submitted_at])];const csv=rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='pulseprep-exam-results.csv';a.click();URL.revokeObjectURL(url)});
-    /* PULSEPREP ADMIN FEEDBACK LOADER */
+
+
+/* SUPABASE EDGE FUNCTION REQUEST */
+
+async function adminCall(body) {
+    const {
+        data: { session },
+        error: sessionError
+    } = await sb.auth.getSession();
+
+    if (sessionError) {
+        throw sessionError;
+    }
+
+    if (!session) {
+        throw new Error("Please sign in again.");
+    }
+
+    const response = await fetch(API_URL, {
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_KEY,
+            "Authorization": "Bearer " + session.access_token
+        },
+
+        body: JSON.stringify(body)
+    });
+
+    const data = await response.json().catch(() => ({
+        error: "Unexpected response from server"
+    }));
+
+    if (!response.ok || data.error) {
+        throw new Error(
+            data.error || "Request failed"
+        );
+    }
+
+    return data;
+}
+
+
+/* LOAD EXAM RESULTS */
+
+async function load() {
+    try {
+        const signedIn = await isSignedIn();
+
+        if (!signedIn) {
+            return;
+        }
+
+        $("detail").classList.add("hidden");
+        $("dashboard").classList.remove("hidden");
+
+        status("Loading student submissions…");
+
+        const data = await adminCall({
+            action: "admin-results"
+        });
+
+        results = data.results || [];
+
+        render();
+
+        status(
+            "Loaded " + results.length + " submission(s)."
+        );
+
+    } catch (error) {
+        status(
+            error.message || "Could not load student submissions.",
+            true
+        );
+    }
+}
+
+
+/* DISPLAY RESULTS TABLE */
+
+function render() {
+    const query = $("search").value.trim().toLowerCase();
+
+    const list = results.filter(result => {
+        return [
+            result.student_name,
+            result.student_email,
+            result.exam_title,
+            result.subject,
+            result.student_id
+        ].some(value =>
+            String(value || "").toLowerCase().includes(query)
+        );
+    });
+
+    $("total").textContent = results.length;
+
+    $("average").textContent = results.length
+        ? (
+            results.reduce(
+                (sum, result) =>
+                    sum + Number(result.score_percent || 0),
+                0
+            ) / results.length
+        ).toFixed(1) + "%"
+        : "—";
+
+    $("students").textContent = new Set(
+        results
+            .map(result =>
+                (result.student_email || "").trim().toLowerCase()
+            )
+            .filter(Boolean)
+    ).size;
+
+    $("examCount").textContent = new Set(
+        results.map(result => result.exam_id)
+    ).size;
+
+    $("rows").innerHTML = list.length
+        ? list.map(result => `
+            <tr>
+                <td>
+                    <b>${esc(result.student_name || "Name not provided")}</b>
+
+                    <div class="muted break">
+                        ID: ${esc(result.student_id || "Not signed in")}
+                    </div>
+                </td>
+
+                <td class="break">
+                    ${esc(result.student_email || "Not provided")}
+                </td>
+
+                <td>
+                    ${esc(result.exam_title)}
+
+                    <div class="muted">
+                        ${esc(result.subject || "")}
+                    </div>
+                </td>
+
+                <td>
+                    <b>${Number(result.score_percent || 0).toFixed(1)}%</b>
+                </td>
+
+                <td>
+                    ${Number(result.correct_count || 0)}
+                    /
+                    ${Number(result.total_questions || 0)}
+
+                    <div class="muted">
+                        Wrong: ${Number(result.incorrect_count || 0)}
+                        ·
+                        Blank: ${Number(result.unanswered_count || 0)}
+                    </div>
+                </td>
+
+                <td>
+                    ${esc(dt(result.submitted_at))}
+                </td>
+
+                <td>
+                    <button
+                        type="button"
+                        data-id="${esc(result.id)}"
+                        class="review">
+                        View answers
+                    </button>
+                </td>
+            </tr>
+        `).join("")
+        : `
+            <tr>
+                <td colspan="7">
+                    No matching submissions.
+                </td>
+            </tr>
+        `;
+
+    document.querySelectorAll(".review").forEach(button => {
+        button.addEventListener("click", () => {
+            showReview(button.dataset.id);
+        });
+    });
+}
+
+
+/* OPEN INDIVIDUAL STUDENT ANSWER REVIEW */
+
+async function showReview(id) {
+    /*
+     * IMPORTANT:
+     * The review section is outside the dashboard section.
+     * Hiding the dashboard will no longer hide the review.
+     */
+
+    $("dashboard").classList.add("hidden");
+    $("detail").classList.remove("hidden");
+
+    $("detailTitle").textContent = "Loading review…";
+    $("detailSub").textContent = "";
+    $("detailBody").textContent = "Loading submitted answers…";
+
+    try {
+        const data = await adminCall({
+            action: "admin-results",
+            attempt_id: id
+        });
+
+        if (!data.attempt) {
+            throw new Error(
+                "The server did not return the student's submission."
+            );
+        }
+
+        const attempt = data.attempt;
+
+        $("detailTitle").textContent =
+            attempt.student_name || "Student submission";
+
+        $("detailSub").textContent =
+            (attempt.student_email || "Email not provided") +
+            " · " +
+            (attempt.exam_title || "Examination") +
+            " · " +
+            Number(attempt.score_percent || 0).toFixed(1) +
+            "%";
+
+        const summary = `
+            <div class="card">
+                <p>
+                    <b>Student ID:</b>
+                    <span class="break">
+                        ${esc(attempt.student_id || "Not signed in")}
+                    </span>
+                </p>
+
+                <p>
+                    <b>Started:</b>
+                    ${esc(dt(attempt.started_at))}
+                </p>
+
+                <p>
+                    <b>Submitted:</b>
+                    ${esc(dt(attempt.submitted_at))}
+                </p>
+
+                <p>
+                    <b>Result:</b>
+                    ${Number(attempt.correct_count || 0)} correct,
+                    ${Number(attempt.incorrect_count || 0)} incorrect,
+                    ${Number(attempt.unanswered_count || 0)} unanswered
+                    out of ${Number(attempt.total_questions || 0)}
+                </p>
+            </div>
+        `;
+
+        const review = data.review || [];
+
+        const reviewHTML = review.map(question => {
+            let resultLabel;
+
+            if (question.is_correct) {
+                resultLabel = '<span class="correct">Correct</span>';
+            } else if (question.your_answer) {
+                resultLabel = '<span class="wrong">Incorrect</span>';
+            } else {
+                resultLabel = "Unanswered";
+            }
+
+            const optionsHTML = ["a", "b", "c", "d"].map(letter => {
+                const optionLetter = letter.toUpperCase();
+
+                const isCorrect =
+                    optionLetter === question.correct_answer;
+
+                const isStudentAnswer =
+                    optionLetter === question.your_answer;
+
+                const classes = [
+                    isCorrect ? "correct" : "",
+                    isStudentAnswer ? "wrong" : ""
+                ].filter(Boolean).join(" ");
+
+                let labels = "";
+
+                if (isStudentAnswer) {
+                    labels += " — Student answer";
+                }
+
+                if (isCorrect) {
+                    labels += " — Correct answer";
+                }
+
+                return `
+                    <p class="answerline ${classes}">
+                        ${optionLetter}.
+                        ${esc(question["option_" + letter])}
+                        ${labels}
+                    </p>
+                `;
+            }).join("");
+
+            return `
+                <article class="question">
+
+                    <div class="muted">
+                        Question ${esc(question.question_order)}
+                        —
+                        ${resultLabel}
+                    </div>
+
+                    <p>
+                        <b>${esc(question.question)}</b>
+                    </p>
+
+                    ${
+                        question.scenario
+                            ? `<p>${esc(question.scenario)}</p>`
+                            : ""
+                    }
+
+                    ${optionsHTML}
+
+                    ${
+                        question.explanation
+                            ? `
+                                <div class="message">
+                                    <b>Explanation:</b>
+                                    ${esc(question.explanation)}
+                                </div>
+                            `
+                            : ""
+                    }
+
+                </article>
+            `;
+        }).join("");
+
+        $("detailBody").innerHTML =
+            summary +
+            (
+                reviewHTML ||
+                '<div class="message">No answer review was returned for this submission.</div>'
+            );
+
+    } catch (error) {
+        $("detailBody").innerHTML = `
+            <div class="message error">
+                <b>Unable to load this submission.</b>
+                <p>${esc(error.message || "An unexpected error occurred.")}</p>
+                <p>Please check your connection and try again.</p>
+            </div>
+        `;
+    }
+}
+
+
+/* ADMINISTRATOR SIGN-IN */
+
+async function signInAdmin() {
+    const button = $("loginButton");
+    const message = $("loginMsg");
+
+    message.classList.remove("hidden", "error");
+    message.textContent = "Signing in…";
+
+    button.disabled = true;
+    button.textContent = "Signing in…";
+
+    try {
+        const {
+            data,
+            error
+        } = await sb.auth.signInWithPassword({
+            email: $("email").value.trim(),
+            password: $("password").value
+        });
+
+        if (error) {
+            throw error;
+        }
+
+        if (!data.session) {
+            throw new Error(
+                "Sign-in did not return a session. Please check your Supabase Auth account."
+            );
+        }
+
+        message.textContent =
+            "Signed in. Loading student results…";
+
+        await load();
+
+    } catch (error) {
+        message.textContent =
+            error.message || "Sign-in failed. Please try again.";
+
+        message.classList.add("error");
+
+    } finally {
+        button.disabled = false;
+        button.textContent = "Sign in";
+    }
+}
+
+
+/* SIGN-IN AND DASHBOARD BUTTONS */
+
+$("loginButton").addEventListener(
+    "click",
+    signInAdmin
+);
+
+$("loginForm").addEventListener("submit", event => {
+    event.preventDefault();
+    signInAdmin();
+});
+
+$("logout").addEventListener("click", async () => {
+    try {
+        await sb.auth.signOut();
+
+        results = [];
+
+        await isSignedIn();
+
+    } catch (error) {
+        status(
+            error.message || "Could not sign out.",
+            true
+        );
+    }
+});
+
+$("refresh").addEventListener("click", load);
+
+$("search").addEventListener("input", render);
+
+
+/* RETURN FROM REVIEW TO RESULTS */
+
+$("closeDetail").addEventListener("click", () => {
+    $("detail").classList.add("hidden");
+    $("dashboard").classList.remove("hidden");
+});
+
+
+/* EXPORT RESULTS TO CSV */
+
+$("export").addEventListener("click", () => {
+    const rows = [
+        [
+            "Student Name",
+            "Email",
+            "Student ID",
+            "Exam",
+            "Subject",
+            "Score %",
+            "Correct",
+            "Incorrect",
+            "Unanswered",
+            "Started At",
+            "Submitted At"
+        ],
+
+        ...results.map(result => [
+            result.student_name,
+            result.student_email,
+            result.student_id,
+            result.exam_title,
+            result.subject,
+            result.score_percent,
+            result.correct_count,
+            result.incorrect_count,
+            result.unanswered_count,
+            result.started_at,
+            result.submitted_at
+        ])
+    ];
+
+    const csv = rows.map(row =>
+        row.map(value =>
+            '"' + String(value ?? "").replace(/"/g, '""') + '"'
+        ).join(",")
+    ).join("\r\n");
+
+    const url = URL.createObjectURL(
+        new Blob([csv], {
+            type: "text/csv;charset=utf-8"
+        })
+    );
+
+    const link = document.createElement("a");
+
+    link.href = url;
+    link.download = "pulseprep-exam-results.csv";
+
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+
+
+/* STUDENT FEEDBACK DASHBOARD */
 
 function feedbackStatus(message, isError = false) {
     const box = $("feedbackStatus");
+
     box.textContent = message;
-    box.className = "message" + (isError ? " error" : "");
+
+    box.className =
+        "message" + (isError ? " error" : "");
 }
+
 
 async function loadStudentFeedback() {
     const button = $("loadFeedbackButton");
@@ -122,7 +1082,9 @@ async function loadStudentFeedback() {
     button.disabled = true;
     button.textContent = "Loading...";
 
-    feedbackStatus("Loading student feedback from Supabase...");
+    feedbackStatus(
+        "Loading student feedback from Supabase..."
+    );
 
     try {
         const data = await adminCall({
@@ -131,21 +1093,31 @@ async function loadStudentFeedback() {
 
         const feedbacks = data.feedbacks || [];
 
-        $("feedbackTotal").textContent = feedbacks.length;
+        $("feedbackTotal").textContent =
+            feedbacks.length;
 
         const ratings = feedbacks
             .map(item => Number(item.question_quality_rating))
-            .filter(rating => Number.isFinite(rating) && rating >= 1 && rating <= 5);
+            .filter(rating =>
+                Number.isFinite(rating) &&
+                rating >= 1 &&
+                rating <= 5
+            );
 
-        $("feedbackAverageRating").textContent = ratings.length
-            ? (
-                ratings.reduce((sum, rating) => sum + rating, 0) /
-                ratings.length
-            ).toFixed(1) + " / 5"
-            : "—";
+        $("feedbackAverageRating").textContent =
+            ratings.length
+                ? (
+                    ratings.reduce(
+                        (sum, rating) => sum + rating,
+                        0
+                    ) / ratings.length
+                ).toFixed(1) + " / 5"
+                : "—";
 
         $("feedbackReportedCount").textContent =
-            feedbacks.filter(item => item.question_problem_type).length;
+            feedbacks.filter(
+                item => item.question_problem_type
+            ).length;
 
         $("feedbackHelpCount").textContent =
             feedbacks.filter(item =>
@@ -153,18 +1125,22 @@ async function loadStudentFeedback() {
                 item.topic_needing_help
             ).length;
 
+
         const difficulties = {};
         const improvements = {};
 
         feedbacks.forEach(item => {
             (item.difficult_areas || []).forEach(topic => {
-                difficulties[topic] = (difficulties[topic] || 0) + 1;
+                difficulties[topic] =
+                    (difficulties[topic] || 0) + 1;
             });
 
             (item.improvement_areas || []).forEach(topic => {
-                improvements[topic] = (improvements[topic] || 0) + 1;
+                improvements[topic] =
+                    (improvements[topic] || 0) + 1;
             });
         });
+
 
         function renderCounts(counts) {
             const entries = Object.entries(counts)
@@ -179,71 +1155,117 @@ async function loadStudentFeedback() {
             ).join("");
         }
 
+
         $("feedbackDifficultTopics").innerHTML =
             renderCounts(difficulties);
 
         $("feedbackImprovementTopics").innerHTML =
             renderCounts(improvements);
 
+
         $("feedbackRows").innerHTML = feedbacks.length
             ? feedbacks.map(item => {
                 const reportedQuestion = item.question_problem_type
-                    ? "Question " +
-                      esc(item.reported_question_order || "unspecified") +
-                      ": " + esc(item.question_problem_type) +
-                      (item.question_problem_details
-                          ? "<br>" + esc(item.question_problem_details)
-                          : "")
+                    ? (
+                        "Question " +
+                        esc(item.reported_question_order || "unspecified") +
+                        ": " +
+                        esc(item.question_problem_type) +
+                        (
+                            item.question_problem_details
+                                ? "<br>" +
+                                  esc(item.question_problem_details)
+                                : ""
+                        )
+                    )
                     : "None reported";
 
                 const suggestions = [
                     item.learning_suggestions,
                     item.additional_recommendations
-                ].filter(Boolean).map(esc).join("<br>");
+                ]
+                .filter(Boolean)
+                .map(esc)
+                .join("<br>");
+
 
                 return `
                     <tr>
-                        <td>${esc(dt(item.created_at))}</td>
+
+                        <td>
+                            ${esc(dt(item.created_at))}
+                        </td>
+
                         <td>
                             <b>${esc(item.student_name || "Student")}</b>
+
                             <div class="muted break">
                                 ${esc(item.student_email || "Email unavailable")}
                             </div>
                         </td>
+
                         <td>
                             ${esc(item.exam_title || "Unknown exam")}
+
                             <div class="muted">
                                 ${esc(item.subject || "")}
                             </div>
                         </td>
+
                         <td>
-                            ${item.question_quality_rating
-                                ? esc(item.question_quality_rating) + " / 5"
-                                : "Not rated"}
+                            ${
+                                item.question_quality_rating
+                                    ? esc(item.question_quality_rating) + " / 5"
+                                    : "Not rated"
+                            }
                         </td>
+
                         <td>
-                            ${(item.difficult_areas || [])
-                                .map(esc).join("<br>") || "—"}
-                            ${item.topic_needing_help
-                                ? "<br><b>Needs help:</b> " +
-                                  esc(item.topic_needing_help)
-                                : ""}
+                            ${
+                                (item.difficult_areas || [])
+                                    .map(esc)
+                                    .join("<br>") || "—"
+                            }
+
+                            ${
+                                item.topic_needing_help
+                                    ? "<br><b>Needs help:</b> " +
+                                      esc(item.topic_needing_help)
+                                    : ""
+                            }
                         </td>
+
                         <td>
-                            ${(item.improvement_areas || [])
-                                .map(esc).join("<br>") || "—"}
+                            ${
+                                (item.improvement_areas || [])
+                                    .map(esc)
+                                    .join("<br>") || "—"
+                            }
                         </td>
-                        <td>${suggestions || "—"}</td>
-                        <td>${reportedQuestion}</td>
+
+                        <td>
+                            ${suggestions || "—"}
+                        </td>
+
+                        <td>
+                            ${reportedQuestion}
+                        </td>
+
                     </tr>
                 `;
             }).join("")
-            : `<tr><td colspan="8">
-                No student feedback has been submitted yet.
-               </td></tr>`;
+            : `
+                <tr>
+                    <td colspan="8">
+                        No student feedback has been submitted yet.
+                    </td>
+                </tr>
+            `;
+
 
         feedbackStatus(
-            "Successfully loaded " + feedbacks.length +
+            "Successfully loaded " +
+            feedbacks.length +
             " feedback submission(s)."
         );
 
@@ -252,17 +1274,46 @@ async function loadStudentFeedback() {
             error.message || "Could not load student feedback.",
             true
         );
+
     } finally {
         button.disabled = false;
         button.textContent = "Load Student Feedback";
     }
 }
 
+
 $("loadFeedbackButton").addEventListener(
     "click",
     loadStudentFeedback
 );
 
-/* END PULSEPREP ADMIN FEEDBACK LOADER */
-sb.auth.onAuthStateChange(()=>setTimeout(load,0));isSignedIn().then(ok=>{if(ok)load()});
-</script></body></html>
+
+/* RESTORE SESSION AND LOAD RESULTS */
+
+sb.auth.onAuthStateChange(() => {
+    setTimeout(() => {
+        load();
+    }, 0);
+});
+
+
+isSignedIn()
+    .then(signedIn => {
+        if (signedIn) {
+            load();
+        }
+    })
+    .catch(error => {
+        const message = $("loginMsg");
+
+        message.classList.remove("hidden");
+        message.classList.add("error");
+
+        message.textContent =
+            error.message || "Could not check your sign-in status.";
+    });
+
+</script>
+
+</body>
+</html>
