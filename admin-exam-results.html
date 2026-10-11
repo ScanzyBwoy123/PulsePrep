@@ -12,7 +12,76 @@
 <header><div><div style="color:#93c5fd;font-size:12px;font-weight:bold;letter-spacing:2px">PULSEPREP ADMIN</div><h1>Student Exam Results</h1><div class="muted" style="color:#cbd5e1">Student details, scores, submitted answers and review</div></div><div class="toprow"><a class="button" href="./admin-shareable-exam-builder.html">Exam Builder</a><button id="logout" class="secondary hidden">Sign out</button></div></header>
 <main>
 <section id="login" class="card" style="max-width:480px;margin:40px auto"><h2>Administrator sign in</h2><p class="muted">Sign in with the administrator account authorized for PulsePrep.</p><form id="loginForm"><label>Email<input id="email" type="email" autocomplete="username" required></label><label>Password<input id="password" type="password" autocomplete="current-password" required></label><button type="button" id="loginButton">Sign in</button></form><div id="loginMsg" class="message hidden"></div></section>
-<section id="dashboard" class="hidden"><div id="status" class="message">Loading submissions…</div><div class="stats"><div class="card stat">Submissions<strong id="total">0</strong></div><div class="card stat">Average score<strong id="average">—</strong></div><div class="card stat">Students identified by email<strong id="students">0</strong></div><div class="card stat">Exams attempted<strong id="examCount">0</strong></div></div><div class="card"><div class="toprow"><input id="search" placeholder="Search by student, email or exam"><button id="refresh">Refresh</button><button id="export" class="green">Export CSV</button></div><p class="muted">Latest 500 submissions. If a student did not sign in, their account ID will show as unavailable.</p><div class="tablewrap"><table><thead><tr><th>Student / ID</th><th>Email</th><th>Examination</th><th>Score</th><th>Correct / Total</th><th>Submitted</th><th>Review</th></tr></thead><tbody id="rows"><tr><td colspan="7">No results loaded.</td></tr></tbody></table></div></div></section>
+<section id="dashboard" class="hidden"><div id="status" class="message">Loading submissions…</div><div class="stats"><div class="card stat">Submissions<strong id="total">0</strong></div><div class="card stat">Average score<strong id="average">—</strong></div><div class="card stat">Students identified by email<strong id="students">0</strong></div><div class="card stat">Exams attempted<strong id="examCount">0</strong></div></div><div class="card"><div class="toprow"><input id="search" placeholder="Search by student, email or exam"><button id="refresh">Refresh</button><button id="export" class="green">Export CSV</button></div><p class="muted">Latest 500 submissions. If a student did not sign in, their account ID will show as unavailable.</p><div class="tablewrap"><table><thead><tr><th>Student / ID</th><th>Email</th><th>Examination</th><th>Score</th><th>Correct / Total</th><th>Submitted</th><th>Review</th></tr></thead><tbody id="rows"><tr><td colspan="7">No results loaded.</td></tr></tbody></table></div></div></<!-- PULSEPREP STUDENT FEEDBACK DASHBOARD -->
+<section id="feedbackDashboard" class="card hidden">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div>
+            <h2 style="margin:0 0 8px">Student Feedback &amp; Quality Reports</h2>
+            <p class="muted">Understand student difficulties and improve examination quality.</p>
+        </div>
+        <button type="button" id="loadFeedbackButton" class="green">
+            Load Student Feedback
+        </button>
+    </div>
+<div class="stats" style="margin:20px 0">
+    <div class="card stat">
+        Total Feedback
+        <strong id="feedbackTotal">0</strong>
+    </div>
+    <div class="card stat">
+        Average Question Rating
+        <strong id="feedbackAverageRating">—</strong>
+    </div>
+    <div class="card stat">
+        Questions Reported
+        <strong id="feedbackReportedCount">0</strong>
+    </div>
+    <div class="card stat">
+        Students Needing Help
+        <strong id="feedbackHelpCount">0</strong>
+    </div>
+</div>
+<div id="feedbackStatus" class="message">
+    Select "Load Student Feedback" to view student responses.
+</div>
+<div class="card">
+    <h3>Common Difficulties</h3>
+    <div id="feedbackDifficultTopics" class="break">
+        No feedback loaded yet.
+    </div>
+</div>
+<div class="card">
+    <h3>Student Suggestions for Improvement</h3>
+    <div id="feedbackImprovementTopics" class="break">
+        No feedback loaded yet.
+    </div>
+</div>
+<div class="card">
+    <h3>Individual Feedback Submissions</h3>
+    <div class="tablewrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Student</th>
+                    <th>Examination</th>
+                    <th>Rating</th>
+                    <th>Difficult Areas</th>
+                    <th>Suggested Improvements</th>
+                    <th>Recommendations</th>
+                    <th>Reported Question</th>
+                </tr>
+            </thead>
+            <tbody id="feedbackRows">
+                <tr>
+                    <td colspan="8">No feedback loaded yet.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</section>
+<!-- END PULSEPREP STUDENT FEEDBACK DASHBOARD -->
 <section id="detail" class="card hidden"><div class="toprow" style="justify-content:space-between;align-items:center"><div><h2 id="detailTitle">Submission review</h2><div id="detailSub" class="muted"></div></div><button id="closeDetail" class="secondary">Back to results</button></div><div id="detailBody"></div></section>
 </main>
 <script>
