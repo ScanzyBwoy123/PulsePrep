@@ -469,6 +469,7 @@ let timerInterval = null;
 let startedAt = null;
 let submitting = false;
 let submitted = false;
+let submittedAttemptId = null;
 /* Safe HTML text */
 function escapeHTML(value) {
     return String(value ?? "").replace(/[&<>"']/g, character => ({
@@ -726,10 +727,16 @@ async function submitExam(autoSubmit = false) {
             );
         }
         submitted = true;
-        submitting = false;
-        $("examSection").classList.add("hidden");
-        $("startSection").classList.add("hidden");
-        displayResults(data);
+submitting = false;
+
+submittedAttemptId = data.attempt_id || null;
+
+$("examSection").classList.add("hidden");
+$("startSection").classList.add("hidden");
+
+displayResults(data);
+
+prepareFeedbackForm();
     } catch (error) {
         submitting = false;
         if (submitButton) {
@@ -854,6 +861,168 @@ function displayResults(data) {
     $("resultsSection").scrollIntoView({ behavior: "smooth" });
 }
 /* Load exam details on page open */
+    /* PULSEPREP STUDENT FEEDBACK SYSTEM */
+
+function prepareFeedbackForm() {
+    const questionSelect = $("reportedQuestionOrder");
+
+    if (!questionSelect) return;
+
+    questionSelect.innerHTML =
+        '<option value="">Select question number</option>';
+
+    questions.forEach((question, index) => {
+        const option = document.createElement("option");
+
+        option.value = String(question.question_order || index + 1);
+        option.textContent = "Question " + (question.question_order || index + 1);
+
+        questionSelect.appendChild(option);
+    });
+}
+
+function showFeedbackMessage(message, isError = false) {
+    const box = $("feedbackMessage");
+
+    if (!box) return;
+
+    box.textContent = message;
+    box.classList.remove(
+        "hidden",
+        "bg-red-50",
+        "text-red-700",
+        "bg-emerald-50",
+        "text-emerald-700"
+    );
+
+    box.classList.add(
+        isError ? "bg-red-50" : "bg-emerald-50",
+        isError ? "text-red-700" : "text-emerald-700"
+    );
+}
+
+$("feedbackForm").addEventListener("submit", async function (event) {
+    event.preventDefault();
+
+    if (!submittedAttemptId) {
+        showFeedbackMessage(
+            "We could not identify your examination submission. Please contact PulsePrep support.",
+            true
+        );
+        return;
+    }
+
+    const button = $("feedbackSubmitButton");
+
+    button.disabled = true;
+    button.textContent = "Submitting feedback...";
+
+    const checkedValues = name => Array.from(
+        document.querySelectorAll(
+            'input[name="' + name + '"]:checked'
+        )
+    ).map(input => input.value);
+
+    const problemType = $("questionProblemType").value;
+    const questionOrder = $("reportedQuestionOrder").value;
+
+    if (problemType && !questionOrder) {
+        showFeedbackMessage(
+            "Please select the question number you want to report.",
+            true
+        );
+
+        button.disabled = false;
+        button.textContent = "Submit Feedback";
+        return;
+    }
+
+    const feedback = {
+        action: "submit-feedback",
+
+        slug: new URLSearchParams(
+            window.location.search
+        ).get("slug"),
+
+        attempt_id: submittedAttemptId,
+
+        difficult_areas: checkedValues("difficult_areas"),
+
+        topic_needing_help:
+            $("topicNeedingHelp").value.trim(),
+
+        improvement_areas: checkedValues("improvement_areas"),
+
+        learning_suggestions:
+            $("learningSuggestions").value.trim(),
+
+        additional_recommendations:
+            $("additionalRecommendations").value.trim(),
+
+        question_quality_rating:
+            $("questionRating").value,
+
+        reported_question_order:
+            problemType ? questionOrder : null,
+
+        question_problem_type:
+            problemType,
+
+        question_problem_details:
+            $("questionProblemDetails").value.trim()
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json",
+                "apikey": SUPABASE_KEY
+            },
+
+            body: JSON.stringify(feedback)
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+            throw new Error(
+                data.error || "Your feedback could not be saved."
+            );
+        }
+
+        $("feedbackForm").classList.add("hidden");
+        $("feedbackThanks").classList.remove("hidden");
+
+        $("feedbackThanksText").textContent =
+            "Your feedback has been saved successfully. Thank you for helping us improve PulsePrep!";
+
+    } catch (error) {
+        showFeedbackMessage(
+            error.message || "Something went wrong. Please try again.",
+            true
+        );
+
+        button.disabled = false;
+        button.textContent = "Submit Feedback";
+    }
+});
+
+
+/* Allow students to skip feedback */
+
+$("feedbackSkipButton").addEventListener("click", function () {
+    $("feedbackForm").classList.add("hidden");
+
+    $("feedbackThanks").classList.remove("hidden");
+
+    $("feedbackThanksText").textContent =
+        "No problem! Thank you for using PulsePrep. You can continue learning with us.";
+});
+
+
+/* END PULSEPREP STUDENT FEEDBACK SYSTEM */
 loadExam();
 </script>
 </body>
