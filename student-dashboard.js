@@ -196,40 +196,56 @@
 
           <!-- CURRENT PLAN -->
 
-          <div class="flex items-center gap-2
-            bg-slate-50 rounded-2xl px-4 py-3">
+<div class="flex items-center gap-2
+  bg-slate-50 rounded-2xl px-4 py-3">
 
-            <div class="w-10 h-10 rounded-full
-              bg-teal-100 text-teal-700
-              flex items-center justify-center">
+  <div class="w-10 h-10 rounded-full
+    bg-teal-100 text-teal-700
+    flex items-center justify-center">
 
-              <i class="fa-solid fa-user-graduate"></i>
+    <i class="fa-solid fa-user-graduate"></i>
 
-            </div>
+  </div>
 
+  <div>
+    <p class="text-xs text-slate-500">
+      Current plan
+    </p>
 
-            <div>
+    <p class="font-extrabold text-slate-900">
+      Student
+    </p>
+  </div>
 
-              <p class="text-xs text-slate-500">
+</div>
 
-                Current plan
+<!-- LIVE DATE AND TIME -->
 
-              </p>
+<div class="rounded-2xl border border-teal-100
+  bg-teal-50 px-4 py-3">
 
+  <div class="flex items-center gap-2 text-teal-700">
+    <i class="fa-regular fa-clock"></i>
 
-              <p class="font-extrabold text-slate-900">
+    <p class="text-xs font-bold uppercase">
+      Ghana Time
+    </p>
+  </div>
 
-                Student
+  <p id="pulsePrepLiveTime"
+    class="text-xl sm:text-2xl font-black
+    text-slate-900 mt-1">
+    --:--:--
+  </p>
 
-              </p>
+  <p id="pulsePrepLiveDate"
+    class="text-xs sm:text-sm text-slate-600 mt-1">
+    Loading date...
+  </p>
 
-            </div>
+</div>
 
-          </div>
-
-        </div>
-
-
+</div>
         <!-- =====================================================
              STATISTICS
              ===================================================== -->
@@ -558,7 +574,40 @@
        ============================================================ */
 
     dashboard.appendChild(section);
+// LIVE DATE AND TIME — GHANA
+function updatePulsePrepClock() {
+  const timeElement = document.getElementById("pulsePrepLiveTime");
+  const dateElement = document.getElementById("pulsePrepLiveDate");
 
+  if (!timeElement || !dateElement) return;
+
+  const now = new Date();
+
+  timeElement.textContent = new Intl.DateTimeFormat("en-GH", {
+    timeZone: "Africa/Accra",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true
+  }).format(now);
+
+  dateElement.textContent = new Intl.DateTimeFormat("en-GH", {
+    timeZone: "Africa/Accra",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  }).format(now);
+}
+
+updatePulsePrepClock();
+
+if (window.pulsePrepClockInterval) {
+  window.clearInterval(window.pulsePrepClockInterval);
+}
+
+window.pulsePrepClockInterval =
+  window.setInterval(updatePulsePrepClock, 1000);
 
     /* ============================================================
        SUBJECT BUTTON
