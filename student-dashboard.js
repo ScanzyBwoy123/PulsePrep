@@ -310,12 +310,10 @@
             </p>
 
 
-            <p class="text-lg font-black text-slate-900">
-
-              0 days
-
-            </p>
-
+            <p id="pulsePrepStudyStreak"
+   class="text-lg font-black text-slate-900">
+  Loading...
+</p>
           </div>
 
 
@@ -342,12 +340,10 @@
             </p>
 
 
-            <p class="text-lg font-black text-slate-900">
-
-              0
-
-            </p>
-
+            <p id="pulsePrepQuestionsDone"
+   class="text-lg font-black text-slate-900">
+  Loading...
+</p> 
           </div>
 
 
@@ -374,11 +370,10 @@
             </p>
 
 
-            <p class="text-lg font-black text-slate-900">
-
-              0%
-
-            </p>
+            <p id="pulsePrepProgressValue"
+   class="text-lg font-black text-slate-900">
+  0%
+</p>
 
           </div>
 
@@ -577,6 +572,7 @@
 
     dashboard.appendChild(section);
      setupPulsePrepStudyGoal();
+     loadPulsePrepQuestionStats();
 // LIVE DATE AND TIME — GHANA
 function updatePulsePrepClock() {
   const timeElement = document.getElementById("pulsePrepLiveTime");
@@ -691,7 +687,166 @@ editButton.addEventListener("click", function () {
 });
 
 }
-  function startDashboard() {
+   /* ============================================================
+LOAD REAL STUDENT QUESTION STATISTICS
+============================================================ */
+  /* ============================================================
+     LOAD REAL STUDENT STATISTICS AND STUDY STREAK
+     ============================================================ */
+
+  async function loadPulsePrepQuestionStats() {
+    const counter = document.getElementById("pulsePrepQuestionsDone");
+    const streakDisplay = document.getElementById("pulsePrepStudyStreak");
+
+    if (!counter) return;
+
+    try {
+      if (
+        !window.pulseprepSupabase ||
+        typeof window.getPulsePrepUser !== "function"
+      ) {
+        counter.textContent = "Sign in required";
+        if (streakDisplay) streakDisplay.textContent = "—";
+        return;
+      }
+
+      const authResult = await window.getPulsePrepUser();
+      const user =
+        authResult?.data?.user ||
+        authResult?.user ||
+        authResult;
+
+      if (!user || !user.id) {
+        counter.textContent = "Sign in required";
+        if (streakDisplay) streakDisplay.textContent = "—";
+        return;
+      }
+
+      const { data, error } = await window.pulseprepSupabase
+        .from("student_activity")
+        .select("created_at, activity_type")
+        .eq("user_id", user.id)
+        .eq("activity_type", "question_answered")
+        .order("created_at", { ascending: false })
+        .limit(1000);
+
+      if (error) throw error;
+
+      const activities = data || [];
+
+      counter.textContent = String(activities.length);
+
+  const progressDisplay =
+    document.getElementById("pulsePrepProgressValue");
+  if (progressDisplay) {
+    const storageKey = "pulsePrepDailyStudyGoal";
+    const savedGoal = Number(localStorage.getItem(storageKey));
+    const dailyGoal =
+      Number.isInteger(savedGoal) && savedGoal >= 1 && savedGoal <= 200
+        ? savedGoal
+        : 10;
+    const todayKey = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Africa/Accra",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).format(new Date());
+    const todayParts = todayKey.split("-");
+    const todayQuestions = activities.filter(function (activity) {
+      if (!activity.created_at) return false;
+      const activityDate = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Africa/Accra",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).format(new Date(activity.created_at));
+      return activityDate === todayKey;
+    }).length;
+    const percentage = Math.min(
+      100,
+      Math.round((todayQuestions / dailyGoal) * 100)
+    );
+    progressDisplay.textContent = percentage + "%";
+  }
+
+      if (!streakDisplay) return;
+
+      // Get calendar dates using Ghana time.
+      function ghanaDateKey(date) {
+        const parts = new Intl.DateTimeFormat("en-CA", {
+          timeZone: "Africa/Accra",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit"
+        }).formatToParts(date);
+
+        const values = {};
+
+        parts.forEach(function (part) {
+          values[part.type] = part.value;
+        });
+
+        return values.year + "-" + values.month + "-" + values.day;
+      }
+
+      const studyDates = new Set();
+
+      activities.forEach(function (activity) {
+        if (activity.created_at) {
+          studyDates.add(ghanaDateKey(new Date(activity.created_at)));
+        }
+      });
+
+      const today = ghanaDateKey(new Date());
+
+      // Calculate yesterday using calendar dates, not elapsed hours.
+      const todayParts = today.split("-").map(Number);
+      const todayDate = new Date(Date.UTC(
+        todayParts[0],
+        todayParts[1] - 1,
+        todayParts[2]
+      ));
+
+      todayDate.setUTCDate(todayDate.getUTCDate() - 1);
+
+      const yesterday = todayDate.toISOString().slice(0, 10);
+
+      let currentDate = studyDates.has(today)
+        ? today
+        : studyDates.has(yesterday)
+          ? yesterday
+          : null;
+
+      let streak = 0;
+
+      while (currentDate && studyDates.has(currentDate)) {
+        streak++;
+
+        const parts = currentDate.split("-").map(Number);
+        const date = new Date(Date.UTC(
+          parts[0],
+          parts[1] - 1,
+          parts[2]
+        ));
+
+        date.setUTCDate(date.getUTCDate() - 1);
+        currentDate = date.toISOString().slice(0, 10);
+      }
+
+      streakDisplay.textContent =
+        streak + (streak === 1 ? " day" : " days");
+
+    } catch (error) {
+      console.error("PulsePrep statistics error:", error);
+      counter.textContent = "Unavailable";
+
+      if (streakDisplay) {
+        streakDisplay.textContent = "Unavailable";
+      }
+    }
+  }
+
+function startDashboard() {
 
     /*
       Small delay allows the existing PulsePrep page to finish
