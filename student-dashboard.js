@@ -277,11 +277,16 @@
 
 
             <div class="mt-2">
-  <p id="pulsePrepGoalValue" class="text-lg font-black text-slate-900">
+    <p id="pulsePrepGoalValue" class="text-lg font-black text-slate-900">
     10 questions
   </p>
 
- Edit Goal
+  <button
+    type="button"
+    id="pulsePrepEditGoal"
+    class="mt-2 rounded-lg bg-blue-100 px-3 py-2 text-sm font-bold text-blue-700 hover:bg-blue-200">
+    <i class="fa-solid fa-pen-to-square"></i> Edit Goal
+  </button>
 </div>
 
           </div>
@@ -662,8 +667,8 @@ EDITABLE DAILY STUDY GOAL
 ============================================================ */
 
 function setupPulsePrepStudyGoal() {
-const goalValue = document.getElementById(“pulsePrepGoalValue”);
-const editButton = document.getElementById(“pulsePrepEditGoal”);
+const goalValue = document.getElementById("pulsePrepGoalValue");
+const editButton = document.getElementById("pulsePrepEditGoal");
 
 if (!goalValue || !editButton) return;
 const storageKey = "pulsePrepDailyStudyGoal";
