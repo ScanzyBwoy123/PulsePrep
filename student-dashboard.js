@@ -756,7 +756,7 @@ LOAD REAL STUDENT QUESTION STATISTICS
       month: "2-digit",
       day: "2-digit"
     }).format(new Date());
-    const todayParts = todayKey.split("-");
+
     const todayQuestions = activities.filter(function (activity) {
       if (!activity.created_at) return false;
       const activityDate = new Intl.DateTimeFormat("en-CA", {
@@ -767,13 +767,13 @@ LOAD REAL STUDENT QUESTION STATISTICS
       }).format(new Date(activity.created_at));
       return activityDate === todayKey;
     }).length;
+
     const percentage = Math.min(
       100,
       Math.round((todayQuestions / dailyGoal) * 100)
     );
     progressDisplay.textContent = percentage + "%";
   }
-
       if (!streakDisplay) return;
 
       // Get calendar dates using Ghana time.
