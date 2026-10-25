@@ -276,11 +276,13 @@
             </p>
 
 
-            <p class="text-lg font-black text-slate-900">
+            <div class="mt-2">
+  <p id="pulsePrepGoalValue" class="text-lg font-black text-slate-900">
+    10 questions
+  </p>
 
-              Get Started
-
-            </p>
+ Edit Goal
+</div>
 
           </div>
 
@@ -574,6 +576,7 @@
        ============================================================ */
 
     dashboard.appendChild(section);
+     setupPulsePrepStudyGoal();
 // LIVE DATE AND TIME — GHANA
 function updatePulsePrepClock() {
   const timeElement = document.getElementById("pulsePrepLiveTime");
@@ -658,7 +661,36 @@ window.pulsePrepClockInterval =
   /* ============================================================
      WAIT FOR EXISTING PULSEPREP PAGE
      ============================================================ */
+  /* ============================================================
+EDITABLE DAILY STUDY GOAL
+============================================================ */
 
+function setupPulsePrepStudyGoal() {
+const goalValue = document.getElementById(“pulsePrepGoalValue”);
+const editButton = document.getElementById(“pulsePrepEditGoal”);
+
+if (!goalValue || !editButton) return;
+const storageKey = "pulsePrepDailyStudyGoal";
+let goal = Number(localStorage.getItem(storageKey)) || 10;
+function displayGoal() {
+  goalValue.textContent = goal + (goal === 1 ? " question" : " questions");
+}
+displayGoal();
+editButton.addEventListener("click", function () {
+  const answer = prompt("Set your daily study goal (1–200 questions):", String(goal));
+  if (answer === null) return;
+  const newGoal = Number(answer);
+  if (!Number.isInteger(newGoal) || newGoal < 1 || newGoal > 200) {
+    alert("Please enter a whole number from 1 to 200.");
+    return;
+  }
+  goal = newGoal;
+  localStorage.setItem(storageKey, String(goal));
+  displayGoal();
+  alert("Your daily study goal has been updated!");
+});
+
+}
   function startDashboard() {
 
     /*
