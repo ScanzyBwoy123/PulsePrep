@@ -53,7 +53,18 @@ main{max-width:1240px;margin:0 auto;padding:30px clamp(14px,3vw,34px) 54px}.hero
       style="width:100%;padding:12px;margin-top:8px"></textarea>
 
     <p style="font-size:12px;color:#66758c">
-      Automatic image recognition will be added separately.
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+  <button class="btn btn-soft" id="extractUploadedText" type="button">
+    📄 Extract Text from File
+  </button>
+  <span id="extractStatus" style="font-size:12px;color:#66758c;align-self:center">
+    Upload a PDF or image first.
+  </span>
+</div>
+<p style="font-size:12px;color:#66758c">
+  Extract text from PDFs and use OCR to read scanned pages and image labels.
+  Review the extracted content before generating questions.
+</p>
     </p>
 
     <label for="diagramCount">Number of questions</label>
@@ -307,6 +318,184 @@ function escapeDiagramText(value) {
     "'": '&#39;'
   })[character]);
 }
+ // =====================================
+// AUTOMATIC PDF TEXT EXTRACTION + OCR
+// =====================================
+
+let tesseractLoader = null;
+
+async function loadDiagramOCR() {
+  if (window.Tesseract) {
+    return window.Tesseract;
+  }
+
+  if (!tesseractLoader) {
+    tesseractLoader = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+
+      script.src =
+        'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+
+      script.onload = () => {
+        if (window.Tesseract) {
+          resolve(window.Tesseract);
+        } else {
+          reject(new Error('OCR library failed to initialize.'));
+        }
+      };
+
+      script.onerror = () => {
+        reject(new Error(
+          'Could not load OCR. Check your internet connection.'
+        ));
+      };
+
+      document.head.appendChild(script);
+    });
+  }
+
+  return tesseractLoader;
+}
+
+
+// Automatically suggest a topic from the filename
+function suggestDiagramTopic(filename) {
+  return String(filename || '')
+    .replace(/\.[^.]+$/, '')
+    .replace(/[_-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+
+// Read text from the currently uploaded PDF or image
+async function extractUploadedFileText() {
+  const button = document.getElementById('extractUploadedText');
+  const status = document.getElementById('extractStatus');
+  const topicInput = document.getElementById('diagramTopic');
+  const notesInput = document.getElementById('diagramNotes');
+
+  if (!currentName || !pageCanvases.length) {
+    status.textContent = 'Please upload a PDF or image first.';
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = '⏳ Extracting...';
+  status.textContent = 'Reading your document...';
+
+  try {
+    let extractedText = '';
+
+    // First, try extracting selectable text from the PDF.
+    if (isPDF && pdf) {
+      status.textContent = 'Extracting text from PDF pages...';
+
+      for (let pageNumber = 1;
+           pageNumber <= pdf.numPages;
+           pageNumber++) {
+
+        const page = await pdf.getPage(pageNumber);
+        const content = await page.getTextContent();
+
+        const pageText = content.items
+          .map(item => item.str || '')
+          .filter(Boolean)
+          .join(' ');
+
+        if (pageText.trim()) {
+          extractedText +=
+            '\n--- Page ' + pageNumber + ' ---\n' +
+            pageText + '\n';
+        }
+      }
+    }
+
+    // If the PDF has no selectable text, use OCR on its rendered pages.
+    // Also use OCR for uploaded images.
+    if (extractedText.trim().length < 30) {
+      status.textContent =
+        'Using OCR to read text from your pages...';
+
+      const Tesseract = await loadDiagramOCR();
+      let ocrText = '';
+
+      for (let i = 0; i < pageCanvases.length; i++) {
+        status.textContent =
+          'Reading page ' + (i + 1) +
+          ' of ' + pageCanvases.length + '...';
+
+        const result = await Tesseract.recognize(
+          pageCanvases[i],
+          'eng',
+          {
+            logger: message => {
+              if (message.status === 'recognizing text') {
+                status.textContent =
+                  'Reading page ' + (i + 1) +
+                  '... ' +
+                  Math.round((message.progress || 0) * 100) +
+                  '%';
+              }
+            }
+          }
+        );
+
+        const pageText =
+          result.data && result.data.text
+            ? result.data.text.trim()
+            : '';
+
+        if (pageText) {
+          ocrText +=
+            '\n--- Page ' + (i + 1) + ' ---\n' +
+            pageText + '\n';
+        }
+      }
+
+      if (ocrText.trim()) {
+        extractedText = ocrText;
+      }
+    }
+
+    if (!extractedText.trim()) {
+      throw new Error(
+        'No readable text was found. Try a clearer image or PDF.'
+      );
+    }
+
+    // Fill the topic only if it is currently empty.
+    if (!topicInput.value.trim()) {
+      topicInput.value = suggestDiagramTopic(currentName);
+    }
+
+    // Fill the notes field with the extracted content.
+    notesInput.value = extractedText.trim();
+
+    status.textContent =
+      '✅ Text extracted successfully. Review your notes below.';
+
+    notesInput.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+  } catch (error) {
+    console.error('Diagram text extraction error:', error);
+
+    status.textContent = '❌ ' + error.message;
+
+  } finally {
+    button.disabled = false;
+    button.textContent = '📄 Extract Text from File';
+  }
+}
+
+
+// Connect the extraction button
+document
+  .getElementById('extractUploadedText')
+  .addEventListener('click', extractUploadedFileText);
  renderLibrary();
 })();
 </script>
