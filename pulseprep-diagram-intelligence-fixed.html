@@ -35,6 +35,54 @@ main{max-width:1240px;margin:0 auto;padding:30px clamp(14px,3vw,34px) 54px}.hero
 <div class="hint" id="hint">Tip: select a page below, then drag on the document to crop a diagram.</div><div class="page-strip" id="pageStrip"></div>
 <div class="actions"><button class="btn btn-soft" id="resetCrop" disabled>Reset selection</button><button class="btn btn-plain" id="downloadPage" disabled>Download page</button><span class="spacer"></span><button class="btn btn-primary" id="saveCrop" disabled>✦ Save selected diagram</button></div>
 </section></div>
+ <section class="panel" id="diagramAssistant" style="margin-top:22px">
+  <div class="panel-head">
+    <h2>🧠 Diagram Study Assistant</h2>
+    <p>Understand diagrams and create practice questions.</p>
+  </div>
+
+  <div class="panel-body">
+    <label for="diagramTopic">Diagram topic</label>
+    <input id="diagramTopic" type="text"
+      placeholder="e.g. Human heart anatomy"
+      style="width:100%;padding:12px;margin:8px 0 15px">
+
+    <label for="diagramNotes">Diagram labels or study notes</label>
+    <textarea id="diagramNotes" rows="5"
+      placeholder="Enter the labels or paste your study notes here…"
+      style="width:100%;padding:12px;margin-top:8px"></textarea>
+
+    <p style="font-size:12px;color:#66758c">
+      Automatic image recognition will be added separately.
+    </p>
+
+    <label for="diagramCount">Number of questions</label>
+    <select id="diagramCount">
+      <option value="5">5</option>
+      <option value="10">10</option>
+      <option value="20">20</option>
+    </select>
+
+    <label for="diagramDifficulty">Difficulty</label>
+    <select id="diagramDifficulty">
+      <option value="easy">Easy</option>
+      <option value="medium" selected>Medium</option>
+      <option value="hard">Hard</option>
+    </select>
+
+    <div style="margin-top:15px">
+      <button class="btn btn-soft" id="explainDiagram">
+        Explain My Notes
+      </button>
+
+      <button class="btn btn-primary" id="generateDiagramQuestions">
+        Generate MCQs
+      </button>
+    </div>
+
+    <div id="diagramResults" style="margin-top:18px"></div>
+  </div>
+</section>
 <div class="features"><div class="feature"><div class="ico">🔍</div><b>Inspect and zoom</b><p>Make small labels and structures easier to read.</p></div><div class="feature"><div class="ico">✂️</div><b>Crop the exact area</b><p>Choose the diagram yourself for more reliable results.</p></div><div class="feature"><div class="ico">📚</div><b>Keep a revision library</b><p>Saved crops stay in this browser on this device.</p></div></div>
 <p style="font-size:11px;color:#78869a;margin:18px 2px 0">Prototype note: automatic diagram detection, AI explanations, label recognition, and diagram-based MCQs are planned follow-up modules. This version does not claim to identify diagrams automatically.</p>
 </main>
@@ -71,6 +119,194 @@ main{max-width:1240px;margin:0 auto;padding:30px clamp(14px,3vw,34px) 54px}.hero
  function dataURLBlob(data){const [head,b64]=data.split(',');const mime=(head.match(/:(.*?);/)||[])[1]||'image/png';const bin=atob(b64),arr=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);return new Blob([arr],{type:mime})}
  $('saveCrop').onclick=()=>{if(!cropRect||cropRect.w<8||cropRect.h<8){notice('Drag to select a larger area first.');return}const out=document.createElement('canvas');out.width=Math.round(cropRect.w);out.height=Math.round(cropRect.h);out.getContext('2d').drawImage(canvas,cropRect.x,cropRect.y,cropRect.w,cropRect.h,0,0,out.width,out.height);const data=out.toDataURL('image/png');const title=prompt('Name this diagram:',currentName.replace(/\.[^.]+$/,'')+' - page '+currentPage)||('Diagram - page '+currentPage);saveRecord({title,data,source:currentName,page:currentPage,createdAt:new Date().toISOString()}).then(()=>{renderLibrary();downloadBlob(dataURLBlob(data),title.replace(/[^\w.-]+/g,'-')+'.png');notice('Diagram saved to this browser’s library and downloaded.');cropRect=null;selection.style.display='none';setEnabled()}).catch(e=>{console.error(e);notice('Could not save locally. Try downloading the crop instead.')})};
  $('clearLibrary').onclick=async()=>{if(!confirm('Delete all diagrams saved in this browser? This cannot be undone.'))return;const db=await openDB();await new Promise((resolve,reject)=>{const tx=db.transaction('diagrams','readwrite');tx.objectStore('diagrams').clear();tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error)});renderLibrary()};
+ // =====================================
+// DIAGRAM STUDY ASSISTANT — DEVTOOLS API
+// =====================================
+
+const DIAGRAM_API =
+  'https://devtools-api-production-5d61.up.railway.app';
+
+const diagramResults = document.getElementById('diagramResults');
+
+
+// Explain the notes entered by the student
+document.getElementById('explainDiagram').addEventListener('click', () => {
+  const topic =
+    document.getElementById('diagramTopic').value.trim();
+
+  const notes =
+    document.getElementById('diagramNotes').value.trim();
+
+  if (!notes) {
+    diagramResults.innerHTML =
+      '<p>Please enter your diagram labels or study notes first.</p>';
+    return;
+  }
+
+  diagramResults.innerHTML = `
+    <div style="padding:16px;background:#f0f7ff;border-radius:12px">
+      <h3>📘 ${escapeDiagramText(topic || 'Study Notes')}</h3>
+      <p><strong>Your notes, organized for revision:</strong></p>
+      <div style="white-space:pre-wrap;line-height:1.8">${escapeDiagramText(notes)}</div>
+      <p style="color:#52647a;font-size:13px">
+        This displays and organizes your notes. It does not yet provide
+        AI-powered explanations or recognize labels directly from images.
+      </p>
+    </div>
+  `;
+});
+
+
+// Generate multiple-choice questions using DevTools API
+document.getElementById('generateDiagramQuestions')
+  .addEventListener('click', async () => {
+
+    const topic =
+      document.getElementById('diagramTopic').value.trim()
+      || 'General Studies';
+
+    const notes =
+      document.getElementById('diagramNotes').value.trim();
+
+    const count =
+      Number(document.getElementById('diagramCount').value);
+
+    const difficulty =
+      document.getElementById('diagramDifficulty').value;
+
+    if (!notes) {
+      diagramResults.innerHTML =
+        '<p>Please enter your diagram labels or study notes first.</p>';
+      return;
+    }
+
+    const button =
+      document.getElementById('generateDiagramQuestions');
+
+    button.disabled = true;
+    button.textContent = 'Generating questions…';
+
+    diagramResults.innerHTML =
+      '<p>🧠 Connecting to DevTools API…</p>';
+
+    try {
+      const response = await fetch(
+        DIAGRAM_API + '/v1/mcq/generate',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            topic: topic,
+            notes: notes,
+            count: count,
+            difficulty: difficulty
+          })
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || data.error || 'Question generation failed.'
+        );
+      }
+
+      if (!data.questions || data.questions.length === 0) {
+        diagramResults.innerHTML =
+          '<p>No questions were generated. Try adding more detailed notes.</p>';
+        return;
+      }
+
+      diagramResults.innerHTML = `
+        <h3>📝 Practice Questions: ${escapeDiagramText(topic)}</h3>
+        <p>Generated ${data.questions.length} question(s).</p>
+        <div id="diagramQuestionList"></div>
+      `;
+
+      const list = document.getElementById('diagramQuestionList');
+
+      data.questions.forEach((question, index) => {
+        const card = document.createElement('div');
+
+        card.style.cssText =
+          'padding:16px;margin:12px 0;border:1px solid #dbe4f0;' +
+          'border-radius:12px;background:#fff';
+
+        const heading = document.createElement('h4');
+        heading.textContent =
+          `${index + 1}. ${question.question || 'Question'}`;
+
+        card.appendChild(heading);
+
+        if (Array.isArray(question.options)) {
+          question.options.forEach(option => {
+            const row = document.createElement('p');
+            const optionText =
+              typeof option === 'string'
+                ? option
+                : option.text || '';
+
+            row.textContent =
+              `${option.isCorrect ? '✅ ' : '• '}${optionText}`;
+
+            if (option.isCorrect) {
+              row.style.cssText =
+                'color:#16803d;font-weight:600';
+            }
+
+            card.appendChild(row);
+          });
+        }
+
+        const answer = document.createElement('p');
+        answer.style.cssText =
+          'margin-top:12px;color:#16803d;font-weight:600';
+
+        answer.textContent =
+          'Answer: ' + (question.answer || 'See the correct option above');
+
+        card.appendChild(answer);
+
+        if (question.explanation) {
+          const explanation = document.createElement('p');
+          explanation.textContent =
+            'Explanation: ' + question.explanation;
+          card.appendChild(explanation);
+        }
+
+        list.appendChild(card);
+      });
+
+    } catch (error) {
+      diagramResults.innerHTML = '';
+
+      const message = document.createElement('p');
+      message.style.color = '#b42318';
+      message.textContent =
+        'Unable to generate questions: ' + error.message;
+
+      diagramResults.appendChild(message);
+
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Generate MCQs';
+    }
+  });
+
+
+// Safely display user-entered text
+function escapeDiagramText(value) {
+  return String(value).replace(/[&<>"']/g, character => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[character]);
+}
  renderLibrary();
 })();
 </script>
