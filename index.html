@@ -4015,7 +4015,7 @@ function openJuniorDangoteAI(topic = "Nursing") {
 
     try {
 
-            const { data: sessionData, error: sessionError } =
+                  const { data: sessionData, error: sessionError } =
         await window.pulseprepSupabase.auth.getSession();
 
       const session = sessionData?.session;
