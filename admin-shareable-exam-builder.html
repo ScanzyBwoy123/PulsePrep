@@ -437,6 +437,7 @@ const SUPABASE_KEY =
   const GENERATE_FUNCTION =
     SUPABASE_URL + "/functions/v1/generate-publish-exam";
 
+const ADMIN_EMAIL = "scanzybwoy8@gmail.com";
   const client = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
@@ -504,7 +505,11 @@ const SUPABASE_KEY =
     button.textContent = "Signing in...";
 
     try {
-      const email = $("email").value.trim();
+      const email = $("email").value.trim().toLowerCase();
+
+if (email !== ADMIN_EMAIL) {
+  throw new Error("This email is not authorized for the exam builder.");
+}
       const password = $("password").value;
 
       const { data, error } = await client.auth.signInWithPassword({
