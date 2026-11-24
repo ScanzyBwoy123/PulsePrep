@@ -531,7 +531,54 @@ if (email !== ADMIN_EMAIL) {
       button.textContent = "Sign In";
     }
   });
+$("signupButton").addEventListener("click", async () => {
+  clearStatus();
 
+  const email = $("email").value.trim().toLowerCase();
+  const password = $("password").value;
+
+  if (email !== ADMIN_EMAIL) {
+    showStatus("Use the authorized administrator email: " + ADMIN_EMAIL, "error");
+    return;
+  }
+
+  if (password.length < 8) {
+    showStatus("Enter a password with at least 8 characters.", "error");
+    return;
+  }
+
+  const button = $("signupButton");
+  button.disabled = true;
+  button.textContent = "Creating account...";
+
+  try {
+    const { data, error } = await client.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: window.location.href
+      }
+    });
+
+    if (error) throw error;
+
+    if (data.session && data.user) {
+      showBuilder(data.user);
+      showStatus("Administrator account created and signed in.", "success");
+    } else {
+      showStatus(
+        "Registration submitted. Check " + ADMIN_EMAIL +
+        " for the confirmation email, then sign in here.",
+        "success"
+      );
+    }
+  } catch (error) {
+    showStatus(error.message || "Account registration failed.", "error");
+  } finally {
+    button.disabled = false;
+    button.textContent = "Create administrator account";
+  }
+});
   $("logoutButton").addEventListener("click", async () => {
     await client.auth.signOut();
     showLogin();
